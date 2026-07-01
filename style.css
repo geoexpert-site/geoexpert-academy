@@ -343,17 +343,3 @@ a{ color:inherit; text-decoration:none; }
   width:auto;
   object-fit:contain;
 }
-/* ---------- Rappel après envoi ---------- */
-.whatsapp-reminder{
-  display:none;
-  margin-top:16px;
-  padding:16px 18px;
-  background:var(--teal-soft);
-  border:1px solid var(--teal);
-  border-radius:10px;
-  font-size:13.5px;
-  color:var(--ink);
-  line-height:1.5;
-}
-.whatsapp-reminder.show{ display:block; }
-.whatsapp-reminder strong{ color:var(--teal); }
