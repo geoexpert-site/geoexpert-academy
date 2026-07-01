@@ -30,9 +30,6 @@ if (coordsEl) {
 }
 
 // --- Formulaire d'inscription -> message WhatsApp pré-rempli ---
-const WHATSAPP_NUMBER = "2250787015030"; // format international sans le "+"
-
-const form = document.getElementById('inscriptionForm');
 form?.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -40,6 +37,7 @@ form?.addEventListener('submit', (e) => {
   const phone = document.getElementById('fPhone').value.trim();
   const formation = document.getElementById('fFormation').value;
   const message = document.getElementById('fMessage').value.trim();
+  const screenshot = document.getElementById('fScreenshot').files[0];
 
   const lines = [
     `Bonjour GeoExpert Academy,`,
@@ -50,9 +48,16 @@ form?.addEventListener('submit', (e) => {
     `Formation : ${formation}`,
   ];
   if (message) lines.push(``, `Message : ${message}`);
+  if (screenshot) lines.push(``, `(Je joins ma capture d'écran de paiement juste après ce message)`);
 
   const text = encodeURIComponent(lines.join('\n'));
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 
   window.open(url, '_blank', 'noopener');
+
+  // Affiche le rappel si une capture a été sélectionnée
+  if (screenshot) {
+    const reminder = document.getElementById('whatsappReminder');
+    if (reminder) reminder.classList.add('show');
+  }
 });
