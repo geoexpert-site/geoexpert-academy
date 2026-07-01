@@ -10,15 +10,14 @@ navToggle?.addEventListener('click', () => {
   mainNav.classList.toggle('open');
 });
 
-// Ferme le menu mobile après un clic sur un lien
 mainNav?.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => mainNav.classList.remove('open'));
 });
 
-// --- Petit ticker de coordonnées dans le hero (clin d'oeil géomatique) ---
+// --- Ticker de coordonnées dans le hero ---
 const coordsEl = document.getElementById('heroCoords');
 if (coordsEl) {
-  const baseLat = 5.336;   // Abidjan approx.
+  const baseLat = 5.336;
   const baseLng = -4.029;
   let t = 0;
   setInterval(() => {
@@ -30,7 +29,9 @@ if (coordsEl) {
 }
 
 // --- Formulaire d'inscription -> message WhatsApp pré-rempli ---
+const WHATSAPP_NUMBER = "2250787015030";
 
+const form = document.getElementById('inscriptionForm');
 form?.addEventListener('submit', (e) => {
   e.preventDefault();
 
