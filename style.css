@@ -589,3 +589,33 @@ a{ color:inherit; text-decoration:none; }
 }
 .faq-item[open] summary::after{ transform:rotate(45deg); }
 .faq-item p{ padding-bottom:18px; font-size:14.5px; }
+/* ---------- Bannière emploi ---------- */
+.job-banner{
+  padding:44px 0;
+  border-bottom:1px solid var(--line);
+}
+.job-banner-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:28px 32px;
+}
+.job-banner-text{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  max-width:600px;
+}
+.job-icon{ font-size:28px; flex-shrink:0; }
+.job-banner-text h3{ font-size:18px; margin-bottom:4px; }
+.job-banner-text p{ font-size:14px; margin:0; }
+
+@media (max-width:700px){
+  .job-banner-inner{ flex-direction:column; align-items:flex-start; }
+  .job-banner-inner .btn{ width:100%; justify-content:center; }
+}
