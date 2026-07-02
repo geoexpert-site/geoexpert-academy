@@ -25,6 +25,85 @@
   --font-display:  'Cormorant Garamond', serif;
   --font-body:     'Inter', sans-serif;
   --font-mono:     'JetBrains Mono', monospace;
+/* ---------- Formations spécialisées ---------- */
+.specialisees{ padding:80px 0; border-bottom:1px solid var(--line); }
+.spec-list{
+  display:flex;
+  flex-direction:column;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  margin-top:10px;
+}
+.spec-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 22px;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+  transition:background .2s;
+}
+.spec-row:last-child{ border-bottom:none; }
+.spec-row:hover{ background:var(--bg-soft); }
+.spec-name{ font-size:15px; color:var(--ink); font-weight:500; }
+.spec-status{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:0.04em;
+  color:var(--teal);
+  background:var(--teal-soft);
+  padding:5px 12px;
+  border-radius:20px;
+  white-space:nowrap;
+}
+.spec-cta{
+  margin-top:36px;
+  padding:28px;
+  background:var(--bg-soft);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.spec-cta p{ color:var(--ink); font-size:15px; margin:0; }
+
+/* ---------- Formations à venir ---------- */
+.bientot{ padding:80px 0; border-bottom:1px solid var(--line); background:var(--bg-soft); }
+.soon-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+  gap:16px;
+  margin-top:10px;
+}
+.soon-chip{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:20px;
+  background:var(--bg);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  opacity:0.85;
+}
+.soon-badge{
+  align-self:flex-start;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:0.05em;
+  color:var(--magenta);
+  background:rgba(168,60,147,0.1);
+  padding:4px 10px;
+  border-radius:20px;
+}
+.soon-name{ font-size:15.5px; font-weight:600; color:var(--ink); }
+
+@media (max-width:600px){
+  .spec-row{ flex-direction:column; align-items:flex-start; gap:6px; }
+  .spec-cta{ flex-direction:column; align-items:flex-start; }
+}
 
   --radius:        14px;
   --container-w:   1180px;
