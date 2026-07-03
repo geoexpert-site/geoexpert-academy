@@ -207,3 +207,56 @@ if (mapEl && typeof L !== 'undefined') {
     `);
   });
 }
+// --- Vérification de certificat ---
+// Ajoutez une entrée ici pour chaque certificat délivré.
+const certificatsValides = [
+  {
+    code: "GEA-06-2026-0001",
+    nom: "Kouamé Kouakou Donatien",
+    formation: "Géomatique, SIG & Cartographie",
+    duree: "15 heures",
+    niveau: "Débutant",
+    lieu: "Abidjan, Présentiel",
+    date: "30 juin 2026"
+  },
+  // Copiez ce bloc et modifiez-le pour chaque nouveau certificat.
+];
+
+const btnVerifier = document.getElementById('btnVerifier');
+const inputCode = document.getElementById('codeCertificat');
+const resultatDiv = document.getElementById('resultat');
+
+function verifierCertificat() {
+  const saisie = inputCode.value.trim().toUpperCase();
+
+  if (!saisie) {
+    resultatDiv.className = 'show invalide';
+    resultatDiv.innerHTML = `<h3>Champ vide</h3><p>Veuillez entrer un code de certificat.</p>`;
+    return;
+  }
+
+  const trouve = certificatsValides.find(c => c.code.toUpperCase() === saisie);
+
+  if (trouve) {
+    resultatDiv.className = 'show valide';
+    resultatDiv.innerHTML = `
+      <h3>Certificat authentique</h3>
+      <p><strong>Titulaire :</strong> ${trouve.nom}</p>
+      <p><strong>Formation :</strong> ${trouve.formation}</p>
+      <p><strong>Durée :</strong> ${trouve.duree} — ${trouve.niveau}</p>
+      <p><strong>Lieu :</strong> ${trouve.lieu}</p>
+      <p><strong>Date :</strong> ${trouve.date}</p>
+    `;
+  } else {
+    resultatDiv.className = 'show invalide';
+    resultatDiv.innerHTML = `
+      <h3>Certificat introuvable</h3>
+      <p>Ce code ne correspond à aucun certificat délivré par GeoExpert Academy. Vérifiez la saisie ou contactez-nous.</p>
+    `;
+  }
+}
+
+btnVerifier?.addEventListener('click', verifierCertificat);
+inputCode?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') verifierCertificat();
+});
