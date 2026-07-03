@@ -774,3 +774,50 @@ a{ color:inherit; text-decoration:none; }
 @media (max-width:900px){
   .gallery-grid{ grid-template-columns:repeat(2, 1fr); }
 }
+
+/* ---------- Simulateur de parcours ---------- */
+.simulateur{ padding:90px 0; border-bottom:1px solid var(--line); }
+.sim-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:10px;
+  margin-bottom:32px;
+}
+.sim-chip{
+  padding:12px 22px;
+  border-radius:30px;
+  border:1px solid var(--line-strong);
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:14.5px;
+  font-weight:500;
+  cursor:pointer;
+  transition:border-color .2s, background .2s, color .2s;
+}
+.sim-chip:hover{ border-color:var(--teal); color:var(--teal); }
+.sim-chip.active{
+  background:var(--gradient-brand);
+  border-color:transparent;
+  color:#fff;
+}
+.sim-result{
+  display:none;
+  max-width:560px;
+  padding:28px;
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+}
+.sim-result.show{ display:block; }
+.sim-result-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:8px;
+}
+.sim-result h3{ margin-bottom:10px; }
+.sim-result p:not(.sim-result-label){ margin-bottom:20px; }
