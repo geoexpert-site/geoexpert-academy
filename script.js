@@ -92,6 +92,10 @@ const simData = {
     formation: "SIG & Environnement",
     desc: "Cartographie de zones vulnérables, suivi environnemental — utile pour vos projets de terrain."
   }
+  "Autre": {
+  formation: "Un échange personnalisé",
+  desc: "Votre profil ne rentre dans aucune case toute faite ? Décrivez-nous votre métier et vos besoins, on vous recommandera la formation la plus adaptée — ou on en construit une sur mesure."
+}
 };
 
 const simOptions = document.getElementById('simOptions');
@@ -110,9 +114,10 @@ simOptions?.addEventListener('click', (e) => {
   document.getElementById('simResultTitle').textContent = data.formation;
   document.getElementById('simResultDesc').textContent = data.desc;
 
-  const text = encodeURIComponent(
-    `Bonjour GeoExpert,\nJe suis ${profile} et le simulateur du site m'a recommandé : ${data.formation}.\nJe souhaite en savoir plus.`
-  );
+const text = profile === "Autre"
+  ? encodeURIComponent(`Bonjour GeoExpert,\nJe n'ai pas trouvé mon profil dans votre simulateur. Pouvez-vous m'aider à trouver la formation adaptée à mon métier ?`)
+  : encodeURIComponent(`Bonjour GeoExpert,\nJe suis ${profile} et le simulateur du site m'a recommandé : ${data.formation}.\nJe souhaite en savoir plus.`);
+  
   document.getElementById('simResultCta').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 
   simResult.classList.add('show');
