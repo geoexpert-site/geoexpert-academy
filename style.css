@@ -619,3 +619,58 @@ a{ color:inherit; text-decoration:none; }
   .job-banner-inner{ flex-direction:column; align-items:flex-start; }
   .job-banner-inner .btn{ width:100%; justify-content:center; }
 }
+/* ---------- Fondateur ---------- */
+.fondateur{ padding:90px 0; border-bottom:1px solid var(--line); background:var(--bg-soft); }
+.fondateur-inner{
+  display:grid;
+  grid-template-columns:320px 1fr;
+  gap:56px;
+  align-items:center;
+}
+.fondateur-photo img{
+  width:100%;
+  border-radius:var(--radius);
+  display:block;
+  box-shadow:0 20px 40px rgba(46,44,52,0.12);
+}
+.fondateur-role{
+  font-family:var(--font-mono);
+  font-size:13px;
+  color:var(--teal);
+  margin-bottom:20px;
+}
+.fondateur-credentials{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:26px;
+}
+.fondateur-credentials li{
+  position:relative;
+  padding-left:22px;
+  font-size:14.5px;
+  color:var(--ink-dim);
+}
+.fondateur-credentials li::before{
+  content:'';
+  position:absolute;
+  left:0; top:8px;
+  width:8px; height:8px;
+  border-radius:50%;
+  background:var(--gradient-brand);
+}
+.fondateur-quote{
+  font-family:var(--font-display);
+  font-size:19px;
+  font-style:italic;
+  color:var(--ink);
+  line-height:1.5;
+  border-left:3px solid var(--teal);
+  padding-left:20px;
+}
+
+@media (max-width:800px){
+  .fondateur-inner{ grid-template-columns:1fr; gap:32px; }
+  .fondateur-photo{ max-width:280px; margin:0 auto; }
+}
