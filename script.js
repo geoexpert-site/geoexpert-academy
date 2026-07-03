@@ -65,3 +65,54 @@ presVideoFacade?.addEventListener('click', function () {
     title="Vidéo de présentation GeoExpert" frameborder="0" allowfullscreen
     allow="autoplay; encrypted-media"></iframe>`;
 });
+// --- Simulateur de parcours ---
+const simData = {
+  "Étudiant": {
+    formation: "ArcMap + QGIS — Spécial BTP (Août 2026)",
+    desc: "Une excellente porte d'entrée dans les SIG, avec un contenu appliqué et recherché sur le marché de l'emploi."
+  },
+  "Géographe": {
+    formation: "SIG & Environnement",
+    desc: "Approfondissez vos compétences avec une spécialisation directement liée à votre formation initiale."
+  },
+  "Géologue": {
+    formation: "SIG appliqué à l'exploration minière",
+    desc: "Cartographie géologique, prospection et suivi de sites — adapté à votre secteur."
+  },
+  "Ingénieur": {
+    formation: "ArcMap + QGIS — Spécial BTP (Août 2026)",
+    desc: "Conçue spécifiquement pour les professionnels du BTP : implantation, suivi de chantier, cartographie de projets."
+  },
+  "Urbaniste": {
+    formation: "SIG & Urbanisme",
+    desc: "Aménagement du territoire, zonage et analyse spatiale urbaine, appliqués à vos projets."
+  },
+  "ONG": {
+    formation: "SIG & Environnement",
+    desc: "Cartographie de zones vulnérables, suivi environnemental — utile pour vos projets de terrain."
+  }
+};
+
+const simOptions = document.getElementById('simOptions');
+const simResult = document.getElementById('simResult');
+
+simOptions?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.sim-chip');
+  if (!btn) return;
+
+  simOptions.querySelectorAll('.sim-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+
+  const profile = btn.dataset.profile;
+  const data = simData[profile];
+
+  document.getElementById('simResultTitle').textContent = data.formation;
+  document.getElementById('simResultDesc').textContent = data.desc;
+
+  const text = encodeURIComponent(
+    `Bonjour GeoExpert,\nJe suis ${profile} et le simulateur du site m'a recommandé : ${data.formation}.\nJe souhaite en savoir plus.`
+  );
+  document.getElementById('simResultCta').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+
+  simResult.classList.add('show');
+});
