@@ -134,7 +134,7 @@ const mapPoints = [
     lieu: "Cocody Saint-Viateur – Rond-point Y4, Abidjan",
     categorieLabel: "Formation",
     type: "formation",
-    image: ""
+    image: "images/salle.jpg"
   },
   {
     lat: 6.822850,
@@ -144,17 +144,17 @@ const mapPoints = [
     lieu: "Yamoussoukro",
     categorieLabel: "Projet SIG réalisé",
     type: "projet",
-    image: ""
+    image: "images/carteyakro.jpg"
   },
   {
     lat: 7.704786,
     lng: -5.034898,
-    titre: "Cartographie des villages non électrifiés et conception d'un SIG",
-    description: "Collecte de données géographiques, géolocalisation des villages non électrifiés et développement d'un Système d'Information Géographique destiné à soutenir la planification des projets d'électrification rurale.",
+    titre: "Analyse spatiale des cas de diarrhée infantile en fonction de la proximité entre les puits et les fosses septiques",
+    description: "Réalisation d'une analyse spatiale visant à étudier la relation entre les cas de diarrhée infantile et la distance séparant les puits des fosses septiques. Le projet a permis d'identifier les quartiers où la proximité entre ces infrastructures est associée à une fréquence plus élevée des cas de diarrhée, afin d'orienter les actions de santé publique et d'assainissement.",
     lieu: "Bouaké",
     categorieLabel: "Projet SIG réalisé",
     type: "projet",
-    image: ""
+    image: "images/cartebke.jpg"
   },
   {
     lat: 5.388291,
@@ -164,7 +164,7 @@ const mapPoints = [
     lieu: "Cocody 7ᵉ Tranche, Abidjan",
     categorieLabel: "WebSIG",
     type: "projet",
-    image: ""
+    image: "images/webmaping.jpg"
   },
 ];
 
