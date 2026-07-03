@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -490,6 +491,23 @@
   </div>
 </section>
 
+<!-- ============ CARTE INTERACTIVE ============ -->
+<section class="carte-interactive" id="carte">
+  <div class="container">
+    <p class="section-eyebrow">GeoExpert sur le terrain</p>
+    <h2>Nos formations et projets, sur la carte</h2>
+    <p class="section-lead">Sessions de formation, projets réalisés et zones d'intervention.</p>
+
+    <div class="map-legend">
+      <span><i style="background:#0092A6"></i> Formations</span>
+      <span><i style="background:#4B3F92"></i> Projets réalisés</span>
+      <span><i style="background:#A83C93"></i> Zones d'intervention</span>
+    </div>
+
+    <div id="mapAbidjan"></div>
+  </div>
+</section>
+
 <!-- ============ SIMULATEUR DE PARCOURS ============ -->
 <section class="simulateur" id="simulateur">
   <div class="container">
@@ -683,7 +701,8 @@
   <p>&copy; 2026 GeoExpert Academy & Consulting — Abidjan, Côte d'Ivoire.</p>
 </div>
 </footer>
-
+  
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
