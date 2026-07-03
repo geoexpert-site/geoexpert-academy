@@ -122,3 +122,88 @@ const text = profile === "Autre"
 
   simResult.classList.add('show');
 });
+
+// --- Carte interactive Leaflet ---
+// Modifiez uniquement ce tableau pour ajouter/modifier/supprimer des points.
+const mapPoints = [
+  {
+    lat: 5.383732,
+    lng: -3.956526,
+    titre: "Formation Professionnelle en Géomatique, SIG & Cartographie",
+    description: "Formation intensive de 40 heures permettant de maîtriser les SIG, la cartographie et les outils géospatiaux à travers des projets concrets et des études de cas appliquées à plusieurs secteurs d'activité.",
+    lieu: "Cocody Saint-Viateur – Rond-point Y4, Abidjan",
+    categorieLabel: "Formation",
+    type: "formation",
+    image: ""
+  },
+  {
+    lat: 6.822850,
+    lng: -5.275669,
+    titre: "Système d'Information Géographique pour la gestion intégrée des lacs artificiels",
+    description: "Conception et mise en œuvre d'un Système d'Information Géographique (SIG) dédié à l'analyse, au suivi et à la gestion intégrée des lacs artificiels de la ville de Yamoussoukro afin d'appuyer la prise de décision.",
+    lieu: "Yamoussoukro",
+    categorieLabel: "Projet SIG réalisé",
+    type: "projet",
+    image: ""
+  },
+  {
+    lat: 7.704786,
+    lng: -5.034898,
+    titre: "Cartographie des villages non électrifiés et conception d'un SIG",
+    description: "Collecte de données géographiques, géolocalisation des villages non électrifiés et développement d'un Système d'Information Géographique destiné à soutenir la planification des projets d'électrification rurale.",
+    lieu: "Bouaké",
+    categorieLabel: "Projet SIG réalisé",
+    type: "projet",
+    image: ""
+  },
+  {
+    lat: 5.388291,
+    lng: -3.986180,
+    titre: "Développement d'une application WebSIG pour la gestion des données foncières",
+    description: "Conception et développement d'une application WebSIG avec ArcGIS Online permettant la visualisation, la consultation et le partage sécurisé des données foncières via une interface web interactive.",
+    lieu: "Cocody 7ᵉ Tranche, Abidjan",
+    categorieLabel: "WebSIG",
+    type: "projet",
+    image: ""
+  },
+];
+
+const typeColors = {
+  formation: "#0092A6",
+  projet: "#4B3F92",
+  zone: "#A83C93"
+};
+
+const mapEl = document.getElementById('mapAbidjan');
+if (mapEl && typeof L !== 'undefined') {
+  const map = L.map('mapAbidjan').setView([6.2, -4.8], 7);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  mapPoints.forEach(point => {
+    const marker = L.circleMarker([point.lat, point.lng], {
+      radius: 9,
+      fillColor: typeColors[point.type] || "#0092A6",
+      color: "#fff",
+      weight: 2,
+      fillOpacity: 0.9
+    }).addTo(map);
+
+    const imageHtml = point.image
+      ? `<img src="${point.image}" alt="${point.titre}">`
+      : '';
+
+    marker.bindPopup(`
+      <div class="map-popup">
+        ${imageHtml}
+        <span class="map-popup-tag">${point.categorieLabel}</span>
+        <h4>${point.titre}</h4>
+        <p class="map-popup-lieu">📍 ${point.lieu}</p>
+        <p>${point.description}</p>
+      </div>
+    `);
+  });
+}
