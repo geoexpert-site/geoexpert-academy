@@ -694,3 +694,46 @@ a{ color:inherit; text-decoration:none; }
   .hero-inner > *{ animation:none; opacity:1; transform:none; }
 }
 
+/* ---------- Vidéo de présentation ---------- */
+.presentation-video{ padding:90px 0; border-bottom:1px solid var(--line); }
+.video-facade{
+  position:relative;
+  aspect-ratio:16/9;
+  max-width:900px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  background:
+    linear-gradient(120deg, rgba(0,146,166,0.14), rgba(75,63,146,0.14), rgba(168,60,147,0.14)),
+    var(--bg-soft);
+  border:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:16px;
+  cursor:pointer;
+}
+.video-facade iframe{
+  position:absolute; inset:0; width:100%; height:100%; border:0;
+}
+.play-btn{
+  width:76px; height:76px;
+  border-radius:50%;
+  background:var(--gradient-brand);
+  border:none;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 14px 30px rgba(75,63,146,0.28);
+  transition:transform .2s;
+}
+.video-facade:hover .play-btn{ transform:scale(1.08); }
+.play-btn svg{ width:28px; height:28px; margin-left:3px; }
+.video-facade-label{
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  color:var(--ink-faint);
+  letter-spacing:0.03em;
+}
