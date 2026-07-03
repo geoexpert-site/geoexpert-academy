@@ -91,7 +91,7 @@ const simData = {
   "ONG": {
     formation: "SIG & Environnement",
     desc: "Cartographie de zones vulnérables, suivi environnemental — utile pour vos projets de terrain."
-  }
+  },
   "Autre": {
   formation: "Un échange personnalisé",
   desc: "Votre profil ne rentre dans aucune case toute faite ? Décrivez-nous votre métier et vos besoins, on vous recommandera la formation la plus adaptée — ou on en construit une sur mesure."
