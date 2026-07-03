@@ -65,6 +65,7 @@ presVideoFacade?.addEventListener('click', function () {
     title="Vidéo de présentation GeoExpert" frameborder="0" allowfullscreen
     allow="autoplay; encrypted-media"></iframe>`;
 });
+
 // --- Simulateur de parcours ---
 const simData = {
   "Étudiant": {
