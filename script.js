@@ -57,3 +57,11 @@ form?.addEventListener('submit', (e) => {
 
   window.open(url, '_blank', 'noopener');
 });
+// --- Vidéo de présentation (chargement au clic, pas avant) ---
+const presVideoFacade = document.getElementById('presVideoFacade');
+presVideoFacade?.addEventListener('click', function () {
+  const videoId = this.dataset.videoId;
+  this.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+    title="Vidéo de présentation GeoExpert" frameborder="0" allowfullscreen
+    allow="autoplay; encrypted-media"></iframe>`;
+});
