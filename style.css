@@ -275,7 +275,7 @@ a{ color:inherit; text-decoration:none; }
 .formation-meta{ list-style:none; font-size:13.5px; margin-bottom:20px; display:flex; flex-direction:column; gap:6px; color:var(--ink-dim); }
 .formation-meta strong{ color:var(--ink); }
 .formation-price{ margin-bottom:20px; padding-top:16px; border-top:1px solid var(--line); }
-.price-amount{ display:block; font-family:var(--font-display); font-size:26px; color:var(--magenta); font-weight:600; }
+.price-amount{ display:block; font-family:var(--font-display); font-size:22px; color:var(--magenta); font-weight:800; letter-spacing:-0.01em; }
 .price-detail{ font-size:12.5px; color:var(--ink-faint); }
 .formation-card.placeholder{ justify-content:space-between; opacity:0.85; }
 .formation-card.placeholder .btn{ margin-top:16px; }
