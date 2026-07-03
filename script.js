@@ -219,6 +219,42 @@ const certificatsValides = [
     lieu: "Abidjan, Présentiel",
     date: "30 juin 2026"
   },
+   {
+    code: "GEA-06-2026-0002",
+    nom: "Koné Morata Mory",
+    formation: "Géomatique, SIG & Cartographie",
+    duree: "15 heures",
+    niveau: "Débutant",
+    lieu: "Abidjan, Présentiel",
+    date: "30 juin 2026"
+  },
+   {
+    code: "GEA-06-2026-0003",
+    nom: "Kissié Marus Emannuel",
+    formation: "Géomatique, SIG & Cartographie",
+    duree: "15 heures",
+    niveau: "Débutant",
+    lieu: "Abidjan, Présentiel",
+    date: "30 juin 2026"
+  },
+   {
+    code: "GEA-06-2026-0004",
+    nom: "Kouadio Kouakou Ulriche",
+    formation: "Géomatique, SIG & Cartographie",
+    duree: "15 heures",
+    niveau: "Débutant",
+    lieu: "Abidjan, Présentiel",
+    date: "30 juin 2026"
+  },
+   {
+    code: "GEA-06-2026-0005",
+    nom: "Bamba ibrahim",
+    formation: "Géomatique, SIG & Cartographie",
+    duree: "15 heures",
+    niveau: "Débutant",
+    lieu: "Abidjan, Présentiel",
+    date: "30 juin 2026"
+  },
   // Copiez ce bloc et modifiez-le pour chaque nouveau certificat.
 ];
 
