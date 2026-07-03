@@ -880,3 +880,91 @@ a{ color:inherit; text-decoration:none; }
   margin-bottom:6px;
 }
 .map-popup p{ font-size:13px; margin:0; color:var(--ink-dim); }
+
+/* ---------- Vérification de certificat ---------- */
+.verification-section{
+  padding:80px 20px;
+  background:var(--gradient-brand);
+  color:#fff;
+  text-align:center;
+}
+.verification-section h2{
+  font-family:var(--font-display);
+  font-size:36px;
+  font-weight:600;
+  margin-bottom:15px;
+  color:#fff;
+}
+.verification-section p{
+  color:rgba(255,255,255,0.85);
+  margin-bottom:35px;
+}
+.verification-box{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.verification-box input{
+  width:320px;
+  padding:15px;
+  border-radius:10px;
+  border:none;
+  font-family:var(--font-mono);
+  font-size:15px;
+  outline:none;
+  color:var(--ink);
+  text-transform:uppercase;
+}
+.verification-box input:focus{
+  box-shadow:0 0 0 3px rgba(255,255,255,0.4);
+}
+.verification-box button{
+  background:#fff;
+  color:var(--indigo);
+  border:none;
+  padding:15px 30px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:15.5px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .2s ease;
+}
+.verification-box button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(0,0,0,0.18);
+}
+#resultat{
+  margin-top:35px;
+  background:#fff;
+  color:var(--ink);
+  padding:26px;
+  border-radius:var(--radius);
+  display:none;
+  min-width:320px;
+  max-width:480px;
+  text-align:left;
+  box-shadow:0 20px 40px rgba(46,44,52,0.18);
+  margin-left:auto;
+  margin-right:auto;
+}
+#resultat.show{ display:block; }
+#resultat.valide h3{
+  font-family:var(--font-display);
+  color:var(--teal);
+  font-size:20px;
+  margin-bottom:12px;
+}
+#resultat.invalide h3{
+  font-family:var(--font-display);
+  color:var(--magenta);
+  font-size:20px;
+  margin-bottom:12px;
+}
+#resultat p{
+  color:var(--ink-dim);
+  font-size:14.5px;
+  margin-bottom:4px;
+}
+#resultat p strong{ color:var(--ink); }
