@@ -296,3 +296,32 @@ btnVerifier?.addEventListener('click', verifierCertificat);
 inputCode?.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') verifierCertificat();
 });
+
+// --- Laisser un avis (envoi WhatsApp pour validation) ---
+
+const btnLaisserAvis = document.getElementById('btnLaisserAvis');
+const avisForm = document.getElementById('avisForm');
+
+btnLaisserAvis?.addEventListener('click', () => {
+  avisForm.classList.toggle('show');
+});
+
+avisForm?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const nom = document.getElementById('avisNom').value.trim();
+  const formationSuivie = document.getElementById('avisFormation').value.trim();
+  const messageAvis = document.getElementById('avisMessage').value.trim();
+
+  const lines = [
+    `Bonjour GeoExpert,`,
+    `Je souhaite partager un avis sur ma formation.`,
+    ``,
+    `Nom : ${nom}`,
+    `Formation suivie : ${formationSuivie}`,
+    `Avis : ${messageAvis}`,
+  ];
+
+  const text = encodeURIComponent(lines.join('\n'));
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener');
+});
