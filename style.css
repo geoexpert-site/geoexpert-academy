@@ -981,3 +981,94 @@ a{ color:inherit; text-decoration:none; }
   margin-bottom:4px;
 }
 #resultat p strong{ color:var(--ink); }
+
+/* ---------- Témoignages ---------- */
+.temoignages{ padding:90px 0; border-bottom:1px solid var(--line); background:var(--bg-soft); }
+.temoignages-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+  gap:22px;
+  margin-top:10px;
+}
+.temoignage-card{
+  position:relative;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:30px;
+}
+.temoignage-quote{
+  font-size:15px;
+  color:var(--ink);
+  line-height:1.65;
+  margin-bottom:24px;
+}
+.temoignage-quote::before{
+  content:'"';
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:40px;
+  color:var(--teal);
+  display:block;
+  line-height:1;
+  margin-bottom:4px;
+}
+.temoignage-author{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.temoignage-avatar{
+  width:44px; height:44px;
+  border-radius:50%;
+  background:var(--gradient-brand);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:15px;
+  flex-shrink:0;
+  object-fit:cover;
+}
+.temoignage-name{ font-size:14.5px; font-weight:600; color:var(--ink); margin:0; }
+.temoignage-formation{ font-size:12.5px; color:var(--ink-faint); margin:0; }
+
+/* ---------- Laisser un avis ---------- */
+.avis-cta{
+  margin-top:36px;
+  padding:24px 28px;
+  background:var(--bg);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.avis-cta p{ margin:0; font-size:14.5px; color:var(--ink); }
+.avis-form{
+  display:none;
+  flex-direction:column;
+  gap:16px;
+  margin-top:20px;
+  padding:26px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  max-width:520px;
+}
+.avis-form.show{ display:flex; }
+.avis-form label{ display:flex; flex-direction:column; gap:8px; font-size:13.5px; color:var(--ink-dim); }
+.avis-form input, .avis-form textarea{
+  background:var(--bg-soft);
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  padding:11px 13px;
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:14.5px;
+}
+.avis-form input:focus, .avis-form textarea:focus{ border-color:var(--teal); }
