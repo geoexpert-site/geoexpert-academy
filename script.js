@@ -229,7 +229,7 @@ const mapPoints = [
     categorieLabel: "Climat",
     type: "climat",
     image: "images/cartecentreci.jpg"
-}
+},
 ];
 
 const typeColors = {
