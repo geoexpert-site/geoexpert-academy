@@ -174,8 +174,12 @@ const mapPoints = [
 
 const typeColors = {
   formation: "#0092A6",
-  projet: "#4B3F92",
-  zone: "#A83C93"
+  websig: "#4B3F92",
+  cartographie: "#A83C93",
+  hydrographie: "#2E86C1",
+  environnement: "#3FA34D",
+  energie: "#E67E22",
+  foncier: "#8B5E3C"
 };
 
 const mapEl = document.getElementById('mapAbidjan');
