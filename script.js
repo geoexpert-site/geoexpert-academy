@@ -252,7 +252,9 @@ if (mapEl && typeof L !== 'undefined') {
       weight: 2,
       fillOpacity: 0.9
     }).addTo(map);
-
+    
+    marker.bindTooltip("Cliquez pour en savoir plus", { direction: "top", offset: [0, -8] });
+    
     const imageHtml = point.image
       ? `<img src="${point.image}" alt="${point.titre}">`
       : '';
