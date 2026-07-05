@@ -187,7 +187,7 @@ const mapPoints = [
     description: "Conception d'une carte thématique du relief du département de Toumodi à l'aide d'outils SIG et de données altimétriques. Le projet met en évidence les variations d'altitude et les caractéristiques topographiques afin de faciliter les analyses spatiales et la prise de décision.",
     lieu: "Toumodi",
     categorieLabel: "Télédétection",
-    type: "environnement",
+    type: "relief",
     image: "images/cartetoumodi.jpg"
   },
   {
@@ -197,7 +197,7 @@ const mapPoints = [
     description: "Réalisation d'une carte d'occupation du sol à partir d'images satellitaires afin d'identifier les différentes unités d'utilisation des terres (zones agricoles, forêts, savanes, habitats et plans d'eau). Cette cartographie constitue un outil d'aide à la planification territoriale, au suivi de l'évolution du paysage et à la gestion durable des ressources naturelles.",
     lieu: "Sous-préfecture de Katiola",
     categorieLabel: "Télédétection",
-    type: "environnement",
+    type: "occupation_sol",
     image: "images/cartekatiola.jpg"
 },
 {
@@ -217,7 +217,7 @@ const mapPoints = [
     description: "Réalisation d'une carte du relief de la région de San Pedro à partir d'un Modèle Numérique de Terrain (MNT). Cette cartographie met en évidence les variations altitudinales et les principales formes du relief afin d'appuyer les études d'aménagement du territoire, les analyses environnementales et la planification des infrastructures.",
     lieu: "San Pedro",
     categorieLabel: "Télédétection",
-    type: "environnement",
+    type: "relief",
     image: "images/cartesanpedro.jpg"
 },
 {
