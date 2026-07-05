@@ -209,6 +209,16 @@ const mapPoints = [
     categorieLabel: "Zone d'intervention",
     type: "environnement",
     image: "images/carteborreettienkto.jpg"
+},
+{
+    lat: 4.748510,
+    lng: -6.636300,
+    titre: "Cartographie du relief de la région de San Pedro",
+    description: "Réalisation d'une carte du relief de la région de San Pedro à partir d'un Modèle Numérique de Terrain (MNT). Cette cartographie met en évidence les variations altitudinales et les principales formes du relief afin d'appuyer les études d'aménagement du territoire, les analyses environnementales et la planification des infrastructures.",
+    lieu: "San Pedro",
+    categorieLabel: "Télédétection",
+    type: "environnement",
+    image: "images/cartesanpedro.jpg"
 }
 ];
 
