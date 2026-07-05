@@ -1084,3 +1084,14 @@ a{ color:inherit; text-decoration:none; }
   font-size:14.5px;
 }
 .avis-form input:focus, .avis-form textarea:focus{ border-color:var(--teal); }
+/* ---------- Sélecteur de vue carte (Leaflet) ---------- */
+.leaflet-control-layers{
+  border-radius:10px !important;
+  border:1px solid var(--line) !important;
+  font-family:var(--font-body);
+  font-size:13.5px;
+}
+.leaflet-control-layers-toggle{
+  width:34px !important;
+  height:34px !important;
+}
