@@ -230,6 +230,16 @@ const mapPoints = [
     type: "climat",
     image: "images/cartecentreci.jpg"
 },
+{
+    lat: 15.000000,
+    lng: -1.500000,
+    titre: "Cartographie des pays de l'Alliance des États du Sahel (AES)",
+    description: "Conception d'une carte thématique des pays membres de l'Alliance des États du Sahel (AES), mettant en évidence leurs limites administratives, les principales villes, les réseaux de transport et les éléments géographiques majeurs. Cette cartographie constitue un support d'analyse géopolitique, territoriale et de communication.",
+    lieu: "Mali • Burkina Faso • Niger",
+    categorieLabel: "Cartographie",
+    type: "cartographie",
+    image: "images/cartepaysaes.jpg"
+} 
 ];
 
 const typeColors = {
