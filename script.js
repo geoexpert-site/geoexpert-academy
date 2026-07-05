@@ -186,9 +186,22 @@ const mapEl = document.getElementById('mapAbidjan');
 if (mapEl && typeof L !== 'undefined') {
   const map = L.map('mapAbidjan').setView([6.2, -4.8], 7);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // Vue carte classique (par défaut)
+  const carteClassique = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
     maxZoom: 18
+  }).addTo(map);
+
+  // Vue satellite (Esri World Imagery — gratuit, sans clé API)
+  const vueSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 18
+  });
+
+  // Bouton pour basculer entre les deux vues
+  L.control.layers({
+    "🗺️ Carte": carteClassique,
+    "🛰️ Satellite": vueSatellite
   }).addTo(map);
 
   mapPoints.forEach(point => {
