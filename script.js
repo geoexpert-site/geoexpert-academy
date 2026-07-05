@@ -130,7 +130,7 @@ const text = profile === "Autre"
 // --- Carte interactive Leaflet ---
 // Modifiez uniquement ce tableau pour ajouter/modifier/supprimer des points.
 const mapPoints = [
-  {
+{
     lat: 5.383732,
     lng: -3.956526,
     titre: "Formation Professionnelle en Géomatique, SIG & Cartographie",
@@ -146,8 +146,8 @@ const mapPoints = [
     titre: "Système d'Information Géographique pour la gestion intégrée des lacs artificiels",
     description: "Conception et mise en œuvre d'un Système d'Information Géographique (SIG) dédié à l'analyse, au suivi et à la gestion intégrée des lacs artificiels de la ville de Yamoussoukro afin d'appuyer la prise de décision.",
     lieu: "Yamoussoukro",
-    categorieLabel: "Projet SIG réalisé",
-    type: "projet",
+    categorieLabel: "Projet SIG",
+    type: "hydrographie",
     image: "images/carteyakro.jpg"
   },
   {
@@ -156,8 +156,8 @@ const mapPoints = [
     titre: "Analyse spatiale des cas de diarrhée infantile en fonction de la proximité entre les puits et les fosses septiques",
     description: "Réalisation d'une analyse spatiale visant à étudier la relation entre les cas de diarrhée infantile et la distance séparant les puits des fosses septiques. Le projet a permis d'identifier les quartiers où la proximité entre ces infrastructures est associée à une fréquence plus élevée des cas de diarrhée, afin d'orienter les actions de santé publique et d'assainissement.",
     lieu: "Bouaké",
-    categorieLabel: "Projet SIG réalisé",
-    type: "projet",
+    categorieLabel: "pROJET SIG",
+    type: "environnement",
     image: "images/cartebke.jpg"
   },
   {
@@ -166,10 +166,50 @@ const mapPoints = [
     titre: "Développement d'une application WebSIG pour la gestion des données foncières",
     description: "Conception et développement d'une application WebSIG avec ArcGIS Online permettant la visualisation, la consultation et le partage sécurisé des données foncières via une interface web interactive.",
     lieu: "Cocody 7ᵉ Tranche, Abidjan",
-    categorieLabel: "WebSIG",
-    type: "projet",
+    categorieLabel: "webSIG",
+    type: "websig",
     image: "images/webmaping.jpg"
   },
+  {
+    lat: 5.496162,
+    lng: -3.211064,
+    titre: "Cartographie du réseau hydrographique du département d'Aboisso",
+    description: "Production d'une carte du réseau hydrographique du département d'Aboisso pour l'identification des cours d'eau, l'analyse spatiale et l'appui aux projets d'aménagement et de développement territorial.",
+    lieu: "Aboisso",
+    categorieLabel: "Hydrographie",
+    type: "cartographie",
+    image: "images/carteaboisso.jpg"
+  },
+    {
+    lat:  6.557422,
+    lng: -5.018573,
+    titre: "Cartographie du relief du dépatement de Toumodi",
+    description: "Conception d'une carte thématique du relief du département de Toumodi à l'aide d'outils SIG et de données altimétriques. Le projet met en évidence les variations d'altitude et les caractéristiques topographiques afin de faciliter les analyses spatiales et la prise de décision.",
+    lieu: "Toumodi",
+    categorieLabel: "Télédétection",
+    type: "environnement",
+    image: "images/cartetoumodi.jpg"
+  },
+  {
+    lat: 8.139500,
+    lng: -5.100000,
+    titre: "Cartographie de l'occupation du sol de la sous-préfecture de Katiola",
+    description: "Réalisation d'une carte d'occupation du sol à partir d'images satellitaires afin d'identifier les différentes unités d'utilisation des terres (zones agricoles, forêts, savanes, habitats et plans d'eau). Cette cartographie constitue un outil d'aide à la planification territoriale, au suivi de l'évolution du paysage et à la gestion durable des ressources naturelles.",
+    lieu: "Sous-préfecture de Katiola",
+    categorieLabel: "Télédétection",
+    type: "environnement",
+    image: "images/cartekatiola.jpg"
+},
+{
+    lat: 6.818802,
+    lng: -4.556134,
+    titre: "Cartographie des sites d'orpaillage clandestin de Booré Ettienkro",
+    description: "Réalisation d'une cartographie des sites d'orpaillage clandestin à Booré Ettienkro à partir de données de terrain et d'analyses spatiales. Ce travail a permis de localiser les zones d'exploitation, d'évaluer leur répartition spatiale et de fournir un outil d'aide à la surveillance environnementale et à la prise de décision.",
+    lieu: "Booré Ettienkro",
+    categorieLabel: "Zone d'intervention",
+    type: "environnement",
+    image: "images/carteborreettienkto.jpg"
+}
 ];
 
 const typeColors = {
