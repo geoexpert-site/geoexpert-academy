@@ -57,14 +57,18 @@ form?.addEventListener('submit', (e) => {
 
   window.open(url, '_blank', 'noopener');
 });
-// --- Vidéo de présentation (chargement au clic, pas avant) ---
 const presVideoFacade = document.getElementById('presVideoFacade');
-presVideoFacade?.addEventListener('click', function () {
-  const videoId = this.dataset.videoId;
-  this.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-    title="Vidéo de présentation GeoExpert" frameborder="0" allowfullscreen
-    allow="autoplay; encrypted-media"></iframe>`;
-});
+if (presVideoFacade) {
+  const videoId = presVideoFacade.dataset.videoId;
+  // Affiche automatiquement la miniature YouTube en fond
+  presVideoFacade.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/maxresdefault.jpg')`;
+
+  presVideoFacade.addEventListener('click', function () {
+    this.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+      title="Vidéo de présentation GeoExpert" frameborder="0" allowfullscreen
+      allow="autoplay; encrypted-media"></iframe>`;
+  });
+}
 
 // --- Simulateur de parcours ---
 const simData = {
