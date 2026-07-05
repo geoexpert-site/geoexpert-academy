@@ -219,6 +219,16 @@ const mapPoints = [
     categorieLabel: "Télédétection",
     type: "environnement",
     image: "images/cartesanpedro.jpg"
+},
+{
+    lat: 7.540000,
+    lng: -5.550000,
+    titre: "Spatialisation de la pluviométrie moyenne du Centre de la Côte d'Ivoire après la rupture climatique de 1979",
+    description: "Réalisation d'une analyse spatiale de la pluviométrie moyenne dans le Centre de la Côte d'Ivoire à la suite de la rupture climatique de 1979. Ce projet a consisté à interpoler les données pluviométriques afin de cartographier leur répartition spatiale et d'identifier les zones les plus affectées par les changements climatiques, dans le but d'appuyer les études environnementales et la gestion des ressources naturelles.",
+    lieu: "Centre de la Côte d'Ivoire",
+    categorieLabel: "Climat",
+    type: "climat",
+    image: "images/cartecentreci.jpg"
 }
 ];
 
