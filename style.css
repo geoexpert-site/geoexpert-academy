@@ -1122,3 +1122,39 @@ a{ color:inherit; text-decoration:none; }
   text-decoration:underline;
 }
 .footer-legal-link:hover{ color:var(--teal); }
+
+/* ---------- Programme détaillé ---------- */
+.programme{ padding:90px 0; border-bottom:1px solid var(--line); background:var(--bg-soft); }
+.programme-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+  gap:32px;
+  margin-top:10px;
+  margin-bottom:32px;
+}
+.programme-col h3{ font-size:18px; margin-bottom:16px; }
+.programme-list{ list-style:none; display:flex; flex-direction:column; gap:12px; }
+.programme-list li{
+  position:relative;
+  padding-left:26px;
+  font-size:14.5px;
+  color:var(--ink-dim);
+}
+.programme-list li::before{
+  content:'✓';
+  position:absolute;
+  left:0;
+  color:var(--teal);
+  font-weight:700;
+}
+.programme-certificat{
+  background:var(--bg);
+  border:1px solid var(--teal);
+  border-radius:var(--radius);
+  padding:18px 24px;
+  font-weight:600;
+  color:var(--ink);
+  margin-bottom:20px;
+}
+.programme-debouches{ font-size:14.5px; margin-bottom:28px; }
+.programme-debouches strong{ color:var(--ink); }
