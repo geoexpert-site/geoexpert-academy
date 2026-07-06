@@ -73,8 +73,8 @@ if (presVideoFacade) {
 // --- Simulateur de parcours ---
 const simData = {
   "Étudiant": {
-    formation: "ArcMap + QGIS — Spécial BTP (Août 2026)",
-    desc: "Une excellente porte d'entrée dans les SIG, avec un contenu appliqué et recherché sur le marché de l'emploi."
+    formation: "Devenez Géomaticien Opérationnel (Août 2026)",
+    desc: "Une excellente porte d'entrée dans les SIG, avec un contenu appliqué et recherché sur le marché de l'emploi, quel que soit votre secteur."
   },
   "Géographe": {
     formation: "SIG & Environnement",
@@ -85,8 +85,8 @@ const simData = {
     desc: "Cartographie géologique, prospection et suivi de sites — adapté à votre secteur."
   },
   "Ingénieur": {
-    formation: "ArcMap + QGIS — Spécial BTP (Août 2026)",
-    desc: "Conçue spécifiquement pour les professionnels du BTP : implantation, suivi de chantier, cartographie de projets."
+    formation: "Devenez Géomaticien Opérationnel (Août 2026)",
+    desc: "Une formation complète en SIG et cartographie, directement applicable à vos projets d'ingénierie, quel que soit votre secteur."
   },
   "Urbaniste": {
     formation: "SIG & Urbanisme",
