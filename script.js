@@ -14,20 +14,6 @@ mainNav?.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => mainNav.classList.remove('open'));
 });
 
-// --- Ticker de coordonnées dans le hero ---
-const coordsEl = document.getElementById('heroCoords');
-if (coordsEl) {
-  const baseLat = 5.336;
-  const baseLng = -4.029;
-  let t = 0;
-  setInterval(() => {
-    t += 0.01;
-    const lat = baseLat + Math.sin(t) * 0.002;
-    const lng = baseLng + Math.cos(t) * 0.002;
-    coordsEl.textContent = `${lat.toFixed(5)}°N  ${Math.abs(lng).toFixed(5)}°O`;
-  }, 400);
-}
-
 // --- Formulaire d'inscription -> message WhatsApp pré-rempli ---
 const WHATSAPP_NUMBER = "2250787015030";
 
