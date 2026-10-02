@@ -105,12 +105,47 @@
     .gs-grid span{display:block;margin-top:6px;font-size:.95rem;opacity:.95}
   </style>
   <div class="gs-grid">
-    <div><strong>XX+</strong><span>apprenants formés</span></div>
-    <div><strong>XX+</strong><span>projets cartographiques réalisés</span></div>
-    <div><strong>7+</strong><span>ans d'expérience en géomatique</span></div>
-    <div><strong>10</strong><span>experts dans l'équipe</span></div>
-    <div><strong>2</strong><span>villes : Abidjan et Bouaké</span></div>
+    <div><strong class="gs-count" data-target="50" data-suffix="+">0</strong><span>apprenants formés</span></div>
+    <div><strong class="gs-count" data-target="100" data-suffix="+">0</strong><span>projets cartographiques réalisés</span></div>
+    <div><strong class="gs-count" data-target="7" data-suffix="+">0</strong><span>ans d'expérience en géomatique</span></div>
+    <div><strong class="gs-count" data-target="10" data-suffix="">0</strong><span>experts dans l'équipe</span></div>
+    <div><strong class="gs-count" data-target="2" data-suffix="">0</strong><span>villes : Abidjan et Bouaké</span></div>
   </div>
+  <script>
+    (function(){
+      var els = document.querySelectorAll(".gs-count");
+      var reduit = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function afficher(el, n){
+        el.textContent = n.toLocaleString("fr-FR") + (el.dataset.suffix || "");
+      }
+
+      function animer(el){
+        var cible = parseInt(el.dataset.target, 10);
+        if (reduit) { afficher(el, cible); return; }
+        var duree = 1800, debut = null;
+        function pas(t){
+          if (!debut) debut = t;
+          var p = Math.min((t - debut) / duree, 1);
+          var ease = 1 - Math.pow(1 - p, 3);
+          afficher(el, Math.round(cible * ease));
+          if (p < 1) requestAnimationFrame(pas);
+        }
+        requestAnimationFrame(pas);
+      }
+
+      if (!("IntersectionObserver" in window)) {
+        els.forEach(function(el){ afficher(el, parseInt(el.dataset.target, 10)); });
+        return;
+      }
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if (e.isIntersecting) { animer(e.target); obs.unobserve(e.target); }
+        });
+      }, {threshold: 0.4});
+      els.forEach(function(el){ obs.observe(el); });
+    })();
+  </script>
 </section>
   
 <!-- ============ POUR QUI ============ -->
