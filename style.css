@@ -42,7 +42,7 @@
   --ink-faint:     #75737E; /* ✅ CORRIGÉ : assombri pour contraste AA (ancien #9C9AA4) */
 
   /* Typographie */
-  --font-display:  'Inter', sans-serif;
+  --font-display:  'Montserrat', 'Inter', sans-serif;
   --font-body:     'Inter', sans-serif;
   /* --font-mono supprimé : jamais chargé et non utilisé */
 

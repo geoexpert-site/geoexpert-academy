@@ -261,7 +261,7 @@
     },
     "ONG": {
       formation: "SIG & Environnement",
-      desc: "Cartographie de zones vulnérables, suivi environnemental — utile pour vos projets de terrain."
+      desc: "Cartographie de zones vulnérables, suivi environnemental, utile pour vos projets de terrain."
     },
     "Autre": {
       formation: "Un échange personnalisé",

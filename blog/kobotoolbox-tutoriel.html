@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KoboToolbox : collecter des données terrain facilement | GeoExpert Academy</title>
+<meta name="description" content="Tutoriel complet pour utiliser KoboToolbox : créer des formulaires, collecter des données terrain avec un smartphone et les analyser dans QGIS.">
+<meta name="keywords" content="KoboToolbox tutoriel, collecte données terrain, Kobo Collect, ODK, formulaire numérique">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/kobotoolbox-tutoriel.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/kobotoolbox-tutoriel.html">
+<meta property="og:title" content="KoboToolbox : collecter des données terrain facilement">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "KoboToolbox : collecter des données terrain facilement",
+  "author": {"@type": "Person", "name": "Jean Eudes AKA"},
+  "publisher": {"@type": "Organization", "name": "GeoExpert Academy & Consulting"},
+  "datePublished": "2026-10-07"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-cta{ margin:48px 0; padding:32px; background:var(--bg-soft); border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:var(--radius); }
+  .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
+  .article-cta p{ margin-bottom:20px; font-size:15px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../index.html">Accueil</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../index.html#formations">Formations</a>
+      <a href="../index.html#inscription">Inscription</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Tutoriel</span>
+
+    <h1>KoboToolbox : collecter des données terrain facilement</h1>
+
+    <div class="article-meta">
+      <span>7 octobre 2026</span>
+      <span>8 min de lecture</span>
+      <span>Jean Eudes AKA</span>
+    </div>
+
+    <p class="article-lead">
+      KoboToolbox est la solution gratuite de référence pour créer des formulaires numériques
+      et collecter des données sur le terrain avec un simple smartphone. Guide complet pour
+      démarrer.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Qu'est-ce que KoboToolbox ?</h2>
+      <p>
+        <strong>KoboToolbox</strong> est une suite d'outils gratuits et open source permettant de :
+      </p>
+      <ul>
+        <li><strong>Créer des formulaires</strong> numériques (en ligne)</li>
+        <li><strong>Collecter des données</strong> sur le terrain (via l'app Kobo Collect)</li>
+        <li><strong>Analyser et exporter</strong> les données (Excel, CSV, KML, etc.)</li>
+      </ul>
+      <p>
+        C'est l'outil utilisé par des milliers d'ONG, institutions et entreprises dans le monde
+        pour des enquêtes, des recensements, des études de terrain.
+      </p>
+
+      <h2>Pourquoi utiliser KoboToolbox ?</h2>
+      <ul>
+        <li><strong>Gratuit</strong> et open source</li>
+        <li><strong>Fonctionne hors ligne</strong> : la collecte se fait sans connexion Internet</li>
+        <li><strong>Géolocalisation</strong> : capture automatique des coordonnées GPS</li>
+        <li><strong>Photos et médias</strong> : possibilité d'ajouter des images et vidéos</li>
+        <li><strong>Export facile</strong> : vers Excel, QGIS, ArcGIS</li>
+        <li><strong>Multi-utilisateurs</strong> : plusieurs enquêteurs sur un même projet</li>
+      </ul>
+
+      <h2>Les 5 étapes pour démarrer</h2>
+
+      <h3>Étape 1 : Créer un compte gratuit</h3>
+      <p>
+        Rendez-vous sur <strong>kobotoolbox.org</strong> et créez un compte gratuit
+        (avec une adresse email). Cela prend 2 minutes.
+      </p>
+
+      <h3>Étape 2 : Concevoir votre premier formulaire</h3>
+      <p>
+        Depuis le tableau de bord, cliquez sur <strong>"Nouveau projet"</strong> puis
+        <strong>"Créer un projet à partir de zéro"</strong>. Vous accédez à l'interface
+        de construction de formulaire où vous pouvez ajouter :
+      </p>
+      <ul>
+        <li>Des questions textes</li>
+        <li>Des choix multiples</li>
+        <li>Des dates</li>
+        <li>Des photos</li>
+        <li>Des coordonnées GPS</li>
+      </ul>
+
+      <h3>Étape 3 : Installer Kobo Collect sur le terrain</h3>
+      <p>
+        Téléchargez l'application <strong>Kobo Collect</strong> depuis le Play Store
+        (Android). Connectez-la à votre compte KoboToolbox avec le même identifiant.
+        Le formulaire apparaît alors dans l'application.
+      </p>
+
+      <h3>Étape 4 : Collecter les données</h3>
+      <p>
+        Sur le terrain, l'enquêteur :
+      </p>
+      <ol>
+        <li>Ouvre l'application Kobo Collect</li>
+        <li>Sélectionne le formulaire</li>
+        <li>Remplit les questions une par une</li>
+        <li>Capture la localisation GPS (optionnelle)</li>
+        <li>Prend des photos si nécessaire</li>
+        <li>Enregistre la fiche</li>
+      </ol>
+      <p>
+        <strong>Les données sont stockées localement</strong> tant qu'il n'y a pas de connexion.
+        Dès que l'enquêteur retrouve du réseau, tout est automatiquement synchronisé.
+      </p>
+
+      <h3>Étape 5 : Analyser et exporter</h3>
+      <p>
+        De retour au bureau, connectez-vous à KoboToolbox pour :
+      </p>
+      <ul>
+        <li>Visualiser les statistiques en temps réel</li>
+        <li>Vérifier la qualité des données</li>
+        <li>Exporter au format Excel, CSV, KML</li>
+        <li>Intégrer les données dans QGIS ou ArcGIS</li>
+      </ul>
+
+      <div class="article-cta">
+        <h3>Maîtrisez KoboToolbox en 24 heures</h3>
+        <p>
+          Notre formation <strong>"Collecte Mobile de Données & SIG"</strong> vous apprend
+          à concevoir des formulaires, collecter sur le terrain et intégrer les données
+          dans un SIG.
+        </p>
+        <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+      </div>
+
+      <h2>Bonnes pratiques pour la collecte terrain</h2>
+      <ul>
+        <li><strong>Testez le formulaire</strong> avant le déploiement sur le terrain</li>
+        <li><strong>Formez les enquêteurs</strong> à l'application (1-2 heures suffisent)</li>
+        <li><strong>Prévoyez des batteries externes</strong> : la collecte consomme de l'énergie</li>
+        <li><strong>Faites des sauvegardes</strong> régulières des données</li>
+        <li><strong>Vérifiez la cohérence</strong> des données chaque soir</li>
+        <li><strong>Prévoyez une marge</strong> : les imprévus arrivent</li>
+      </ul>
+
+      <h2>KoboToolbox vs les autres solutions</h2>
+      <p>
+        D'autres outils existent (ODK, SurveyCTO, CommCare), mais KoboToolbox est le plus
+        accessible pour :
+      </p>
+      <ul>
+        <li>Le prix (gratuit sans limite)</li>
+        <li>La simplicité d'utilisation</li>
+        <li>L'hébergement cloud inclus</li>
+        <li>La communauté mondiale</li>
+      </ul>
+      <p>
+        C'est <strong>le choix idéal pour la Côte d'Ivoire</strong> et l'Afrique de l'Ouest,
+        où il est largement adopté par les ONG et institutions.
+      </p>
+
+      <h2>Conclusion</h2>
+      <p>
+        KoboToolbox est <strong>l'outil indispensable</strong> pour tout professionnel
+        du territoire : géomaticien, agronome, urbaniste, sociologue, épidémiologiste...
+      </p>
+      <p>
+        Sa maîtrise est <strong>un vrai plus sur un CV</strong>, car il combine la collecte
+        de données, la géolocalisation et l'analyse spatiale.
+      </p>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Apprenez la collecte de données terrain</h3>
+      <p>Formation complète KoboToolbox + SIG + QField.</p>
+    </div>
+    <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>

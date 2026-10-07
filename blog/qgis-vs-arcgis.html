@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QGIS vs ArcGIS : lequel choisir pour débuter en 2026 ? | GeoExpert Academy</title>
+<meta name="description" content="Comparatif complet QGIS vs ArcGIS : prix, fonctionnalités, prise en main. Découvrez lequel choisir pour débuter en SIG en 2026.">
+<meta name="keywords" content="QGIS vs ArcGIS, comparatif QGIS ArcGIS, quel logiciel SIG choisir, formation QGIS, formation ArcGIS">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/qgis-vs-arcgis.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/qgis-vs-arcgis.html">
+<meta property="og:title" content="QGIS vs ArcGIS : lequel choisir pour débuter ?">
+<meta property="og:description" content="Comparatif complet des deux logiciels phares de la géomatique.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "QGIS vs ArcGIS : lequel choisir pour débuter en 2026 ?",
+  "description": "Comparatif complet QGIS vs ArcGIS : prix, fonctionnalités, prise en main.",
+  "image": "https://geoexpertacademy.ci/images/og-image.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Jean Eudes AKA"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GeoExpert Academy & Consulting",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://geoexpertacademy.ci/images/logo-full.png"
+    }
+  },
+  "datePublished": "2026-10-07",
+  "dateModified": "2026-10-07"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-content a{ color:var(--teal); text-decoration:underline; }
+  .article-cta{ margin:48px 0; padding:32px; background:var(--bg-soft); border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:var(--radius); }
+  .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
+  .article-cta p{ margin-bottom:20px; font-size:15px; }
+  .compare-table{ width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px; }
+  .compare-table th{ background:var(--bg-soft); padding:12px; text-align:left; font-weight:600; color:var(--ink); border-bottom:1px solid var(--line); }
+  .compare-table td{ padding:12px; border-bottom:1px solid var(--line); color:var(--ink-dim); }
+  .compare-table tr:last-child td{ border-bottom:none; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../index.html">Accueil</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../index.html#formations">Formations</a>
+      <a href="../index.html#inscription">Inscription</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Comparatif</span>
+
+    <h1>QGIS vs ArcGIS : lequel choisir pour débuter en 2026 ?</h1>
+
+    <div class="article-meta">
+      <span>7 octobre 2026</span>
+      <span>6 min de lecture</span>
+      <span>Jean Eudes AKA</span>
+    </div>
+
+    <p class="article-lead">
+      QGIS et ArcGIS sont les deux logiciels les plus utilisés en géomatique. Le premier est
+      gratuit et open source, le second est la référence en entreprise. Lequel choisir quand
+      on débute ? Voici notre comparatif complet pour vous aider à décider.
+    </p>
+
+    <div class="article-content">
+
+      <h2>QGIS : la force du gratuit et de l'open source</h2>
+      <p>
+        <strong>QGIS</strong> est un logiciel libre développé par une communauté mondiale de
+        bénévoles et de contributeurs professionnels. Il est <strong>100% gratuit</strong>,
+        téléchargeable sur Windows, Mac et Linux.
+      </p>
+      <h3>Ses points forts</h3>
+      <ul>
+        <li>Gratuit, sans limite d'utilisation</li>
+        <li>Communauté immense et très active</li>
+        <li>Compatible avec la quasi-totalité des formats SIG</li>
+        <li>Extensions (plugins) très nombreuses</li>
+        <li>Mises à jour fréquentes</li>
+        <li>Fonctionne sur des ordinateurs peu puissants</li>
+      </ul>
+      <h3>Ses limites</h3>
+      <ul>
+        <li>Interface parfois moins intuitive pour les débutants</li>
+        <li>Pas de support client officiel (mais une communauté très réactive)</li>
+        <li>Moins reconnu par certaines grandes entreprises</li>
+      </ul>
+
+      <h2>ArcGIS : la référence en entreprise</h2>
+      <p>
+        <strong>ArcGIS</strong> est développé par la société américaine Esri, leader mondial du
+        SIG depuis plus de 50 ans. C'est <strong>un logiciel payant</strong> avec plusieurs
+        niveaux de licence.
+      </p>
+      <h3>Ses points forts</h3>
+      <ul>
+        <li>Référence dans les grandes entreprises et administrations</li>
+        <li>Interface soignée et ergonomique</li>
+        <li>Support client professionnel</li>
+        <li>Écosystème complet (desktop, web, mobile, cloud)</li>
+        <li>Formations certifiantes reconnues</li>
+      </ul>
+      <h3>Ses limites</h3>
+      <ul>
+        <li>Coût élevé (licences annuelles de plusieurs centaines à milliers d'euros)</li>
+        <li>Nécessite un ordinateur puissant</li>
+        <li>Formats partiellement propriétaires</li>
+      </ul>
+
+      <h2>Comparatif côte à côte</h2>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Critère</th>
+            <th>QGIS</th>
+            <th>ArcGIS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Prix</strong></td>
+            <td>Gratuit</td>
+            <td>Payant</td>
+          </tr>
+          <tr>
+            <td><strong>Open source</strong></td>
+            <td>Oui</td>
+            <td>Non</td>
+          </tr>
+          <tr>
+            <td><strong>Prise en main</strong></td>
+            <td>Moyenne</td>
+            <td>Facile</td>
+          </tr>
+          <tr>
+            <td><strong>Communauté</strong></td>
+            <td>Mondiale, très active</td>
+            <td>Professionnelle</td>
+          </tr>
+          <tr>
+            <td><strong>Support client</strong></td>
+            <td>Communautaire</td>
+            <td>Officiel 24/7</td>
+          </tr>
+          <tr>
+            <td><strong>Formats supportés</strong></td>
+            <td>Tous formats standards</td>
+            <td>Standard + propriétaires</td>
+          </tr>
+          <tr>
+            <td><strong>Idéal pour</strong></td>
+            <td>Débuter, projets indépendants</td>
+            <td>Grandes entreprises</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Lequel choisir quand on débute ?</h2>
+      <p>
+        Notre réponse est simple : <strong>commencez par QGIS</strong>.
+      </p>
+      <p>Voici pourquoi :</p>
+      <ol>
+        <li><strong>Il est gratuit</strong> : vous ne prenez aucun risque financier</li>
+        <li><strong>Les concepts sont identiques</strong> : une fois QGIS maîtrisé, vous passerez
+            à ArcGIS très facilement en quelques jours</li>
+        <li><strong>La communauté est là</strong> : pour chaque question, vous trouverez
+            une réponse en quelques minutes sur les forums</li>
+        <li><strong>Il est utilisé partout</strong> : au Cameroun, en Côte d'Ivoire, au Sénégal,
+            beaucoup d'organisations utilisent QGIS</li>
+      </ol>
+
+      <div class="article-cta">
+        <h3>Apprenez QGIS ET ArcGIS en 40 heures</h3>
+        <p>
+          Notre formation <strong>"Devenez Géomaticien Opérationnel"</strong> vous forme sur
+          les 2 logiciels + télédétection, collecte de données et WebGIS. Aucun prérequis.
+        </p>
+        <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+      </div>
+
+      <h2>Et après QGIS, on passe à ArcGIS ?</h2>
+      <p>
+        Une fois les bases de QGIS maîtrisées (2-3 mois de pratique régulière), vous pouvez :
+      </p>
+      <ul>
+        <li>Suivre une formation spécifique sur ArcGIS</li>
+        <li>Télécharger un essai gratuit d'ArcGIS Pro (21 jours)</li>
+        <li>Suivre les tutoriels Esri en ligne (certains sont gratuits)</li>
+        <li>Postuler dans des entreprises qui utilisent ArcGIS</li>
+      </ul>
+
+      <h2>Conclusion</h2>
+      <p>
+        <strong>Pour débuter en 2026, QGIS est le meilleur choix.</strong> Gratuit, puissant
+        et accessible, il vous donnera toutes les bases dont vous avez besoin. Une fois
+        à l'aise, vous pourrez passer à ArcGIS si votre parcours professionnel le nécessite.
+      </p>
+      <p>
+        L'essentiel n'est pas le logiciel que vous utilisez, mais <strong>la maîtrise des
+        concepts</strong> : systèmes de coordonnées, analyse spatiale, cartographie thématique.
+        Ces concepts s'appliquent à <strong>tous les logiciels SIG</strong>.
+      </p>
+
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Prêt à passer à la pratique ?</h3>
+      <p>Découvrez notre formation complète QGIS + ArcGIS.</p>
+    </div>
+    <a href="../index.html#formations" class="btn btn-primary">Voir les formations</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting — Abidjan, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>

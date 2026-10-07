@@ -31,7 +31,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="images/favicon.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
@@ -111,12 +111,12 @@
       <a href="#formations">Formations</a>
       <a href="#videos">Vidéos</a>
       <a href="#realisations">Réalisations</a>
+      <a href="blog.html">Blog</a>
       <a href="#inscription">Inscription</a>
       <a href="#services">Services</a>
       <a href="#fondateur">Fondateur</a>
       <a href="#contact">Contact</a>
-      <a href="#verification">Vérifier un certificat</a>
-      <a href="#faq">FAQ</a>
+      <a href="#verification">Certificat</a>
     </nav>
     <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
        class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
@@ -1193,7 +1193,7 @@
   <!-- ✅ AJOUTÉ : lien vers politique de confidentialité -->
   <a href="#mentions-legales" class="footer-legal-link">Mentions légales</a> 
   <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
-  <p>&copy; 2026 GeoExpert Academy & Consulting — Abidjan, Côte d'Ivoire.</p>
+  <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
 </div>
 </footer>
   
@@ -1201,67 +1201,6 @@
 <script src="script.js"></script>
 
 <!-- Assistant GeoExpert -->
-<button id="gx-btn" aria-label="Ouvrir l'assistant">💬</button>
-<div id="gx-box">
-  <div id="gx-head">Assistant GeoExpert</div>
-  <div id="gx-msgs"></div>
-  <div id="gx-form">
-    <input id="gx-in" placeholder="Posez votre question..." aria-label="Votre question à l'assistant" />
-    <button id="gx-send">Envoyer</button>
-  </div>
-</div>
 
-<script>
-(function(){
-  var URL_AGENT = "https://geoexpertacademy-agent.geographe07.workers.dev/";
-  var btn = document.getElementById("gx-btn");
-  var box = document.getElementById("gx-box");
-  var msgs = document.getElementById("gx-msgs");
-  var input = document.getElementById("gx-in");
-  var send = document.getElementById("gx-send");
-  var history = [];
-
-  function add(text, who){
-    var d = document.createElement("div");
-    d.className = "gx-m " + (who === "u" ? "gx-u" : "gx-b");
-    d.textContent = text;
-    msgs.appendChild(d);
-    msgs.scrollTop = msgs.scrollHeight;
-    return d;
-  }
-
-  btn.onclick = function(){
-    var open = box.style.display === "flex";
-    box.style.display = open ? "none" : "flex";
-    if (!open && !msgs.children.length) {
-      add("Bonjour ! Je suis l'assistant de GeoExpert Academy. Posez-moi vos questions sur nos formations, les tarifs ou l'inscription.", "b");
-    }
-  };
-
-  async function envoyer(){
-    var t = input.value.trim();
-    if (!t) return;
-    input.value = "";
-    add(t, "u");
-    history.push({role:"user", text:t});
-    var wait = add("...", "b");
-    try {
-      var r = await fetch(URL_AGENT, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({messages: history})
-      });
-      var data = await r.json();
-      wait.textContent = data.reply;
-      history.push({role:"model", text:data.reply});
-    } catch(e) {
-      wait.textContent = "Désolé, une erreur est survenue. Écrivez-nous sur WhatsApp : 07 87 01 50 30.";
-    }
-  }
-
-  send.onclick = envoyer;
-  input.addEventListener("keydown", function(e){ if (e.key === "Enter") envoyer(); });
-})();
-</script>
 </body>
 </html>
