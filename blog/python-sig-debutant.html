@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartographier avec Python : par où commencer ? | GeoExpert Academy</title>
+<meta name="description" content="Guide pour débuter avec Python en SIG : bibliothèques essentielles (GeoPandas, Rasterio), premiers scripts, automatisation cartographique.">
+<meta name="keywords" content="Python SIG, GeoPandas, Rasterio, automatisation SIG, Python géomatique">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/python-sig-debutant.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/python-sig-debutant.html">
+<meta property="og:title" content="Cartographier avec Python : par où commencer ?">
+<meta property="og:description" content="Guide pour débuter avec Python en SIG.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Cartographier avec Python : par où commencer ?",
+  "author": {"@type": "Person", "name": "Jean Eudes AKA"},
+  "publisher": {"@type": "Organization", "name": "GeoExpert Academy & Consulting"},
+  "datePublished": "2026-10-07"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-content code{ font-family:monospace; background:var(--bg-soft-2); padding:2px 6px; border-radius:4px; font-size:14.5px; color:var(--indigo); }
+  .article-cta{ margin:48px 0; padding:32px; background:var(--bg-soft); border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:var(--radius); }
+  .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
+  .article-cta p{ margin-bottom:20px; font-size:15px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../index.html">Accueil</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../index.html#formations">Formations</a>
+      <a href="../index.html#inscription">Inscription</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Programmation</span>
+
+    <h1>Cartographier avec Python : par où commencer ?</h1>
+
+    <div class="article-meta">
+      <span>7 octobre 2026</span>
+      <span>9 min de lecture</span>
+      <span>Jean Eudes AKA</span>
+    </div>
+
+    <p class="article-lead">
+      Python est devenu le langage de référence en géomatique. Il permet d'automatiser les
+      tâches répétitives, de traiter d'énormes volumes de données et de créer des cartes
+      de façon reproductible. Guide pour débuter.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Pourquoi utiliser Python en SIG ?</h2>
+      <p>
+        QGIS et ArcGIS sont excellents pour les analyses ponctuelles. Mais quand vous devez :
+      </p>
+      <ul>
+        <li>Traiter <strong>500 fichiers</strong> en même temps</li>
+        <li>Refaire <strong>la même analyse chaque mois</strong></li>
+        <li>Automatiser la <strong>production de cartes</strong></li>
+        <li>Combiner <strong>données SIG et statistiques</strong></li>
+        <li>Créer une <strong>application web cartographique</strong></li>
+      </ul>
+      <p>
+        ... Python devient <strong>indispensable</strong>. C'est ce qui distingue un
+        géomaticien "utilisateur" d'un géomaticien "expert".
+      </p>
+
+      <h2>Les 5 bibliothèques Python à connaître</h2>
+
+      <h3>1. GeoPandas : le couteau suisse</h3>
+      <p>
+        <strong>GeoPandas</strong> est LA bibliothèque pour manipuler des données vectorielles
+        (points, lignes, polygones). Elle combine la puissance de pandas (analyse de données)
+        avec les fonctionnalités SIG.
+      </p>
+      <p>
+        <strong>Ce qu'on peut faire :</strong>
+      </p>
+      <ul>
+        <li>Charger des shapefiles, GeoJSON, GPKG</li>
+        <li>Filtrer, fusionner, découper des couches</li>
+        <li>Calculer des surfaces, distances, intersections</li>
+        <li>Reprojeter dans un autre système de coordonnées</li>
+        <li>Exporter vers tous les formats</li>
+      </ul>
+
+      <h3>2. Rasterio : pour les données raster</h3>
+      <p>
+        <strong>Rasterio</strong> est la bibliothèque pour les données raster : images satellite,
+        MNT, cartes d'occupation du sol.
+      </p>
+      <p>
+        <strong>Ce qu'on peut faire :</strong>
+      </p>
+      <ul>
+        <li>Lire et écrire des GeoTIFF</li>
+        <li>Découper un raster selon un polygone</li>
+        <li>Reprojeter un raster</li>
+        <li>Calculer des statistiques par zone</li>
+      </ul>
+
+      <h3>3. Matplotlib + Cartopy : pour les cartes</h3>
+      <p>
+        <strong>Matplotlib</strong> est LA bibliothèque de visualisation Python.
+        <strong>Cartopy</strong> la complète pour les cartes géographiques (projections,
+        fonds de carte, etc.).
+      </p>
+      <p>
+        <strong>Ce qu'on peut faire :</strong>
+      </p>
+      <ul>
+        <li>Créer des cartes statiques (PNG, PDF, SVG)</li>
+        <li>Ajouter des légendes, échelles, flèches nord</li>
+        <li>Personnaliser entièrement le rendu</li>
+      </ul>
+
+      <h3>4. Folium : pour les cartes interactives</h3>
+      <p>
+        <strong>Folium</strong> permet de créer des cartes interactives (Leaflet) directement
+        depuis Python, sans écrire une ligne de JavaScript.
+      </p>
+      <p>
+        <strong>Ce qu'on peut faire :</strong>
+      </p>
+      <ul>
+        <li>Générer des cartes web interactives</li>
+        <li>Ajouter des marqueurs, popups, choroplèthes</li>
+        <li>Exporter en HTML autonome</li>
+      </ul>
+
+      <h3>5. Shapely : pour la géométrie</h3>
+      <p>
+        <strong>Shapely</strong> gère les opérations géométriques de base.
+      </p>
+      <p>
+        <strong>Ce qu'on peut faire :</strong>
+      </p>
+      <ul>
+        <li>Créer des buffers</li>
+        <li>Calculer des intersections, unions, différences</li>
+        <li>Vérifier la validité des géométries</li>
+      </ul>
+
+      <h2>Comment installer tout ça ?</h2>
+      <p>
+        La façon la plus simple : utiliser <strong>Anaconda</strong> ou <strong>Miniconda</strong>,
+        qui incluent déjà la plupart de ces bibliothèques.
+      </p>
+      <p>Sinon, en ligne de commande :</p>
+      <ul>
+        <li><code>pip install geopandas</code></li>
+        <li><code>pip install rasterio</code></li>
+        <li><code>pip install folium</code></li>
+        <li><code>pip install matplotlib cartopy</code></li>
+        <li><code>pip install shapely</code></li>
+      </ul>
+
+      <h2>Votre premier script : créer une carte</h2>
+      <p>
+        Voici les étapes typiques d'un premier script Python en SIG :
+      </p>
+      <ol>
+        <li><strong>Importer les bibliothèques</strong> nécessaires</li>
+        <li><strong>Charger les données</strong> (shapefile, GeoJSON...)</li>
+        <li><strong>Faire l'analyse</strong> (filtre, calcul, intersection)</li>
+        <li><strong>Créer la carte</strong> avec Matplotlib</li>
+        <li><strong>Ajouter les éléments</strong> : titre, légende, échelle</li>
+        <li><strong>Exporter</strong> en PNG, PDF ou HTML</li>
+      </ol>
+      <p>
+        En 20-30 lignes de code, vous produisez une carte professionnelle, reproductible
+        à volonté.
+      </p>
+
+      <h2>Faut-il être développeur pour se lancer ?</h2>
+      <p>
+        <strong>Non</strong>, mais il faut accepter une petite courbe d'apprentissage :
+      </p>
+      <ul>
+        <li>1-2 semaines pour comprendre la syntaxe Python</li>
+        <li>1-2 mois pour être à l'aise avec GeoPandas</li>
+        <li>3-6 mois pour automatiser des tâches complexes</li>
+      </ul>
+      <p>
+        Les géomaticiens qui maîtrisent Python sont <strong>parmi les mieux payés</strong>
+        du marché. C'est un vrai accélérateur de carrière.
+      </p>
+
+      <div class="article-cta">
+        <h3>Apprenez Python pour les SIG</h3>
+        <p>
+          Notre formation <strong>"Python pour les SIG"</strong> vous apprend à automatiser
+          vos analyses et créer des cartes professionnelles en Python.
+        </p>
+        <a href="https://wa.me/2250787015030?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20la%20formation%20Python%20pour%20les%20SIG." class="btn btn-whatsapp" target="_blank" rel="noopener">Demander des infos</a>
+      </div>
+
+      <h2>Les cas d'usage concrets</h2>
+      <p>Voici ce que vous pourrez faire une fois Python maîtrisé :</p>
+      <ul>
+        <li><strong>Automatiser la production de 100 cartes</strong> pour un atlas régional</li>
+        <li><strong>Fusionner automatiquement</strong> les données de 50 communes</li>
+        <li><strong>Calculer des statistiques</strong> par quartier en 1 clic</li>
+        <li><strong>Créer un dashboard</strong> avec cartes interactives</li>
+        <li><strong>Traiter des séries temporelles</strong> de 20 ans d'images satellite</li>
+        <li><strong>Publier une carte en ligne</strong> automatiquement</li>
+      </ul>
+
+      <h2>Par où commencer concrètement ?</h2>
+      <p>Voici un plan de progression réaliste :</p>
+      <ol>
+        <li><strong>Semaines 1-2</strong> : apprendre les bases de Python (variables, boucles, fonctions)</li>
+        <li><strong>Semaines 3-4</strong> : découvrir pandas (analyse de données)</li>
+        <li><strong>Semaines 5-6</strong> : apprendre GeoPandas (vecteur)</li>
+        <li><strong>Semaines 7-8</strong> : apprendre Rasterio (raster)</li>
+        <li><strong>Semaines 9-10</strong> : créer des cartes avec Matplotlib</li>
+        <li><strong>Semaines 11-12</strong> : créer des cartes interactives avec Folium</li>
+        <li><strong>Au-delà</strong> : automatiser des tâches de plus en plus complexes</li>
+      </ol>
+      <p>
+        <strong>Conseil :</strong> ne cherchez pas à tout apprendre en même temps. Concentrez-vous
+        sur <strong>une bibliothèque à la fois</strong>, avec des <strong>projets concrets</strong>.
+      </p>
+
+      <h2>Conclusion</h2>
+      <p>
+        Python n'est plus une option en géomatique : c'est devenu <strong>un standard</strong>.
+        Les offres d'emploi mentionnent de plus en plus souvent Python en prérequis.
+      </p>
+      <p>
+        La bonne nouvelle : la communauté Python est <strong>immense et bienveillante</strong>.
+        Les ressources gratuites abondent. Et avec de la régularité, on progresse vite.
+      </p>
+      <p>
+        <strong>Commencez petit</strong> : un script qui charge un shapefile et l'affiche.
+        Puis ajoutez une fonctionnalité à la fois. Dans 6 mois, vous aurez un vrai savoir-faire.
+      </p>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Formez-vous à Python pour les SIG</h3>
+      <p>Automatisez vos analyses et boostez votre carrière.</p>
+    </div>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20des%20informations%20sur%20la%20formation%20Python." class="btn btn-whatsapp" target="_blank" rel="noopener">Nous contacter</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

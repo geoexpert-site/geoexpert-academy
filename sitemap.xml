@@ -43,6 +43,42 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://geoexpertacademy.ci/blog/erreurs-debutant-sig.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/blog/collecte-donnees-terrain.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/blog/google-earth-engine-debutant.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/blog/metiers-geomatique.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/blog/python-sig-debutant.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/blog/postgis-introduction.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://geoexpertacademy.ci/politique-confidentialite.html</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>yearly</changefreq>

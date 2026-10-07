@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction à Google Earth Engine pour débutants | GeoExpert Academy</title>
+<meta name="description" content="Découvrez Google Earth Engine : la plateforme gratuite de Google pour analyser des images satellitaires. Guide complet pour débutants.">
+<meta name="keywords" content="Google Earth Engine tutoriel, GEE débutant, télédétection, analyse images satellite, formation télédétection">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/google-earth-engine-debutant.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/google-earth-engine-debutant.html">
+<meta property="og:title" content="Introduction à Google Earth Engine pour débutants">
+<meta property="og:description" content="Guide complet pour débuter avec Google Earth Engine.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Introduction à Google Earth Engine pour débutants",
+  "author": {"@type": "Person", "name": "Jean Eudes AKA"},
+  "publisher": {"@type": "Organization", "name": "GeoExpert Academy & Consulting"},
+  "datePublished": "2026-10-07"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-cta{ margin:48px 0; padding:32px; background:var(--bg-soft); border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:var(--radius); }
+  .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
+  .article-cta p{ margin-bottom:20px; font-size:15px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../index.html">Accueil</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../index.html#formations">Formations</a>
+      <a href="../index.html#inscription">Inscription</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Télédétection</span>
+
+    <h1>Introduction à Google Earth Engine pour débutants</h1>
+
+    <div class="article-meta">
+      <span>7 octobre 2026</span>
+      <span>7 min de lecture</span>
+      <span>Jean Eudes AKA</span>
+    </div>
+
+    <p class="article-lead">
+      Google Earth Engine (GEE) révolutionne la télédétection. Cette plateforme gratuite
+      de Google permet d'analyser des décennies d'images satellitaires en quelques clics,
+      sans installer de logiciel ni télécharger des téraoctets de données.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Qu'est-ce que Google Earth Engine ?</h2>
+      <p>
+        <strong>Google Earth Engine</strong> est une plateforme cloud gratuite développée par
+        Google pour l'analyse de données géospatiales à grande échelle.
+      </p>
+      <p>Elle donne accès à :</p>
+      <ul>
+        <li>Une <strong>archive de 40+ ans</strong> d'images satellitaires (Landsat, Sentinel, MODIS...)</li>
+        <li>Des <strong>données climatiques</strong>, d'élévation, d'occupation du sol</li>
+        <li>Une <strong>puissance de calcul</strong> colossale (les serveurs de Google)</li>
+        <li>Un <strong>éditeur de code en ligne</strong> (JavaScript)</li>
+      </ul>
+      <p>
+        En résumé : vous pouvez analyser <strong>des milliers d'images satellite en quelques
+        minutes</strong>, ce qui prendrait des jours sur un ordinateur classique.
+      </p>
+
+      <h2>Pourquoi c'est une révolution</h2>
+
+      <h3>Avant Google Earth Engine</h3>
+      <ul>
+        <li>📥 Télécharger des téraoctets d'images satellite</li>
+        <li>💻 Avoir un ordinateur très puissant (32+ Go de RAM)</li>
+        <li>🕒 Passer des heures, voire des jours, à traiter les données</li>
+        <li>💾 Gérer un espace de stockage énorme</li>
+      </ul>
+
+      <h3>Avec Google Earth Engine</h3>
+      <ul>
+        <li>✅ Tout est <strong>déjà sur les serveurs de Google</strong></li>
+        <li>✅ Un simple ordinateur portable suffit</li>
+        <li>✅ Les calculs se font <strong>en quelques secondes</strong></li>
+        <li>✅ Aucun stockage local nécessaire</li>
+      </ul>
+
+      <h2>Que peut-on faire avec GEE ?</h2>
+      <ul>
+        <li><strong>Suivre la déforestation</strong> année par année</li>
+        <li><strong>Détecter les feux de forêt</strong> en temps réel</li>
+        <li><strong>Cartographier l'occupation du sol</strong> (agriculture, urbain, forêt)</li>
+        <li><strong>Calculer des indices de végétation</strong> (NDVI) sur 20 ans</li>
+        <li><strong>Suivre l'expansion urbaine</strong> des villes</li>
+        <li><strong>Analyser les sécheresses</strong> et les inondations</li>
+        <li><strong>Cartographier les zones humides</strong></li>
+        <li><strong>Prédire les rendements agricoles</strong></li>
+      </ul>
+
+      <h2>Comment démarrer ?</h2>
+
+      <h3>Étape 1 — Créer un compte</h3>
+      <p>
+        Rendez-vous sur <strong>earthengine.google.com</strong> et inscrivez-vous avec
+        un compte Google. L'inscription est <strong>gratuite</strong> pour les usages
+        académiques, la recherche et les projets à but non lucratif.
+      </p>
+      <p>
+        ⚠️ L'approbation prend généralement quelques jours. Il faut expliquer votre projet
+        dans le formulaire d'inscription.
+      </p>
+
+      <h3>Étape 2 — Découvrir le Code Editor</h3>
+      <p>
+        Une fois votre compte validé, vous accédez au <strong>Code Editor</strong>,
+        l'interface principale de GEE. Elle comprend :
+      </p>
+      <ul>
+        <li>Une zone de <strong>code JavaScript</strong></li>
+        <li>Une carte <strong>Google Maps</strong> interactive</li>
+        <li>Une <strong>console</strong> de résultats</li>
+        <li>Un <strong>explorateur de données</strong> (le catalogue)</li>
+      </ul>
+
+      <h3>Étape 3 — Premier script simple</h3>
+      <p>
+        Voici un script GEE simple qui affiche une image satellite :
+      </p>
+      <ul>
+        <li><strong>Charger une image Sentinel-2</strong> : grâce à la fonction <code>ee.Image()</code></li>
+        <li><strong>Sélectionner les bandes</strong> (rouge, vert, bleu)</li>
+        <li><strong>Ajouter l'image à la carte</strong> : avec <code>Map.addLayer()</code></li>
+      </ul>
+      <p>
+        En quelques lignes, vous affichez une image satellite de la zone de votre choix.
+      </p>
+
+      <h3>Étape 4 — Explorer les exemples</h3>
+      <p>
+        GEE propose une <strong>bibliothèque d'exemples</strong> commentés. C'est la meilleure
+        façon d'apprendre :
+      </p>
+      <ul>
+        <li>Calculer le NDVI d'une zone</li>
+        <li>Détecter les changements d'occupation du sol</li>
+        <li>Créer une série temporelle d'images</li>
+        <li>Exporter les résultats vers QGIS</li>
+      </ul>
+
+      <h2>GEE vs QGIS : sont-ils concurrents ?</h2>
+      <p>
+        <strong>Non, ils sont complémentaires.</strong>
+      </p>
+      <ul>
+        <li><strong>QGIS</strong> : idéal pour les analyses locales, la cartographie, les petits projets</li>
+        <li><strong>GEE</strong> : idéal pour les analyses à grande échelle, les séries temporelles, le traitement d'énormes volumes de données</li>
+      </ul>
+      <p>
+        <strong>Le workflow idéal :</strong> vous préparez et analysez de grandes quantités
+        d'images satellite dans GEE, puis vous exportez les résultats vers QGIS pour la
+        cartographie finale.
+      </p>
+
+      <div class="article-cta">
+        <h3>Maîtrisez Google Earth Engine</h3>
+        <p>
+          Notre formation <strong>"Analyse d'Images Satellitaires & Télédétection"</strong>
+          vous apprend à utiliser GEE pour des projets concrets : suivi de déforestation,
+          cartographie agricole, analyse climatique.
+        </p>
+        <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+      </div>
+
+      <h2>Faut-il savoir coder pour utiliser GEE ?</h2>
+      <p>
+        GEE utilise <strong>JavaScript</strong>. Rassurez-vous :
+      </p>
+      <ul>
+        <li>Les bases suffisent pour 80% des cas d'usage</li>
+        <li>Des <strong>centaines d'exemples</strong> sont disponibles à copier-coller</li>
+        <li>La documentation est <strong>très bien faite</strong></li>
+        <li>La communauté est <strong>active et réactive</strong></li>
+      </ul>
+      <p>
+        Si vous débutez, vous pouvez commencer <strong>sans rien connaître au code</strong> :
+        copiez les exemples, modifiez-les légèrement, observez les résultats. La programmation
+        viendra naturellement avec la pratique.
+      </p>
+
+      <h2>Les limites de GEE</h2>
+      <p>
+        GEE n'est pas parfait. Voici ses limites :
+      </p>
+      <ul>
+        <li><strong>Nécessite une connexion Internet</strong> stable</li>
+        <li><strong>Approbation du compte</strong> longue (parfois plusieurs semaines)</li>
+        <li><strong>Export de données</strong> limité en taille</li>
+        <li><strong>JavaScript</strong> à apprendre pour aller loin</li>
+        <li><strong>Interface</strong> peu intuitive au début</li>
+      </ul>
+      <p>
+        Malgré ces limites, <strong>GEE reste l'outil le plus puissant</strong> disponible
+        gratuitement pour la télédétection.
+      </p>
+
+      <h2>Conclusion</h2>
+      <p>
+        Google Earth Engine est <strong>en train de changer le métier de géomaticien</strong>.
+        Ce qui prenait des semaines se fait maintenant en quelques heures. Les professionnels
+        qui maîtrisent GEE ont un <strong>vrai avantage sur le marché du travail</strong>.
+      </p>
+      <p>
+        <strong>Pour débuter :</strong> créez un compte, testez les exemples officiels,
+        modifiez-les, explorez. La courbe d'apprentissage est raide au début, mais les
+        possibilités sont immenses.
+      </p>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Formez-vous à la télédétection</h3>
+      <p>Apprenez Google Earth Engine avec des projets concrets.</p>
+    </div>
+    <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

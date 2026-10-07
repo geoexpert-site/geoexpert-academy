@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réussir sa collecte de données terrain : guide pratique | GeoExpert Academy</title>
+<meta name="description" content="Guide pratique pour réussir votre collecte de données terrain : préparation, outils, bonnes pratiques, gestion des imprévus. Conseils d'expert.">
+<meta name="keywords" content="collecte données terrain, enquête terrain, KoboToolbox, GPS, formation SIG terrain">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/collecte-donnees-terrain.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/collecte-donnees-terrain.html">
+<meta property="og:title" content="Réussir sa collecte de données terrain : guide pratique">
+<meta property="og:description" content="Guide pratique pour réussir votre collecte de données terrain.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Réussir sa collecte de données terrain : guide pratique",
+  "author": {"@type": "Person", "name": "Jean Eudes AKA"},
+  "publisher": {"@type": "Organization", "name": "GeoExpert Academy & Consulting"},
+  "datePublished": "2026-10-07"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-cta{ margin:48px 0; padding:32px; background:var(--bg-soft); border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:var(--radius); }
+  .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
+  .article-cta p{ margin-bottom:20px; font-size:15px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../index.html">Accueil</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../index.html#formations">Formations</a>
+      <a href="../index.html#inscription">Inscription</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Guide pratique</span>
+
+    <h1>Réussir sa collecte de données terrain : guide pratique</h1>
+
+    <div class="article-meta">
+      <span>7 octobre 2026</span>
+      <span>8 min de lecture</span>
+      <span>Jean Eudes AKA</span>
+    </div>
+
+    <p class="article-lead">
+      La collecte de données terrain est l'étape la plus critique de tout projet SIG.
+      Une donnée mal collectée compromet toute l'analyse. Voici les bonnes pratiques
+      pour réussir votre collecte à tous les coups.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Pourquoi la collecte terrain est si importante</h2>
+      <p>
+        En SIG, il y a une règle simple : <strong>garbage in, garbage out</strong>. Si vos
+        données d'entrée sont mauvaises, vos cartes et analyses le seront aussi.
+      </p>
+      <p>
+        Or, la collecte terrain est <strong>la source principale</strong> de données dans
+        la plupart des projets. C'est aussi l'étape la plus coûteuse (temps, déplacements,
+        équipes). Une collecte ratée = un projet à refaire.
+      </p>
+
+      <h2>Étape 1 : La préparation en amont</h2>
+
+      <h3>Définir précisément les objectifs</h3>
+      <p>
+        Avant de partir sur le terrain, répondez à ces questions :
+      </p>
+      <ul>
+        <li>Quelle est la <strong>question principale</strong> à laquelle je veux répondre ?</li>
+        <li>Quelles <strong>données</strong> sont strictement nécessaires ?</li>
+        <li>Quelle <strong>précision</strong> est requise ?</li>
+        <li>Quelle est la <strong>zone géographique</strong> exacte ?</li>
+        <li>Qui va <strong>utiliser</strong> les données ?</li>
+      </ul>
+
+      <h3>Concevoir le formulaire de collecte</h3>
+      <p>
+        Le formulaire est le <strong>cœur de la collecte</strong>. Un bon formulaire :
+      </p>
+      <ul>
+        <li>Est <strong>court</strong> (15 minutes maximum par fiche)</li>
+        <li>A des <strong>questions claires</strong>, sans ambiguïté</li>
+        <li>Utilise des <strong>réponses fermées</strong> quand c'est possible (listes)</li>
+        <li>Capture les <strong>coordonnées GPS</strong> automatiquement</li>
+        <li>Permet d'ajouter des <strong>photos</strong></li>
+      </ul>
+      <p>
+        <strong>Outil recommandé :</strong> KoboToolbox (gratuit, open source).
+      </p>
+
+      <h3>Tester le formulaire sur le terrain</h3>
+      <p>
+        <strong>Règle d'or :</strong> testez toujours votre formulaire <strong>avant</strong>
+        la collecte réelle. Faites 3-5 fiches sur place pour repérer :
+      </p>
+      <ul>
+        <li>Les questions ambiguës</li>
+        <li>Les réponses manquantes dans les listes</li>
+        <li>Les problèmes techniques (GPS, batterie, réseau)</li>
+        <li>Le temps réel de remplissage</li>
+      </ul>
+
+      <h2>Étape 2 : L'équipement et les outils</h2>
+
+      <h3>Le matériel indispensable</h3>
+      <ul>
+        <li>📱 <strong>Smartphone ou tablette</strong> (Android recommandé)</li>
+        <li>🔋 <strong>Batteries externes</strong> (au moins 2 par équipe)</li>
+        <li>🛰️ <strong>Récepteur GPS</strong> si haute précision requise</li>
+        <li>📷 <strong>Appareil photo</strong> (parfois intégré au téléphone)</li>
+        <li>📝 <strong>Carnet papier</strong> (en secours)</li>
+        <li>🗺️ <strong>Cartes imprimées</strong> de la zone</li>
+        <li>🌧️ <strong>Protection</strong> contre la pluie/poussière</li>
+      </ul>
+
+      <h3>Les outils numériques</h3>
+      <ul>
+        <li><strong>KoboToolbox</strong> : création de formulaires et collecte</li>
+        <li><strong>Kobo Collect</strong> : app mobile de collecte</li>
+        <li><strong>QField</strong> : collecte SIG directement dans QGIS</li>
+        <li><strong>OSMAnd</strong> : navigation hors ligne</li>
+        <li><strong>Maps.me</strong> : cartes hors ligne</li>
+      </ul>
+
+      <h2>Étape 3 : La formation des enquêteurs</h2>
+      <p>
+        Même avec le meilleur formulaire, une équipe mal formée donnera de mauvaises données.
+      </p>
+      <p><strong>Formez vos enquêteurs sur :</strong></p>
+      <ul>
+        <li>L'utilisation de l'application mobile (2-3 heures)</li>
+        <li>La compréhension des questions (1-2 heures)</li>
+        <li>Les bonnes pratiques d'enquête (accord, respect, patience)</li>
+        <li>La gestion des imprévus (refus, absence, incompréhension)</li>
+        <li>La synchronisation des données</li>
+      </ul>
+
+      <h2>Étape 4 : La collecte sur le terrain</h2>
+
+      <h3>Bonnes pratiques pendant la collecte</h3>
+      <ul>
+        <li><strong>Arrivez tôt</strong> : les gens sont plus disponibles le matin</li>
+        <li><strong>Présentez-vous clairement</strong> : qui vous êtes, pourquoi vous êtes là</li>
+        <li><strong>Demandez l'accord</strong> : expliquez l'usage des données</li>
+        <li><strong>Soyez patient</strong> : ne forcez jamais une réponse</li>
+        <li><strong>Notez les imprévus</strong> : un contexte particulier peut éclairer une donnée</li>
+        <li><strong>Vérifiez au fur et à mesure</strong> : contrôlez la cohérence</li>
+      </ul>
+
+      <h3>Gérer les imprévus</h3>
+      <p>
+        Les imprévus sont <strong>normaux</strong> sur le terrain. Voici comment réagir :
+      </p>
+      <ul>
+        <li><strong>Pas de réseau ?</strong> → Le formulaire fonctionne hors ligne, tout sera synchronisé plus tard</li>
+        <li><strong>Batterie vide ?</strong> → Utilisez une batterie externe ou le carnet papier</li>
+        <li><strong>Personne à interroger ?</strong> → Repassez plus tard ou notez l'absence</li>
+        <li><strong>Refus de répondre ?</strong> → Respectez, remerciez, passez à la suite</li>
+        <li><strong>Mauvaise compréhension ?</strong> → Reformulez, ne suggérez pas la réponse</li>
+      </ul>
+
+      <h2>Étape 5 : Le contrôle qualité</h2>
+
+      <h3>Vérification quotidienne</h3>
+      <p>
+        <strong>Chaque soir</strong>, vérifiez :
+      </p>
+      <ul>
+        <li>Le nombre de fiches collectées vs prévu</li>
+        <li>La cohérence des réponses (pas de doublons, pas d'aberrations)</li>
+        <li>La qualité des photos et coordonnées GPS</li>
+        <li>Les points manquants ou problématiques</li>
+      </ul>
+
+      <h3>Correction en cours de collecte</h3>
+      <p>
+        Si vous détectez une erreur <strong>répétée</strong>, corrigez immédiatement :
+      </p>
+      <ul>
+        <li>Reformulez la question problématique</li>
+        <li>Rappelez la bonne pratique aux enquêteurs</li>
+        <li>Retournez sur les fiches mal collectées</li>
+      </ul>
+
+      <div class="article-cta">
+        <h3>Maîtrisez la collecte de données terrain</h3>
+        <p>
+          Notre formation <strong>"Collecte Mobile de Données & SIG"</strong> vous apprend
+          à concevoir des formulaires, collecter sur le terrain et intégrer vos données
+          dans un SIG.
+        </p>
+        <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+      </div>
+
+      <h2>Les erreurs à éviter absolument</h2>
+      <ul>
+        <li>❌ <strong>Négliger la préparation</strong> : partir sur le terrain sans formulaire testé</li>
+        <li>❌ <strong>Ne pas former les enquêteurs</strong> : chacun fait à sa manière</li>
+        <li>❌ <strong>Ne pas vérifier au quotidien</strong> : les erreurs s'accumulent</li>
+        <li>❌ <strong>Modifier le formulaire en cours de route</strong> : les données deviennent incomparables</li>
+        <li>❌ <strong>Ne pas documenter le contexte</strong> : les données perdent du sens</li>
+      </ul>
+
+      <h2>Conclusion</h2>
+      <p>
+        La collecte de données terrain est un <strong>art qui s'apprend</strong>. Les projets
+        réussis sont ceux où l'on a investi du temps <strong>en amont</strong> : préparation,
+        formation, tests.
+      </p>
+      <p>
+        Avec les bons outils (KoboToolbox, Kobo Collect) et les bonnes pratiques, vous pouvez
+        collecter des données <strong>fiables et exploitables</strong> dans n'importe quel
+        contexte, même en zones rurales sans réseau.
+      </p>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Apprenez la collecte de données terrain</h3>
+      <p>Formation pratique avec KoboToolbox et QField.</p>
+    </div>
+    <a href="../index.html#formations" class="btn btn-primary">Voir la formation</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
