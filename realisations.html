@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réalisations | Projets SIG et cartographiques - GeoExpert Academy</title>
+<meta name="description" content="Découvrez nos réalisations en cartographie, SIG, télédétection et analyse spatiale en Côte d'Ivoire : projets pour ONG, entreprises, institutions.">
+<meta name="keywords" content="réalisations SIG, projets cartographiques Côte d'Ivoire, portfolio géomatique, projets télédétection, cartographie Abidjan">
+<link rel="canonical" href="https://geoexpertacademy.ci/realisations.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://geoexpertacademy.ci/realisations.html">
+<meta property="og:title" content="Réalisations | GeoExpert Academy & Consulting">
+<meta property="og:description" content="Projets SIG, cartographie et télédétection en Côte d'Ivoire.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Réalisations GeoExpert Academy",
+  "url": "https://geoexpertacademy.ci/realisations.html",
+  "about": {
+    "@type": "EducationalOrganization",
+    "name": "GeoExpert Academy & Consulting"
+  }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="style.css">
+
+<style>
+  /* HERO RÉALISATIONS */
+  .real-hero{
+    padding:100px 0 70px;
+    background:var(--bg-soft);
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .real-hero::before{
+    content:'';
+    position:absolute;
+    top:-100px; right:-100px;
+    width:400px; height:400px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(0,146,166,0.08) 0%, transparent 70%);
+  }
+  .real-hero .container{
+    position:relative;
+    z-index:1;
+    max-width:800px;
+    text-align:center;
+  }
+  .real-hero h1{
+    font-size:clamp(32px,5vw,50px);
+    font-weight:800;
+    margin-bottom:20px;
+    line-height:1.15;
+  }
+  .real-hero .text-accent{
+    background:var(--gradient-brand);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .real-hero .hero-lead{
+    font-size:18px;
+    color:var(--ink-dim);
+    line-height:1.7;
+    max-width:640px;
+    margin:0 auto;
+  }
+
+  /* CHIFFRES */
+  .real-stats{
+    padding:50px 0;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+  }
+  .real-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:24px;
+    text-align:center;
+  }
+  .real-stat strong{
+    display:block;
+    font-family:var(--font-display);
+    font-size:38px;
+    font-weight:800;
+    background:var(--gradient-brand);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    line-height:1.1;
+    margin-bottom:8px;
+  }
+  .real-stat span{
+    font-size:14px;
+    color:var(--ink-dim);
+  }
+
+  /* SECTION RÉALISATIONS */
+  .real-section{
+    padding:80px 0;
+    background:var(--bg);
+  }
+  .real-container{
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  .real-section h2{
+    font-size:clamp(26px,3.5vw,38px);
+    margin-bottom:18px;
+    font-weight:700;
+  }
+  .real-section h2 .text-accent{
+    background:var(--gradient-brand);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .real-section .section-lead{
+    max-width:640px;
+    margin-bottom:44px;
+  }
+
+  /* GRILLE PROJETS */
+  .projects-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+    gap:28px;
+  }
+  .project-card{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:transform .15s, box-shadow .2s;
+  }
+  .project-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 16px 32px rgba(0,146,166,0.12);
+  }
+  .project-image{
+    width:100%;
+    aspect-ratio:4/3;
+    object-fit:contain;
+    display:block;
+    border-bottom:1px solid var(--line);
+    background:var(--bg-soft);
+    padding:12px;
+  }
+  .project-body{
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+  }
+  .project-tag{
+    align-self:flex-start;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--teal);
+    background:var(--teal-soft);
+    padding:5px 11px;
+    border-radius:6px;
+    margin-bottom:14px;
+  }
+  .project-card:nth-child(2) .project-tag{ color:var(--indigo); background:rgba(75,63,146,0.1); }
+  .project-card:nth-child(3) .project-tag{ color:var(--magenta); background:rgba(168,60,147,0.1); }
+  .project-card:nth-child(4) .project-tag{ color:var(--teal); background:var(--teal-soft); }
+  .project-card:nth-child(5) .project-tag{ color:var(--indigo); background:rgba(75,63,146,0.1); }
+  .project-card:nth-child(6) .project-tag{ color:var(--magenta); background:rgba(168,60,147,0.1); }
+  .project-card:nth-child(7) .project-tag{ color:var(--teal); background:var(--teal-soft); }
+  .project-card:nth-child(8) .project-tag{ color:var(--indigo); background:rgba(75,63,146,0.1); }
+
+  .project-body h3{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:10px;
+    line-height:1.35;
+    color:var(--ink);
+  }
+  .project-location{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-faint);
+    margin-bottom:14px;
+    font-weight:500;
+  }
+  .project-location svg{
+    width:14px;
+    height:14px;
+    stroke:currentColor;
+    fill:none;
+    stroke-width:2;
+  }
+  .project-desc{
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--ink-dim);
+    margin-bottom:18px;
+    flex:1;
+  }
+  .project-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .project-tools span{
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink-dim);
+    background:var(--bg-soft);
+    padding:3px 10px;
+    border-radius:20px;
+  }
+
+  /* CTA FINAL */
+  .real-cta{
+    padding:80px 24px;
+    text-align:center;
+    background:var(--gradient-brand);
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+  }
+  .real-cta::before{
+    content:'';
+    position:absolute;
+    top:-100px; left:50%;
+    transform:translateX(-50%);
+    width:500px; height:500px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  }
+  .real-cta .container{
+    position:relative;
+    z-index:1;
+    max-width:640px;
+  }
+  .real-cta h2{
+    color:#fff;
+    margin-bottom:16px;
+    font-size:clamp(26px,3.5vw,36px);
+  }
+  .real-cta p{
+    color:rgba(255,255,255,0.9);
+    font-size:17px;
+    line-height:1.7;
+    margin-bottom:32px;
+  }
+  .real-cta .btn{
+    background:#fff;
+    color:var(--indigo);
+    font-weight:600;
+    font-size:15px;
+    padding:14px 30px;
+  }
+  .real-cta .btn:hover{
+    background:var(--bg-soft);
+    transform:translateY(-2px);
+  }
+
+  @media (max-width:700px){
+    .real-hero{ padding:70px 0 50px; }
+    .real-section{ padding:60px 0; }
+    .projects-grid{ grid-template-columns:1fr; }
+    .real-stat strong{ font-size:30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager" decoding="async">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Accueil</a>
+      <a href="a-propos.html">À propos</a>
+      <a href="services.html">Services</a>
+      <a href="realisations.html">Réalisations</a>
+      <a href="index.html#formations">Formations</a>
+      <a href="blog.html">Blog</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
+       class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="real-hero">
+  <div class="container">
+    <p class="section-eyebrow">Portfolio</p>
+    <h1>Nos <span class="text-accent">réalisations</span> en cartographie et SIG</h1>
+    <p class="hero-lead">
+      Découvrez une sélection de projets que nous avons menés pour des ONG, entreprises,
+      institutions et apprenants. Chaque projet est une preuve concrète de notre expertise
+      en géomatique appliquée.
+    </p>
+  </div>
+</section>
+
+<!-- ============ CHIFFRES CLÉS ============ -->
+<section class="real-stats">
+  <div class="container">
+    <div class="real-stats-grid">
+      <div class="real-stat">
+        <strong>1500+</strong>
+        <span>Cartes réalisées</span>
+      </div>
+      <div class="real-stat">
+        <strong>8+</strong>
+        <span>Années d'expérience</span>
+      </div>
+      <div class="real-stat">
+        <strong>6</strong>
+        <span>Secteurs d'intervention</span>
+      </div>
+      <div class="real-stat">
+        <strong>10+</strong>
+        <span>Villes couvertes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROJETS ============ -->
+<section class="real-section">
+  <div class="real-container">
+    <p class="section-eyebrow">Projets sélectionnés</p>
+    <h2>Ce que nous <span class="text-accent">réalisons</span></h2>
+    <p class="section-lead">
+      De la cartographie thématique à la télédétection, voici quelques-uns de nos projets
+      récents en Côte d'Ivoire.
+    </p>
+
+    <div class="projects-grid">
+
+      <!-- PROJET 1 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte1.webp" type="image/webp">
+          <img src="images/Carte1.jpg" alt="Carte de la stratégie de gestion des végétaux aquatiques envahissants sur les lacs artificiels de Côte d'Ivoire" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Cartographie</span>
+          <h3>Stratégie de gestion des VAE sur les lacs artificiels</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Yamoussoukro
+          </p>
+          <p class="project-desc">
+            Conception d'une carte stratégique pour la gestion des végétaux aquatiques
+            envahissants (VAE) sur les lacs artificiels de Yamoussoukro. Identification
+            des zones d'intervention prioritaires et support d'aide à la décision pour
+            les autorités locales.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Cartographie</span>
+            <span>Analyse spatiale</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 2 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte3.webp" type="image/webp">
+          <img src="images/Carte3.jpg" alt="Carte pédologique de la Côte d'Ivoire réalisée par GeoExpert Academy" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Pédologie</span>
+          <h3>Carte pédologique de la Côte d'Ivoire</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Côte d'Ivoire
+          </p>
+          <p class="project-desc">
+            Production d'une carte pédologique nationale mettant en évidence les grands
+            types de sols du pays. Support pédagogique et outil d'aide à la planification
+            agricole et à la gestion des terres.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Cartographie thématique</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 3 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte6.webp" type="image/webp">
+          <img src="images/Carte6.jpg" alt="Carte du bassin versant du fleuve Bandama en Côte d'Ivoire" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Hydrologie</span>
+          <h3>Bassin versant du fleuve Bandama</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Bandama, Côte d'Ivoire
+          </p>
+          <p class="project-desc">
+            Délimitation et cartographie du bassin versant du fleuve Bandama à partir
+            d'un modèle numérique de terrain (MNT). Analyse du réseau hydrographique et
+            des sous-bassins pour des études hydrologiques et environnementales.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>MNT</span>
+            <span>Hydrographie</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 4 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte4.webp" type="image/webp">
+          <img src="images/Carte4.jpg" alt="Modèle numérique d'altitude en 3D de la ville de Yamoussoukro" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Relief 3D</span>
+          <h3>Altitude en 3D de Yamoussoukro</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Yamoussoukro
+          </p>
+          <p class="project-desc">
+            Représentation 3D du relief de la ville de Yamoussoukro à partir d'un MNT.
+            Visualisation immersive des variations d'altitude pour des études d'aménagement
+            urbain et de planification territoriale.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>MNT</span>
+            <span>3D</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 5 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte5.webp" type="image/webp">
+          <img src="images/Carte5.jpg" alt="Carte du relief de la région de Toumodi en Côte d'Ivoire" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Relief</span>
+          <h3>Relief de la région de Toumodi</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Toumodi
+          </p>
+          <p class="project-desc">
+            Cartographie du relief de la région de Toumodi à partir de données altimétriques.
+            Mise en évidence des principales formes topographiques pour appuyer les études
+            d'aménagement et les analyses environnementales.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Analyse du relief</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 6 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte7.webp" type="image/webp">
+          <img src="images/Carte7.jpg" alt="Carte des différents climats de la Côte d'Ivoire" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Climat</span>
+          <h3>Zones climatiques de la Côte d'Ivoire</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Côte d'Ivoire
+          </p>
+          <p class="project-desc">
+            Cartographie des différents climats de Côte d'Ivoire à partir de données
+            météorologiques. Support pour les études agro-climatiques, la planification
+            agricole et la gestion des ressources en eau.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Analyse climatique</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 7 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte8.webp" type="image/webp">
+          <img src="images/Carte8.jpg" alt="Carte des différents quartiers d'Abidjan" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Urbain</span>
+          <h3>Quartiers d'Abidjan</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Abidjan
+          </p>
+          <p class="project-desc">
+            Production d'une carte administrative des différents quartiers d'Abidjan.
+            Représentation claire du découpage urbain et support pour les études
+            d'aménagement, la gestion des services publics et l'analyse territoriale.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Cartographie urbaine</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PROJET 8 -->
+      <article class="project-card">
+        <picture>
+          <source srcset="images/Carte2.webp" type="image/webp">
+          <img src="images/Carte2.jpg" alt="Carte de proximité des habitations et zones de cultures autour des lacs artificiels" class="project-image" width="800" height="500" loading="lazy" decoding="async">
+        </picture>
+        <div class="project-body">
+          <span class="project-tag">Analyse spatiale</span>
+          <h3>Proximité des habitations aux lacs artificiels</h3>
+          <p class="project-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            Yamoussoukro
+          </p>
+          <p class="project-desc">
+            Analyse spatiale de la proximité des habitations et des zones de cultures
+            autour des lacs artificiels. Détection des zones à risque et support pour
+            la planification urbaine et la gestion des risques environnementaux.
+          </p>
+          <div class="project-tools">
+            <span>QGIS</span>
+            <span>Analyse spatiale</span>
+            <span>Zone tampon</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section class="real-cta">
+  <div class="container">
+    <h2>Vous avez un projet cartographique ?</h2>
+    <p>
+      Discutons de votre besoin. Nous vous proposons une solution adaptée à votre
+      contexte, vos données et vos objectifs.
+    </p>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20j'ai%20un%20projet%20cartographique%20et%20je%20souhaite%20discuter."
+       class="btn" target="_blank" rel="noopener">Discuter de mon projet</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/profile.php?id=61590209789158" target="_blank" rel="noopener" aria-label="Facebook GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@geoexpertacademy" target="_blank" rel="noopener" aria-label="TikTok GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82c-1.02-.9-1.64-2.16-1.7-3.6h-3.15v13.9c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1-2.94-2.94 2.94 2.94 0 0 1 2.94-2.94c.3 0 .59.05.86.13v-3.2a6.15 6.15 0 0 0-.86-.06A6.14 6.14 0 0 0 2.7 16.19a6.14 6.14 0 0 0 6.11 6.13 6.14 6.14 0 0 0 6.11-6.13V9.07a8.7 8.7 0 0 0 5.08 1.63V7.55a5.32 5.32 0 0 1-3.4-1.73Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@geoexpertacademyconsulting0794" target="_blank" rel="noopener" aria-label="YouTube GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.02-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.98.13c-.4.05-1.26.05-2.02.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.2 3.28.2 3.28s.2 1.4.8 2.02c.77.8 1.77.78 2.22.86C6.8 19.05 12 19.1 12 19.1s4.1-.01 6.98-.14c.4-.05 1.26-.05 2.02-.85.6-.62.8-2.02.8-2.02s.2-1.64.2-3.28v-1.44c0-1.64-.2-3.28-.2-3.28ZM9.98 14.6V8.85l5.4 2.88-5.4 2.87Z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/geoexpert-academy-consulting" target="_blank" rel="noopener" aria-label="LinkedIn GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
+      </a>
+    </div>
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting — Abidjan, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+</body>
+</html>
