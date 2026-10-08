@@ -1556,3 +1556,179 @@ picture img{
     transform:none;
   }
 }
+
+/* ==========================================================
+   SECTION POURQUOI NOUS CHOISIR
+   ========================================================== */
+.pourquoi-section{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-soft);
+}
+.pourquoi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:22px;
+  margin-top:32px;
+}
+.pourquoi-card{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px 24px;
+  transition:transform .15s, box-shadow .2s, border-color .2s;
+}
+.pourquoi-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px rgba(0,146,166,0.1);
+  border-color:var(--teal);
+}
+.pourquoi-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:52px;
+  height:52px;
+  border-radius:12px;
+  background:var(--teal-soft);
+  color:var(--teal);
+  margin-bottom:16px;
+}
+.pourquoi-card:nth-child(2) .pourquoi-icon{ background:rgba(75,63,146,0.1); color:var(--indigo); }
+.pourquoi-card:nth-child(3) .pourquoi-icon{ background:rgba(168,60,147,0.1); color:var(--magenta); }
+.pourquoi-card:nth-child(4) .pourquoi-icon{ background:var(--teal-soft); color:var(--teal); }
+.pourquoi-card:nth-child(5) .pourquoi-icon{ background:rgba(75,63,146,0.1); color:var(--indigo); }
+.pourquoi-card:nth-child(6) .pourquoi-icon{ background:rgba(168,60,147,0.1); color:var(--magenta); }
+.pourquoi-card h3{
+  font-size:17px;
+  margin-bottom:8px;
+  color:var(--ink);
+  font-weight:600;
+}
+.pourquoi-card p{
+  font-size:14.5px;
+  line-height:1.65;
+  color:var(--ink-dim);
+  margin:0;
+}
+
+@media (max-width:600px){
+  .pourquoi-grid{ grid-template-columns:1fr; }
+}
+
+/* ==========================================================
+   CTA STICKY MOBILE (visible uniquement sur mobile)
+   ========================================================== */
+.mobile-cta-bar{
+  display:none;
+}
+
+@media (max-width: 900px){
+  .mobile-cta-bar{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:100;
+    background:rgba(255,255,255,0.95);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom)) 14px;
+    gap:10px;
+    box-shadow:0 -4px 20px rgba(46,44,52,0.08);
+  }
+  .mobile-cta-btn{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:14.5px;
+    font-weight:600;
+    text-decoration:none;
+    transition:transform .15s, box-shadow .2s;
+  }
+  .mobile-cta-btn:active{ transform:scale(0.97); }
+  .mobile-cta-whatsapp{
+    background:#25B357;
+    color:#fff;
+    box-shadow:0 4px 12px rgba(37,179,87,0.25);
+  }
+  .mobile-cta-call{
+    background:var(--gradient-brand);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(75,63,146,0.25);
+  }
+  /* Évite que le contenu soit caché par la barre */
+  body{
+    padding-bottom:80px;
+  }
+  /* Décale le bouton Tidio au-dessus de la barre */
+  #tidio-chat,
+  [id^="tidio-chat"]{
+    bottom:80px !important;
+  }
+}
+/* ==========================================================
+   SECTION NOTRE MÉTHODE (4 étapes)
+   ========================================================== */
+.methode-section{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+}
+.methode-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:24px;
+  margin-top:32px;
+  position:relative;
+}
+.methode-step{
+  position:relative;
+  padding:28px 24px 24px;
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  transition:border-color .2s, box-shadow .2s;
+}
+.methode-step:hover{
+  border-color:var(--teal);
+  box-shadow:0 12px 26px rgba(0,146,166,0.08);
+}
+.methode-number{
+  font-family:var(--font-display);
+  font-size:38px;
+  font-weight:800;
+  line-height:1;
+  background:var(--gradient-brand);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:14px;
+}
+.methode-step h3{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:10px;
+  color:var(--ink);
+}
+.methode-step p{
+  font-size:14.5px;
+  line-height:1.65;
+  color:var(--ink-dim);
+  margin:0;
+}
+.methode-step em{
+  color:var(--ink);
+  font-style:italic;
+  font-weight:500;
+}
+
+@media (max-width:600px){
+  .methode-grid{ grid-template-columns:1fr; }
+}
