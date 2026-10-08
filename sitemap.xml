@@ -12,6 +12,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+    <url>
+    <loc>https://geoexpertacademy.ci/services.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <url>
     <loc>https://geoexpertacademy.ci/blog.html</loc>
     <lastmod>2026-10-07</lastmod>
