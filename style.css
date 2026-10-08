@@ -1732,3 +1732,102 @@ picture img{
 @media (max-width:600px){
   .methode-grid{ grid-template-columns:1fr; }
 }
+/* ==========================================================
+   SECTION NEWSLETTER
+   ========================================================== */
+/* ==========================================================
+   SECTION NEWSLETTER
+   ========================================================== */
+.newsletter-section{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-soft);
+}
+.newsletter-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  align-items:center;
+  max-width:1000px;
+  margin:0 auto;
+}
+.newsletter-text h2{
+  font-size:clamp(24px, 3.5vw, 34px);
+  margin-bottom:16px;
+  font-weight:700;
+}
+.newsletter-lead{
+  font-size:16px;
+  line-height:1.7;
+  color:var(--ink-dim);
+  margin-bottom:24px;
+}
+.newsletter-benefits{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.newsletter-benefits li{
+  position:relative;
+  padding-left:26px;
+  margin-bottom:10px;
+  font-size:15px;
+  color:var(--ink-dim);
+  line-height:1.5;
+}
+.newsletter-benefits li::before{
+  content:'✓';
+  position:absolute;
+  left:0;
+  top:0;
+  color:var(--teal);
+  font-weight:700;
+}
+.newsletter-form-wrap{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:32px;
+  display:block;
+}
+/* Styles du formulaire Brevo */
+.newsletter-brevo{
+  width:100%;
+}
+.newsletter-input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  font-family:var(--font-body);
+  font-size:15px;
+  color:var(--ink);
+  background:var(--bg-soft);
+  transition:border-color .2s, box-shadow .2s;
+}
+.newsletter-input:focus{
+  border-color:var(--teal);
+  box-shadow:0 0 0 3px var(--teal-soft);
+  outline:none;
+}
+.newsletter-input::placeholder{
+  color:var(--ink-faint);
+}
+.newsletter-btn{
+  margin-top:8px;
+}
+.sib-form-message-panel{
+  display:none;
+}
+.sib-form-message-panel[data-display="block"]{
+  display:block;
+}
+@media (max-width:800px){
+  .newsletter-inner{
+    grid-template-columns:1fr;
+    gap:32px;
+  }
+  .newsletter-form-wrap{
+    padding:24px;
+  }
+}

@@ -1162,6 +1162,91 @@
     </div>
   </div>
 </section>
+<!-- ============ NEWSLETTER ============ -->
+ <!-- ============ NEWSLETTER ============ -->
+<section class="newsletter-section" id="newsletter">
+  <div class="container">
+    <div class="newsletter-inner">
+      <div class="newsletter-text">
+        <p class="section-eyebrow">Restez informé</p>
+        <h2>Recevez nos conseils et actualités</h2>
+        <p class="newsletter-lead">
+          Inscrivez-vous à notre newsletter pour recevoir en priorité les dates des
+          prochaines sessions, les nouveaux articles de blog et les conseils pratiques
+          en géomatique. <strong>Zéro spam, désinscription en 1 clic.</strong>
+        </p>
+        <ul class="newsletter-benefits">
+          <li>Dates des prochaines sessions en avant-première</li>
+          <li>Nouveaux articles et tutoriels SIG</li>
+          <li>Conseils pratiques en géomatique</li>
+          <li>Offres spéciales réservées aux abonnés</li>
+        </ul>
+      </div>
+      <div class="newsletter-form-wrap">
+
+        <!-- FORMULAIRE BREVO INTÉGRÉ -->
+        <div id="sib-form-container" class="sib-form-container newsletter-brevo">
+          <div id="error-message" class="sib-form-message-panel" style="font-family:inherit;font-size:14px;text-align:left;color:#661d1d;background-color:#ffeded;border:1px solid #ff4949;border-radius:8px;padding:12px;margin-bottom:16px;">
+            <div class="sib-form-message-panel__text">
+              <span>Nous n'avons pas pu confirmer votre inscription.</span>
+            </div>
+          </div>
+          <div id="success-message" class="sib-form-message-panel" style="font-family:inherit;font-size:14px;text-align:left;color:#085229;background-color:#e7faf0;border:1px solid #13ce66;border-radius:8px;padding:12px;margin-bottom:16px;">
+            <div class="sib-form-message-panel__text">
+              <span>Votre inscription est confirmée. Merci !</span>
+            </div>
+          </div>
+          <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center;background:transparent;">
+            <form id="sib-form" method="POST" action="https://4194a653.sibforms.com/serve/MUIFACDPFJy5fNJt5YnJHdLV2SY_TY6Po-CV0q03Wxum4AhBQ7fST4DTVw8pFwiIlTtZsu2fm6Fo6OV8ztoSzP3jhTI7PLHckSa5NtkNLIIZkI5JLTaF15R10fh8Cutz8XuUj-QP-b1oq9v95zIFeiVbDcAiyet4PpsifxbfFuFDCTgj1qi5O9uE-M05xthKgMisMIjINnOP8PQZ7Q==" data-type="subscription">
+
+              <div class="form__entry entry_block" style="margin-bottom:16px;">
+                <label class="entry__label" for="PRENOM" style="display:block;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:8px;text-align:left;">Votre prénom *</label>
+                <input class="input newsletter-input" maxlength="200" type="text" id="PRENOM" name="PRENOM" autocomplete="given-name" placeholder="Ex : Jean" required />
+                <label class="entry__error entry__error--primary" style="font-size:13px;color:#661d1d;"></label>
+              </div>
+
+              <div class="form__entry entry_block" style="margin-bottom:16px;">
+                <label class="entry__label" for="NOM" style="display:block;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:8px;text-align:left;">Votre nom *</label>
+                <input class="input newsletter-input" maxlength="200" type="text" id="NOM" name="NOM" autocomplete="family-name" placeholder="Ex : Kouassi" required />
+                <label class="entry__error entry__error--primary" style="font-size:13px;color:#661d1d;"></label>
+              </div>
+
+              <div class="form__entry entry_block" style="margin-bottom:16px;">
+                <label class="entry__label" for="EMAIL" style="display:block;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:8px;text-align:left;">Votre email *</label>
+                <input class="input newsletter-input" type="email" id="EMAIL" name="EMAIL" autocomplete="email" placeholder="Ex : contact@exemple.com" required />
+                <label class="entry__error entry__error--primary" style="font-size:13px;color:#661d1d;"></label>
+              </div>
+
+              <button type="submit" form="sib-form" class="btn btn-primary newsletter-btn" style="width:100%;padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;">
+                Je m'inscris
+              </button>
+
+              <input type="text" name="email_address_check" value="" class="input--hidden" style="display:none;">
+              <input type="hidden" name="locale" value="fr">
+            </form>
+          </div>
+        </div>
+        <!-- FIN FORMULAIRE BREVO -->
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scripts Brevo -->
+<script>
+  window.REQUIRED_CODE_ERROR_MESSAGE = 'Veuillez choisir un code pays';
+  window.LOCALE = 'fr';
+  window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides. Veuillez vérifier le format du champ et réessayer.";
+  window.REQUIRED_ERROR_MESSAGE = "Vous devez renseigner ce champ.";
+  window.GENERIC_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides.";
+  window.INVALID_NUMBER = "Les informations que vous avez fournies ne sont pas valides.";
+  window.INVALID_DATE = "Veuillez saisir une date valide";
+  window.REQUIRED_MULTISELECT_MESSAGE = 'Veuillez choisir au moins une option';
+  window.translation = { common: { selectedList: '{quantity} liste sélectionnée', selectedLists: '{quantity} listes sélectionnées', selectedOption: '{quantity} sélectionné', selectedOptions: '{quantity} sélectionnés' } };
+  var AUTOHIDE = Boolean(0);
+</script>
+<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 
 <!-- ============ VÉRIFICATION DE CERTIFICAT ============ -->
 <section class="verification-section" id="verification">
