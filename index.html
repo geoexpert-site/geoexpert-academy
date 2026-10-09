@@ -32,7 +32,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="images/favicon.png">
+<!-- Favicon -->
+<link rel="icon" href="images/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<link rel="manifest" href="images/site.webmanifest">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 
@@ -108,15 +112,72 @@
       </picture>
     </a>
     <nav class="main-nav" id="mainNav">
-      <a href="index.html">Accueil</a>
-      <a href="a-propos.html">À propos</a>
-      <a href="services.html">Services</a>
-      <a href="realisations.html">Réalisations</a>
-      <a href="ressources.html">Ressources</a>
-      <a href="index.html#formations">Formations</a>
-      <a href="blog.html">Blog</a>
-      <a href="index.html#inscription">Inscription</a>
-      <a href="contact.html">Contact</a>
+      <div class="nav-item">
+        <a href="index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="index.html#formations">
+            <strong>Toutes les formations</strong>
+            <small>Découvrir nos programmes</small>
+          </a>
+          <a href="ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="contact.html">Contact</a>
+      </div>
     </nav>
     <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
        class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
@@ -517,37 +578,6 @@
       <div class="soon-chip">
         <span class="soon-badge">Bientôt disponible</span>
         <span class="soon-name">PostgreSQL / PostGIS</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ VIDEOS ============ -->
-<section class="videos" id="videos">
-  <div class="container">
-    <p class="section-eyebrow">Démonstrations</p>
-    <h2>Vidéos de formation</h2>
-    <p class="section-lead">Un aperçu de nos formations et démonstrations d'outils SIG.</p>
-
-    <div class="video-grid">
-      <!-- ✅ CORRIGÉ : youtube-nocookie + referrerpolicy + allow -->
-      <div class="video-card">
-        <div class="video-embed">
-          <iframe src="https://www.youtube-nocookie.com/embed/lHaDNWcJyD8" title="Plan cadastral géoréférencé - GeoExpert Academy" frameborder="0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <h4>PLAN CADASTRAL GEOREFERENCE</h4>
-      </div>
-      <div class="video-card">
-        <div class="video-embed">
-          <iframe src="https://www.youtube-nocookie.com/embed/etj83AQ-buY" title="Mise en page et présentation de cartes - GeoExpert Academy" frameborder="0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <h4>MISE EN PAGE ET PRESENTATION DE QUELQUES CARTES</h4>
-      </div>
-      <div class="video-card">
-        <div class="video-embed">
-          <iframe src="https://www.youtube-nocookie.com/embed/Q3bke-DoEmA" title="Carte de secteur - GeoExpert Academy" frameborder="0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <h4>CARTE DE SECTEUR</h4>
       </div>
     </div>
   </div>
@@ -1019,52 +1049,6 @@
   </div>
 </section>
 
-<!-- ============ FAQ ============ -->
-<section class="faq" id="faq">
-  <div class="container">
-    <p class="section-eyebrow">Questions fréquentes</p>
-    <h2>FAQ</h2>
-
-    <div class="faq-list">
-      <details class="faq-item">
-        <summary>La géomatique est-elle réservée aux géographes ?</summary>
-        <p>Non. Nos formations s'adressent à tous les professionnels du territoire : BTP, agronomie, urbanisme, topographie, mines, environnement, et bien d'autres secteurs.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Les formations sont-elles en présentiel ou en ligne ?</summary>
-        <p>Les deux formats existent selon les sessions. Le programme précise à chaque fois s'il s'agit d'une formation en présentiel à Abidjan ou en ligne.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Quels logiciels sont utilisés pendant la formation ?</summary>
-        <p>QGIS, ArcGIS, KoboToolbox et Google Earth Pro pour la formation principale, ainsi que Google Earth Engine pour les autres modules.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Comment se passe le paiement ?</summary>
-        <p>Le paiement se fait via Wave ou Orange Money. Une partie est versée à l'inscription, le solde avant le début de la formation. Les détails sont indiqués dans la section Inscription.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Que se passe-t-il si la session n'atteint pas le nombre minimum d'inscrits ?</summary>
-        <p>Si le nombre minimum d'inscrits n'est pas atteint à la date prévue, la session est reportée à une date ultérieure communiquée à tous les inscrits. Les frais déjà versés restent valables pour la nouvelle date.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Un niveau particulier est-il requis pour s'inscrire ?</summary>
-        <p>Aucune connaissance en SIG n'est exigée, mais une aisance de base avec l'utilisation d'un ordinateur (fichiers, dossiers, navigation) est recommandée. 
-          Un ordinateur portable (Windows ou mac / avec au moins 8 Go de RAM) est nécessaire pour suivre la formation dans de bonnes conditions.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>Proposez-vous des formations sur mesure ?</summary>
-        <p>Oui, au-delà des formations listées, nous organisons des sessions personnalisées selon vos besoins. Contactez-nous directement sur WhatsApp pour en discuter.</p>
-      </details>
-    </div>
-  </div>
-</section> 
-  
 <!-- ============ BANNIÈRE EMPLOI ============ -->
 <!-- ✅ CORRIGÉ : div interne inutile supprimé -->
 <section class="job-banner">
@@ -1162,6 +1146,164 @@
 </script>
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 
+<!-- ============ APERÇU SERVICES ============ -->
+<section class="home-services-preview">
+  <div class="container">
+    <p class="section-eyebrow">Nos services</p>
+    <h2>Formation et consulting en géomatique</h2>
+    <p class="section-lead">
+      De la formation professionnelle à l'accompagnement de projets SIG, nous mobilisons
+      les outils de la géomatique pour transformer vos données en décisions.
+    </p>
+
+    <div class="preview-grid">
+      <a href="services.html" class="preview-card">
+        <div class="preview-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/>
+            <path d="M22 10v6"/>
+            <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+          </svg>
+        </div>
+        <h3>Formation professionnelle</h3>
+        <p>QGIS, ArcGIS, télédétection, cartographie et collecte de données.</p>
+        <span class="preview-link">En savoir plus →</span>
+      </a>
+
+      <a href="services.html" class="preview-card">
+        <div class="preview-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/>
+            <path d="M15 5.764v15"/>
+            <path d="M9 3.236v15"/>
+          </svg>
+        </div>
+        <h3>Cartographie professionnelle</h3>
+        <p>Cartes thématiques, cartes d'analyse et mise en page cartographique.</p>
+        <span class="preview-link">En savoir plus →</span>
+      </a>
+
+      <a href="services.html" class="preview-card">
+        <div class="preview-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+            <path d="M2 12h20"/>
+          </svg>
+        </div>
+        <h3>Télédétection</h3>
+        <p>Analyse d'images satellitaires, indices spectraux, suivi territorial.</p>
+        <span class="preview-link">En savoir plus →</span>
+      </a>
+
+      <a href="services.html" class="preview-card">
+        <div class="preview-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+            <path d="M12 18h.01"/>
+          </svg>
+        </div>
+        <h3>Collecte de données terrain</h3>
+        <p>Formulaires mobiles, relevés GPS, intégration dans un SIG.</p>
+        <span class="preview-link">En savoir plus →</span>
+      </a>
+    </div>
+
+    <div class="preview-cta">
+      <a href="services.html" class="btn btn-outline">Voir tous nos services</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APERÇU RÉALISATIONS ============ -->
+<section class="home-real-preview">
+  <div class="container">
+    <p class="section-eyebrow">Nos réalisations</p>
+    <h2>Ce que nous avons accompli</h2>
+    <p class="section-lead">
+      Une sélection de projets cartographiques et d'analyses spatiales menés
+      en Côte d'Ivoire.
+    </p>
+
+    <div class="real-preview-grid">
+      <a href="realisations.html" class="real-preview-card">
+        <picture>
+          <source srcset="images/Carte1.webp" type="image/webp">
+          <img src="images/Carte1.jpg" alt="Carte de gestion des végétaux aquatiques envahissants" width="400" height="300" loading="lazy" decoding="async">
+        </picture>
+        <div class="real-preview-body">
+          <h3>Gestion des VAE sur les lacs artificiels</h3>
+          <p>Yamoussoukro</p>
+        </div>
+      </a>
+
+      <a href="realisations.html" class="real-preview-card">
+        <picture>
+          <source srcset="images/Carte6.webp" type="image/webp">
+          <img src="images/Carte6.jpg" alt="Bassin versant du fleuve Bandama" width="400" height="300" loading="lazy" decoding="async">
+        </picture>
+        <div class="real-preview-body">
+          <h3>Bassin versant du Bandama</h3>
+          <p>Côte d'Ivoire</p>
+        </div>
+      </a>
+
+      <a href="realisations.html" class="real-preview-card">
+        <picture>
+          <source srcset="images/Carte8.webp" type="image/webp">
+          <img src="images/Carte8.jpg" alt="Quartiers d'Abidjan" width="400" height="300" loading="lazy" decoding="async">
+        </picture>
+        <div class="real-preview-body">
+          <h3>Quartiers d'Abidjan</h3>
+          <p>Abidjan</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="preview-cta">
+      <a href="realisations.html" class="btn btn-outline">Voir toutes nos réalisations</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DERNIERS ARTICLES BLOG ============ -->
+<section class="home-blog-preview">
+  <div class="container">
+    <p class="section-eyebrow">Blog</p>
+    <h2>Nos derniers articles</h2>
+    <p class="section-lead">
+      Conseils pratiques, guides et ressources pour progresser en géomatique.
+    </p>
+
+    <div class="blog-preview-grid">
+      <a href="blog/debuter-sig-2026.html" class="blog-preview-card">
+        <span class="blog-preview-tag">Guide débutant</span>
+        <h3>Comment débuter en SIG en 2026</h3>
+        <p>Les 3 étapes pour se lancer efficacement dans les Systèmes d'Information Géographique.</p>
+        <span class="blog-preview-meta">8 min de lecture</span>
+      </a>
+
+      <a href="blog/qgis-vs-arcgis.html" class="blog-preview-card">
+        <span class="blog-preview-tag">Comparatif</span>
+        <h3>QGIS vs ArcGIS : lequel choisir ?</h3>
+        <p>Comparatif complet des deux logiciels phares de la géomatique.</p>
+        <span class="blog-preview-meta">6 min de lecture</span>
+      </a>
+
+      <a href="blog/debouches-geomatique-ci.html" class="blog-preview-card">
+        <span class="blog-preview-tag">Carrière</span>
+        <h3>Débouchés géomatique en Côte d'Ivoire</h3>
+        <p>Les 8 secteurs qui recrutent des profils SIG et leurs perspectives.</p>
+        <span class="blog-preview-meta">7 min de lecture</span>
+      </a>
+    </div>
+
+    <div class="preview-cta">
+      <a href="blog.html" class="btn btn-outline">Voir tous nos articles</a>
+    </div>
+  </div>
+</section>
+
 <!-- ============ VÉRIFICATION DE CERTIFICAT ============ -->
 <section class="verification-section" id="verification">
   <div class="container">
@@ -1173,61 +1315,6 @@
       <button id="btnVerifier">Vérifier</button>
     </div>
     <div id="resultat" role="status" aria-live="polite"></div>
-  </div>
-</section>
-
-<!-- ============ MENTIONS LÉGALES ============ -->
-<section class="mentions-legales" id="mentions-legales">
-  <div class="container">
-    <p class="section-eyebrow">Informations légales</p>
-    <h2>Mentions légales</h2>
-
-    <div class="mentions-content">
-     <h3>Éditeur du site</h3>
-     <p>
-      Ce site est édité par Jean Eudes AKA, exerçant sous le nom commercial
-      <strong>GeoExpert Academy & Consulting</strong>, activité de formation professionnelle
-      et de consulting en géomatique, basée à Abidjan, Côte d'Ivoire. Cette activité s'appuie sur une équipe de 10 collaborateurs
-      aux compétences complémentaires (géomatique et urbanisme, Topographie, agroclimatologie,
-      community management, administration, commercial/chargé de relation client, trésorerie).
-     </p>
-
-      <h3>Contact</h3>
-      <p>
-        WhatsApp / Wave / Orange Money : 07 87 01 50 30<br>
-        Service client Appel uniquement : 07 79 47 69 46<br>
-        Email : contact@geoexpertacademy.ci<br>
-        Site web : geoexpertacademy.ci
-      </p>
-
-      <h3>Hébergement</h3>
-      <p>
-        Ce site est hébergé par GitHub, Inc., 88 Colin P. Kelly Jr. Street,
-        San Francisco, CA 94107, États-Unis.
-      </p>
-
-      <h3>Propriété intellectuelle</h3>
-      <p>
-        L'ensemble des contenus présents sur ce site (textes, logo, cartes, photos,
-        supports de formation) est la propriété de GeoExpert Academy & Consulting,
-        sauf mention contraire. Toute reproduction sans autorisation préalable est interdite.
-      </p>
-
-      <h3>Données personnelles</h3>
-      <p>
-        Les informations transmises via les formulaires de ce site (inscription, avis,
-        contact) sont envoyées directement par WhatsApp et ne sont pas stockées sur
-        une base de données du site. Ces informations sont utilisées uniquement pour
-        traiter votre demande et ne sont ni vendues, ni transmises à des tiers.
-      </p>
-
-      <h3>Cookies</h3>
-      <p>
-        Ce site utilise Google Analytics à des fins de mesure d'audience. Ce service
-        peut déposer des cookies techniques dans votre navigateur. Aucune donnée
-        personnelle identifiable n'est collectée à cette fin.
-      </p>
-    </div>
   </div>
 </section>
 
@@ -1254,9 +1341,10 @@
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
     </a>
   </div>
-  <!-- ✅ AJOUTÉ : lien vers politique de confidentialité -->
-  <a href="#mentions-legales" class="footer-legal-link">Mentions légales</a> 
-  <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+  <!-- ✅ AJOUTÉ : lien vers politique de confidentialité et mentions légales -->
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="cgv.html" class="footer-legal-link">CGV</a>
   <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
 </div>
 </footer>
@@ -1285,6 +1373,10 @@
     <span>Appeler</span>
   </a>
 </div>
+
+<!-- Leaflet puis script principal (ordre important) -->
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="script.js"></script>
 
 </body>
 </html>

@@ -4,16 +4,19 @@
 // Organisation :
 //   0. Helpers
 //   1. Menu mobile
-//   2. Formulaire d'inscription
-//   3. Formulaire d'avis
-//   4. Façade vidéo de présentation
-//   5. Simulateur de parcours
-//   6. Carte interactive Leaflet
-//   7. Vérification de certificat
+//   2. Sous-menus (dropdowns)
+//   3. Formulaire d'inscription
+//   4. Formulaire d'avis
+//   5. Façade vidéo de présentation
+//   6. Simulateur de parcours
+//   7. Carte interactive Leaflet
+//   8. Vérification de certificat
 // ==========================================================
 
 (function () {
   'use strict';
+
+  function init() {
 
   // ==========================================================
   // 0. HELPERS
@@ -66,6 +69,7 @@
   // ==========================================================
   // 1. MENU MOBILE
   // ==========================================================
+  try {
   const navToggle = document.getElementById('navToggle');
   const mainNav = document.getElementById('mainNav');
 
@@ -78,7 +82,7 @@
 
   /** Ouvre/ferme le menu et synchronise aria-expanded. */
   navToggle?.addEventListener('click', (e) => {
-    e.stopPropagation(); // évite que le listener document ferme aussitôt
+    e.stopPropagation();
     const isOpen = mainNav.classList.toggle('open');
     navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
@@ -88,31 +92,78 @@
     link.addEventListener('click', fermerMenu);
   });
 
-  // ✅ AJOUTÉ : ferme le menu au clic en dehors
+  // Ferme le menu au clic en dehors
   document.addEventListener('click', (e) => {
     if (!mainNav?.classList.contains('open')) return;
     if (mainNav.contains(e.target) || navToggle?.contains(e.target)) return;
     fermerMenu();
   });
 
-  // ✅ AJOUTÉ : ferme le menu avec la touche Échap (accessibilité clavier)
+  // Ferme le menu avec la touche Échap
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && mainNav?.classList.contains('open')) {
       fermerMenu();
       navToggle?.focus();
     }
   });
-
+  } catch (err) {
+    console.error('[Section 1] erreur :', err);
+  }
 
   // ==========================================================
-  // 2. FORMULAIRE D'INSCRIPTION
+  // 2. SOUS-MENUS (DROPDOWNS)
   // ==========================================================
+  try {
+  document.querySelectorAll('.nav-toggle-sub').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const navItem = this.closest('.nav-item');
+      if (!navItem) return;
+
+      const isOpen = navItem.classList.contains('open');
+
+      // Ferme tous les autres sous-menus
+      document.querySelectorAll('.nav-item.open').forEach(function (item) {
+        if (item !== navItem) item.classList.remove('open');
+      });
+
+      // Toggle celui-ci
+      navItem.classList.toggle('open', !isOpen);
+    });
+  });
+
+  // Ferme les sous-menus au clic ailleurs
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.nav-item')) {
+      document.querySelectorAll('.nav-item.open').forEach(function (item) {
+        item.classList.remove('open');
+      });
+    }
+  });
+
+  // Ferme les sous-menus à la touche Échap
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-item.open').forEach(function (item) {
+        item.classList.remove('open');
+      });
+    }
+  });
+  } catch (err) {
+    console.error('[Section 2] erreur :', err);
+  }
+
+  // ==========================================================
+  // 3. FORMULAIRE D'INSCRIPTION
+  // ==========================================================
+  try {
   const form = document.getElementById('inscriptionForm');
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // ✅ CORRIGÉ : récupération sécurisée des valeurs
     const name       = document.getElementById('fName')?.value.trim() ?? '';
     const phone      = document.getElementById('fPhone')?.value.trim() ?? '';
     const profession = document.getElementById('fProfession')?.value.trim() ?? '';
@@ -122,13 +173,11 @@
     const formation  = document.getElementById('fFormation')?.value ?? '';
     const message    = document.getElementById('fMessage')?.value.trim() ?? '';
 
-    // ✅ AJOUTÉ : vérification de tous les champs obligatoires
     if (!name || !phone || !profession || !niveau || !ville || !mode || !formation) {
       alert("Merci de remplir tous les champs obligatoires.");
       return;
     }
 
-    // ✅ AJOUTÉ : validation du numéro de téléphone
     const phoneClean = phone.replace(/\s+/g, '');
     if (!/^(\+?225)?0?[0-9]{8,10}$/.test(phoneClean)) {
       alert("Merci d'entrer un numéro de téléphone valide (ex : 07 87 01 50 30).");
@@ -151,17 +200,17 @@
     ];
     if (message) lines.push(``, `Message : ${message}`);
 
-    // ✅ CORRIGÉ : URLSearchParams + link.click() au lieu de window.open
     ouvrirLien(whatsappUrl(lines.join('\n')));
-
-    // ✅ AJOUTÉ : réinitialise le formulaire après envoi
     form.reset();
   });
-
+  } catch (err) {
+    console.error('[Section 3] erreur :', err);
+  }
 
   // ==========================================================
-  // 3. FORMULAIRE D'AVIS
+  // 4. FORMULAIRE D'AVIS
   // ==========================================================
+  try {
   const btnLaisserAvis = document.getElementById('btnLaisserAvis');
   const avisForm = document.getElementById('avisForm');
 
@@ -172,7 +221,6 @@
   avisForm?.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // ✅ CORRIGÉ : accès sécurisé aux champs
     const nom             = document.getElementById('avisNom')?.value.trim() ?? '';
     const formationSuivie = document.getElementById('avisFormation')?.value.trim() ?? '';
     const messageAvis     = document.getElementById('avisMessage')?.value.trim() ?? '';
@@ -193,21 +241,22 @@
 
     ouvrirLien(whatsappUrl(lines.join('\n')));
 
-    // ✅ AJOUTÉ : réinitialise + cache le formulaire après envoi
     avisForm.reset();
     avisForm.classList.remove('show');
   });
-
+  } catch (err) {
+    console.error('[Section 4] erreur :', err);
+  }
 
   // ==========================================================
-  // 4. FAÇADE VIDÉO DE PRÉSENTATION
+  // 5. FAÇADE VIDÉO DE PRÉSENTATION
   // ==========================================================
+  try {
   const presVideoFacade = document.getElementById('presVideoFacade');
 
   if (presVideoFacade) {
     const videoId = presVideoFacade.dataset.videoId;
 
-    // ✅ CORRIGÉ : fallback si maxresdefault.jpg n'existe pas
     const maxRes = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     const hqRes  = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
     presVideoFacade.style.backgroundImage = `url('${maxRes}')`;
@@ -218,7 +267,6 @@
       presVideoFacade.style.backgroundImage = `url('${hqRes}')`;
     };
 
-    // ✅ CORRIGÉ : { once: true } + youtube-nocookie + referrerpolicy
     presVideoFacade.addEventListener('click', function handler() {
       this.removeEventListener('click', handler);
       this.style.backgroundImage = 'none';
@@ -233,11 +281,14 @@
         </iframe>`;
     });
   }
-
+  } catch (err) {
+    console.error('[Section 5] erreur :', err);
+  }
 
   // ==========================================================
-  // 5. SIMULATEUR DE PARCOURS
+  // 6. SIMULATEUR DE PARCOURS
   // ==========================================================
+  try {
   const simData = {
     "Étudiant": {
       formation: "Devenez Géomaticien Opérationnel (Octobre 2026)",
@@ -265,7 +316,7 @@
     },
     "Autre": {
       formation: "Un échange personnalisé",
-      desc: "Votre profil ne rentre dans aucune case toute faite ? Décrivez-nous votre métier et vos besoins, on vous recommandera la formation la plus adaptée — ou on en construit une sur mesure."
+      desc: "Votre profil ne rentre dans aucune case toute faite ? Décrivez-nous votre métier et vos besoins, on vous recommandera la formation la plus adaptée ou on en construit une sur mesure."
     }
   };
 
@@ -282,7 +333,6 @@
     const profile = btn.dataset.profile;
     const data = simData[profile];
 
-    // ✅ AJOUTÉ : sécurité si le profil n'existe pas
     if (!data) {
       console.warn(`Profil inconnu dans le simulateur : ${profile}`);
       return;
@@ -299,29 +349,25 @@
 
     simResult.classList.add('show');
 
-    // ✅ AJOUTÉ : scroll fluide vers le résultat
     if (!PREFERS_REDUCED_MOTION) {
       simResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
-
+  } catch (err) {
+    console.error('[Section 6] erreur :', err);
+  }
 
   // ==========================================================
-  // 6. CARTE INTERACTIVE LEAFLET
+  // 7. CARTE INTERACTIVE LEAFLET
   // ==========================================================
-
-  /**
-   * Points affichés sur la carte.
-   * Pour ajouter un point : copier un bloc { ... } et modifier les valeurs.
-   * `type` doit correspondre à une clé de `typeColors`.
-   */
+  try {
   const mapPoints = [
     {
       lat: 5.383732,
       lng: -3.956526,
       titre: "Formation Professionnelle en Géomatique, SIG & Cartographie",
       description: "Formation intensive de 40 heures permettant de maîtriser les SIG, la cartographie et les outils géospatiaux à travers des projets concrets et des études de cas appliquées à plusieurs secteurs d'activité.",
-      lieu: "Cocody Saint-Viateur – Rond-point Y4, Abidjan",
+      lieu: "Cocody Saint-Viateur, Rond-point Y4, Abidjan",
       categorieLabel: "Formation",
       type: "formation",
       image: "images/salle.jpg"
@@ -342,7 +388,6 @@
       titre: "Analyse spatiale des cas de diarrhée infantile en fonction de la proximité entre les puits et les fosses septiques",
       description: "Réalisation d'une analyse spatiale visant à étudier la relation entre les cas de diarrhée infantile et la distance séparant les puits des fosses septiques. Le projet a permis d'identifier les quartiers où la proximité entre ces infrastructures est associée à une fréquence plus élevée des cas de diarrhée, afin d'orienter les actions de santé publique et d'assainissement.",
       lieu: "Bouaké",
-      // ✅ CORRIGÉ : "pROJET SIG" → "Projet SIG"
       categorieLabel: "Projet SIG",
       type: "environnement",
       image: "images/cartebke.jpg"
@@ -393,7 +438,6 @@
       titre: "Cartographie des sites d'orpaillage clandestin de Booré Ettienkro",
       description: "Réalisation d'une cartographie des sites d'orpaillage clandestin à Booré Ettienkro à partir de données de terrain et d'analyses spatiales. Ce travail a permis de localiser les zones d'exploitation, d'évaluer leur répartition spatiale et de fournir un outil d'aide à la surveillance environnementale et à la prise de décision.",
       lieu: "Booré Ettienkro",
-      // ✅ CORRIGÉ : type aligné sur le categorieLabel
       categorieLabel: "Zone d'intervention",
       type: "zone_intervention",
       image: "images/carteborreettienkto.jpg"
@@ -423,7 +467,7 @@
       lng: -1.500000,
       titre: "Cartographie des pays de l'Alliance des États du Sahel (AES)",
       description: "Conception d'une carte thématique des pays membres de l'Alliance des États du Sahel (AES), mettant en évidence leurs limites administratives, les principales villes, les réseaux de transport et les éléments géographiques majeurs. Cette cartographie constitue un support d'analyse géopolitique, territoriale et de communication.",
-      lieu: "Mali • Burkina Faso • Niger",
+      lieu: "Mali, Burkina Faso, Niger",
       categorieLabel: "Cartographie",
       type: "cartographie",
       image: "images/cartepaysaes.jpg"
@@ -446,8 +490,12 @@
 
   const mapEl = document.getElementById('mapAbidjan');
 
+  if (mapEl && typeof L === 'undefined') {
+    console.error('Leaflet (L) est introuvable : vérifie que leaflet.js est chargé AVANT script.js.');
+    mapEl.textContent = "La carte n'a pas pu se charger. Recharge la page.";
+  }
+
   if (mapEl && typeof L !== 'undefined') {
-    // ✅ AJOUTÉ : désactive les animations de zoom si prefers-reduced-motion
     const map = L.map('mapAbidjan', {
       closePopupOnClick: true,
       zoomAnimation: !PREFERS_REDUCED_MOTION,
@@ -471,8 +519,8 @@
     );
 
     L.control.layers({
-      "🗺️ Carte": carteClassique,
-      "🛰️ Satellite": vueSatellite
+      "Carte": carteClassique,
+      "Satellite": vueSatellite
     }).addTo(map);
 
     mapPoints.forEach((point) => {
@@ -484,13 +532,11 @@
         fillOpacity: 0.9
       }).addTo(map);
 
-      // ✅ CORRIGÉ : tooltip = titre du point (plus informatif)
       marker.bindTooltip(escapeHTML(point.titre), {
         direction: "top",
         offset: [0, -8]
       });
 
-      // ✅ CORRIGÉ : escapeHTML + loading=lazy + width/height sur l'image
       const imageHtml = point.image
         ? `<img src="${escapeHTML(point.image)}" alt="${escapeHTML(point.titre)}" loading="lazy" width="220" height="140">`
         : '';
@@ -500,29 +546,33 @@
           ${imageHtml}
           <span class="map-popup-tag">${escapeHTML(point.categorieLabel)}</span>
           <h4>${escapeHTML(point.titre)}</h4>
-          <p class="map-popup-lieu">📍 ${escapeHTML(point.lieu)}</p>
+          <p class="map-popup-lieu">${escapeHTML(point.lieu)}</p>
           <p>${escapeHTML(point.description)}</p>
         </div>
       `);
     });
 
-    // ✅ AJOUTÉ : zoom automatique sur l'ensemble des points
-    if (mapPoints.length > 0) {
-      const bounds = L.latLngBounds(mapPoints.map((p) => [p.lat, p.lng]));
+    // Cadrage sur la Côte d'Ivoire (le point AES, très au nord, reste accessible en dézoomant)
+    const pointsCI = mapPoints.filter((p) => p.lat < 10);
+    if (pointsCI.length > 0) {
+      const bounds = L.latLngBounds(pointsCI.map((p) => [p.lat, p.lng]));
       map.fitBounds(bounds, { padding: [30, 30] });
     }
+
+    // Recalcule la taille de la carte quand la mise en page est terminée
+    // (évite une carte grise ou vide si le conteneur change de taille)
+    window.addEventListener('load', () => map.invalidateSize());
+    setTimeout(() => map.invalidateSize(), 400);
+    window.addEventListener('resize', () => map.invalidateSize());
+  }
+  } catch (err) {
+    console.error('[Section 7] erreur :', err);
   }
 
-
   // ==========================================================
-  // 7. VÉRIFICATION DE CERTIFICAT
+  // 8. VÉRIFICATION DE CERTIFICAT
   // ==========================================================
-
-  /**
-   * ⚠️ IMPORTANT : à chaque nouveau certificat délivré,
-   * ajoutez ici une entrée avec un code unique au format :
-   * GEA-MM-YYYY-NNNN (ex : GEA-06-2026-0001)
-   */
+  try {
   const certificatsValides = [
     {
       code: "GEA-06-2026-0001",
@@ -569,7 +619,6 @@
       lieu: "Abidjan, Présentiel",
       date: "30 juin 2026"
     }
-    // Copiez ce bloc et modifiez-le pour chaque nouveau certificat.
   ];
 
   const btnVerifier = document.getElementById('btnVerifier');
@@ -577,10 +626,8 @@
   const resultatDiv = document.getElementById('resultat');
 
   function verifierCertificat() {
-    // ✅ AJOUTÉ : vérification que les éléments existent
     if (!inputCode || !resultatDiv) return;
 
-    // ✅ CORRIGÉ : enlève aussi les espaces internes
     const saisie = inputCode.value.trim().replace(/\s+/g, '').toUpperCase();
 
     if (!saisie) {
@@ -599,7 +646,7 @@
         <h3>Certificat authentique</h3>
         <p><strong>Titulaire :</strong> ${escapeHTML(trouve.nom)}</p>
         <p><strong>Formation :</strong> ${escapeHTML(trouve.formation)}</p>
-        <p><strong>Durée :</strong> ${escapeHTML(trouve.duree)} — ${escapeHTML(trouve.niveau)}</p>
+        <p><strong>Durée :</strong> ${escapeHTML(trouve.duree)}, ${escapeHTML(trouve.niveau)}</p>
         <p><strong>Lieu :</strong> ${escapeHTML(trouve.lieu)}</p>
         <p><strong>Date :</strong> ${escapeHTML(trouve.date)}</p>
       `;
@@ -616,5 +663,17 @@
   inputCode?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') verifierCertificat();
   });
+  } catch (err) {
+    console.error('[Section 8] erreur :', err);
+  }
+
+
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
 })();

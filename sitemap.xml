@@ -108,4 +108,28 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+    <url>
+    <loc>https://geoexpertacademy.ci/faq.html</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+    <url>
+    <loc>https://geoexpertacademy.ci/mentions-legales.html</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/cgv.html</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+    <url>
+    <loc>https://geoexpertacademy.ci/videos.html</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

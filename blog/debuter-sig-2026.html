@@ -180,14 +180,72 @@
       </picture>
     </a>
     <nav class="main-nav" id="mainNav">
-      <a href="../index.html">Accueil</a>
-      <a href="../a-propos.html">À propos</a>
-      <a href="../services.html">Services</a>
-      <a href="realisations.html">Réalisations</a>
-      <a href="../ressources.html">Ressources</a>
-      <a href="../index.html#formations">Formations</a>
-      <a href="../blog.html">Blog</a>
-      <a href="contact.html">Contact</a>
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Toutes les formations</strong>
+            <small>Découvrir nos programmes</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
     </nav>
     <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
        class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
@@ -414,10 +472,13 @@
       </a>
     </div>
     <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
     <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
   </div>
 </footer>
 
 <script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script defer src="../script.js"></script>
 </body>
 </html>

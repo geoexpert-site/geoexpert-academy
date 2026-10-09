@@ -59,7 +59,6 @@
 
 html{
   scroll-behavior:smooth;
-  overflow-x:hidden; /* ✅ AJOUTÉ : sécurité contre débordements */
 }
 
 body{
@@ -68,7 +67,7 @@ body{
   font-family:var(--font-body);
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden; /* ✅ AJOUTÉ */
+  overflow-x:clip; /* clip (et non hidden) : n'empêche pas le header sticky de fonctionner */
 }
 
 /* ✅ AJOUTÉ : compense le header sticky lors du clic sur une ancre */
@@ -273,6 +272,171 @@ a{ color:inherit; text-decoration:none; }
   display:block;
 }
 
+/* ==========================================================
+   MENU AVEC SOUS-MENUS
+   ========================================================== */
+
+/* Nav principal */
+.main-nav{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* Chaque item du menu */
+.nav-item{
+  position:relative;
+}
+
+/* Lien de premier niveau */
+.nav-item > a,
+.nav-item > button{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 14px;
+  font-size:14.5px;
+  color:var(--ink-dim);
+  font-weight:500;
+  text-decoration:none;
+  background:none;
+  border:none;
+  cursor:pointer;
+  border-radius:8px;
+  transition:color .2s, background .2s;
+  font-family:inherit;
+}
+.nav-item > a:hover,
+.nav-item > button:hover{
+  color:var(--teal);
+  background:var(--teal-soft);
+}
+
+/* Flèche du menu déroulant */
+.nav-item .nav-arrow{
+  width:12px;
+  height:12px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:transform .2s;
+}
+.nav-item.open .nav-arrow{
+  transform:rotate(180deg);
+}
+
+/* Sous-menu déroulant */
+.nav-dropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  min-width:240px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.1);
+  padding:8px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-8px);
+  transition:opacity .2s, transform .2s, visibility .2s;
+  z-index:60;
+}
+.nav-item.open .nav-dropdown{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+
+/* Liens dans le sous-menu */
+.nav-dropdown a{
+  display:block;
+  padding:10px 14px;
+  font-size:14px;
+  color:var(--ink-dim);
+  text-decoration:none;
+  border-radius:8px;
+  transition:color .15s, background .15s;
+  white-space:nowrap;
+}
+.nav-dropdown a:hover{
+  color:var(--teal);
+  background:var(--teal-soft);
+}
+.nav-dropdown a strong{
+  display:block;
+  font-weight:600;
+  color:var(--ink);
+  margin-bottom:2px;
+}
+.nav-dropdown a:hover strong{
+  color:var(--teal);
+}
+.nav-dropdown a small{
+  display:block;
+  font-size:12px;
+  color:var(--ink-faint);
+  font-weight:400;
+}
+
+/* Séparateur dans le sous-menu */
+.nav-dropdown .nav-separator{
+  height:1px;
+  background:var(--line);
+  margin:6px 8px;
+}
+
+/* ==========================================================
+   MOBILE — sous-menus adaptés
+   ========================================================== */
+@media (max-width: 900px){
+  .main-nav{
+    flex-direction:column;
+    gap:0;
+    align-items:stretch;
+  }
+  .nav-item{
+    width:100%;
+  }
+  .nav-item > a,
+  .nav-item > button{
+    width:100%;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+    font-size:15px;
+  }
+  .nav-item > a:hover,
+  .nav-item > button:hover{
+    background:none;
+  }
+  .nav-dropdown{
+    position:static;
+    opacity:1;
+    visibility:visible;
+    transform:none;
+    box-shadow:none;
+    border:none;
+    padding:0 0 0 16px;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s;
+  }
+  .nav-item.open .nav-dropdown{
+    max-height:400px;
+  }
+  .nav-dropdown a{
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+  }
+  .nav-dropdown a:last-child{
+    border-bottom:none;
+  }
+}
 
 /* ==========================================================
    5. HERO
@@ -1341,6 +1505,8 @@ picture img{
    8. CARTES LEAFLET
    ========================================================== */
 #mapAbidjan{
+  position:relative;
+  z-index:0; /* isole les z-index internes de Leaflet pour qu'ils ne passent pas devant le menu */
   height:480px;
   width:100%;
   border-radius:var(--radius);
@@ -1829,5 +1995,199 @@ picture img{
   }
   .newsletter-form-wrap{
     padding:24px;
+  }
+}
+
+/* ==========================================================
+   SECTIONS APERÇU PAGE D'ACCUEIL (services, réalisations, blog)
+   ========================================================== */
+
+/* ---- APERÇU SERVICES ---- */
+.home-services-preview{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+}
+.preview-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:20px;
+  margin-top:32px;
+}
+.preview-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px 24px;
+  display:flex;
+  flex-direction:column;
+  text-decoration:none;
+  transition:transform .15s, box-shadow .2s, border-color .2s;
+}
+.preview-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px rgba(0,146,166,0.1);
+  border-color:var(--teal);
+}
+.preview-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border-radius:10px;
+  background:var(--bg);
+  color:var(--teal);
+  margin-bottom:16px;
+}
+.preview-card:nth-child(2) .preview-icon{ color:var(--indigo); }
+.preview-card:nth-child(3) .preview-icon{ color:var(--magenta); }
+.preview-card:nth-child(4) .preview-icon{ color:var(--teal); }
+.preview-icon svg{
+  width:24px;
+  height:24px;
+}
+.preview-card h3{
+  font-size:16.5px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:var(--ink);
+}
+.preview-card p{
+  font-size:14px;
+  color:var(--ink-dim);
+  line-height:1.6;
+  margin-bottom:14px;
+  flex:1;
+}
+.preview-link{
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--teal);
+}
+.preview-card:nth-child(2) .preview-link{ color:var(--indigo); }
+.preview-card:nth-child(3) .preview-link{ color:var(--magenta); }
+.preview-cta{
+  text-align:center;
+  margin-top:36px;
+}
+
+/* ---- APERÇU RÉALISATIONS ---- */
+.home-real-preview{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-soft);
+}
+.real-preview-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:20px;
+  margin-top:32px;
+}
+.real-preview-card{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  text-decoration:none;
+  transition:transform .15s, box-shadow .2s;
+}
+.real-preview-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px rgba(0,146,166,0.12);
+}
+.real-preview-card picture{
+  display:block;
+}
+.real-preview-card img{
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:contain;
+  background:var(--bg-soft);
+  padding:8px;
+  display:block;
+}
+.real-preview-body{
+  padding:18px 20px;
+}
+.real-preview-body h3{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:4px;
+  color:var(--ink);
+  line-height:1.4;
+}
+.real-preview-body p{
+  font-size:13px;
+  color:var(--ink-faint);
+  margin:0;
+}
+
+/* ---- APERÇU BLOG ---- */
+.home-blog-preview{
+  padding:clamp(50px, 8vw, 90px) 0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+}
+.blog-preview-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:20px;
+  margin-top:32px;
+}
+.blog-preview-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  text-decoration:none;
+  display:flex;
+  flex-direction:column;
+  transition:transform .15s, box-shadow .2s, border-color .2s;
+}
+.blog-preview-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px rgba(0,146,166,0.1);
+  border-color:var(--teal);
+}
+.blog-preview-tag{
+  align-self:flex-start;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--teal);
+  background:var(--teal-soft);
+  padding:5px 11px;
+  border-radius:6px;
+  margin-bottom:14px;
+}
+.blog-preview-card:nth-child(2) .blog-preview-tag{ color:var(--indigo); background:rgba(75,63,146,0.1); }
+.blog-preview-card:nth-child(3) .blog-preview-tag{ color:var(--magenta); background:rgba(168,60,147,0.1); }
+.blog-preview-card h3{
+  font-size:16.5px;
+  font-weight:700;
+  margin-bottom:10px;
+  color:var(--ink);
+  line-height:1.35;
+}
+.blog-preview-card p{
+  font-size:14px;
+  color:var(--ink-dim);
+  line-height:1.6;
+  margin-bottom:14px;
+  flex:1;
+}
+.blog-preview-meta{
+  font-size:12.5px;
+  color:var(--ink-faint);
+  font-weight:500;
+}
+
+@media (max-width:600px){
+  .preview-grid,
+  .real-preview-grid,
+  .blog-preview-grid{
+    grid-template-columns:1fr;
   }
 }
