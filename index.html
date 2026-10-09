@@ -957,52 +957,57 @@
 </section>
 
 <!-- ============ INSCRIPTION ============ -->
+<!-- ============ INSCRIPTION ============ -->
 <section class="inscription" id="inscription">
-  <div class="container inscription-inner">
+  <div class="inscription-inner">
     <div class="inscription-text">
       <p class="section-eyebrow">Étape suivante</p>
       <h2>Inscrivez-vous à une formation</h2>
       <p class="section-lead">
-        Remplissez ce formulaire rapide : il ouvre directement une conversation WhatsApp pré-remplie avec l'académie.
-        Aucun compte requis pour le moment.
+        Remplissez ce formulaire rapide. Il ouvre directement une conversation
+        WhatsApp pré-remplie avec l'académie.
       </p>
-      <p class="inscription-note">Espace apprenant (connexion, accès aux cours en ligne), bientôt disponible.</p>
+      <p class="inscription-note">
+        Espace apprenant (connexion, accès aux cours en ligne) bientôt disponible.
+      </p>
+
       <div class="payment-block">
         <h4>Moyens de paiement</h4>
-        <div class="payment-method">
-          <div class="method-left">
-            <img src="images/logo-wave.png" alt="Logo Wave, moyen de paiement mobile" width="60" height="30" loading="lazy" decoding="async">
-            <span class="method-name">Wave</span>
+        <div class="payment-methods-grid">
+          <div class="payment-method-card">
+            <div class="payment-method-head">
+              <img src="images/logo-wave.png" alt="Logo Wave" class="payment-method-logo" width="36" height="36" loading="lazy">
+              <span class="payment-method-name">Wave</span>
+            </div>
+            <div class="payment-method-number">07 87 01 50 30</div>
           </div>
-          <span class="method-number">07 87 01 50 30</span>
-        </div>
-        <div class="payment-method">
-          <div class="method-left">
-            <img src="images/logo-orange-money.png" alt="Logo Orange Money, moyen de paiement mobile" width="60" height="30" loading="lazy" decoding="async">
-            <span class="method-name">Orange Money</span>
+          <div class="payment-method-card">
+            <div class="payment-method-head">
+              <img src="images/logo-orange-money.png" alt="Logo Orange Money" class="payment-method-logo" width="36" height="36" loading="lazy">
+              <span class="payment-method-name">Orange Money</span>
+            </div>
+            <div class="payment-method-number">07 87 01 50 30</div>
           </div>
-          <span class="method-number">07 87 01 50 30</span>
         </div>
         <p class="payment-note">
-          Compte au nom de <strong>JEAN EUDES AKA</strong>. Après paiement, envoyez la capture
-          d'écran de la transaction via WhatsApp pour confirmer votre inscription.
+          Compte au nom de <strong>JEAN EUDES AKA</strong>. Après paiement, envoyez la
+          capture d'écran de la transaction via WhatsApp pour confirmer votre inscription.
         </p>
       </div>
     </div>
 
-    <!-- ✅ CORRIGÉ : <label> orphelin supprimé + name="" ajoutés partout -->
     <form class="inscription-form" id="inscriptionForm">
       <label>
         Nom complet
-        <input type="text" id="fName" name="nom" required placeholder="Ex: Kouassi Aya" autocomplete="name">
+        <input type="text" id="fName" name="nom" required placeholder="Ex : Kouassi Aya" autocomplete="name">
       </label>
       <label>
         Numéro WhatsApp
-        <input type="tel" id="fPhone" name="telephone" required placeholder="Ex: 07 87 01 50 30" autocomplete="tel">
+        <input type="tel" id="fPhone" name="telephone" required placeholder="Ex : 07 87 01 50 30" autocomplete="tel">
       </label>
       <label>
         Profession / niveau d'étude / domaine d'activité
-        <input type="text" id="fProfession" name="profession" required placeholder="Ex: Topographe, Étudiant en géographie...">
+        <input type="text" id="fProfession" name="profession" required placeholder="Ex : Topographe, Étudiant en géographie...">
       </label>
       <label>
         Niveau en SIG / Cartographie / Géomatique
@@ -1015,7 +1020,7 @@
       </label>
       <label>
         Ville de résidence
-        <input type="text" id="fVille" name="ville" required placeholder="Ex: Abidjan" autocomplete="address-level2">
+        <input type="text" id="fVille" name="ville" required placeholder="Ex : Abidjan" autocomplete="address-level2">
       </label>
       <label>
         Mode de formation souhaité
@@ -1044,11 +1049,8 @@
         Envoyer via WhatsApp
       </button>
     </form>
-    <strong>N'oubliez pas :</strong> 
-    Dans la conversation WhatsApp qui vient de s'ouvrir, joignez la capture d'écran de votre paiement (icône trombone 📎) pour confirmer votre inscription.
   </div>
 </section>
-
 <!-- ============ BANNIÈRE EMPLOI ============ -->
 <!-- ✅ CORRIGÉ : div interne inutile supprimé -->
 <section class="job-banner">
