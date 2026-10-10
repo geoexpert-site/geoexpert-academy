@@ -2441,3 +2441,144 @@ html, body{
     border-radius:12px;
   }
 }
+/* ==========================================================
+   CTA VERS PAGE TARIFS (section Formations de l'accueil)
+   ========================================================== */
+.formations-cta{
+  margin-top:44px;
+  padding:32px 28px;
+  background:var(--bg);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.formations-cta-text{
+  font-size:15.5px;
+  color:var(--ink-dim);
+  line-height:1.5;
+  margin:0;
+  font-weight:500;
+}
+.formations-cta .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.formations-cta .btn svg{
+  transition:transform .2s;
+}
+.formations-cta .btn:hover svg{
+  transform:translateX(4px);
+}
+
+@media (max-width:700px){
+  .formations-cta{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:24px 20px;
+    gap:16px;
+  }
+  .formations-cta .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
+/* ==========================================================
+   CTA VERS PAGE RÉALISATIONS (section carte interactive)
+   ========================================================== */
+.carte-cta{
+  margin-top:32px;
+  padding:32px 28px;
+  background:var(--bg);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.carte-cta-text{
+  font-size:15.5px;
+  color:var(--ink-dim);
+  line-height:1.5;
+  margin:0;
+  font-weight:500;
+}
+.carte-cta .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.carte-cta .btn svg{
+  transition:transform .2s;
+}
+.carte-cta .btn:hover svg{
+  transform:translateX(4px);
+}
+
+@media (max-width:700px){
+  .carte-cta{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:24px 20px;
+    gap:16px;
+  }
+  .carte-cta .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
+/* ==========================================================
+   CTA VERS PAGE VIDÉOS (section galerie formations)
+   ========================================================== */
+.gallery-cta{
+  margin-top:36px;
+  padding:32px 28px;
+  background:var(--bg);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.gallery-cta-text{
+  font-size:15.5px;
+  color:var(--ink-dim);
+  line-height:1.5;
+  margin:0;
+  font-weight:500;
+}
+.gallery-cta .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.gallery-cta .btn svg{
+  transition:transform .2s;
+}
+.gallery-cta .btn:hover svg{
+  transform:translateX(4px);
+}
+
+@media (max-width:700px){
+  .gallery-cta{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:24px 20px;
+    gap:16px;
+  }
+  .gallery-cta .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
