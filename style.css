@@ -2195,9 +2195,9 @@ picture img{
    SECTION INSCRIPTION — REFONTE RESPONSIVE + MODERNE
    ========================================================== */
 
-/* Correction du débordement horizontal global */
+/* Débordement horizontal : ne pas bloquer le défilement sur html ou body (cela casse le menu sticky).
+   La protection est déjà assurée par la règle clip définie plus haut sur body. */
 html, body{
-  overflow-x:hidden;
   max-width:100%;
 }
 
