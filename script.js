@@ -668,6 +668,50 @@
   }
 
 
+
+  // ==========================================================
+  // 9. COMPTEURS ANIMÉS (bande des chiffres de l'accueil)
+  // ==========================================================
+  try {
+      (function(){
+        var els = document.querySelectorAll(".gs-count");
+        var reduit = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function afficher(el, n){
+          el.textContent = n.toLocaleString("fr-FR") + (el.dataset.suffix || "");
+        }
+
+        function animer(el){
+          var cible = parseInt(el.dataset.target, 10);
+          if (reduit) { afficher(el, cible); return; }
+          var duree = 1800, debut = null;
+          // ✅ AJOUTÉ : on force le départ à 0 avant d'animer
+          afficher(el, 0);
+          function pas(t){
+            if (!debut) debut = t;
+            var p = Math.min((t - debut) / duree, 1);
+            var ease = 1 - Math.pow(1 - p, 3);
+            afficher(el, Math.round(cible * ease));
+            if (p < 1) requestAnimationFrame(pas);
+          }
+          requestAnimationFrame(pas);
+        }
+
+        if (!("IntersectionObserver" in window)) {
+          els.forEach(function(el){ afficher(el, parseInt(el.dataset.target, 10)); });
+          return;
+        }
+        var obs = new IntersectionObserver(function(entries){
+          entries.forEach(function(e){
+            if (e.isIntersecting) { animer(e.target); obs.unobserve(e.target); }
+          });
+        }, {threshold: 0.4});
+        els.forEach(function(el){ obs.observe(el); });
+      })();
+  } catch (err) {
+    console.error('[Section 9] erreur :', err);
+  }
+
   }
 
   if (document.readyState === 'loading') {
