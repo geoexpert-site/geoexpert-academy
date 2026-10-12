@@ -2653,3 +2653,50 @@ html, body{
   line-height:1.5;
   margin:8px 0 0;
 }
+/* ==========================================================
+   CTA VERS PAGE RESSOURCES (section vidéos)
+   ========================================================== */
+.video-cta{
+  margin-top:36px;
+  padding:32px 28px;
+  background:var(--bg-soft);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.video-cta-text{
+  font-size:15.5px;
+  color:var(--ink-dim);
+  line-height:1.5;
+  margin:0;
+  font-weight:500;
+}
+.video-cta .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.video-cta .btn svg{
+  transition:transform .2s;
+}
+.video-cta .btn:hover svg{
+  transform:translateX(4px);
+}
+
+@media (max-width:700px){
+  .video-cta{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:24px 20px;
+    gap:16px;
+  }
+  .video-cta .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
