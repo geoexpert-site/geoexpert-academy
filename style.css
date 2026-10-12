@@ -2589,3 +2589,67 @@ html, body{
 .gs-grid{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:24px;text-align:center}
 .gs-grid strong{display:block;font-size:2.4rem;line-height:1.1}
 .gs-grid span{display:block;margin-top:6px;font-size:.95rem;opacity:.95}
+
+/* ==========================================================
+   FORMULAIRE SYSTEME.IO (newsletter)
+   ========================================================== */
+.sysio-form{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  width:100%;
+}
+
+.sysio-field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.sysio-field label{
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink);
+  text-align:left;
+}
+
+.sysio-field input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  font-family:var(--font-body);
+  font-size:15px;
+  color:var(--ink);
+  background:var(--bg-soft);
+  transition:border-color .2s, box-shadow .2s;
+  box-sizing:border-box;
+}
+
+.sysio-field input:focus{
+  border-color:var(--teal);
+  box-shadow:0 0 0 3px var(--teal-soft);
+  outline:none;
+  background:var(--bg);
+}
+
+.sysio-field input::placeholder{
+  color:var(--ink-faint);
+}
+
+.sysio-btn{
+  width:100%;
+  padding:14px 24px;
+  font-size:15px;
+  font-weight:600;
+  margin-top:8px;
+  cursor:pointer;
+}
+
+.sysio-note{
+  font-size:11.5px;
+  color:var(--ink-faint);
+  text-align:center;
+  line-height:1.5;
+  margin:8px 0 0;
+}
