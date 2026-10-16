@@ -182,9 +182,24 @@
 </header>
 
 
-<!-- ============ HERO fun ============ -->
-<section class="hero" id="accueil">
-  <div class="hero-contours" aria-hidden="true"></div>
+<!-- ============ HERO avec carrousel ============ -->
+<section class="hero hero-carousel" id="accueil">
+  <!-- Carrousel en arrière-plan -->
+  <div class="hero-bg-carousel" aria-hidden="true">
+    <div class="hero-bg-slide active" style="background-image:url('images/formation-salle-1.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/formation-terrain-1.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/formation-exercice-1.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/formation-certificat-1.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/Carte1.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/formation-salle-2.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/formation-terrain-2.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/Carte3.jpg')"></div>
+  </div>
+
+  <!-- Voile sombre par-dessus les photos -->
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  <!-- Contenu par-dessus -->
   <div class="container hero-inner">
     <p class="eyebrow">Abidjan, Bouaké, Côte d'Ivoire · Formation & Consulting en Géomatique</p>
     <h1>Transformez des données du terrain<br>en <span class="text-accent">décisions cartographiées.</span></h1>
@@ -197,7 +212,6 @@
       <a href="https://wa.me/2250787015030?text=Bonjour%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert%20GeoExpert."
          class="btn btn-outline" target="_blank" rel="noopener">Parler à un expert</a>
     </div>
-    <!-- ✅ CORRIGÉ : </div> manquant ajouté, structure DOM réparée -->
     <div class="hero-stats">
       <div><span class="stat-num">ArcGIS · QGIS · GEE · ArcGIS ONLINE</span><span class="stat-label">GOOGLE EARTH PRO · GLOBAL MAPPER · AUTO CAD</span></div>
       <div><span class="stat-num">80%</span><span class="stat-label">Pratique terrain</span></div>
@@ -205,7 +219,6 @@
     </div>
   </div>
 </section>
-
 <!-- ============ VIDÉO DE PRÉSENTATION ============ -->
 <section class="presentation-video">
   <div class="container">

@@ -668,7 +668,6 @@
   }
 
 
-
   // ==========================================================
   // 9. COMPTEURS ANIMÉS (bande des chiffres de l'accueil)
   // ==========================================================
@@ -720,4 +719,27 @@
     init();
   }
 
+// ==========================================================
+// CARROUSEL DU HERO (photos en arrière-plan)
+// ==========================================================
+document.addEventListener('DOMContentLoaded', function () {
+  const heroCarousel = document.querySelector('.hero-carousel');
+  if (!heroCarousel) return;
+  if (PREFERS_REDUCED_MOTION) return;
+  
+  const slides = heroCarousel.querySelectorAll('.hero-bg-slide');
+  if (slides.length < 2) return;
+  
+  let currentIndex = 0;
+  const DURATION = 5000;
+  
+  function nextHeroSlide() {
+    slides[currentIndex].classList.remove('active');
+    currentIndex = (currentIndex + 1) % slides.length;
+    slides[currentIndex].classList.add('active');
+  }
+  
+  setInterval(nextHeroSlide, DURATION);
+});
 })();
+
