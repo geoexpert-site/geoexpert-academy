@@ -717,29 +717,36 @@
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
-  }
+  }  // ==========================================================
+  // 9. CARROUSEL DU HERO (photos en arrière-plan)
+  // ==========================================================
+  document.addEventListener('DOMContentLoaded', function () {
+    const heroCarousel = document.querySelector('.hero-carousel');
+    if (!heroCarousel) {
+      console.warn('Carrousel : .hero-carousel non trouvé');
+      return;
+    }
 
-// ==========================================================
-// CARROUSEL DU HERO (photos en arrière-plan)
-// ==========================================================
-document.addEventListener('DOMContentLoaded', function () {
-  const heroCarousel = document.querySelector('.hero-carousel');
-  if (!heroCarousel) return;
-  if (PREFERS_REDUCED_MOTION) return;
-  
-  const slides = heroCarousel.querySelectorAll('.hero-bg-slide');
-  if (slides.length < 2) return;
-  
-  let currentIndex = 0;
-  const DURATION = 5000;
-  
-  function nextHeroSlide() {
-    slides[currentIndex].classList.remove('active');
-    currentIndex = (currentIndex + 1) % slides.length;
-    slides[currentIndex].classList.add('active');
-  }
-  
-  setInterval(nextHeroSlide, DURATION);
-});
+    const slides = heroCarousel.querySelectorAll('.hero-bg-slide');
+    console.log('Carrousel : ' + slides.length + ' slides trouvées');
+
+    if (slides.length < 2) {
+      console.warn('Carrousel : pas assez de slides');
+      return;
+    }
+
+    let currentIndex = 0;
+    const DURATION = 5000;
+
+    function nextHeroSlide() {
+      slides[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('active');
+    }
+
+    setInterval(nextHeroSlide, DURATION);
+    console.log('Carrousel : démarré');
+  });
+
 })();
 
