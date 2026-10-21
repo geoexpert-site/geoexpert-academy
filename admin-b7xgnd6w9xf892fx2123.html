@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration | GeoExpert Academy</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { background:var(--bg-soft); }
+  .a-wrap { max-width:1000px; margin:0 auto; padding:30px 20px 80px; }
+  .a-card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:22px; margin-bottom:18px; }
+  .a-card h2 { font-size:20px; margin:0 0 12px; }
+  .a-card label { display:block; font-weight:600; font-size:14px; margin:12px 0 4px; }
+  .a-card input[type=text], .a-card input[type=password], .a-card input[type=number], .a-card select { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font:15px var(--font-body); }
+  .a-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .tabs button { border:1px solid var(--line); background:#fff; padding:9px 16px; border-radius:8px; cursor:pointer; font:600 14px var(--font-body); }
+  .tabs button.on { background:var(--teal); color:#fff; border-color:var(--teal); }
+  .b { background:var(--teal); color:#fff; border:0; border-radius:8px; padding:10px 18px; cursor:pointer; font:600 14px var(--font-body); margin-top:14px; }
+  .b.sec { background:#fff; color:var(--ink); border:1px solid var(--line); padding:6px 10px; margin:2px; font-size:12.5px; }
+  .b.red { color:#a11; }
+  .ok { color:#0a7a3b; font-weight:600; } .err { color:#a11; font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .code { font-family:monospace; font-weight:700; }
+  .vid { display:grid; grid-template-columns:1fr 330px; gap:10px; align-items:center; padding:5px 0; border-top:1px solid #edf2f3; font-size:13.5px; }
+  .vid input { font:12.5px monospace; }
+  .box { background:var(--bg-soft); border:1px dashed var(--teal); border-radius:10px; padding:14px; margin-top:14px; white-space:pre-wrap; font-size:14px; }
+  .warn { color:#a14b00; font-weight:600; }
+  @media (max-width:700px) { .a-row { grid-template-columns:1fr; } .vid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="a-wrap">
+  <h1 style="font-size:26px;margin-bottom:18px;">Administration des accès</h1>
+
+  <div class="a-card" id="loginCard">
+    <h2>Connexion</h2>
+    <label for="pw">Mot de passe administrateur</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button class="b" id="go">Se connecter</button>
+    <div id="loginMsg" class="err" role="alert"></div>
+  </div>
+
+  <div id="app" hidden>
+    <div class="tabs" id="tabs">
+      <button data-t="new" class="on">Nouvel accès</button>
+      <button data-t="list">Apprenants</button>
+      <button data-t="vid">Vidéos Bunny</button>
+      <button data-t="pdf">Exercices PDF</button>
+    </div>
+
+    <div class="a-card" data-p="new">
+      <h2>Créer un accès après un paiement</h2>
+      <label for="nLabel">Nom ou initiales de l'apprenant (visible sur ses vidéos, pas de numéro de téléphone)</label>
+      <input type="text" id="nLabel" maxlength="40" placeholder="ex. Kouadio A.">
+      <div class="a-row">
+        <div><label for="nProd">Formation achetée</label><select id="nProd"></select></div>
+        <div><label for="nDays">Durée de l'accès (jours)</label><input type="number" id="nDays" value="365" min="1" max="1500"></div>
+        <div><label for="nHold">Déblocage du reste (jours)</label><input type="number" id="nHold" value="8" min="0" max="60"></div>
+      </div>
+      <label style="font-weight:400"><input type="checkbox" id="nNow"> Tout débloquer immédiatement (sans attendre la fin de la garantie)</label>
+      <button class="b" id="create">Créer l'accès</button>
+      <div id="created"></div>
+    </div>
+
+    <div class="a-card" data-p="list" hidden>
+      <h2>Apprenants</h2>
+      <div style="overflow-x:auto"><table><thead><tr><th>Apprenant</th><th>Code</th><th>Modules</th><th>Fin d'accès</th><th>Activité</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </div>
+
+    <div class="a-card" data-p="vid" hidden>
+      <h2>Identifiants des vidéos Bunny</h2>
+      <p style="font-size:14px;color:var(--ink-dim)">Collez, pour chaque vidéo, son identifiant Bunny (Video ID). Laissez vide si la vidéo n'est pas prête.</p>
+      <div id="vids"></div>
+      <button class="b" id="saveIds">Enregistrer les identifiants</button>
+      <div id="idsMsg"></div>
+    </div>
+
+    <div class="a-card" data-p="pdf" hidden>
+      <h2>Exercices PDF</h2>
+      <p style="font-size:14px;color:var(--ink-dim)">Les PDF sont protégés : seuls les apprenants connectés peuvent les ouvrir. Taille maximale : 10 Mo.</p>
+      <div id="pdfs"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ===== A REMPLIR =====
+  var API_URL = "espace-apprenant-api.geographe07.workers.dev"; // Adresse de votre Worker Cloudflare (voir GUIDE-INSTALLATION.md)
+  var ESPACE_URL = "https://geoexpertacademy.ci/espace-apprenant.html";
+
+  var LABELS = { arc1: 'ArcGIS Module 1', arc2: 'ArcGIS Module 2', qgis1: 'QGIS Module 1', qgis2: 'QGIS Module 2', tele: 'Télédétection', web: 'Webmapping', kobo: 'KoboToolbox', google: 'Google Earth', 'pack-qgis': 'Pack QGIS (Modules 1 et 2)', 'pack-arcgis': 'Pack ArcGIS (Modules 1 et 2)', 'pack-complet': 'Pack complet (8 modules)' };
+  var $ = function (id) { return document.getElementById(id); };
+  var pw = '', state = null;
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+  function fd(ms) { return ms ? new Date(ms).toLocaleDateString('fr-FR') : '-'; }
+
+  async function call(path, method, body, raw) {
+    var h = { 'X-Admin-Password': pw };
+    if (body) h['Content-Type'] = 'application/json';
+    var r = await fetch(API_URL + path, { method: method, headers: h, body: raw || (body ? JSON.stringify(body) : undefined) });
+    var j = await r.json().catch(function () { return {}; });
+    if (!r.ok) throw new Error(j.error || 'Erreur');
+    return j;
+  }
+
+  async function load() {
+    state = await call('/admin/state', 'GET');
+    var sel = $('nProd'); sel.textContent = '';
+    state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
+    renderList(); renderVids(); renderPdfs();
+  }
+
+  $('go').addEventListener('click', async function () {
+    pw = $('pw').value; $('loginMsg').textContent = '';
+    if (API_URL.indexOf('VOTRE-WORKER') !== -1) { $('loginMsg').textContent = "Renseignez d'abord API_URL dans le fichier."; return; }
+    try { await load(); $('loginCard').hidden = true; $('app').hidden = false; }
+    catch (e) { $('loginMsg').textContent = e.message; }
+  });
+
+  $('tabs').addEventListener('click', function (e) {
+    var t = e.target.getAttribute('data-t'); if (!t) return;
+    document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('on', b === e.target); });
+    document.querySelectorAll('[data-p]').forEach(function (p) { p.hidden = p.getAttribute('data-p') !== t; });
+  });
+
+  $('create').addEventListener('click', async function () {
+    var out = $('created'); out.textContent = '';
+    try {
+      var j = await call('/admin/create', 'POST', { label: $('nLabel').value, product: $('nProd').value, days: $('nDays').value, holdDays: $('nHold').value, immediate: $('nNow').checked });
+      var msg = 'Bonjour, votre paiement est bien reçu, merci.\n\nVotre espace apprenant : ' + ESPACE_URL + '\nVotre code personnel : ' + j.code + '\n\nCe code est strictement personnel : merci de ne pas le partager. Votre assistance dure 3 mois : écrivez-nous ici dès que vous êtes bloqué (réponse sous 48 heures ouvrables).\n\nBonne formation !';
+      out.appendChild(el('p', 'ok', 'Accès créé pour ' + j.label + ' : ' + j.code));
+      out.appendChild(el('div', 'box', msg));
+      var c = el('button', 'b', 'Copier le message'); c.type = 'button';
+      c.addEventListener('click', function () { navigator.clipboard.writeText(msg).then(function () { c.textContent = 'Copié'; }); });
+      var w = el('a', 'b', 'Ouvrir WhatsApp'); w.href = 'https://wa.me/?text=' + encodeURIComponent(msg); w.target = '_blank'; w.rel = 'noopener'; w.style.display = 'inline-block'; w.style.marginLeft = '8px'; w.style.textDecoration = 'none';
+      out.appendChild(c); out.appendChild(w);
+      $('nLabel').value = ''; await load();
+    } catch (e) { out.appendChild(el('p', 'err', e.message)); }
+  });
+
+  function renderList() {
+    var tb = $('rows'); tb.textContent = '';
+    state.students.forEach(function (s) {
+      var tr = el('tr');
+      tr.appendChild(el('td', '', s.label));
+      tr.appendChild(el('td', 'code', s.code));
+      var now = Date.now();
+      tr.appendChild(el('td', '', s.modules.map(function (g) { return (LABELS[g.m] || g.m) + (g.from > now ? ' (le ' + fd(g.from) + ')' : ''); }).join(', ')));
+      tr.appendChild(el('td', '', fd(s.expires) + (s.expires < now ? ' (expiré)' : '') + (s.active ? '' : ' (coupé)')));
+      var act = el('td', '', s.logins + ' connexion(s), dernière : ' + fd(s.lastLogin) + '. Réseaux distincts : ' + s.networks + (s.countries.length ? ' (' + s.countries.join(', ') + ')' : ''));
+      if (s.networks >= 4) { act.appendChild(document.createElement('br')); act.appendChild(el('span', 'warn', 'Partage possible : plusieurs réseaux différents')); }
+      tr.appendChild(act);
+      var a = el('td');
+      [['active', s.active ? 'Couper' : 'Réactiver', s.active ? 'red' : ''], ['more', '+30 jours', ''], ['unlock', 'Tout débloquer', '']].forEach(function (x) {
+        var b = el('button', 'b sec ' + x[2], x[1]); b.type = 'button';
+        b.addEventListener('click', async function () {
+          var body = { code: s.code };
+          if (x[0] === 'active') body.active = !s.active; if (x[0] === 'more') body.addDays = 30; if (x[0] === 'unlock') body.unlockNow = true;
+          try { await call('/admin/update', 'POST', body); await load(); } catch (e) { alert(e.message); }
+        });
+        a.appendChild(b);
+      });
+      tr.appendChild(a); tb.appendChild(tr);
+    });
+    if (!state.students.length) { var tr = el('tr'); var td = el('td', '', 'Aucun apprenant pour le moment.'); td.colSpan = 6; tr.appendChild(td); tb.appendChild(tr); }
+  }
+
+  function renderVids() {
+    var box = $('vids'); box.textContent = '';
+    state.catalog.forEach(function (m) {
+      box.appendChild(el('h3', '', m.title)).style.cssText = 'font-size:15px;margin:16px 0 4px;';
+      m.videos.forEach(function (v) {
+        var r = el('div', 'vid'); r.appendChild(el('span', '', v.title));
+        var i = el('input'); i.type = 'text'; i.value = v.id; i.setAttribute('data-k', v.k); i.setAttribute('data-orig', v.id); i.placeholder = 'Video ID Bunny'; i.spellcheck = false;
+        r.appendChild(i); box.appendChild(r);
+      });
+    });
+  }
+  $('saveIds').addEventListener('click', async function () {
+    var ids = {}; document.querySelectorAll('#vids input').forEach(function (i) { if (i.value.trim() !== i.getAttribute('data-orig')) ids[i.getAttribute('data-k')] = i.value.trim(); });
+    var m = $('idsMsg'); m.textContent = '';
+    if (!Object.keys(ids).length) { m.className = ''; m.textContent = 'Aucun changement.'; return; }
+    try { var j = await call('/admin/ids', 'PUT', { ids: ids }); m.className = 'ok'; m.textContent = j.saved + ' identifiant(s) enregistré(s). Les valeurs invalides sont ignorées.'; await load(); }
+    catch (e) { m.className = 'err'; m.textContent = e.message; }
+  });
+
+  function renderPdfs() {
+    var box = $('pdfs'); box.textContent = '';
+    state.catalog.forEach(function (m) {
+      if (!m.exercises.length) return;
+      box.appendChild(el('h3', '', m.title)).style.cssText = 'font-size:15px;margin:16px 0 4px;';
+      m.exercises.forEach(function (x) {
+        var r = el('div', 'vid'); r.appendChild(el('span', '', x.title + (x.has ? '  (déjà envoyé)' : '')));
+        var f = el('input'); f.type = 'file'; f.accept = 'application/pdf';
+        f.addEventListener('change', async function () {
+          if (!f.files[0]) return;
+          try { await call('/admin/file?k=' + encodeURIComponent(x.k), 'PUT', null, f.files[0]); alert('Fichier envoyé.'); await load(); document.querySelector('[data-t=pdf]').click(); }
+          catch (e) { alert(e.message); }
+        });
+        r.appendChild(f); box.appendChild(r);
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

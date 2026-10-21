@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formations vidéo en ligne | QGIS, ArcGIS, Télédétection - GeoExpert Academy</title>
+<meta name="description" content="Formations vidéo en ligne en SIG, QGIS, ArcGIS, télédétection, Webmapping et KoboToolbox avec assistance du formateur pendant 3 mois.">
+<link rel="canonical" href="https://geoexpertacademy.ci/formations-video-geoexpert.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://geoexpertacademy.ci/formations-video-geoexpert.html">
+<meta property="og:title" content="Formations vidéo SIG : QGIS, ArcGIS, télédétection | GeoExpert Academy">
+<meta property="og:description" content="Apprenez le SIG à votre rythme, avec 3 mois d'assistance du formateur. Formations dès 5 000 FCFA.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": 1, "item": {"@type": "Course", "name": "Votre premier projet SIG avec ArcGIS", "description": "Organiser un projet SIG, importer ses données et numériser un ancien plan avec ArcGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "10000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 2, "item": {"@type": "Course", "name": "Analyser un territoire avec ArcGIS", "description": "Relief, pente, Clip, Intersect, Buffer et Near avec ArcGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "15000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 3, "item": {"@type": "Course", "name": "Votre premier projet SIG avec QGIS", "description": "Créer une base de données et importer ses données avec QGIS, logiciel gratuit.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "10000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 4, "item": {"@type": "Course", "name": "Analyser un territoire avec QGIS", "description": "Relief, pente, Clip, Intersect, Buffer et proximité avec QGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "15000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 5, "item": {"@type": "Course", "name": "Lire la Terre vue du ciel : télédétection", "description": "Indices NDVI, NDWI, NDBI, classification et mise en page cartographique.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "12000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 6, "item": {"@type": "Course", "name": "Publier votre carte interactive sur internet", "description": "Créer et publier une application de webmapping avec ArcGIS Online.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "10000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 7, "item": {"@type": "Course", "name": "Collecter des données de terrain avec KoboToolbox", "description": "Collecte mobile avec KoboToolbox et intégration dans un SIG.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "10000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 8, "item": {"@type": "Course", "name": "Gagner du temps avec Google Earth", "description": "Utiliser Google Earth en complément d'un logiciel SIG.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "5000", "priceCurrency": "XOF", "category": "Paid"}}}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="style.css">
+
+<style>
+  /* Styles spécifiques pour la page de vente (basés sur la charte GeoExpert) */
+  .sales-hero { padding: 80px 0 60px; background: var(--bg-soft); border-bottom: 1px solid var(--line); }
+  .sales-hero h1 { font-size: clamp(34px, 5vw, 50px); font-weight: 800; line-height: 1.1; margin-bottom: 20px; color: var(--ink); }
+  .sales-hero p { font-size: 18px; color: var(--ink-dim); max-width: 650px; line-height: 1.6; }
+  .sales-hero .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+  
+  .hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 44px; align-items: center; max-width: 1080px; margin: 0 auto; }
+  .hero-panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: 0 12px 32px rgba(0,146,166,.08); }
+  .hero-panel h2 { font-size: 20px; margin-bottom: 16px; }
+  .benefit { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #edf2f3; }
+  .benefit:last-child { border-bottom: 0; }
+  .check { width: 28px; height: 28px; flex: 0 0 28px; display: grid; place-items: center; background: var(--teal-soft); color: var(--teal); border-radius: 50%; font-weight: 800; }
+  .benefit strong { display: block; font-size: 14px; color: var(--ink); }
+  .benefit small { display: block; color: var(--ink-faint); font-size: 13px; margin-top: 2px; }
+
+  .section-head { max-width: 700px; margin: 0 auto 28px; text-align: center; }
+  .section-head h2 { font-size: clamp(26px, 3.4vw, 36px); margin-bottom: 10px; }
+  .section-head p { color: var(--ink-dim); margin: 0; font-size: 16px; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; max-width: 1080px; margin: 0 auto; }
+  .course-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; background: #fff; transition: transform .15s, box-shadow .2s; }
+  .course-card:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,146,166,.1); border-color: var(--teal); }
+  .course-tag { align-self: flex-start; background: var(--bg-soft); color: var(--teal); padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .course-card h3 { font-size: 19px; line-height: 1.3; margin: 15px 0 8px; font-weight: 700; color: var(--ink); }
+  .course-card p { font-size: 14px; color: var(--ink-dim); margin: 0 0 16px; flex: 1; }
+  .course-card ul { padding-left: 18px; color: var(--ink-dim); font-size: 13px; margin: 0 0 20px; }
+  .course-card li { margin-bottom: 4px; }
+  .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; margin-bottom: 14px; }
+  .price { font-size: 28px; line-height: 1.2; font-weight: 800; color: var(--magenta); letter-spacing: -.5px; }
+  .currency { color: var(--ink-faint); font-size: 12px; font-weight: 500; }
+  .course-card .btn { width: 100%; }
+
+  .packs-section { background: var(--bg-soft); padding: 70px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .packs-section .cards { max-width: 1080px; }
+  .pack-card { position: relative; }
+  .pack-card.featured { border: 2px solid var(--teal); background: var(--bg); }
+  .popular { position: absolute; top: -12px; right: 18px; background: var(--gradient-brand); color: #fff; border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 700; }
+
+  .support-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; max-width: 1080px; margin: 0 auto; }
+  .support-box { border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; background: var(--bg); }
+  .support-box h3 { margin: 0 0 12px; font-size: 20px; font-weight: 700; }
+  .support-box p { color: var(--ink-dim); margin: 0 0 14px; font-size: 15px; }
+  .support-list { list-style: none; padding: 0; margin: 0; }
+  .support-list li { padding: 10px 0 10px 28px; position: relative; border-bottom: 1px solid #edf2f3; font-size: 14.5px; color: var(--ink-dim); }
+  .support-list li:last-child { border: 0; }
+  .support-list li::before { content: "✓"; position: absolute; left: 0; color: var(--teal); font-weight: 800; }
+  
+  .notice { padding: 15px 17px; background: #fff8e9; border: 1px solid #f2dfb7; border-radius: 12px; color: #6b531d; font-size: 13px; margin-top: 16px; line-height: 1.5; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1080px; margin: 0 auto; }
+  .step { padding: 24px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); }
+  .step-num { color: var(--teal); font-size: 13px; font-weight: 800; letter-spacing: 1px; }
+  .step h3 { margin: 8px 0; font-size: 17px; font-weight: 700; }
+  .step p { margin: 0; color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+
+  .faq-section { padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); }
+  .faq-wrap { max-width: 850px; margin: 0 auto; }
+  .faq-wrap details { border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .faq-wrap summary { font-weight: 700; cursor: pointer; font-size: 16px; color: var(--ink); }
+  .faq-wrap details p { color: var(--ink-dim); margin: 10px 0 0; font-size: 15px; line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .support-wrap { grid-template-columns: 1fr; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .cards { grid-template-columns: 1fr; }
+    .sales-hero { padding: 60px 0 40px; }
+  }
+
+    /* --- CARROUSEL HERO --- */
+  .sales-hero-carousel {
+    position: relative;
+    padding: 120px 0 100px;
+    background: #0F0A1F;
+    overflow: hidden;
+    text-align: left; /* On aligne à gauche pour faire plus pro */
+  }
+  
+  .hero-bg-carousel {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out, transform 8s ease-out;
+    transform: scale(1.05);
+  }
+  .hero-bg-slide.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(135deg, rgba(15,10,31,0.9) 0%, rgba(15,10,31,0.7) 50%, rgba(81,48,134,0.8) 100%);
+  }
+  
+  .hero-content-wrap {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 44px;
+    align-items: center;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  
+  .sales-hero-carousel h1 { color: #fff; }
+  .sales-hero-carousel p { color: rgba(255,255,255,0.9); }
+  
+  /* Adapter le panneau d'avantages pour le fond sombre */
+  .hero-panel-dark {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+  }
+  
+  @media (max-width: 900px) {
+    .hero-content-wrap { grid-template-columns: 1fr; }
+  }
+
+  /* --- Cartes formations : niveau, durée, aide au choix --- */
+  .course-card p { flex: 0 0 auto; }
+  .course-card ul { flex: 1; }
+  .course-meta { display: grid; gap: 3px; font-size: 12.5px; color: var(--ink-dim); margin: 0 0 14px; padding: 10px 12px; background: var(--bg-soft); border-radius: 8px; }
+  .course-meta strong { color: var(--ink); font-weight: 600; }
+  .guide-box { max-width: 1080px; margin: 0 auto 28px; background: var(--bg-soft); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: 18px 22px; font-size: 15px; line-height: 1.6; color: var(--ink-dim); }
+  .guide-box strong { color: var(--ink); }
+  .guide-box a { color: var(--teal); font-weight: 600; text-decoration: underline; }
+
+  /* --- Ajouts : chiffres, public, comparatif, programme, besoins, garantie --- */
+  .stats-band { background:#fff; border-bottom:1px solid var(--line); padding:26px 0; }
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; max-width:1080px; margin:0 auto; padding:0 24px; text-align:center; }
+  .stats-grid strong { display:block; font-family:var(--font-display); font-size:30px; font-weight:800; color:var(--indigo); line-height:1.1; }
+  .stats-grid span { font-size:13px; color:var(--ink-dim); }
+  .audience-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:1080px; margin:0 auto; }
+  .audience-card { border:1px solid var(--line); border-radius:var(--radius); padding:22px; background:#fff; }
+  .audience-card h3 { font-size:17px; margin:0 0 6px; font-weight:700; color:var(--ink); }
+  .audience-card p { margin:0; font-size:14px; color:var(--ink-dim); line-height:1.55; }
+  .outcomes-box { max-width:1080px; margin:36px auto 0; background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius); padding:28px; }
+  .outcomes-box h3 { margin:0 0 16px; font-size:20px; font-weight:700; }
+  .outcomes-box ul { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:12px 28px; }
+  .outcomes-box li { position:relative; padding-left:28px; font-size:15px; color:var(--ink-dim); line-height:1.5; }
+  .outcomes-box li::before { content:"✓"; position:absolute; left:0; color:var(--teal); font-weight:800; }
+  .compare-wrap { overflow-x:auto; max-width:1080px; margin:0 auto; }
+  .compare { width:100%; border-collapse:collapse; font-size:14.5px; background:#fff; border:1px solid var(--line); }
+  .compare th, .compare td { padding:13px 16px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink-dim); }
+  .compare thead th { background:var(--bg-soft); color:var(--ink); font-family:var(--font-display); }
+  .compare tbody th { color:var(--ink); font-weight:600; width:24%; }
+  .price-old { font-size:14px; color:var(--ink-faint); text-decoration:line-through; margin-top:auto; }
+  .save-tag { align-self:flex-start; display:inline-block; background:var(--teal-soft); color:var(--teal); font-size:12px; font-weight:700; padding:3px 10px; border-radius:99px; margin:4px 0 8px; }
+  .price-old + .save-tag + .price-row { margin-top:0; }
+  .prog-wrap { max-width:900px; margin:0 auto; }
+  .prog-wrap details { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:12px; }
+  .prog-wrap summary { cursor:pointer; padding:18px 22px; font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--ink); display:flex; align-items:center; gap:10px; list-style:none; }
+  .prog-wrap summary::-webkit-details-marker { display:none; }
+  .prog-wrap summary::after { content:"+"; margin-left:auto; font-size:22px; color:var(--magenta); line-height:1; }
+  .prog-wrap details[open] summary::after { content:"\2212"; }
+  .prog-wrap summary small { font-family:var(--font-body); font-weight:400; font-size:13px; color:var(--ink-faint); }
+  .vlist { list-style:none; margin:0; padding:0 22px 12px; }
+  .vlist li { display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-top:1px solid #edf2f3; font-size:14px; color:var(--ink-dim); }
+  .vlist li span:last-child { flex:0 0 auto; color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+  .vlist-note { padding:0 22px 18px; font-size:13.5px; color:var(--ink-dim); }
+  .needs-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; max-width:1080px; margin:0 auto; }
+  .need-card { background:#fff; border:1px solid var(--line); border-top:4px solid var(--teal); border-radius:var(--radius); padding:20px; }
+  .need-card:nth-child(2) { border-top-color:var(--indigo); }
+  .need-card:nth-child(3) { border-top-color:var(--magenta); }
+  .need-card h3 { font-size:16px; margin:0 0 6px; font-weight:700; }
+  .need-card p { margin:0; font-size:14px; color:var(--ink-dim); line-height:1.55; }
+  .guarantee { max-width:900px; margin:0 auto; display:flex; gap:22px; align-items:center; background:var(--teal-soft); border:1px solid var(--teal); border-radius:var(--radius); padding:26px 30px; }
+  .guarantee-badge { flex:0 0 76px; height:76px; border-radius:50%; background:var(--teal); color:#fff; display:grid; place-items:center; text-align:center; font-family:var(--font-display); font-weight:800; font-size:26px; line-height:1; }
+  .guarantee-badge small { display:block; font-size:11px; font-weight:600; }
+  .guarantee h3 { margin:0 0 6px; font-size:20px; }
+  .guarantee p { margin:0; font-size:15px; color:var(--ink-dim); line-height:1.6; }
+  .free-guide { max-width:900px; margin:0 auto; text-align:center; background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius); padding:36px 28px; }
+  .free-guide h2 { font-size:clamp(22px,3.2vw,30px); margin-bottom:10px; }
+  .free-guide p { color:var(--ink-dim); margin:0 auto 22px; max-width:560px; }
+  @media (max-width:900px) {
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .audience-grid { grid-template-columns:repeat(2,1fr); }
+    .needs-grid { grid-template-columns:repeat(2,1fr); }
+    .outcomes-box ul { grid-template-columns:1fr; }
+  }
+  @media (max-width:600px) {
+    .audience-grid, .needs-grid { grid-template-columns:1fr; }
+    .guarantee { flex-direction:column; text-align:center; }
+    .compare th, .compare td { padding:10px 12px; font-size:13.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header" id="header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item"><a href="index.html">Accueil</a></div>
+      <div class="nav-item">
+        <a href="index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="index.html#formations"><strong>Formations en direct</strong><small>Nos sessions présentiel</small></a>
+          <a href="formations-video-geoexpert.html"><strong>Formations vidéo</strong><small>Apprendre à la demande</small></a>
+          <a href="tarifs.html"><strong>Tarifs</strong><small>Nos prix et formules</small></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="services.html"><strong>Nos services</strong><small>Formation, consulting, SIG</small></a>
+          <a href="realisations.html"><strong>Réalisations</strong><small>Projets et portfolio</small></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="blog.html"><strong>Tous les articles</strong><small>Guides et conseils</small></a>
+          <a href="faq.html"><strong>FAQ</strong><small>Questions fréquentes</small></a>
+        </div>
+      </div>
+      <div class="nav-item"><a href="contact.html">Contact</a></div>
+    </nav>
+    <a href="https://wa.me/2250787015030" class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">WhatsApp</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO AVEC CARROUSEL -->
+<section class="sales-hero-carousel">
+  <!-- Images du carrousel (remplace les noms par tes vraies images) -->
+  <div class="hero-bg-carousel">
+    <div class="hero-bg-slide active" style="background-image:url('images/presentiel-enligne.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/exercice.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/salle-formation3.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('images/salle-formation4.jpg')"></div>
+    <div class="hero-bg-slide" style="background-image:url('Kakemono.jpg')"></div>
+  </div>
+  
+  <!-- Voile sombre pour lire le texte -->
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content-wrap">
+    <div>
+      <p class="section-eyebrow" style="color:#00D4EE;">Cours pratiques en ligne</p>
+      <h1 style="font-size: clamp(32px, 5vw, 48px); font-weight: 700; line-height: 1.15; margin-bottom: 20px;">
+        Développez vos compétences SIG,<br>
+        <span style="background:linear-gradient(100deg, #00D4EE 0%, #A78BFF 55%, #E88BD8 100%); -webkit-background-clip:text; background-clip:text; color:transparent;">à votre rythme.</span>
+      </h1>
+      <p style="font-size: 17px; line-height: 1.6; max-width: 600px;">
+        Accédez à des formations vidéo pratiques en QGIS, ArcGIS, télédétection, Webmapping et collecte de données. Et lorsque vous rencontrez un blocage, vous pouvez solliciter l'assistance du formateur.
+      </p>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px;">
+        <a href="#formations" class="btn btn-primary" style="padding: 14px 28px; font-size: 15px;">Découvrir les formations</a>
+        <a href="#assistance" class="btn btn-outline" style="color: #fff; border-color: rgba(255,255,255,0.5); padding: 14px 28px; font-size: 15px;">Voir l'accompagnement</a>
+      </div>
+    </div>
+    
+    <aside class="hero-panel hero-panel-dark">
+      <h2 style="font-size: 20px; margin-bottom: 16px; color: var(--ink);">Apprendre avec un formateur en soutien</h2>
+      <div class="benefit"><span class="check">✓</span><div><strong>Vidéos pratiques</strong><small>Suivez les démonstrations selon votre disponibilité.</small></div></div>
+      <div class="benefit"><span class="check">✓</span><div><strong>Assistance pendant 3 mois</strong><small>Une aide pour vos questions liées aux cours achetés.</small></div></div>
+      <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+      <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+    </aside>
+  </div>
+</section>
+
+<!-- CHIFFRES -->
+<section class="stats-band" aria-label="Chiffres clés">
+  <div class="stats-grid">
+    <div><strong>100 h</strong><span>de vidéos pratiques</span></div>
+    <div><strong>70+</strong><span>vidéos et astuces courtes</span></div>
+    <div><strong>50+</strong><span>exercices pratiques corrigés</span></div>
+    <div><strong>3 mois</strong><span>d'assistance du formateur</span></div>
+  </div>
+</section>
+
+<!-- SECTION VIDÉO EXPLICATIVE -->
+<section id="apercu" style="padding: 60px 0; background: #fff; text-align: center;">
+  <div class="container" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="font-size: clamp(24px, 4vw, 32px); margin-bottom: 10px;">Regardez un extrait gratuit avant d'acheter</h2>
+    <p style="color: var(--ink-dim); margin-bottom: 30px;">Découvrez la méthode du formateur et l'accompagnement inclus, en quelques minutes.</p>
+    
+    <!-- REMPLACE "TON_ID_VIDEO_YOUTUBE" PAR L'ID DE TA VIDÉO -->
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+      <iframe 
+        src="https://www.youtube.com/embed/TON_ID_VIDEO_YOUTUBE" 
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATIONS À L'UNITÉ -->
+<!-- POUR QUI -->
+<section id="pour-qui" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <h2>À qui s'adressent ces formations ?</h2>
+      <p>Aucun besoin d'être informaticien. Si vous travaillez avec des cartes, des terrains ou des données localisées, ces cours sont pour vous.</p>
+    </div>
+    <div class="audience-grid">
+      <div class="audience-card"><h3>Étudiants et jeunes diplômés</h3><p>Géographie, urbanisme, environnement, agronomie : ajoutez une compétence SIG qui compte sur un CV.</p></div>
+      <div class="audience-card"><h3>Techniciens et ingénieurs</h3><p>Eaux et forêts, BTP, agriculture, énergie, mine : cartographiez vos données de terrain sans dépendre d'un tiers.</p></div>
+      <div class="audience-card"><h3>Urbanistes et géomètres</h3><p>Numérisez des plans, créez des bases parcellaires et produisez des cartes fiables.</p></div>
+      <div class="audience-card"><h3>ONG, projets et collectivités</h3><p>Collectez des données avec un téléphone et présentez des cartes claires dans vos rapports.</p></div>
+      <div class="audience-card"><h3>Chercheurs et doctorants</h3><p>Analysez des données spatiales et préparez des cartes propres pour vos publications.</p></div>
+      <div class="audience-card"><h3>Reconversion et montée en compétences</h3><p>Vous voulez apprendre un nouveau métier ou évoluer dans le vôtre, à votre rythme.</p></div>
+    </div>
+    <div class="outcomes-box">
+      <h3>Ce que vous saurez faire à la fin</h3>
+      <ul>
+        <li>Construire une base de données SIG propre et y intégrer vos points GPS, plans et fichiers Excel</li>
+        <li>Numériser un ancien plan papier ou une parcelle</li>
+        <li>Produire des courbes de niveau, des cartes de relief, de pente et de zones tampons autour d'un point ou d'une route</li>
+        <li>Suivre la végétation, l'eau et l'extension des zones bâties sur des images satellites</li>
+        <li>Collecter des données sur le terrain avec votre téléphone, puis les cartographier</li>
+        <li>Publier une carte interactive consultable en ligne</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="formations" style="padding: 70px 0;">
+  <div class="container">
+    <div class="section-head">
+      <h2>Choisissez votre formation vidéo</h2>
+      <p>Chaque formation s'apprend pas à pas, par la pratique. Le niveau et la durée sont indiqués sur chaque carte.</p>
+    </div>
+    <div class="guide-box">
+      <strong>Vous débutez ? Commencez par un Module 1.</strong>
+      Choisissez QGIS si vous voulez un logiciel gratuit, ou ArcGIS si c'est le logiciel utilisé dans votre entreprise ou votre école. Passez ensuite au Module 2 pour apprendre à analyser un territoire.
+      Un doute ? <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20d%C3%A9bute%20en%20SIG%2C%20quelle%20formation%20vid%C3%A9o%20me%20conseillez-vous%20%3F" target="_blank" rel="noopener">Demandez conseil sur WhatsApp</a>.
+    </div>
+    <div class="cards">
+      <article class="course-card">
+        <span class="course-tag">ArcGIS · Module 1</span>
+        <h3>Votre premier projet SIG avec ArcGIS</h3>
+        <p>Rangez vos points GPS, vos plans et vos données de terrain dans un projet propre, même sans aucune expérience.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> environ 45 min de vidéo, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Créer un projet SIG bien organisé dès le départ</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP, le format SIG le plus courant</li><li>Transformer un vieux plan papier en carte numérique (vectorisation)</li><li>Gagner du temps grâce aux astuces ArcMap</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="ArcGIS — Module 1 : bases et gestion des données" data-price="10 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">ArcGIS · Module 2</span>
+        <h3>Analyser un territoire avec ArcGIS</h3>
+        <p>Répondez à des questions concrètes avec une carte : quelles zones sont proches d'une route, quelle est la pente d'un terrain.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> environ 4 h de vidéo, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (outil Clip)</li><li>Croiser des couches et mesurer des distances (Intersect, Buffer, Near)</li><li>Télécharger gratuitement des données spatiales (images et données vectorielles)</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="ArcGIS — Module 2 : analyse spatiale avancée" data-price="15 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">QGIS · Module 1</span>
+        <h3>Votre premier projet SIG avec QGIS, 100 % gratuit</h3>
+        <p>Le logiciel libre pour démarrer : organisez vos données et transformez un vieux plan en carte numérique.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> environ 1 h de vidéo, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Créer une base de données GeoPackage et vos couches</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP ou GeoPackage</li><li>Transformer un ancien plan en base de données parcellaire</li><li>Gagner du temps grâce aux astuces QGIS</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="QGIS — Module 1 : données et bases de données" data-price="10 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">QGIS · Module 2</span>
+        <h3>Analyser un territoire avec QGIS</h3>
+        <p>Découpez, croisez et mesurez vos données pour produire des résultats utiles à un vrai projet.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> environ 2 h 15 de vidéo, 2 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (Clip, extraction par masque)</li><li>Croiser des couches et créer des zones tampons (Intersect, Buffer)</li><li>Mesurer des distances entre objets (proximité)</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="QGIS — Module 2 : analyse spatiale" data-price="15 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">Télédétection</span>
+        <h3>Lire la Terre vue du ciel</h3>
+        <p>Repérez la végétation, l'eau et les zones construites sur des images satellites, puis présentez vos cartes.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant en télédétection</span><span><strong>Durée :</strong> environ 6 h de vidéo</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Afficher et interpréter une image satellite (compositions colorées)</li><li>Suivre l'état de la végétation avec l'indice NDVI</li><li>Repérer l'eau et les zones bâties (NDWI, MNDWI, NDBI)</li><li>Classer une image automatiquement et réaliser une carte professionnelle</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">12 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="Télédétection — module vidéo complet" data-price="12 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">Webmapping</span>
+        <h3>Publier votre carte interactive sur internet</h3>
+        <p>Créez une carte en ligne consultable sur téléphone, tablette ou site web.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire</span><span><strong>Durée :</strong> environ 4 h 30 de vidéo</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Créer une application cartographique avec ArcGIS Online</li><li>La rendre utilisable sur smartphone et tablette</li><li>La publier sur votre site web</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="Webmapping — création et déploiement d&#x27;application" data-price="10 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">Collecte mobile</span>
+        <h3>Collecter des données de terrain avec votre téléphone</h3>
+        <p>Remplacez les fiches papier par un questionnaire sur smartphone, puis transformez les réponses en carte.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> environ 55 min de vidéo</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Créer votre compte et configurer KoboToolbox</li><li>Collecter des données sur le terrain avec votre mobile</li><li>Importer les réponses dans un SIG et les cartographier pour un rapport</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="KoboToolbox — collecte mobile et intégration SIG" data-price="10 000 FCFA">Je m'inscris</button>
+      </article>
+      <article class="course-card">
+        <span class="course-tag">Outils complémentaires</span>
+        <h3>Gagner du temps avec Google Earth</h3>
+        <p>Utilisez Google Earth en complément de votre logiciel SIG pour préparer et vérifier vos cartes.</p>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> environ 1 h 30 de vidéo</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <ul><li>Suivre une série de vidéos pratiques</li><li>Utiliser Google Earth à côté de votre logiciel SIG</li><li>Importer un fichier KML (vos tracés Google Earth) dans ArcGIS</li></ul>
+        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="price-row"><span class="price">5 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="Google Earth et outils complémentaires aux SIG" data-price="5 000 FCFA">Je m'inscris</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARATIF QGIS / ARCGIS -->
+<section id="comparatif" style="padding: 70px 0;">
+  <div class="container">
+    <div class="section-head">
+      <h2>QGIS ou ArcGIS : lequel choisir ?</h2>
+      <p>Les deux font le même métier. Apprendre l'un vous aidera à comprendre l'autre.</p>
+    </div>
+    <div class="compare-wrap">
+      <table class="compare">
+        <thead><tr><th></th><th>QGIS</th><th>ArcGIS</th></tr></thead>
+        <tbody>
+          <tr><th>Prix du logiciel</th><td>Gratuit</td><td>Licence payante, souvent fournie par un employeur ou une école</td></tr>
+          <tr><th>Pour qui ?</th><td>Idéal pour apprendre seul sans dépenser</td><td>Utile si votre organisation travaille déjà avec ArcGIS</td></tr>
+          <tr><th>Nos formations</th><td>Modules 1 et 2</td><td>Modules 1 et 2, plus la mise en page professionnelle en télédétection et le Webmapping avec ArcGIS Online</td></tr>
+          <tr><th>Notre conseil</th><td colspan="2">Vous débutez et voulez un outil gratuit : commencez par QGIS Module 1. Votre travail utilise ArcGIS : commencez par ArcGIS Module 1.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PACKS -->
+<section class="packs-section" id="packs">
+  <div class="container">
+    <div class="section-head">
+      <h2>Économisez avec nos packs</h2>
+      <p>Regroupez plusieurs modules pour construire un parcours plus complet à un tarif avantageux.</p>
+    </div>
+    <div class="cards">
+      <article class="course-card pack-card featured">
+        <span class="popular">Pack recommandé</span>
+        <span class="course-tag">2 modules + astuces</span>
+        <h3>Pack QGIS</h3>
+        <p>Des bases de données à l'analyse spatiale, pour développer votre autonomie sur QGIS.</p>
+        <ul><li>QGIS module 1</li><li>QGIS module 2</li><li>Assistance du formateur pendant 3 mois</li></ul>
+        <div class="price-old">Au lieu de 25 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
+        <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-primary order-btn" data-product="Pack QGIS — modules 1 et 2" data-price="20 000 FCFA">Choisir le pack QGIS</button>
+      </article>
+      <article class="course-card pack-card">
+        <span class="course-tag">2 modules + astuces</span>
+        <h3>Pack ArcGIS</h3>
+        <p>Un parcours sur ArcMap, de la gestion des données aux outils d'analyse spatiale.</p>
+        <ul><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li><li>Assistance du formateur pendant 3 mois</li></ul>
+        <div class="price-old">Au lieu de 25 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
+        <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="Pack ArcGIS — modules 1 et 2 avec astuces" data-price="20 000 FCFA">Choisir le pack ArcGIS</button>
+      </article>
+      <article class="course-card pack-card">
+        <span class="course-tag">Parcours complet</span>
+        <h3>Pack Géomatique numérique</h3>
+        <p>Une sélection de formations complémentaires pour développer vos compétences en géomatique.</p>
+        <ul><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li></ul>
+        <div class="price-old">Au lieu de 87 000 FCFA</div><span class="save-tag">Vous économisez 32 000 FCFA</span>
+        <div class="price-row"><span class="price">55 000</span><span class="currency">FCFA</span></div>
+        <button class="btn btn-outline order-btn" data-product="Pack Géomatique numérique — toutes les formations listées" data-price="55 000 FCFA">Choisir le pack complet</button>
+      </article>
+    </div>
+    <p class="notice" style="max-width: 800px; margin: 24px auto 0; text-align: center;">Le contenu exact, les modalités de remise des vidéos et les conditions d'assistance sont confirmés lors de la commande.</p>
+    <!-- URGENCE HONNÊTE : si vos prix de lancement ont une vraie date de fin, retirez l'attribut hidden ci-dessous et écrivez la date. -->
+    <p id="launch-note" class="notice" hidden style="max-width: 800px; margin: 14px auto 0; text-align: center;">Prix de lancement valables jusqu'au [date à compléter].</p>
+  </div>
+</section>
+
+<!-- PROGRAMME DÉTAILLÉ -->
+<section id="programme" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <h2>Le programme vidéo en détail</h2>
+      <p>Chaque module est découpé en courtes vidéos pratiques. Ouvrez un module pour voir le titre et la durée de chaque vidéo.</p>
+    </div>
+    <div class="prog-wrap">
+      <details><summary>ArcGIS Module 1 : bases et gestion des données <small>7 vidéos, 10 astuces, 5 exercices</small></summary><ul class="vlist"><li><span>Structurer une base de données dans ArcGIS</span><span>5:08</span></li><li><span>Importer des points GPS depuis un CSV</span><span>2:21</span></li><li><span>Importer un fichier DXF</span><span>2:11</span></li><li><span>Sauvegarder un fichier GPX dans votre base de données</span><span>3:33</span></li><li><span>Importer un fichier GPX dans ArcMap</span><span>2:19</span></li><li><span>Importer un vieux plan dans votre base de données</span><span>6:27</span></li><li><span>Vectoriser un vieux plan</span><span>9:39</span></li></ul><p class="vlist-note">Astuces courtes : afficher le catalogue et la recherche, afficher le fond Google sur un DXF, bien choisir les coordonnées X et Y d'un CSV, activer l'image satellite, supprimer une vectorisation faite par erreur, activer la barre d'édition, et d'autres.</p></details>
+      <details><summary>ArcGIS Module 2 : analyse spatiale avancée <small>13 vidéos, 2 astuces, 4 exercices</small></summary><ul class="vlist"><li><span>Introduction au Module 2 : analyse spatiale avancée</span><span>10:14</span></li><li><span>Introduction et création d'un feature dataset</span><span>10:03</span></li><li><span>Extraire les courbes de niveau à partir d'un MNT</span><span>14:48</span></li><li><span>Définir le relief sans les courbes de niveau, et la pente</span><span>8:13</span></li><li><span>Extraire un département (exemple : Yakro)</span><span>13:15</span></li><li><span>Extraire une couche raster à partir d'une donnée vectorielle</span><span>8:01</span></li><li><span>Extraire les données avec l'outil Clip</span><span>16:24</span></li><li><span>Utiliser efficacement l'outil Intersect</span><span>14:04</span></li><li><span>Utiliser efficacement Buffer et multiple buffer</span><span>24:00</span></li><li><span>Utiliser efficacement l'outil Near</span><span>14:31</span></li><li><span>Télécharger des données vectorielles et raster, partie 1</span><span>56:54</span></li><li><span>Télécharger des données vectorielles et raster, partie 2</span><span>34:48</span></li><li><span>Astuce : exporter des courbes de niveau vers AutoCAD</span><span>5:52</span></li><li><span>Astuce : exporter des courbes de niveau en KMZ depuis ArcMap</span><span>6:59</span></li></ul></details>
+      <details><summary>QGIS Module 1 : données et bases de données <small>10 vidéos, 3 astuces, 5 exercices</small></summary><ul class="vlist"><li><span>Introduction au Module 1</span><span>4:36</span></li><li><span>Créer une base de données sur QGIS</span><span>8:12</span></li><li><span>Créer trois couches (polygone, ligne, point) et les importer dans la base</span><span>9:46</span></li><li><span>Importer un fichier CSV</span><span>7:13</span></li><li><span>Importer un fichier DXF</span><span>3:40</span></li><li><span>Enregistrer un fichier DXF dans la base de données</span><span>1:54</span></li><li><span>Importer un fichier GPX et le sauvegarder dans la base</span><span>3:50</span></li><li><span>Importer un fichier raster</span><span>6:05</span></li><li><span>Créer une base parcellaire à partir d'un vieux plan</span><span>8:52</span></li><li><span>Importer un fichier KML dans le GeoPackage</span><span>2:52</span></li><li><span>Astuce : activer Google Satellite dans QGIS</span><span>3:55</span></li><li><span>Astuce : zoomer sur une couche manuellement</span><span>1:22</span></li></ul></details>
+      <details><summary>QGIS Module 2 : analyse spatiale <small>10 vidéos, 2 exercices</small></summary><ul class="vlist"><li><span>Introduction au Module 2</span><span>2:32</span></li><li><span>Extraire les courbes de niveau</span><span>14:34</span></li><li><span>Définir la pente (slope) à partir d'un MNT</span><span>6:58</span></li><li><span>Définir le relief directement sur le MNT</span><span>7:30</span></li><li><span>L'outil Clip et l'extraction par masque</span><span>17:20</span></li><li><span>Importer toutes les couches vectorielles du module</span><span>9:31</span></li><li><span>Découper toutes les données dans la zone d'étude</span><span>13:41</span></li><li><span>Utiliser efficacement l'outil Intersect</span><span>23:31</span></li><li><span>Utiliser efficacement l'outil Buffer (tampon)</span><span>25:39</span></li><li><span>Utiliser efficacement l'outil de proximité</span><span>14:12</span></li></ul></details>
+      <details><summary>Télédétection : analyse d'images satellitaires <small>6 vidéos, 6 h</small></summary><ul class="vlist"><li><span>Introduction, compositions colorées et NDVI</span><span>1:38:21</span></li><li><span>Suite : suivi de site avec le NDVI</span><span>8:52</span></li><li><span>NDWI, MNDWI et NDBI</span><span>1:24:03</span></li><li><span>Suite NDBI, NBR et classification non supervisée</span><span>1:05:33</span></li><li><span>Suite de la classification non supervisée et mise en page professionnelle</span><span>1:09:44</span></li><li><span>Mise en page professionnelle avec Arcmap</span><span>41:59</span></li></ul></details>
+      <details><summary>Webmapping : créer et déployer une application <small>2 vidéos, 4 h 30</small></summary><ul class="vlist"><li><span>Création d'une application Webmapping avec ArcGIS Online, partie 1</span><span>2:19:13</span></li><li><span>Création d'une application Webmapping avec ArcGIS Online, partie 2</span><span>2:12:05</span></li></ul></details>
+      <details><summary>KoboToolbox : collecte mobile et intégration SIG <small>3 vidéos, 55 min</small></summary><ul class="vlist"><li><span>Introduction à la collecte de données</span><span>3:00</span></li><li><span>Création de votre compte KoboToolbox</span><span>39:10</span></li><li><span>Paramètres de l'application et collecte de données</span><span>12:23</span></li></ul></details>
+      <details><summary>Google Earth et outils complémentaires aux SIG <small>8 vidéos, 1 h 30</small></summary><ul class="vlist"><li><span>Google comme outil complémentaire au SIG, parties 1 à 6</span><span>1 h 23</span></li><li><span>Google comme outil complémentaire au SIG, partie 7 (QGIS)</span><span>3:14</span></li><li><span>Importer un fichier KML dans la géodatabase ArcGIS</span><span>6:08</span></li></ul></details>
+    </div>
+  </div>
+</section>
+
+<!-- CE DONT VOUS AVEZ BESOIN -->
+<section id="besoins" style="padding: 70px 0;">
+  <div class="container">
+    <div class="section-head">
+      <h2>Ce dont vous avez besoin pour suivre</h2>
+      <p>Vérifiez ces points avant de commander, pour démarrer sans mauvaise surprise.</p>
+    </div>
+    <div class="needs-grid">
+      <div class="need-card"><h3>Un ordinateur</h3><p>Un téléphone suffit pour regarder les vidéos, mais il faut un ordinateur pour refaire les manipulations. ArcMap fonctionne uniquement sous Windows. Configuration conseillée : Windows 10 ou 11, 8 Go de mémoire vive et de l'espace libre pour les données.</p></div>
+      <div class="need-card"><h3>Un logiciel</h3><p>QGIS est gratuit. ArcGIS demande une licence, souvent fournie par l'employeur ou l'école. Le Webmapping utilise ArcGIS Online, et vous créez votre compte KoboToolbox pendant la formation.</p></div>
+      <div class="need-card"><h3>Une connexion internet</h3><p>Pour regarder les vidéos et télécharger les données utilisées dans les exercices. Les modalités de remise des vidéos sont confirmées à la commande.</p></div>
+      <div class="need-card"><h3>Un peu de temps</h3><p>Quelques heures par semaine suffisent. Vous avancez à votre rythme et vous revoyez les vidéos autant que nécessaire.</p></div>
+    </div>
+    <p class="notice" style="max-width: 800px; margin: 24px auto 0; text-align: center;">Vous hésitez sur votre configuration ? Écrivez-nous sur WhatsApp avant de commander, nous vous confirmons si votre ordinateur convient.</p>
+  </div>
+</section>
+
+<!-- GARANTIE -->
+<section id="garantie" style="padding: 20px 0 70px;">
+  <div class="container">
+    <div class="guarantee">
+      <div class="guarantee-badge"><span>7<small>jours</small></span></div>
+      <div>
+        <h3>Testez sans risque</h3>
+        <p>Si la formation ne vous convient pas, contactez-nous dans les 7 jours suivant la réception de vos accès. Les conditions détaillées de remboursement vous sont confirmées lors de la commande.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ASSISTANCE -->
+<section id="assistance" style="padding: 70px 0;">
+  <div class="container">
+    <div class="section-head">
+      <h2>Vous n'êtes pas seul après l'achat</h2>
+      <p>Les formations sont conçues pour avancer en autonomie, tout en gardant la possibilité de solliciter le formateur en cas de blocage.</p>
+    </div>
+    <div class="support-wrap">
+      <div class="support-box">
+        <h3>Assistance personnalisée incluse</h3>
+        <p>Pour chaque formation ou pack acheté, vous bénéficiez de trois mois d'assistance sur les contenus concernés.</p>
+        <ul class="support-list">
+          <li>Questions sur les manipulations montrées dans les vidéos</li>
+          <li>Aide à la compréhension des erreurs et blocages techniques</li>
+          <li>Orientation pour réaliser les exercices de la formation</li>
+          <li>Contact par WhatsApp avec le formateur</li>
+        </ul>
+      </div>
+      <div class="support-box">
+        <h3>Modalités de l'accompagnement</h3>
+        <ul class="support-list">
+          <li>Durée : 3 mois à compter de l'accès à la formation</li>
+          <li>Délai indicatif de réponse : sous 48 heures ouvrables</li>
+          <li>Assistance liée aux cours et aux exercices achetés</li>
+          <li>Projets personnels ou professionnels complets : prestation complémentaire sur devis</li>
+        </ul>
+        <div class="notice">L'assistance n'est pas un service disponible en continu. Les réponses sont apportées selon les modalités et les horaires de disponibilité du formateur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMENT ÇA MARCHE -->
+<section id="fonctionnement" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <h2>Comment ça fonctionne ?</h2>
+      <p>Une démarche simple pour choisir la formation adaptée à vos besoins.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-num">ÉTAPE 01</span><h3>Choisissez votre cours</h3><p>Comparez les modules et les packs, puis sélectionnez la formation qui vous intéresse.</p></div>
+      <div class="step"><span class="step-num">ÉTAPE 02</span><h3>Contactez GeoExpert Academy</h3><p>Le bouton ouvre WhatsApp avec un message préparé pour confirmer le contenu, le prix et les modalités de paiement.</p></div>
+      <div class="step"><span class="step-num">ÉTAPE 03</span><h3>Accédez à vos vidéos</h3><p>Après confirmation de la commande et du paiement, les modalités d'accès vous sont communiquées.</p></div>
+    </div>
+    <div class="notice" style="max-width: 800px; margin: 24px auto 0; text-align: center;">Votre commande est confirmée sur WhatsApp : vous recevez les instructions de paiement (Wave ou Orange Money), puis vos accès après réception du paiement.</div>
+  </div>
+</section>
+
+<!-- TÉMOIGNAGES CLIENTS -->
+<section style="padding: 70px 0; background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="container">
+    <div class="section-head">
+      <h2>Ils ont suivi la formation et témoignent</h2>
+      <p>Découvrez les retours de professionnels qui ont déjà utilisé nos méthodes et nos vidéos.</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1080px; margin: 0 auto;">
+      
+      <!-- AVIS 1 -->
+      <div style="background: var(--bg-soft); padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); display: flex; flex-direction: column;">
+        <div style="color: #F5B041; font-size: 20px; margin-bottom: 10px;">★★★★★</div>
+        <p style="font-size: 15px; font-style: italic; color: var(--ink-dim); margin-bottom: 20px; flex: 1; line-height: 1.6;">
+          "C'est un bon exercice qui m'a permis de bien assimiler le cours et faire des recherches. Le formateur est très disponible et patient avec nous les apprenants. Il est l'un des meilleurs formateurs que j'ai connu. Je vous remercie énormément pour avoir initié cette formation."
+        </p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-display);">GM</div>
+          <div>
+            <strong style="display: block; font-size: 14.5px; color: var(--ink);">GUINDO Mamadou</strong>
+            <span style="font-size: 12px; color: var(--ink-faint);">Ingénieur des techniques des Eaux et Forêts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVIS 2 -->
+      <div style="background: var(--bg-soft); padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); display: flex; flex-direction: column;">
+        <div style="color: #F5B041; font-size: 20px; margin-bottom: 10px;">★★★★★</div>
+        <p style="font-size: 15px; font-style: italic; color: var(--ink-dim); margin-bottom: 20px; flex: 1; line-height: 1.6;">
+          "Les exercices sont en fonction des modules enseignés et on sent l'évolution. Le formateur maîtrise son sujet, il se rend disponible quand on a besoin de lui, jour et nuit. Mon souhait est de passer de débutant à intermédiaire. Je suis vraiment engagée pour maîtriser les SIG."
+        </p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--indigo); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-display);">ZH</div>
+          <div>
+            <strong style="display: block; font-size: 14.5px; color: var(--ink);">ZANHAN Sossihey Herbert Melanie</strong>
+            <span style="font-size: 12px; color: var(--ink-faint);">Agent des eaux et forêts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVIS 3 -->
+      <div style="background: var(--bg-soft); padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); display: flex; flex-direction: column;">
+        <div style="color: #F5B041; font-size: 20px; margin-bottom: 10px;">★★★★★</div>
+        <p style="font-size: 15px; font-style: italic; color: var(--ink-dim); margin-bottom: 20px; flex: 1; line-height: 1.6;">
+          "Les cours sont top, le formateur une master class. Franchement 5/5 pour moi."
+        </p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--magenta); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-display);">ES</div>
+          <div>
+            <strong style="display: block; font-size: 14.5px; color: var(--ink);">Eliam Sauveur</strong>
+            <span style="font-size: 12px; color: var(--ink-faint);">Technicien Urbaniste</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVIS 4 -->
+      <div style="background: var(--bg-soft); padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); display: flex; flex-direction: column;">
+        <div style="color: #F5B041; font-size: 20px; margin-bottom: 10px;">★★★★★</div>
+        <p style="font-size: 15px; font-style: italic; color: var(--ink-dim); margin-bottom: 20px; flex: 1; line-height: 1.6;">
+          "Merci pour l'opportunité donnée de m'exprimer sur la formation que je trouve excellente vu la disponibilité, la qualité et le professionnalisme qui est adopté par l'équipe."
+        </p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-display);">KA</div>
+          <div>
+            <strong style="display: block; font-size: 14.5px; color: var(--ink);">KAKOU Anoh</strong>
+            <span style="font-size: 12px; color: var(--ink-faint);">Environnementaliste</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- GUIDE / KIT GRATUIT -->
+<section style="padding: 60px 0;">
+  <div class="container">
+    <div class="free-guide">
+      <h2>Pas encore prêt à acheter ?</h2>
+      <p>Commencez gratuitement avec notre kit de démarrage SIG, et découvrez notre façon d'enseigner avant de choisir un cours.</p>
+      <a href="ressources.html" class="btn btn-primary">Recevoir le kit gratuit</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-head">
+      <h2>Questions fréquentes</h2>
+    </div>
+    <div class="faq-wrap">
+      <details><summary>Dois-je suivre les vidéos à une heure précise ?</summary><p>Non. Le principe de la formation vidéo est de vous permettre d'apprendre selon votre disponibilité. Les modalités d'accès vous seront précisées lors de la commande.</p></details>
+      <details><summary>L'assistance du formateur est-elle incluse ?</summary><p>Oui, trois mois d'assistance sont inclus pour les questions et blocages liés au contenu de la formation achetée et à ses exercices.</p></details>
+      <details><summary>L'assistance permet-elle de faire réaliser mon projet professionnel ?</summary><p>Elle aide à comprendre les cours et à résoudre les difficultés rencontrées pendant les exercices. La réalisation complète d'un projet personnel ou professionnel peut faire l'objet d'un devis séparé.</p></details>
+      <details><summary>Comment payer et recevoir les vidéos ?</summary><p>Contactez GeoExpert Academy via le bouton de commande pour confirmer les moyens de paiement disponibles et les modalités de remise des vidéos avant de payer.</p></details>
+      <details><summary>Je suis totalement débutant, puis-je suivre ?</summary><p>Oui. Les Modules 1 de QGIS et d'ArcGIS, KoboToolbox et Google Earth ne demandent aucun prérequis. Les Modules 2 sont à suivre après le Module 1.</p></details>
+      <details><summary>Puis-je acheter un seul module ?</summary><p>Oui. Chaque formation s'achète séparément. Les packs sont plus avantageux si vous voulez plusieurs modules.</p></details>
+      <details><summary>De quel ordinateur et de quels logiciels ai-je besoin ?</summary><p>Un ordinateur est nécessaire pour refaire les manipulations. QGIS est gratuit, ArcGIS demande une licence. Voir la section « Ce dont vous avez besoin » plus haut sur cette page.</p></details>
+      <details><summary>Puis-je suivre les cours sur mon téléphone ?</summary><p>Vous pouvez regarder les vidéos sur un téléphone, mais pour pratiquer avec les logiciels, il vous faut un ordinateur.</p></details>
+      <details><summary>Combien de temps ai-je accès aux vidéos ?</summary><p>La durée d'accès et les modalités de remise des vidéos sont confirmées lors de la commande.</p></details>
+      <details><summary>Comment fonctionne la garantie de 7 jours ?</summary><p>Si la formation ne vous convient pas, contactez-nous dans les 7 jours suivant la réception de vos accès. Les conditions détaillées vous sont confirmées lors de la commande.</p></details>
+      <details><summary>Comment obtenir l'attestation de fin de formation ?</summary><p>L'attestation est délivrée à la fin de la formation. Les conditions pour l'obtenir vous sont précisées lors de la commande.</p></details>
+      <details><summary>Quelle différence avec la formation en présentiel ?</summary><p>La formation en présentiel se déroule en salle avec le formateur. Les formations vidéo se suivent à votre rythme, avec 3 mois d'assistance. Consultez nos <a href="tarifs.html" style="color:var(--teal);">tarifs</a> pour comparer.</p></details>
+      <details><summary>Quels moyens de paiement acceptez-vous ?</summary><p>Wave et Orange Money. Les instructions de paiement vous sont envoyées sur WhatsApp après votre commande.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section style="padding:70px 20px; text-align:center; background:var(--gradient-brand); color:#fff;">
+  <div class="container" style="max-width:640px;">
+    <h2 style="color:#fff; margin-bottom:16px;">Prêt à renforcer vos compétences SIG ?</h2>
+    <p style="color:rgba(255,255,255,0.9); font-size:17px; margin-bottom:32px;">Choisissez votre formation et échangez avec GeoExpert Academy sur WhatsApp.</p>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20souhaite%20des%20informations%20sur%20les%20formations%20vid%C3%A9o%20en%20ligne." class="btn" style="background:#fff; color:var(--indigo); font-weight:600; padding:14px 30px;" target="_blank" rel="noopener">Nous contacter sur WhatsApp</a>
+  </div>
+</section>
+
+<!-- MODAL (POP-UP) -->
+<div id="modalAchat" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; padding:30px; border-radius:12px; max-width:500px; width:100%; position:relative;">
+    <button id="closeModal" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+    <h3 style="margin-bottom:10px; font-size:22px;">Finaliser votre commande</h3>
+    <p style="font-size:14px; color:var(--ink-dim); margin-bottom:20px;">Remplissez ce formulaire pour nous contacter sur WhatsApp. Nous vous enverrons les instructions de paiement.</p>
+    
+    <label style="display:block; margin-bottom:15px; font-size:14px; font-weight:500;">
+      Votre nom complet
+      <input type="text" id="achatNom" placeholder="Ex: Jean Dupont" style="width:100%; padding:12px; margin-top:5px; border:1px solid #ccc; border-radius:8px; font-family:inherit; font-size:15px;">
+    </label>
+    <label style="display:block; margin-bottom:20px; font-size:14px; font-weight:500;">
+      Formation choisie
+      <input type="text" id="achatFormation" readonly style="width:100%; padding:12px; margin-top:5px; border:1px solid #ccc; border-radius:8px; background:#f0f0f0; font-family:inherit; font-size:15px;">
+    </label>
+    <button id="btnEnvoyerWhatsapp" class="btn btn-whatsapp btn-block" style="width:100%;">Envoyer via WhatsApp</button>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/profile.php?id=61590209789158" target="_blank" rel="noopener" aria-label="Facebook GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@geoexpertacademy" target="_blank" rel="noopener" aria-label="TikTok GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82c-1.02-.9-1.64-2.16-1.7-3.6h-3.15v13.9c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1-2.94-2.94 2.94 2.94 0 0 1 2.94-2.94c.3 0 .59.05.86.13v-3.2a6.15 6.15 0 0 0-.86-.06A6.14 6.14 0 0 0 2.7 16.19a6.14 6.14 0 0 0 6.11 6.13 6.14 6.14 0 0 0 6.11-6.13V9.07a8.7 8.7 0 0 0 5.08 1.63V7.55a5.32 5.32 0 0 1-3.4-1.73Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@geoexpertacademyconsulting0794" target="_blank" rel="noopener" aria-label="YouTube GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.02-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.98.13c-.4.05-1.26.05-2.02.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.2 3.28.2 3.28s.2 1.4.8 2.02c.77.8 1.77.78 2.22.86C6.8 19.05 12 19.1 12 19.1s4.1-.01 6.98-.14c.4-.05 1.26-.05 2.02-.85.6-.62.8-2.02.8-2.02s.2-1.64.2-3.28v-1.44c0-1.64-.2-3.28-.2-3.28ZM9.98 14.6V8.85l5.4 2.88-5.4 2.87Z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/geoexpert-academy-consulting" target="_blank" rel="noopener" aria-label="LinkedIn GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
+      </a>
+    </div>
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Assistant GeoExpert (Tidio) -->
+<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+
+<script defer src="script.js"></script>
+
+<!-- SCRIPT POUR LA MODAL, WHATSAPP ET LE CARROUSEL -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // ==========================================
+    // 1. GESTION DE LA POP-UP (COMMANDES)
+    // ==========================================
+    const btns = document.querySelectorAll('.order-btn, .btn-achat');
+    const modal = document.getElementById('modalAchat');
+    const closeModal = document.getElementById('closeModal');
+    const inputFormation = document.getElementById('achatFormation');
+    const inputNom = document.getElementById('achatNom');
+    const btnWhatsapp = document.getElementById('btnEnvoyerWhatsapp');
+    const WHATSAPP_NUMBER = "2250787015030";
+
+    if (btns.length > 0 && modal) {
+      btns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const nomFormation = this.getAttribute('data-product') || this.getAttribute('data-formation') || '';
+          const prixFormation = this.getAttribute('data-price');
+          inputFormation.value = prixFormation ? nomFormation + ' (' + prixFormation + ')' : nomFormation;
+          if (typeof gtag === 'function') {
+            const valeur = parseInt((prixFormation || '').replace(/\D/g, ''), 10) || 0;
+            gtag('event', 'begin_checkout', { currency: 'XOF', value: valeur, items: [{ item_name: nomFormation, price: valeur }] });
+          }
+          modal.style.display = 'flex';
+        });
+      });
+
+      closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+      btnWhatsapp.addEventListener('click', () => {
+        const nom = inputNom.value.trim();
+        const formation = inputFormation.value;
+        if (!nom) { alert("Veuillez entrer votre nom complet."); return; }
+        
+        const message = `Bonjour GeoExpert, je souhaite commander :\n👉 ${formation}\n👤 Nom : ${nom}\n\nMerci de m'envoyer les instructions de paiement (Wave ou Orange Money).`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        
+        modal.style.display = 'none';
+        inputNom.value = '';
+      });
+    }
+
+    // ==========================================
+    // 1 bis. MASQUER L'APERÇU VIDÉO TANT QUE L'ID YOUTUBE N'EST PAS RENSEIGNÉ
+    // ==========================================
+    const apercu = document.getElementById('apercu');
+    if (apercu) {
+      const frame = apercu.querySelector('iframe');
+      if (!frame || frame.src.indexOf('TON_ID_VIDEO_YOUTUBE') !== -1) apercu.style.display = 'none';
+    }
+
+    // ==========================================
+    // 2. GESTION DU CARROUSEL
+    // ==========================================
+    const heroCarousel = document.querySelector('.sales-hero-carousel');
+    if (heroCarousel) {
+      const slides = heroCarousel.querySelectorAll('.hero-bg-slide');
+      
+      if (slides.length > 1) {
+        let currentIndex = 0;
+        const DURATION = 5000; // 5 secondes
+
+        setInterval(() => {
+          // On retire la classe active de l'image actuelle
+          slides[currentIndex].classList.remove('active');
+          // On passe à l'image suivante
+          currentIndex = (currentIndex + 1) % slides.length;
+          // On ajoute la classe active à la nouvelle image
+          slides[currentIndex].classList.add('active');
+        }, DURATION);
+      }
+    }
+
+  });
+</script>
+</body>
+</html>

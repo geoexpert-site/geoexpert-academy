@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace apprenant | GeoExpert Academy</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="style.css">
+<style>
+  .acc-head { background:var(--bg-soft); border-bottom:1px solid var(--line); padding:18px 0; }
+  .acc-head .container { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .acc-hero { padding:56px 0 24px; }
+  .acc-hero .container, .acc-wrap { max-width:900px; margin:0 auto; padding:0 24px; }
+  .acc-hero h1 { font-size:clamp(28px,4.5vw,40px); margin-bottom:12px; }
+  .acc-hero p { color:var(--ink-dim); font-size:16px; line-height:1.6; margin:0 0 12px; }
+  .acc-rule { background:#fff8e9; border:1px solid #f2dfb7; border-radius:12px; color:#6b531d; font-size:14px; padding:14px 18px; margin-top:16px; line-height:1.55; }
+  .login-box { max-width:520px; margin:10px auto 50px; padding:0 24px; }
+  .login-card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:26px; }
+  .login-card label { display:block; font-weight:600; margin-bottom:8px; }
+  .login-card input { width:100%; padding:14px; border:1px solid var(--line); border-radius:10px; font:600 18px var(--font-body); letter-spacing:1px; text-transform:uppercase; }
+  .login-card button { margin-top:14px; width:100%; }
+  .msg { margin-top:12px; font-size:14px; color:#a11; min-height:20px; }
+  .acc-wrap { padding-bottom:70px; }
+  .bar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; font-size:14px; color:var(--ink-dim); }
+  .bar button { background:none; border:1px solid var(--line); border-radius:8px; padding:7px 14px; cursor:pointer; font:600 13px var(--font-body); }
+  .acc-wrap details { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:12px; }
+  .acc-wrap summary { cursor:pointer; padding:18px 22px; font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--ink); display:flex; align-items:center; gap:10px; list-style:none; }
+  .acc-wrap summary::-webkit-details-marker { display:none; }
+  .acc-wrap summary::after { content:"+"; margin-left:auto; font-size:22px; color:var(--magenta); line-height:1; }
+  .acc-wrap details[open] summary::after { content:"\2212"; }
+  .acc-wrap summary small { font-family:var(--font-body); font-weight:400; font-size:13px; color:var(--ink-faint); }
+  .locked { opacity:.75; }
+  .lockmsg { margin:0 22px 14px; padding:12px 14px; background:var(--bg-soft); border-radius:8px; font-size:14px; }
+  .mbody { padding:0 22px 16px; }
+  .mbody h4 { margin:14px 0 6px; font-size:14px; text-transform:uppercase; letter-spacing:.5px; color:var(--teal); }
+  .vlist2 { list-style:none; margin:0; padding:0; }
+  .vitem { border-top:1px solid #edf2f3; padding:10px 0; font-size:14.5px; color:var(--ink-dim); }
+  .vrow { display:flex; align-items:center; gap:12px; }
+  .vtitle { flex:1; }
+  .vdur { flex:0 0 auto; color:var(--ink-faint); font-variant-numeric:tabular-nums; font-size:13px; }
+  .vbtn { flex:0 0 auto; background:var(--teal); color:#fff; border:0; border-radius:8px; padding:7px 14px; font:600 13px var(--font-body); cursor:pointer; }
+  .vbtn[disabled] { background:#c9d6da; cursor:default; }
+  .player { margin-top:10px; }
+  .player:empty { display:none; }
+  .ratio { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:10px; background:#000; }
+  .ratio iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .wm { position:absolute; z-index:3; pointer-events:none; color:rgba(255,255,255,.55); font:600 15px var(--font-body); text-shadow:0 0 4px rgba(0,0,0,.6); transition:all 1.2s; }
+  .soon { margin:0; padding:12px 14px; background:var(--bg-soft); border-radius:8px; font-size:14px; }
+  .acc-help { text-align:center; padding:0 24px 60px; }
+  @media (max-width:600px) { .vrow { flex-wrap:wrap; } .vtitle { flex-basis:100%; } }
+</style>
+</head>
+<body>
+<header class="acc-head">
+  <div class="container">
+    <a href="index.html" class="brand"><img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60"></a>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j%27ai%20une%20question%20sur%20ma%20formation%20vid%C3%A9o." class="btn btn-whatsapp" target="_blank" rel="noopener">Assistance WhatsApp</a>
+  </div>
+</header>
+<main>
+  <section class="acc-hero">
+    <div class="container">
+      <h1>Espace apprenant</h1>
+      <p id="intro">Entrez le code personnel que vous avez reçu sur WhatsApp pour accéder à votre formation.</p>
+      <div class="acc-rule"><strong>Accès strictement personnel.</strong> Votre code vous est réservé : ne le partagez pas et ne diffusez pas les vidéos. En cas de partage, l'accès peut être retiré sans remboursement.</div>
+    </div>
+  </section>
+
+  <div class="login-box" id="loginBox">
+    <div class="login-card">
+      <label for="code">Votre code d'accès</label>
+      <input id="code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="GEO-XXXX-XXXX-XXXX" maxlength="20">
+      <button type="button" class="btn btn-primary" id="loginBtn">Accéder à ma formation</button>
+      <div class="msg" id="loginMsg" role="alert"></div>
+    </div>
+  </div>
+
+  <div class="acc-wrap" id="content" hidden>
+    <div class="bar"><span id="who"></span><button type="button" id="logout">Se déconnecter</button></div>
+    <div id="modules"></div>
+  </div>
+
+  <div class="acc-help">
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j%27ai%20un%20blocage%20dans%20ma%20formation%20vid%C3%A9o." class="btn btn-whatsapp" target="_blank" rel="noopener">Demander de l'aide au formateur</a>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // ===== A REMPLIR : adresse de votre Worker Cloudflare (voir GUIDE-INSTALLATION.md) =====
+  var API_URL = "espace-apprenant-api.geographe07.workers.dev";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var code = '', wmTimer = null;
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+  function fmtDate(ms) { return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); }
+
+  async function post(path, body) {
+    var r = await fetch(API_URL + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return r;
+  }
+
+  async function login(c, silent) {
+    $('loginMsg').textContent = '';
+    if (API_URL.indexOf('VOTRE-WORKER') !== -1) { $('loginMsg').textContent = "Le service d'accès n'est pas encore configuré."; return; }
+    var btn = $('loginBtn'); btn.disabled = true; btn.textContent = 'Vérification...';
+    try {
+      var r = await post('/api/login', { code: c });
+      var j = await r.json();
+      if (!r.ok) { if (!silent) $('loginMsg').textContent = j.error || 'Code invalide.'; sessionStorage.removeItem('geo_code'); return; }
+      code = c; sessionStorage.setItem('geo_code', c);
+      render(j);
+    } catch (e) {
+      if (!silent) $('loginMsg').textContent = 'Connexion impossible. Vérifiez votre connexion internet et réessayez.';
+    } finally { btn.disabled = false; btn.textContent = 'Accéder à ma formation'; }
+  }
+
+  function render(data) {
+    $('loginBox').hidden = true; $('content').hidden = false;
+    $('intro').textContent = 'Ouvrez un module, puis cliquez sur « Regarder » pour lancer une vidéo.';
+    $('who').textContent = 'Connecté : ' + data.label + ' · accès jusqu\'au ' + fmtDate(data.expires);
+    var box = $('modules'); box.textContent = '';
+    data.modules.forEach(function (m) {
+      var d = el('details', m.locked ? 'locked' : '');
+      var s = el('summary', '', m.title + ' '); s.appendChild(el('small', '', m.locked ? 'bientôt débloqué' : m.meta));
+      d.appendChild(s);
+      if (m.locked) d.appendChild(el('p', 'lockmsg', 'Ce module sera débloqué le ' + fmtDate(m.unlockAt) + '.'));
+      var body = el('div', 'mbody');
+      body.appendChild(el('h4', '', 'Vidéos'));
+      var ul = el('ul', 'vlist2');
+      m.videos.forEach(function (v) {
+        var li = el('li', 'vitem'); var row = el('div', 'vrow');
+        row.appendChild(el('span', 'vtitle', v.title)); row.appendChild(el('span', 'vdur', v.dur));
+        var b = el('button', 'vbtn', m.locked ? 'Verrouillé' : (v.ready ? 'Regarder' : 'Bientôt'));
+        b.type = 'button'; if (m.locked || !v.ready) b.disabled = true;
+        var player = el('div', 'player');
+        b.addEventListener('click', function () { toggleVideo(v.k, b, player); });
+        row.appendChild(b); li.appendChild(row); li.appendChild(player); ul.appendChild(li);
+      });
+      body.appendChild(ul);
+      if (m.exercises.length) {
+        body.appendChild(el('h4', '', 'Exercices'));
+        var eu = el('ul', 'vlist2');
+        m.exercises.forEach(function (x) {
+          var li = el('li', 'vitem'); var row = el('div', 'vrow');
+          row.appendChild(el('span', 'vtitle', x.title)); row.appendChild(el('span', 'vdur', 'PDF'));
+          var b = el('button', 'vbtn', m.locked ? 'Verrouillé' : (x.ready ? 'Ouvrir' : 'Bientôt'));
+          b.type = 'button'; if (m.locked || !x.ready) b.disabled = true;
+          b.addEventListener('click', function () { openFile(x.k, b); });
+          row.appendChild(b); li.appendChild(row); eu.appendChild(li);
+        });
+        body.appendChild(eu);
+      }
+      d.appendChild(body); box.appendChild(d);
+    });
+  }
+
+  async function toggleVideo(k, btn, player) {
+    if (player.firstChild) { player.textContent = ''; btn.textContent = 'Regarder'; return; }
+    btn.disabled = true;
+    try {
+      var r = await post('/api/play', { code: code, k: k });
+      var j = await r.json();
+      if (!r.ok) { player.appendChild(el('p', 'soon', j.error || 'Lecture impossible.')); btn.textContent = 'Fermer'; return; }
+      if (String(j.url).indexOf('https://') !== 0) throw new Error('url');
+      var wrap = el('div', 'ratio'); var f = document.createElement('iframe');
+      f.src = j.url;
+      f.setAttribute('allow', 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture');
+      f.setAttribute('allowfullscreen', 'true'); f.setAttribute('loading', 'lazy');
+      var wm = el('div', 'wm', j.label + ' · GeoExpert Academy');
+      wrap.appendChild(f); wrap.appendChild(wm); player.appendChild(wrap);
+      var place = function () { wm.style.top = (8 + Math.random() * 78) + '%'; wm.style.left = (4 + Math.random() * 55) + '%'; };
+      place(); var t = setInterval(function () { if (!document.body.contains(wm)) { clearInterval(t); return; } place(); }, 12000);
+      btn.textContent = 'Fermer';
+    } catch (e) {
+      player.appendChild(el('p', 'soon', 'Lecture impossible pour le moment. Réessayez ou écrivez-nous sur WhatsApp.')); btn.textContent = 'Fermer';
+    } finally { btn.disabled = false; }
+  }
+
+  async function openFile(k, btn) {
+    var old = btn.textContent; btn.disabled = true; btn.textContent = '...';
+    var w = window.open('', '_blank');
+    try {
+      var r = await post('/api/file', { code: code, k: k });
+      if (!r.ok) { var j = await r.json(); if (w) w.close(); alert(j.error || 'Fichier indisponible.'); return; }
+      var blob = await r.blob(); var u = URL.createObjectURL(blob);
+      if (w) w.location = u; else window.location = u;
+    } catch (e) { if (w) w.close(); alert('Téléchargement impossible pour le moment.'); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+
+  $('loginBtn').addEventListener('click', function () { var c = $('code').value.trim(); if (c) login(c); });
+  $('code').addEventListener('keydown', function (e) { if (e.key === 'Enter') { var c = this.value.trim(); if (c) login(c); } });
+  $('logout').addEventListener('click', function () { sessionStorage.removeItem('geo_code'); code = ''; $('modules').textContent = ''; $('content').hidden = true; $('loginBox').hidden = false; $('code').value = ''; $('intro').textContent = 'Entrez le code personnel que vous avez reçu sur WhatsApp pour accéder à votre formation.'; });
+  var saved = sessionStorage.getItem('geo_code'); if (saved) login(saved, true);
+})();
+</script>
+</body>
+</html>
