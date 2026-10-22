@@ -285,12 +285,50 @@ async function play(l,pl){
  }catch(e){pl.textContent='';pl.appendChild(h('div',{class:'er',text:'Lecture impossible pour le moment. Réessayez.'}))}
 }
 async function openFile(k,btn){
- var o=btn.textContent;btn.disabled=true;btn.textContent='...';var w=window.open('','_blank');
- try{var r=await post('/api/file',{code:code,k:k});
-  if(!r.ok){var j=await r.json();if(w)w.close();alert(j.error||'Fichier indisponible.');return}
-  var u=URL.createObjectURL(await r.blob());if(w)w.location=u;else location=u}
- catch(e){if(w)w.close();alert('Téléchargement impossible pour le moment.')}
- finally{btn.disabled=false;btn.textContent=o}
+  var o=btn.textContent;btn.disabled=true;btn.textContent='...';
+  try{
+    var r=await post('/api/file',{code:code,k:k});
+    
+    // Si le serveur renvoie une erreur (ex: fichier introuvable)
+    if(!r.ok){
+      var j=await r.json();
+      alert(j.error||'Fichier indisponible.');
+      return;
+    }
+    
+    // Si le serveur renvoie un lien (gros fichier)
+    var contentType = r.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      var j = await r.json();
+      if (j.url) { window.location.href = j.url; return; }
+    }
+    
+    // Sinon, on télécharge le fichier (blob) et on force le téléchargement
+    var blob = await r.blob();
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    
+    // On donne un nom au fichier (si le serveur l'a envoyé, sinon on met un nom par défaut)
+    var disposition = r.headers.get('content-disposition');
+    var filename = 'Document_GeoExpert.pdf';
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      filename = disposition.split('filename=')[1].replace(/['"]/g, '');
+    }
+    a.download = filename;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+  }catch(e){
+    console.error(e);
+    alert('Téléchargement impossible. Vérifiez votre connexion.');
+  }finally{
+    btn.disabled=false;
+    btn.textContent=o;
+  }
 }
 
 $('lb').addEventListener('click',function(){var c=$('code').value.trim();if(c)login(c)});
