@@ -286,44 +286,34 @@ async function play(l,pl){
 }
 async function openFile(k,btn){
   var o=btn.textContent;btn.disabled=true;btn.textContent='...';
+  console.log("1. Début du téléchargement pour :", k);
+  
   try{
     var r=await post('/api/file',{code:code,k:k});
+    console.log("2. Réponse du serveur :", r.status);
     
-    // Si le serveur renvoie une erreur (ex: fichier introuvable)
     if(!r.ok){
       var j=await r.json();
+      console.error("Erreur serveur :", j);
       alert(j.error||'Fichier indisponible.');
       return;
     }
     
-    // Si le serveur renvoie un lien (gros fichier)
-    var contentType = r.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-      var j = await r.json();
-      if (j.url) { window.location.href = j.url; return; }
-    }
-    
-    // Sinon, on télécharge le fichier (blob) et on force le téléchargement
+    console.log("3. Le serveur a répondu OK, on télécharge le fichier...");
     var blob = await r.blob();
     var url = window.URL.createObjectURL(blob);
+    
     var a = document.createElement('a');
     a.href = url;
-    
-    // On donne un nom au fichier (si le serveur l'a envoyé, sinon on met un nom par défaut)
-    var disposition = r.headers.get('content-disposition');
-    var filename = 'Document_GeoExpert.pdf';
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      filename = disposition.split('filename=')[1].replace(/['"]/g, '');
-    }
-    a.download = filename;
-    
+    a.download = 'Exercice_GeoExpert.pdf';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    console.log("4. Téléchargement déclenché !");
 
   }catch(e){
-    console.error(e);
+    console.error("Erreur fatale :", e);
     alert('Téléchargement impossible. Vérifiez votre connexion.');
   }finally{
     btn.disabled=false;
