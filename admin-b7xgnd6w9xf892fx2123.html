@@ -353,7 +353,14 @@
       box.appendChild(el('h3', '', m.title)).style.cssText = 'font-size:16px;margin:24px 0 10px;color:var(--teal);';
       m.exercises.forEach(function (x) {
         var r = el('div', 'vid'); 
-        r.appendChild(el('span', '', x.title + (x.has ? ' <span style="color:#0a7a3b;font-weight:600;font-size:12px;">(✔️ En ligne)</span>' : '')));
+        var titleSpan = el('span', '', x.title + ' ');
+        if (x.has) {
+          var badge = document.createElement('span');
+          badge.style.cssText = 'color:#0a7a3b;font-weight:600;font-size:12px;margin-left:5px;';
+          badge.textContent = '✔️ En ligne';
+          titleSpan.appendChild(badge);
+        }
+        r.appendChild(titleSpan);
         var f = el('input'); f.type = 'file'; f.accept = '*/*'; f.style.background = 'transparent'; f.style.border = 'none'; f.style.padding = '0';
         f.addEventListener('change', async function () {
           if (!f.files[0]) return;
