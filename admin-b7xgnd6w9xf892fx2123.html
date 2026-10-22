@@ -200,7 +200,7 @@
       box.appendChild(el('h3', '', m.title)).style.cssText = 'font-size:15px;margin:16px 0 4px;';
       m.exercises.forEach(function (x) {
         var r = el('div', 'vid'); r.appendChild(el('span', '', x.title + (x.has ? '  (déjà envoyé)' : '')));
-        var f = el('input'); f.type = 'file'; f.accept = 'application/pdf';
+        var f = el('input'); f.type = 'file'; f.accept = '*/*';
         f.addEventListener('change', async function () {
           if (!f.files[0]) return;
           try { await call('/admin/file?k=' + encodeURIComponent(x.k), 'PUT', null, f.files[0]); alert('Fichier envoyé.'); await load(); document.querySelector('[data-t=pdf]').click(); }
