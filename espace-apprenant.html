@@ -284,37 +284,35 @@ async function play(l,pl){
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
  }catch(e){pl.textContent='';pl.appendChild(h('div',{class:'er',text:'Lecture impossible pour le moment. Réessayez.'}))}
 }
+
 async function openFile(k,btn){
   var o=btn.textContent;btn.disabled=true;btn.textContent='...';
-  console.log("1. Début du téléchargement pour :", k);
-  
   try{
     var r=await post('/api/file',{code:code,k:k});
-    console.log("2. Réponse du serveur :", r.status);
-    
     if(!r.ok){
-      var j=await r.json();
-      console.error("Erreur serveur :", j);
-      alert(j.error||'Fichier indisponible.');
-      return;
+       var j = await r.json().catch(()=>({}));
+       throw new Error(j.error || 'Fichier indisponible');
     }
-    
-    console.log("3. Le serveur a répondu OK, on télécharge le fichier...");
     var blob = await r.blob();
     var url = window.URL.createObjectURL(blob);
-    
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'Exercice_GeoExpert.pdf';
+    
+    // On récupère le nom du fichier depuis le serveur
+    var disposition = r.headers.get('content-disposition');
+    var filename = 'Exercice_GeoExpert.pdf';
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      filename = disposition.split('filename=')[1].replace(/['"]/g, '');
+    }
+    a.download = filename;
+    
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-    console.log("4. Téléchargement déclenché !");
-
   }catch(e){
-    console.error("Erreur fatale :", e);
-    alert('Téléchargement impossible. Vérifiez votre connexion.');
+    console.error("Erreur DL:", e);
+    alert(e.message || 'Téléchargement impossible. Vérifiez votre connexion.');
   }finally{
     btn.disabled=false;
     btn.textContent=o;
