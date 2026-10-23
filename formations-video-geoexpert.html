@@ -297,47 +297,47 @@
     <div><strong>3 mois</strong><span>d'assistance du formateur</span></div>
   </div>
 </section>
-
 <!-- SECTION VIDÉO EXPLICATIVE -->
-<section id="apercu" style="padding: 70px 0; background: #fff; text-align: center;">
-  <div class="container" style="max-width: 900px; margin: 0 auto;">
+<section id="apercu" style="padding: 60px 0; background: #fff; text-align: center;">
+  <div class="container" style="max-width: 900px; margin: 0 auto; padding: 0 15px;">
     <p class="section-eyebrow" style="justify-content: center;">Aperçu de la plateforme</p>
     <h2 style="font-size: clamp(24px, 4vw, 36px); margin-bottom: 10px; color: var(--indigo);">Découvrez l'espace apprenant en 30 secondes</h2>
-    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">Cliquez pour lancer la vidéo.</p>
+    <p style="color: var(--ink-dim); margin-bottom: 25px; font-size: 16px;">Cliquez pour lancer l'aperçu de l'interface.</p>
     
-    <!-- VIGNETTE DE LA VIDÉO -->
-    <div id="video-container" style="position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(75,63,146,0.2); border: 4px solid #fff; cursor: pointer; background: url('images/apercu-dashboard.jpg') center/cover;">
+    <!-- VIGNETTE DE LA VIDÉO (Image du tableau de bord) -->
+    <div id="video-container" style="position: relative; width: 100%; max-width: 850px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 40px rgba(75,63,146,0.15); border: 4px solid #fff; cursor: pointer; background: url('images/apercu-dashboard.jpg') center/cover;">
+      <!-- Remplace 'images/tableau_de_bord.jpg' par le nom exact de ta capture d'écran -->
       
       <!-- Voile sombre -->
-      <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.5); transition: background 0.3s;" id="video-overlay"></div>
+      <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.4); transition: background 0.3s;" id="video-overlay"></div>
       
-      <!-- Bouton Play -->
+      <!-- Bouton Play bien visible -->
       <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;">
-        <div style="width: 80px; height: 80px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.2s;" id="play-btn">
-          <svg viewBox="0 0 24 24" style="width: 36px; height: 36px; fill: #ffffff; margin-left: 6px;"><path d="M8 5v14l11-7z"/></svg>
+        <div style="width: 75px; height: 75px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: transform 0.2s;" id="play-btn">
+          <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #ffffff; margin-left: 5px;"><path d="M8 5v14l11-7z"/></svg>
         </div>
-        <span style="color: #ffffff; margin-top: 15px; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Lancer l'aperçu</span>
+        <span style="color: #ffffff; margin-top: 15px; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Lancer l'aperçu</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- MODAL (PLEIN ÉCRAN) -->
-<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box;">
+<!-- MODAL PLEIN ÉCRAN (Optimisé Mobile) -->
+<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 99999; align-items: center; justify-content: center; padding: 0;">
   
-  <!-- Bouton fermer -->
-  <button id="close-video" style="position: absolute; top: 15px; right: 15px; background: #ffffff; color: #000000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;">&times;</button>
+  <!-- Bouton Fermer (Très accessible) -->
+  <button id="close-video" style="position: absolute; top: 20px; right: 20px; background: #ffffff; color: #000000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100000;">&times;</button>
   
-  <!-- Conteneur de la vidéo -->
-  <div style="width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000000; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
-    <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay"></iframe>
+  <!-- Conteneur Vidéo (Adapté à l'écran) -->
+  <div style="width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen"></iframe>
   </div>
-  
-  <!-- Petit message d'aide pour mobile -->
-  <p style="position: absolute; bottom: 20px; color: #fff; font-size: 13px; text-align: center; width: 100%; margin: 0;">
-    Pour une meilleure expérience, tournez votre téléphone en mode paysage.
+
+  <!-- Message d'aide pour mobile -->
+  <p style="position: absolute; bottom: 20px; color: rgba(255,255,255,0.7); font-size: 12px; text-align: center; width: 100%; margin: 0; pointer-events: none; text-transform: uppercase; letter-spacing: 1px;">
+    📱 Astuce : Tournez votre téléphone pour voir l'animation en grand
   </p>
-</div>
+</div>      
 
 <!-- POUR QUI -->
 <section id="pour-qui" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
@@ -848,7 +848,7 @@
       });
     }
 
-      // ==========================================
+    // ==========================================
     // GESTION DU LECTEUR VIDÉO (MODAL PLEIN ÉCRAN)
     // ==========================================
     const videoContainer = document.getElementById('video-container');
@@ -857,25 +857,26 @@
     const modalIframe = document.getElementById('video-modal-iframe');
 
     if (videoContainer) {
-      // Effet de survol au lieu de lancer la vidéo
-      videoContainer.addEventListener('mouseenter', () => { document.getElementById('video-overlay').style.background = 'rgba(15, 10, 31, 0.3)'; });
-      videoContainer.addEventListener('mouseleave', () => { document.getElementById('video-overlay').style.background = 'rgba(15, 10, 31, 0.5)'; });
-
-      // Au clic : on charge la vidéo et on ouvre le plein écran
       videoContainer.addEventListener('click', () => {
-        modalIframe.src = 'motion-design.html'; // L'animation ne se lance qu'ICI
+        // On charge la vidéo
+        modalIframe.src = 'motion-design.html';
         videoModal.style.display = 'flex';
+
+        // On tente de passer en plein écran natif (très efficace sur mobile)
+        if (videoModal.requestFullscreen) {
+          videoModal.requestFullscreen();
+        } else if (videoModal.webkitRequestFullscreen) { /* Safari */
+          videoModal.webkitRequestFullscreen();
+        }
       });
 
       closeVideo.addEventListener('click', () => {
         videoModal.style.display = 'none';
         modalIframe.src = ''; // On coupe l'animation
-      });
-      
-      videoModal.addEventListener('click', (e) => {
-        if (e.target === videoModal) {
-          videoModal.style.display = 'none';
-          modalIframe.src = '';
+        
+        // On quitte le plein écran
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
         }
       });
     }
