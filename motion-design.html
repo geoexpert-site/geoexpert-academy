@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Design - GeoExpert</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #F6F3FA; --teal: #0092A6; --indigo: #4B3F92; --magenta: #A83C93;
+  --ink: #2A2A28; --muted: #6B6A72;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: 'Montserrat', sans-serif; }
+body { display: grid; place-items: center; }
+
+.stage {
+  position: relative; width: 100vw; height: 100vh; aspect-ratio: 16 / 9;
+  overflow: hidden; isolation: isolate; color: var(--ink); background: var(--bg);
+}
+
+.blob-1, .blob-2 {
+  position: absolute; width: 60vw; height: 60vw; border-radius: 50%; filter: blur(100px); opacity: 0.15; z-index: 0; pointer-events: none;
+}
+.blob-1 { top: -20%; right: -10%; background: var(--teal); }
+.blob-2 { bottom: -20%; left: -10%; background: var(--indigo); }
+
+.header { position: absolute; z-index: 8; top: 5%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { height: 55px; object-fit: contain; }
+.live { color: var(--indigo); font: 700 10px 'Space Mono', monospace; border: 1px solid var(--indigo); border-radius: 30px; padding: 7px 12px; background: #fff; box-shadow: 0 4px 10px rgba(75,63,146,0.1); }
+
+.scene {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 2% 5%; text-align: center; opacity: 0; visibility: hidden; transform: scale(1.05);
+  transition: opacity .8s ease, transform .8s cubic-bezier(.2,.75,.25,1), visibility .8s; z-index: 2;
+}
+.scene.active { opacity: 1; visibility: visible; transform: scale(1); z-index: 3; }
+
+/* Titres normaux */
+h1, h2 { margin: 0; font-size: clamp(28px, 4vw, 45px); line-height: 1.1; font-weight: 900; letter-spacing: -.02em; color: var(--ink); }
+.gradient { background: linear-gradient(100deg, var(--teal) 0%, var(--indigo) 50%, var(--magenta) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { max-width: 600px; margin-top: 10px; color: var(--muted); font-size: clamp(14px, 1.5vw, 18px); line-height: 1.5; font-weight: 500; }
+
+/* Titre spécifique pour le dashboard (plus petit) */
+.scene-dashboard h2 { font-size: clamp(20px, 2.5vw, 28px); margin-bottom: 15px; }
+
+/* --- SCENE 1 : LOGIN MOCKUP --- */
+.login-mockup { display: flex; width: 90%; max-width: 850px; height: 380px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 60px rgba(75,63,146,0.15); text-align: left; margin-top: 20px; border: 1px solid rgba(0,0,0,0.05); }
+.lm-left { width: 50%; background: url('images/concentration1.jpg') center/cover; position: relative; display: flex; align-items: center; padding: 30px; }
+.lm-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(75,63,146,0.85) 0%, rgba(0,146,166,0.7) 100%); }
+.lm-left-content { position: relative; z-index: 2; color: white; }
+.lm-left-content h3 { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+.lm-left-content p { font-size: 12px; opacity: 0.9; line-height: 1.5; }
+.lm-right { width: 50%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+.lm-logo { height: 35px; margin-bottom: 20px; object-fit: contain; align-self: flex-start; }
+.lm-right h4 { font-size: 20px; font-weight: 800; margin: 0 0 5px 0; color: var(--ink); }
+.lm-right p { font-size: 11px; color: var(--muted); margin-bottom: 20px; line-height: 1.4; }
+.lm-input { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #f8fafc; margin-bottom: 15px; font-family: monospace; letter-spacing: 1px; }
+.lm-btn { width: 100%; padding: 12px; background: var(--teal); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; text-align: center; }
+
+/* --- SCENE 2 : RECREATION EXACTE DU DASHBOARD --- */
+.dashboard-mockup {
+  width: 95%; max-width: 1000px; height: 500px; background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(20,38,61,0.2); text-align: left; display: flex; flex-direction: column; border: 1px solid #e5eaf0;
+  transform: translateY(20px); opacity: 0;
+}
+.active .dashboard-mockup { animation: slideUp 1s ease 0.2s forwards; }
+
+/* Topbar */
+.db-top { background: var(--indigo); height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; }
+.db-top-left { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.db-logo { height: 25px; background: #fff; border-radius: 4px; padding: 2px 5px; }
+.db-top-right { display: flex; align-items: center; gap: 15px; font-size: 12px; }
+.db-progress-mini { width: 80px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+.db-progress-mini i { display: block; height: 100%; width: 16%; background: var(--teal); }
+.db-icons { display: flex; gap: 10px; }
+.db-icons span { background: rgba(255,255,255,0.1); width: 25px; height: 25px; display: grid; place-items: center; border-radius: 5px; }
+
+/* Body */
+.db-body { display: flex; flex: 1; overflow: hidden; background: #F6F3FA; }
+
+/* Sidebar */
+.db-sidebar { width: 300px; background: #fff; border-right: 1px solid #e3e7ee; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.db-search { width: 100%; padding: 8px 10px; border: 1px solid #e3e7ee; border-radius: 6px; font-size: 12px; background: #f8f9fb; }
+.db-home { display: flex; align-items: center; gap: 8px; background: #F6F3FA; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--indigo); }
+.db-module-list { margin-top: 10px; border: 1px solid #e3e7ee; border-radius: 8px; overflow: hidden; }
+.db-mod-head { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fb; font-size: 12px; font-weight: bold; border-bottom: 1px solid #e3e7ee; }
+.db-mod-head span { color: var(--muted); font-weight: normal; }
+.db-lesson { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
+.db-lesson.done { color: #555; }
+.db-lesson.current { background: #e0f7fa; border-left: 3px solid var(--teal); }
+.db-lesson-icon { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ccc; display: grid; place-items: center; flex-shrink: 0; margin-top: 2px; }
+.db-lesson.done .db-lesson-icon { background: var(--teal); border-color: var(--teal); color: #fff; font-size: 10px; }
+.db-lesson-text { flex: 1; line-height: 1.3; }
+.db-lesson-time { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+/* Main Content */
+.db-main { flex: 1; padding: 20px; overflow-y: auto; }
+.db-hero { background: linear-gradient(120deg, var(--indigo), var(--teal)); border-radius: 10px; padding: 20px; display: flex; align-items: center; gap: 20px; color: #fff; margin-bottom: 15px; }
+.db-ring { width: 70px; height: 70px; border-radius: 50%; border: 5px solid rgba(255,255,255,0.2); border-top-color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 18px; }
+.db-hero-text h3 { margin: 0 0 5px 0; font-size: 20px; font-weight: 700; }
+.db-hero-text p { margin: 0 0 10px 0; font-size: 12px; opacity: 0.9; }
+.db-btn-resume { background: var(--magenta); color: #fff; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
+
+/* Stats row */
+.db-stats { display: flex; gap: 15px; margin-bottom: 20px; }
+.db-stat-card { background: #fff; padding: 15px; border-radius: 8px; flex: 1; border: 1px solid #e3e7ee; }
+.db-stat-card h4 { margin: 0 0 5px 0; font-size: 22px; color: var(--indigo); font-weight: 800; }
+.db-stat-card p { margin: 0; font-size: 11px; color: var(--muted); }
+
+/* Vos modules */
+.db-section-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; color: var(--ink); }
+.db-module-card { background: #fff; border: 1px solid #e3e7ee; border-radius: 10px; padding: 15px; width: 280px; }
+.db-tag { display: inline-block; background: #e0f7fa; color: var(--teal); font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-bottom: 10px; }
+.db-module-card h5 { margin: 0 0 5px 0; font-size: 13px; font-weight: bold; }
+.db-module-card p { margin: 0 0 10px 0; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.db-progress-bar { height: 6px; background: #e3e7ee; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+.db-progress-bar i { display: block; height: 100%; width: 16%; background: var(--teal); }
+.db-btn-outline { display: inline-block; border: 1px solid #e3e7ee; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
+
+/* --- MODULES PHARES --- */
+.module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-width: 800px; margin-top: 25px; text-align: center; }
+.module-card { background: #fff; padding: 20px 15px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; gap: 12px; transform: translateY(15px); opacity: 0; border-bottom: 4px solid #ccc; }
+.active .module-card { animation: slideUp 0.6s ease forwards; }
+.active .module-card:nth-child(1) { animation-delay: 0.1s; border-color: #589632; }
+.active .module-card:nth-child(2) { animation-delay: 0.3s; border-color: #0079c1; }
+.active .module-card:nth-child(3) { animation-delay: 0.5s; border-color: #4285f4; }
+.active .module-card:nth-child(4) { animation-delay: 0.7s; border-color: #e67e22; }
+
+.mod-logo { height: 45px; width: auto; max-width: 100%; object-fit: contain; }
+.module-card strong { display: block; font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+.module-card span { display: block; font-size: 11px; color: var(--muted); }
+
+/* --- TEMOIGNAGES MULTIPLES --- */
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 850px; margin-top: 25px; }
+.testi-card-small { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left; transform: scale(0.9); opacity: 0; border-top: 3px solid var(--indigo); }
+.active .testi-card-small { animation: popIn 0.6s cubic-bezier(.2,.75,.25,1) forwards; }
+.active .testi-card-small:nth-child(1) { animation-delay: 0.1s; }
+.active .testi-card-small:nth-child(2) { animation-delay: 0.3s; border-top-color: var(--teal); }
+.active .testi-card-small:nth-child(3) { animation-delay: 0.5s; border-top-color: var(--magenta); }
+.testi-text-small { font-size: 11px; font-style: italic; color: var(--ink); line-height: 1.5; margin-bottom: 10px; }
+.testi-author-small { display: flex; align-items: center; gap: 8px; }
+.testi-avatar-small { width: 25px; height: 25px; background: var(--indigo); color: white; border-radius: 50%; display: grid; place-items: center; font-weight: bold; font-size: 10px; }
+.testi-info-small strong { display: block; font-size: 10px; color: var(--ink); }
+.testi-info-small span { display: block; font-size: 9px; color: var(--muted); }
+
+/* --- BOUTON REPLAY --- */
+.replay-overlay {
+  position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(15, 10, 31, 0.75); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.replay-overlay.show { opacity: 1; pointer-events: auto; }
+.replay-overlay button {
+  width: 80px; height: 80px; border-radius: 50%; background: var(--teal); border: none; color: white; cursor: pointer;
+  display: grid; place-items: center; box-shadow: 0 0 40px rgba(0, 146, 166, 0.6); transition: transform 0.2s, background 0.2s;
+}
+.replay-overlay button:hover { transform: scale(1.1); background: var(--indigo); }
+.replay-overlay svg { width: 36px; height: 36px; margin-left: 5px; fill: white; }
+.replay-overlay span { color: #fff; margin-top: 20px; font-weight: 700; letter-spacing: 1.5px; font-size: 14px; text-transform: uppercase; }
+
+@keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+@keyframes popIn { to { transform: scale(1); opacity: 1; } }
+
+.progress { position: absolute; z-index: 15; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(0,0,0,0.05); }
+.progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--magenta)); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="blob-1"></div>
+  <div class="blob-2"></div>
+
+  <header class="header">
+    <div class="brand">
+      <img src="images/logo-full.png" alt="GeoExpert Academy">
+    </div>
+    <div class="live">ESPACE APPRENANT</div>
+  </header>
+
+  <!-- SCÈNE 1 : LA CONNEXION -->
+  <section class="scene active" data-duration="5">
+    <h2>Votre espace<br><span class="gradient">sécurisé.</span></h2>
+    
+    <div class="login-mockup">
+      <div class="lm-left">
+        <div class="lm-overlay"></div>
+        <div class="lm-left-content">
+          <h3>Donnez une dimension spatiale à votre carrière</h3>
+          <p>Vidéos, exercices, notes et suivi de progression.</p>
+        </div>
+      </div>
+      <div class="lm-right">
+        <img src="images/logo-full.png" class="lm-logo" alt="Logo">
+        <h4>Bienvenue</h4>
+        <p>Entrez le code personnel reçu sur WhatsApp.</p>
+        <div class="lm-input">GEO-XXXX-XXXX-XXXX</div>
+        <div class="lm-btn">Accéder à ma formation</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 2 : LE VRAI TABLEAU DE BORD -->
+  <section class="scene scene-dashboard" data-duration="7">
+    <h2>Votre espace<br><span class="gradient">de formation.</span></h2>
+    
+    <div class="dashboard-mockup">
+      <!-- Topbar -->
+      <div class="db-top">
+        <div class="db-top-left">
+          <img src="images/logo-full.png" class="db-logo" alt="Logo">
+          Abenan Joelle Yao
+        </div>
+        <div class="db-top-right">
+          16 % <div class="db-progress-mini"><i></i></div>
+          <div class="db-icons">
+            <span>🌙</span>
+            <span>↪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="db-body">
+        <!-- Sidebar -->
+        <div class="db-sidebar">
+          <div class="db-search">Rechercher une leçon</div>
+          <div class="db-home">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
+            Tableau de bord
+          </div>
+          
+          <div class="db-module-list">
+            <div class="db-mod-head">ArcGIS - Chapitre 1 <span>4/25</span></div>
+            <div class="db-lesson done">
+              <div class="db-lesson-icon">✓</div>
+              <div class="db-lesson-text">Introduction <span class="db-lesson-time">5:08</span></div>
+            </div>
+            <div class="db-lesson done">
+              <div class="db-lesson-icon">✓</div>
+              <div class="db-lesson-text">Leçon 1 : Démonstration pas-à-pas... <span class="db-lesson-time">10:03</span></div>
+            </div>
+            <div class="db-lesson done">
+              <div class="db-lesson-icon">✓</div>
+              <div class="db-lesson-text">Leçon 2 : Importer des points GPS... <span class="db-lesson-time">14:48</span></div>
+            </div>
+            <div class="db-lesson current">
+              <div class="db-lesson-icon">✓</div>
+              <div class="db-lesson-text">Leçon 3 : Importer un fichier DXF... <span class="db-lesson-time">8:13</span></div>
+            </div>
+            <div class="db-lesson">
+              <div class="db-lesson-icon"></div>
+              <div class="db-lesson-text">Leçon 4 : Importer un fichier GPX... <span class="db-lesson-time">13:15</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main -->
+        <div class="db-main">
+          <!-- Hero -->
+          <div class="db-hero">
+            <div class="db-ring">16%</div>
+            <div class="db-hero-text">
+              <h3>Bonjour Abenan Joelle Yao</h3>
+              <p>Vous avez terminé 4 leçon(s) sur 25. Continuez sur votre lancée.</p>
+              <div class="db-btn-resume">▶ Reprendre : Leçon 3 : Importer un fichier DXF...</div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="db-stats">
+            <div class="db-stat-card">
+              <h4>4 / 25</h4>
+              <p>leçons terminées</p>
+            </div>
+            <div class="db-stat-card">
+              <h4>3 h 33</h4>
+              <p>de vidéo restant</p>
+            </div>
+            <div class="db-stat-card">
+              <h4>22 octobre 2027</h4>
+              <p>fin de votre accès</p>
+            </div>
+          </div>
+
+          <!-- Modules -->
+          <div class="db-section-title">Vos modules</div>
+          <div class="db-module-card">
+            <span class="db-tag">ARCGIS · DÉBUTANT</span>
+            <h5>ArcGIS - Chapitre 1 :<br>Structuration des données géospatiales</h5>
+            <p>Organisez un projet SIG et numérisez vos plans.</p>
+            <div class="db-progress-bar"><i></i></div>
+            <div class="db-btn-outline">Continuer (16 %)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 3 : LES MODULES -->
+  <section class="scene" data-duration="6">
+    <h2>Des modules<br><span class="gradient">concrets.</span></h2>
+    <p class="sub" style="margin-top: 5px;">Du terrain à la cartographie, maîtrisez les logiciels clés.</p>
+    
+    <div class="module-grid">
+      <div class="module-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" class="mod-logo" alt="QGIS">
+        <div><strong>QGIS</strong><span>Bases & Analyse</span></div>
+      </div>
+      <div class="module-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8b/ArcGIS_logo.svg" class="mod-logo" alt="ArcGIS">
+        <div><strong>ArcGIS</strong><span>Géodatabase & Carto</span></div>
+      </div>
+      <div class="module-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Google_Earth_icon.svg" class="mod-logo" alt="Google Earth">
+        <div><strong>Google Earth</strong><span>Prospection & KML</span></div>
+      </div>
+      <div class="module-card">
+        <svg class="mod-logo" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/></svg>
+        <div><strong>KoboToolbox</strong><span>Collecte de données</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 4 : LES TÉMOIGNAGES -->
+  <section class="scene" data-duration="5">
+    <h2>Ils y sont<br><span class="gradient">déjà arrivés.</span></h2>
+    
+    <div class="testi-grid">
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Le formateur est très disponible et patient. Il est l'un des meilleurs formateurs que j'ai connu."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">GM</div>
+          <div class="testi-info-small"><strong>GUINDO M.</strong><span>Ingénieur Eaux & Forêts</span></div>
+        </div>
+      </div>
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Les exercices sont en fonction des modules. On sent l'évolution. Je suis vraiment engagée pour maîtriser les SIG."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">ZH</div>
+          <div class="testi-info-small"><strong>ZANHAN S.</strong><span>Agent des Eaux & Forêts</span></div>
+        </div>
+      </div>
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Les cours sont top, le formateur une master class. Franchement 5/5 pour moi."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">ES</div>
+          <div class="testi-info-small"><strong>Eliam S.</strong><span>Technicien Urbaniste</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 5 : APPEL À L'ACTION -->
+  <section class="scene" data-duration="5">
+    <h2>Prêt à passer<br><span class="gradient">à la pratique ?</span></h2>
+    <p class="sub">Accédez immédiatement à +100h de vidéos et obtenez votre attestation de fin de formation.</p>
+    <div style="margin-top: 30px; background: var(--indigo); color: white; padding: 15px 30px; border-radius: 10px; font-weight: 800; font-size: 18px; box-shadow: 0 10px 20px rgba(75,63,146,0.3);">Découvrir les formations</div>
+  </section>
+
+  <!-- OVERLAY DE REPLAY -->
+  <div class="replay-overlay" id="replay-overlay">
+    <button id="replay-btn" aria-label="Revoir la vidéo">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <span>Revoir la vidéo</span>
+  </div>
+
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<script>
+(() => {
+  const scenes = [...document.querySelectorAll('.scene')];
+  const progress = document.getElementById('progressFill');
+  const replayOverlay = document.getElementById('replay-overlay');
+  const replayBtn = document.getElementById('replay-btn');
+  
+  const durations = scenes.map(s => Number(s.dataset.duration) * 1000);
+  const totalDuration = durations.reduce((a, b) => a + b, 0);
+  let current = 0, sceneStart = performance.now(), running = true, frameId;
+
+  function showScene(index) {
+    scenes.forEach((s, i) => s.classList.toggle('active', i === index));
+    sceneStart = performance.now();
+  }
+
+  function animate(now) {
+    if (!running) return;
+    const elapsed = now - sceneStart;
+    const duration = durations[current];
+
+    progress.style.width = ((current * durations[0] + durations.slice(1, current).reduce((a, b) => a + b, 0) + elapsed) / totalDuration * 100) + '%';
+
+    if (elapsed >= duration) {
+      if (current < scenes.length - 1) { 
+        current++; 
+        showScene(current); 
+      } else { 
+        running = false; 
+        progress.style.width = '100%'; 
+        replayOverlay.classList.add('show'); 
+        return; 
+      }
+    }
+    frameId = requestAnimationFrame(animate);
+  }
+
+  function start() {
+    replayOverlay.classList.remove('show'); 
+    cancelAnimationFrame(frameId); 
+    current = 0; 
+    running = true; 
+    progress.style.width = '0%';
+    showScene(0); 
+    frameId = requestAnimationFrame(animate);
+  }
+
+  replayBtn.addEventListener('click', start);
+  start(); 
+})();
+</script>
+</body>
+</html>
