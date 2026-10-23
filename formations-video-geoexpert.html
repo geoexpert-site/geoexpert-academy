@@ -291,24 +291,24 @@
 </section>
 
 <!-- SECTION VIDÉO EXPLICATIVE -->
-<!-- SECTION VIDÉO EXPLICATIVE -->
 <section id="apercu" style="padding: 70px 0; background: #fff; text-align: center;">
   <div class="container" style="max-width: 900px; margin: 0 auto;">
     <p class="section-eyebrow" style="justify-content: center;">Aperçu de la plateforme</p>
     <h2 style="font-size: clamp(24px, 4vw, 36px); margin-bottom: 10px; color: var(--indigo);">Découvrez l'espace apprenant en 30 secondes</h2>
-    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">Cliquez pour voir la vidéo en grand écran.</p>
+    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">Cliquez pour lancer la vidéo.</p>
     
-    <!-- CONTENEUR VIDÉO AVEC EFFET DE CLIC -->
-    <div id="video-container" style="position: relative; max-width: 900px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(75,63,146,0.2); border: 4px solid #fff; cursor: pointer;">
+    <!-- VIGNETTE DE LA VIDÉO (Image statique, pas de lecture en arrière-plan) -->
+    <div id="video-container" style="position: relative; max-width: 900px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(75,63,146,0.2); border: 4px solid #fff; cursor: pointer; background: url('images/presentiel-enligne.jpg') center/cover;">
       
-      <!-- La vidéo de fond (on bloque les clics dessus avec pointer-events: none) -->
-      <iframe src="motion-design.html" style="width: 100%; height: 100%; border: 0; pointer-events: none;" allow="autoplay"></iframe>
+      <!-- Voile sombre sur l'image -->
+      <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.5); transition: background 0.3s;" id="video-overlay"></div>
       
-      <!-- Le bouton Play par-dessus -->
-      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15, 10, 31, 0.4); transition: background 0.3s;">
-        <div style="width: 80px; height: 80px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.2s;">
+      <!-- Le bouton Play -->
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;">
+        <div style="width: 80px; height: 80px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.2s;" id="play-btn">
           <svg viewBox="0 0 24 24" style="width: 36px; height: 36px; fill: white; margin-left: 6px;"><path d="M8 5v14l11-7z"/></svg>
         </div>
+        <span style="color: white; margin-top: 15px; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Lancer l'aperçu</span>
       </div>
     </div>
   </div>
@@ -318,7 +318,7 @@
 <div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
   <button id="close-video" style="position: absolute; top: 20px; right: 20px; background: #fff; color: #000; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">&times;</button>
   
-  <!-- L'iframe en grand -->
+  <!-- L'iframe est vide au départ, elle se remplira au clic -->
   <div style="width: 100%; max-width: 1200px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
     <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay"></iframe>
   </div>
@@ -833,7 +833,7 @@
       });
     }
 
-        // ==========================================
+      // ==========================================
     // GESTION DU LECTEUR VIDÉO (MODAL PLEIN ÉCRAN)
     // ==========================================
     const videoContainer = document.getElementById('video-container');
@@ -842,9 +842,13 @@
     const modalIframe = document.getElementById('video-modal-iframe');
 
     if (videoContainer) {
+      // Effet de survol au lieu de lancer la vidéo
+      videoContainer.addEventListener('mouseenter', () => { document.getElementById('video-overlay').style.background = 'rgba(15, 10, 31, 0.3)'; });
+      videoContainer.addEventListener('mouseleave', () => { document.getElementById('video-overlay').style.background = 'rgba(15, 10, 31, 0.5)'; });
+
+      // Au clic : on charge la vidéo et on ouvre le plein écran
       videoContainer.addEventListener('click', () => {
-        // On recharge l'animation depuis le début
-        modalIframe.src = 'motion-design.html';
+        modalIframe.src = 'motion-design.html'; // L'animation ne se lance qu'ICI
         videoModal.style.display = 'flex';
       });
 
@@ -853,7 +857,6 @@
         modalIframe.src = ''; // On coupe l'animation
       });
       
-      // Fermer si on clique à côté
       videoModal.addEventListener('click', (e) => {
         if (e.target === videoModal) {
           videoModal.style.display = 'none';
