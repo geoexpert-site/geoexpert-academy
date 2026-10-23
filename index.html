@@ -409,23 +409,36 @@
     <p class="section-lead">Places limitées : la session est confirmée dès que le nombre minimum d'inscrits est atteint.</p>
 
     <div class="formation-grid">
-          <!-- CARTE FORMATIONS EN LIGNE -->
 
-      <article class="formation-card featured" style="background: linear-gradient(135deg, #fff 0%, var(--bg-soft) 100%); border: 2px solid var(--magenta);">
+      <!-- CARTE FORMATIONS EN LIGNE -->
+      <article class="formation-card featured" style="background: linear-gradient(135deg, #fff 0%, var(--bg-soft) 100%); border: 2px solid var(--magenta); display: flex; flex-direction: column;">
         <span class="formation-tag" style="background: var(--magenta); color: #fff;">Nouveau · 100% en ligne</span>
         <h3>Formations vidéo à la demande</h3>
         <p class="formation-desc">
           Apprenez QGIS, ArcGIS et la télédétection à votre rythme. Accédez à plus de 100h de vidéos, des exercices pratiques et une assistance de 3 mois par WhatsApp.
         </p>
-        <ul class="formation-meta">
-          <li><strong>Format :</strong> Vidéos à la demande (Accès 24/7)</li>
-          <li><strong>Public :</strong> Débutants et professionnels</li>
-          <li><strong>Inclus :</strong> Attestation et Accompagnement</li>
+        
+        <!-- Liste à puces pour ajouter de la valeur et équilibrer la hauteur -->
+        <ul class="programme-list" style="margin-bottom: 24px; font-size: 14px; gap: 8px;">
+          <li>Apprendre par la pratique avec des cas réels</li>
+          <li>Accompagnement personnalisé (3 mois)</li>
+          <li>Attestation de fin de formation</li>
+          <li>Accès illimité 24h/24 et 7j/7</li>
         </ul>
+
+        <!-- On pousse le reste vers le bas avec margin-top: auto -->
+        <ul class="formation-meta" style="margin-top: auto; margin-bottom: 20px;">
+          <li><strong>Format :</strong> Vidéos en ligne (à la demande)</li>
+          <li><strong>Public :</strong> Débutants et professionnels</li>
+          <li><strong>Outils enseignés :</strong> QGIS • ArcGIS • KoboToolbox • Google Earth Pro</li>
+        </ul>
+        
         <div class="formation-price">
           <span class="price-amount">À partir de 10 000 FCFA</span>
+          <span class="price-detail">Paiement sécurisé en ligne</span>
         </div>
-        <a href="formations-video-geoexpert.html" class="btn btn-primary btn-block" style="background: var(--magenta); border: 0;">Voir les formations vidéo</a>
+        
+        <a href="formations-video-geoexpert.html" class="btn btn-primary btn-block" style="background: var(--magenta); border: 0; margin-top: 10px;">Voir les formations vidéo</a>
       </article>
 
       <!-- FORMATION CONFIRMÉE -->
