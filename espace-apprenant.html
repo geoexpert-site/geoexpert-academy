@@ -261,9 +261,26 @@ function lesson(k){
  var go=h('button',{class:'go','aria-label':'Lancer la vidéo',onclick:function(){play(l,pl)}},ic('play'));
  pl.appendChild(l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){P.done[k]=!P.done[k];if(!P.done[k])delete P.done[k];sv();lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
- var nx=a[ix+1],pv=a[ix-1];
- m.appendChild(h('div',{class:'ctl'},h('button',{class:'btn alt',disabled:pv?null:'',onclick:function(){lesson(pv.k)}},ic('left'),'Précédente'),dn,h('span',{class:'sp'}),
-  nx?h('button',{class:'btn mag',onclick:function(){P.done[k]=1;sv();lesson(nx.k)}},'Terminer et continuer',ic('right')):h('button',{class:'btn mag',onclick:function(){P.done[k]=1;sv();home()}},'Terminer le module')));
+
+var nx=a[ix+1],pv=a[ix-1];
+        
+// 1. Création du bouton Précédente
+var prevBtn = h('button',{class:'btn alt',onclick:function(){ if(pv) lesson(pv.k); }}, ic('left'), 'Précédente');
+if(!pv) prevBtn.disabled = true; // On désactive proprement si on est à la 1ère leçon
+
+// 2. Création du bouton Suivant / Terminer
+var nextBtn = nx 
+  ? h('button',{class:'btn mag',onclick:function(){ P.done[k]=1; sv(); lesson(nx.k); }}, 'Terminer et continuer', ic('right')) 
+  : h('button',{class:'btn mag',onclick:function(){ P.done[k]=1; sv(); home(); }}, 'Terminer le module');
+
+// 3. On ajoute tout ça à la page
+m.appendChild(h('div',{class:'ctl'},
+  prevBtn, 
+  dn, 
+  h('span',{class:'sp'}), 
+  nextBtn
+));
+
  var tabs=h('div',{class:'tabs'}),pn=h('div',{class:'pn'});
  [['notes','Mes notes'],['ex','Exercices'],['aide','Aide']].forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
  if(tab==='notes'){var ta=h('textarea',{placeholder:'Écrivez vos notes pour cette leçon : elles sont enregistrées automatiquement sur cet appareil.','aria-label':'Mes notes'});ta.value=P.notes[k]||'';var tm;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){P.notes[k]=ta.value;sv()},400)});pn.appendChild(ta)}
