@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publicité GeoExpert</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #F6F3FA; --teal: #0092A6; --indigo: #4B3F92; --magenta: #A83C93;
+  --ink: #2A2A28; --muted: #6B6A72; --ui-bg: #F4F6FA; --ui-card: #FFFFFF;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: 'Montserrat', sans-serif; }
+body { display: grid; place-items: center; }
+
+.stage {
+  position: relative; width: 100vw; height: 100vh; aspect-ratio: 16 / 9;
+  overflow: hidden; isolation: isolate; color: var(--ink); background: var(--bg);
+}
+
+.blob-1, .blob-2 {
+  position: absolute; width: 60vw; height: 60vw; border-radius: 50%; filter: blur(100px); opacity: 0.2; z-index: 0; pointer-events: none;
+}
+.blob-1 { top: -20%; right: -10%; background: var(--teal); }
+.blob-2 { bottom: -20%; left: -10%; background: var(--indigo); }
+
+.header { position: absolute; z-index: 8; top: 4%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: space-between; }
+.brand img { height: 50px; object-fit: contain; }
+.live { color: var(--indigo); font: 700 10px 'Space Mono', monospace; border: 1px solid var(--indigo); border-radius: 30px; padding: 6px 12px; background: #fff; box-shadow: 0 4px 10px rgba(75,63,146,0.1); }
+
+.scene {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 5% 8%; text-align: center; opacity: 0; visibility: hidden; transform: scale(1.05);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.2,.75,.25,1), visibility .5s; z-index: 2;
+}
+.scene.active { opacity: 1; visibility: visible; transform: scale(1); z-index: 3; }
+
+h1, h2 { margin: 0; font-size: clamp(36px, 6vw, 65px); line-height: 1.1; font-weight: 900; letter-spacing: -.03em; color: var(--ink); }
+.gradient { background: linear-gradient(100deg, var(--teal) 0%, var(--indigo) 50%, var(--magenta) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { max-width: 650px; margin-top: 15px; color: var(--muted); font-size: clamp(16px, 2vw, 22px); line-height: 1.5; font-weight: 500; }
+
+/* --- SCENE 2 : LE TABLEAU DE BORD --- */
+.dashboard-mockup {
+  width: 90%; max-width: 900px; height: 420px; background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(20,38,61,0.2); text-align: left; display: flex; flex-direction: column; border: 1px solid #e5eaf0;
+  transform: translateY(20px); opacity: 0; margin-top: 20px;
+}
+.active .dashboard-mockup { animation: slideUp 0.8s ease 0.2s forwards; }
+
+.db-top { background: var(--indigo); height: 45px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; color: #fff; }
+.db-top-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+.db-logo { height: 22px; background: #fff; border-radius: 4px; padding: 2px 5px; }
+.db-top-right { display: flex; align-items: center; gap: 10px; font-size: 11px; }
+.db-progress-mini { width: 60px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+.db-progress-mini i { display: block; height: 100%; width: 16%; background: var(--teal); }
+
+.db-body { display: flex; flex: 1; overflow: hidden; background: #F6F3FA; }
+.db-sidebar { width: 280px; background: #fff; border-right: 1px solid #e3e7ee; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.db-search { width: 100%; padding: 6px 10px; border: 1px solid #e3e7ee; border-radius: 6px; font-size: 11px; background: #f8f9fb; }
+.db-module-list { margin-top: 5px; border: 1px solid #e3e7ee; border-radius: 8px; overflow: hidden; }
+.db-lesson { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 10px; }
+.db-lesson-icon { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc; display: grid; place-items: center; flex-shrink: 0; }
+.db-lesson.done .db-lesson-icon { background: var(--teal); border-color: var(--teal); color: #fff; font-size: 9px; }
+.db-lesson.current { background: #e0f7fa; border-left: 2px solid var(--teal); }
+
+.db-main { flex: 1; padding: 15px; }
+.db-hero { background: linear-gradient(120deg, var(--indigo), var(--teal)); border-radius: 8px; padding: 15px; display: flex; align-items: center; gap: 15px; color: #fff; margin-bottom: 10px; }
+.db-ring { width: 50px; height: 50px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.2); border-top-color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+.db-hero-text h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
+.db-hero-text p { margin: 0; font-size: 11px; opacity: 0.9; }
+.db-stats { display: flex; gap: 10px; }
+.db-stat-card { background: #fff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #e3e7ee; }
+.db-stat-card h4 { margin: 0 0 2px 0; font-size: 16px; color: var(--indigo); font-weight: 800; }
+.db-stat-card p { margin: 0; font-size: 9px; color: var(--muted); }
+
+/* --- SCENE 3 : TEMOIGNAGES --- */
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 850px; margin-top: 20px; }
+.testi-card-small { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left; transform: scale(0.9); opacity: 0; border-top: 3px solid var(--indigo); }
+.active .testi-card-small { animation: popIn 0.5s cubic-bezier(.2,.75,.25,1) forwards; }
+.active .testi-card-small:nth-child(1) { animation-delay: 0.1s; }
+.active .testi-card-small:nth-child(2) { animation-delay: 0.3s; border-top-color: var(--teal); }
+.active .testi-card-small:nth-child(3) { animation-delay: 0.5s; border-top-color: var(--magenta); }
+.testi-text-small { font-size: 12px; font-style: italic; color: var(--ink); line-height: 1.4; margin-bottom: 10px; }
+.testi-author-small { display: flex; align-items: center; gap: 8px; }
+.testi-avatar-small { width: 25px; height: 25px; background: var(--indigo); color: white; border-radius: 50%; display: grid; place-items: center; font-weight: bold; font-size: 10px; }
+.testi-info-small strong { display: block; font-size: 10px; color: var(--ink); }
+.testi-info-small span { display: block; font-size: 9px; color: var(--muted); }
+
+/* --- SCENE 4 : MODULES ET PRIX --- */
+.module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 800px; margin-top: 20px; text-align: center; }
+.module-card { background: #fff; padding: 15px 10px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; gap: 8px; border-bottom: 3px solid #ccc; }
+.active .module-card { animation: slideUp 0.5s ease forwards; }
+.module-card:nth-child(1) { border-color: #589632; }
+.module-card:nth-child(2) { border-color: #0079c1; }
+.module-card:nth-child(3) { border-color: #4285f4; }
+.module-card:nth-child(4) { border-color: #e67e22; }
+.mod-logo { height: 35px; width: auto; object-fit: contain; }
+.module-card strong { display: block; font-size: 12px; color: var(--ink); }
+.price-tag { background: var(--gradient-brand); color: white; padding: 10px 25px; border-radius: 30px; font-size: 20px; font-weight: 800; margin-top: 25px; box-shadow: 0 10px 20px rgba(168,60,147,0.3); animation: pulse 2s infinite; }
+
+/* --- BOUTON REPLAY --- */
+.replay-overlay {
+  position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(15, 10, 31, 0.85); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.replay-overlay.show { opacity: 1; pointer-events: auto; }
+.replay-overlay button {
+  width: 80px; height: 80px; border-radius: 50%; background: var(--teal); border: none; color: white; cursor: pointer;
+  display: grid; place-items: center; box-shadow: 0 0 40px rgba(0, 146, 166, 0.6); transition: transform 0.2s;
+}
+.replay-overlay button:hover { transform: scale(1.1); background: var(--indigo); }
+.replay-overlay svg { width: 36px; height: 36px; margin-left: 5px; fill: white; }
+.replay-overlay span { color: #fff; margin-top: 20px; font-weight: 700; letter-spacing: 1.5px; font-size: 14px; text-transform: uppercase; }
+
+@keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+@keyframes popIn { to { transform: scale(1); opacity: 1; } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+.progress { position: absolute; z-index: 15; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(0,0,0,0.05); }
+.progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--magenta)); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="blob-1"></div>
+  <div class="blob-2"></div>
+
+  <header class="header">
+    <div class="brand">
+      <img src="images/logo-full.png" alt="GeoExpert Academy">
+    </div>
+    <div class="live">FORMATION EN LIGNE</div>
+  </header>
+
+  <!-- SCÈNE 1 : LE PROBLÈME (Hook) -->
+  <section class="scene active" data-duration="4">
+    <h1>Vous galérez avec<br><span class="gradient">QGIS et ArcGIS ?</span></h1>
+    <p class="sub">Arrêtez de perdre du temps sur YouTube. Passez à une méthode claire et structurée.</p>
+  </section>
+
+  <!-- SCÈNE 2 : LA SOLUTION (Tableau de bord) -->
+  <section class="scene" data-duration="5">
+    <h2>Votre espace<br><span class="gradient">d'apprentissage.</span></h2>
+    <p class="sub">Vidéos, exercices, notes. Tout est centralisé.</p>
+    
+    <div class="dashboard-mockup">
+      <div class="db-top">
+        <div class="db-top-left">
+          <img src="images/logo-full.png" class="db-logo" alt="Logo">
+          Votre Espace
+        </div>
+        <div class="db-top-right">
+          16 % <div class="db-progress-mini"><i></i></div>
+        </div>
+      </div>
+      <div class="db-body">
+        <div class="db-sidebar">
+          <div class="db-search">Rechercher une leçon</div>
+          <div class="db-module-list">
+            <div class="db-lesson done"><div class="db-lesson-icon">✓</div>Leçon 1 : Intro</div>
+            <div class="db-lesson done"><div class="db-lesson-icon">✓</div>Leçon 2 : CSV</div>
+            <div class="db-lesson current"><div class="db-lesson-icon">✓</div>Leçon 3 : DXF</div>
+            <div class="db-lesson"><div class="db-lesson-icon"></div>Leçon 4 : GPX</div>
+          </div>
+        </div>
+        <div class="db-main">
+          <div class="db-hero">
+            <div class="db-ring">16%</div>
+            <div class="db-hero-text">
+              <h3>Bonjour Apprenant</h3>
+              <p>Continuez votre progression.</p>
+            </div>
+          </div>
+          <div class="db-stats">
+            <div class="db-stat-card"><h4>4 / 25</h4><p>leçons terminées</p></div>
+            <div class="db-stat-card"><h4>3h 33</h4><p>de vidéo</p></div>
+            <div class="db-stat-card"><h4>2027</h4><p>fin d'accès</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 3 : LA PREUVE (Témoignages) -->
+  <section class="scene" data-duration="4">
+    <h2>Ils y sont<br><span class="gradient">déjà arrivés.</span></h2>
+    <p class="sub">Rejoignez plus de 200 professionnels formés.</p>
+    
+    <div class="testi-grid">
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Le formateur est très disponible et patient. L'un des meilleurs que j'ai connu."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">GM</div>
+          <div class="testi-info-small"><strong>GUINDO M.</strong><span>Ingénieur Eaux & Forêts</span></div>
+        </div>
+      </div>
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Les exercices sont concrets. On sent l'évolution. Je suis engagée à 100%."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">ZH</div>
+          <div class="testi-info-small"><strong>ZANHAN S.</strong><span>Agent des Eaux & Forêts</span></div>
+        </div>
+      </div>
+      <div class="testi-card-small">
+        <p class="testi-text-small">"Les cours sont top, le formateur une master class. Franchement 5/5."</p>
+        <div class="testi-author-small">
+          <div class="testi-avatar-small">ES</div>
+          <div class="testi-info-small"><strong>Eliam S.</strong><span>Technicien Urbaniste</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCÈNE 4 : L'OFFRE (Modules + Prix) -->
+  <section class="scene" data-duration="5">
+    <h2>Maîtrisez les<br><span class="gradient">outils clés.</span></h2>
+    
+    <div class="module-grid">
+      <div class="module-card"><img src="https://cdn.simpleicons.org/qgis/589632" class="mod-logo" alt="QGIS"><strong>QGIS</strong></div>
+      <div class="module-card"><img src="https://cdn.simpleicons.org/arcgis/0079c1" class="mod-logo" alt="ArcGIS"><strong>ArcGIS</strong></div>
+      <div class="module-card"><img src="https://cdn.simpleicons.org/googleearth/4285f4" class="mod-logo" alt="Google Earth"><strong>Google Earth</strong></div>
+      <div class="module-card"><svg class="mod-logo" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg><strong>Kobo</strong></div>
+    </div>
+    
+    <div class="price-tag">Dès 10 000 FCFA</div>
+  </section>
+
+  <!-- SCÈNE 5 : L'ACTION (CTA) -->
+  <section class="scene" data-duration="4">
+    <h2>Prêt à<br><span class="gradient">démarrer ?</span></h2>
+    <p class="sub">Accédez immédiatement à votre espace et obtenez votre attestation.</p>
+    <div style="margin-top: 25px; background: var(--magenta); color: white; padding: 15px 40px; border-radius: 10px; font-weight: 800; font-size: 20px; box-shadow: 0 10px 20px rgba(168,60,147,0.4); animation: pulse 2s infinite;">Cliquez ici pour commencer</div>
+  </section>
+
+  <!-- OVERLAY DE REPLAY -->
+  <div class="replay-overlay" id="replay-overlay">
+    <button id="replay-btn" aria-label="Revoir la vidéo">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <span>Revoir la pub</span>
+  </div>
+
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<script>
+(() => {
+  const scenes = [...document.querySelectorAll('.scene')];
+  const progress = document.getElementById('progressFill');
+  const replayOverlay = document.getElementById('replay-overlay');
+  const replayBtn = document.getElementById('replay-btn');
+  
+  const durations = scenes.map(s => Number(s.dataset.duration) * 1000);
+  const totalDuration = durations.reduce((a, b) => a + b, 0);
+  let current = 0, sceneStart = performance.now(), running = true, frameId;
+
+  function showScene(index) {
+    scenes.forEach((s, i) => s.classList.toggle('active', i === index));
+    sceneStart = performance.now();
+  }
+
+  function animate(now) {
+    if (!running) return;
+    const elapsed = now - sceneStart;
+    const duration = durations[current];
+
+    progress.style.width = ((current * durations[0] + durations.slice(1, current).reduce((a, b) => a + b, 0) + elapsed) / totalDuration * 100) + '%';
+
+    if (elapsed >= duration) {
+      if (current < scenes.length - 1) { 
+        current++; 
+        showScene(current); 
+      } else { 
+        running = false; 
+        progress.style.width = '100%'; 
+        replayOverlay.classList.add('show'); 
+        return; 
+      }
+    }
+    frameId = requestAnimationFrame(animate);
+  }
+
+  function start() {
+    replayOverlay.classList.remove('show'); 
+    cancelAnimationFrame(frameId); 
+    current = 0; 
+    running = true; 
+    progress.style.width = '0%';
+    showScene(0); 
+    frameId = requestAnimationFrame(animate);
+  }
+
+  replayBtn.addEventListener('click', start);
+  start(); 
+})();
+</script>
+</body>
+</html>
