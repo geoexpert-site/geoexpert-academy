@@ -177,7 +177,17 @@
     .guarantee { flex-direction:column; text-align:center; }
     .compare th, .compare td { padding:10px 12px; font-size:13.5px; }
   }
+
+  @media (max-width: 768px) {
+    /* Sur mobile, on donne une hauteur fixe à l'iframe pour que l'animation soit lisible */
+    #apercu .container > div {
+      padding-bottom: 0 !important;
+      height: 60vh !important; /* L'animation prend 60% de la hauteur de l'écran */
+      min-height: 450px;
+    }
+  }
 </style>
+
 </head>
 <body>
 
@@ -281,23 +291,38 @@
 </section>
 
 <!-- SECTION VIDÉO EXPLICATIVE -->
+<!-- SECTION VIDÉO EXPLICATIVE -->
 <section id="apercu" style="padding: 70px 0; background: #fff; text-align: center;">
   <div class="container" style="max-width: 900px; margin: 0 auto;">
     <p class="section-eyebrow" style="justify-content: center;">Aperçu de la plateforme</p>
     <h2 style="font-size: clamp(24px, 4vw, 36px); margin-bottom: 10px; color: var(--indigo);">Découvrez l'espace apprenant en 30 secondes</h2>
-    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">La méthode d'apprentissage, l'accompagnement et le tableau de bord qui vous attendent.</p>
+    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">Cliquez pour voir la vidéo en grand écran.</p>
     
-    <!-- L'ANIMATION EST INTÉGRÉE ICI -->
-    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 20px 50px rgba(75,63,146,0.2); border: 4px solid #fff; background: #0F0A1F;">
-      <iframe 
-        src="motion-design.html" 
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-        allow="autoplay"
-        title="Aperçu de l'espace apprenant GeoExpert Academy">
-      </iframe>
+    <!-- CONTENEUR VIDÉO AVEC EFFET DE CLIC -->
+    <div id="video-container" style="position: relative; max-width: 900px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(75,63,146,0.2); border: 4px solid #fff; cursor: pointer;">
+      
+      <!-- La vidéo de fond (on bloque les clics dessus avec pointer-events: none) -->
+      <iframe src="motion-design.html" style="width: 100%; height: 100%; border: 0; pointer-events: none;" allow="autoplay"></iframe>
+      
+      <!-- Le bouton Play par-dessus -->
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(15, 10, 31, 0.4); transition: background 0.3s;">
+        <div style="width: 80px; height: 80px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 36px; height: 36px; fill: white; margin-left: 6px;"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- MODAL (PLEIN ÉCRAN) -->
+<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+  <button id="close-video" style="position: absolute; top: 20px; right: 20px; background: #fff; color: #000; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">&times;</button>
+  
+  <!-- L'iframe en grand -->
+  <div style="width: 100%; max-width: 1200px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+    <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay"></iframe>
+  </div>
+</div>
 
 <!-- POUR QUI -->
 <section id="pour-qui" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
@@ -805,6 +830,35 @@
         
         modal.style.display = 'none';
         inputNom.value = '';
+      });
+    }
+
+        // ==========================================
+    // GESTION DU LECTEUR VIDÉO (MODAL PLEIN ÉCRAN)
+    // ==========================================
+    const videoContainer = document.getElementById('video-container');
+    const videoModal = document.getElementById('video-modal');
+    const closeVideo = document.getElementById('close-video');
+    const modalIframe = document.getElementById('video-modal-iframe');
+
+    if (videoContainer) {
+      videoContainer.addEventListener('click', () => {
+        // On recharge l'animation depuis le début
+        modalIframe.src = 'motion-design.html';
+        videoModal.style.display = 'flex';
+      });
+
+      closeVideo.addEventListener('click', () => {
+        videoModal.style.display = 'none';
+        modalIframe.src = ''; // On coupe l'animation
+      });
+      
+      // Fermer si on clique à côté
+      videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+          videoModal.style.display = 'none';
+          modalIframe.src = '';
+        }
       });
     }
 

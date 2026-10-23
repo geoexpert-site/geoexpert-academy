@@ -9,7 +9,7 @@
 
 :root {
   --bg: #F6F3FA; --teal: #0092A6; --indigo: #4B3F92; --magenta: #A83C93;
-  --ink: #2A2A28; --muted: #6B6A72;
+  --ink: #2A2A28; --muted: #6B6A72; --ui-bg: #F4F6FA; --ui-card: #FFFFFF;
 }
 
 * { box-sizing: border-box; }
@@ -34,21 +34,17 @@ body { display: grid; place-items: center; }
 
 .scene {
   position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  padding: 2% 5%; text-align: center; opacity: 0; visibility: hidden; transform: scale(1.05);
+  padding: 5% 8%; text-align: center; opacity: 0; visibility: hidden; transform: scale(1.05);
   transition: opacity .8s ease, transform .8s cubic-bezier(.2,.75,.25,1), visibility .8s; z-index: 2;
 }
 .scene.active { opacity: 1; visibility: visible; transform: scale(1); z-index: 3; }
 
-/* Titres normaux */
-h1, h2 { margin: 0; font-size: clamp(28px, 4vw, 45px); line-height: 1.1; font-weight: 900; letter-spacing: -.02em; color: var(--ink); }
+h1, h2 { margin: 0; font-size: clamp(32px, 5vw, 55px); line-height: 1.1; font-weight: 900; letter-spacing: -.03em; color: var(--ink); }
 .gradient { background: linear-gradient(100deg, var(--teal) 0%, var(--indigo) 50%, var(--magenta) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.sub { max-width: 600px; margin-top: 10px; color: var(--muted); font-size: clamp(14px, 1.5vw, 18px); line-height: 1.5; font-weight: 500; }
-
-/* Titre spécifique pour le dashboard (plus petit) */
-.scene-dashboard h2 { font-size: clamp(20px, 2.5vw, 28px); margin-bottom: 15px; }
+.sub { max-width: 600px; margin-top: 15px; color: var(--muted); font-size: clamp(14px, 1.8vw, 18px); line-height: 1.6; font-weight: 500; }
 
 /* --- SCENE 1 : LOGIN MOCKUP --- */
-.login-mockup { display: flex; width: 90%; max-width: 850px; height: 380px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 60px rgba(75,63,146,0.15); text-align: left; margin-top: 20px; border: 1px solid rgba(0,0,0,0.05); }
+.login-mockup { display: flex; width: 90%; max-width: 850px; height: 380px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 60px rgba(75,63,146,0.15); text-align: left; margin-top: 25px; border: 1px solid rgba(0,0,0,0.05); }
 .lm-left { width: 50%; background: url('images/concentration1.jpg') center/cover; position: relative; display: flex; align-items: center; padding: 30px; }
 .lm-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(75,63,146,0.85) 0%, rgba(0,146,166,0.7) 100%); }
 .lm-left-content { position: relative; z-index: 2; color: white; }
@@ -63,7 +59,7 @@ h1, h2 { margin: 0; font-size: clamp(28px, 4vw, 45px); line-height: 1.1; font-we
 
 /* --- SCENE 2 : RECREATION EXACTE DU DASHBOARD --- */
 .dashboard-mockup {
-  width: 95%; max-width: 1000px; height: 500px; background: #fff; border-radius: 12px; overflow: hidden;
+  width: 95%; max-width: 1000px; height: 480px; background: #fff; border-radius: 12px; overflow: hidden;
   box-shadow: 0 30px 60px rgba(20,38,61,0.2); text-align: left; display: flex; flex-direction: column; border: 1px solid #e5eaf0;
   transform: translateY(20px); opacity: 0;
 }
@@ -203,7 +199,7 @@ h1, h2 { margin: 0; font-size: clamp(28px, 4vw, 45px); line-height: 1.1; font-we
   </section>
 
   <!-- SCÈNE 2 : LE VRAI TABLEAU DE BORD -->
-  <section class="scene scene-dashboard" data-duration="7">
+  <section class="scene" data-duration="7">
     <h2>Votre espace<br><span class="gradient">de formation.</span></h2>
     
     <div class="dashboard-mockup">
@@ -306,15 +302,15 @@ h1, h2 { margin: 0; font-size: clamp(28px, 4vw, 45px); line-height: 1.1; font-we
     
     <div class="module-grid">
       <div class="module-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" class="mod-logo" alt="QGIS">
+        <img src="https://cdn.simpleicons.org/qgis/589632" class="mod-logo" alt="QGIS">
         <div><strong>QGIS</strong><span>Bases & Analyse</span></div>
       </div>
       <div class="module-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8b/ArcGIS_logo.svg" class="mod-logo" alt="ArcGIS">
+        <img src="https://cdn.simpleicons.org/arcgis/0079c1" class="mod-logo" alt="ArcGIS">
         <div><strong>ArcGIS</strong><span>Géodatabase & Carto</span></div>
       </div>
       <div class="module-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Google_Earth_icon.svg" class="mod-logo" alt="Google Earth">
+        <img src="https://cdn.simpleicons.org/googleearth/4285f4" class="mod-logo" alt="Google Earth">
         <div><strong>Google Earth</strong><span>Prospection & KML</span></div>
       </div>
       <div class="module-card">
