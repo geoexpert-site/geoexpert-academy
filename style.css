@@ -798,6 +798,7 @@ a{ color:inherit; text-decoration:none; }
 }
 .formation-meta strong{ color:var(--ink); }
 .formation-price{
+  margin-top: auto; /* NOUVEAU : pousse le prix et le bouton tout en bas */
   margin-bottom:20px;
   padding-top:16px;
   border-top:1px solid var(--line);
