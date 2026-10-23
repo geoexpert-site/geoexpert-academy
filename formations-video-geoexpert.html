@@ -323,12 +323,20 @@
 </section>
 
 <!-- MODAL (PLEIN ÉCRAN) -->
-<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
-  <button id="close-video" style="position: absolute; top: 20px; right: 20px; background: #ffffff; color: #000000; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">&times;</button>
+<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box;">
   
-  <div style="width: 100%; max-width: 1200px; aspect-ratio: 16/9; background: #000000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+  <!-- Bouton fermer -->
+  <button id="close-video" style="position: absolute; top: 15px; right: 15px; background: #ffffff; color: #000000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;">&times;</button>
+  
+  <!-- Conteneur de la vidéo -->
+  <div style="width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000000; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
     <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay"></iframe>
   </div>
+  
+  <!-- Petit message d'aide pour mobile -->
+  <p style="position: absolute; bottom: 20px; color: #fff; font-size: 13px; text-align: center; width: 100%; margin: 0;">
+    📱 Pour une meilleure expérience, tournez votre téléphone en mode paysage.
+  </p>
 </div>
 
 <!-- POUR QUI -->
