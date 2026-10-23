@@ -194,6 +194,14 @@
     max-width: 100vw !important;
   }
 }
+/* Animation du texte clignotant */
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.95); }
+}
+.blink-text {
+  animation: blink 1.5s infinite;
+}
 </style>
 
 </head>
@@ -333,10 +341,12 @@
     <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen"></iframe>
   </div>
 
-  <!-- Message d'aide pour mobile -->
-  <p style="position: absolute; bottom: 20px; color: rgba(255,255,255,0.7); font-size: 12px; text-align: center; width: 100%; margin: 0; pointer-events: none; text-transform: uppercase; letter-spacing: 1px;">
-    📱 Astuce : Tournez votre téléphone pour voir l'animation en grand
-  </p>
+  <!-- Message d'aide clignotant -->
+  <div id="rotate-msg" style="position: absolute; bottom: 25px; width: 100%; text-align: center; pointer-events: none; z-index: 100000; transition: opacity 0.6s ease; opacity: 1;">
+    <span class="blink-text" style="display: inline-block; background: #14263d; color: #00D4EE; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #0092A6; box-shadow: 0 4px 15px rgba(0,146,166,0.3);">
+      Tournez votre téléphone pour voir en grand
+    </span>
+  </div>
 </div>      
 
 <!-- POUR QUI -->
@@ -847,7 +857,6 @@
         inputNom.value = '';
       });
     }
-
     // ==========================================
     // GESTION DU LECTEUR VIDÉO (MODAL PLEIN ÉCRAN)
     // ==========================================
@@ -855,6 +864,8 @@
     const videoModal = document.getElementById('video-modal');
     const closeVideo = document.getElementById('close-video');
     const modalIframe = document.getElementById('video-modal-iframe');
+    const rotateMsg = document.getElementById('rotate-msg');
+    let rotateTimer;
 
     if (videoContainer) {
       videoContainer.addEventListener('click', () => {
@@ -862,18 +873,31 @@
         modalIframe.src = 'motion-design.html';
         videoModal.style.display = 'flex';
 
-        // On tente de passer en plein écran natif (très efficace sur mobile)
+        // On tente de passer en plein écran natif
         if (videoModal.requestFullscreen) {
           videoModal.requestFullscreen();
         } else if (videoModal.webkitRequestFullscreen) { /* Safari */
           videoModal.webkitRequestFullscreen();
         }
+
+        // GESTION DU MESSAGE CLIGNOTANT
+        // 1. On le remet visible
+        rotateMsg.style.opacity = '1';
+        // 2. On annule l'ancien minuteur s'il y en avait un
+        clearTimeout(rotateTimer);
+        // 3. On lance le minuteur pour le faire disparaître après 7 secondes
+        rotateTimer = setTimeout(() => {
+          rotateMsg.style.opacity = '0';
+        }, 7000); // 7000 millisecondes = 7 secondes
       });
 
       closeVideo.addEventListener('click', () => {
         videoModal.style.display = 'none';
         modalIframe.src = ''; // On coupe l'animation
         
+        // On annule le minuteur si on ferme la vidéo avant la fin
+        clearTimeout(rotateTimer);
+
         // On quitte le plein écran
         if (document.fullscreenElement) {
           document.exitFullscreen();
