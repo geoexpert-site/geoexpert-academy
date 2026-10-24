@@ -1,0 +1,28 @@
+# Worker d'ADMINISTRATION de TEST (même code que l'espace apprenant, ROLE = "admin").
+# Il partage les données de test (KV + D1) avec espace-apprenant-api-test.
+name = "geoexpert-admin-test"
+main = "worker.js"
+compatibility_date = "2026-10-21"
+workers_dev = true
+preview_urls = false
+
+[vars]
+ROLE = "admin"
+# Tant que Cloudflare Access n'est pas activé sur ce Worker de test, la page s'ouvre avec le mot de passe seul.
+# Dès que ACCESS_AUD est renseigné, Access devient obligatoire.
+ACCESS_OPTIONAL = "oui"
+ACCESS_TEAM_DOMAIN = ""
+ACCESS_AUD = ""
+ADMIN_EMAILS = "geographe07@gmail.com"
+ALLOWED_ORIGINS = ""
+LIBRARY_ID = "785941"
+PLAYER_HOST = "iframe.mediadelivery.net"
+
+[[kv_namespaces]]
+binding = "ACCESS"
+id = "955c726a9dd643eb84fed30281261636"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "geoexpert-test"
+database_id = "3f7b44aa-686a-40d6-a442-ce09da27c3cf"

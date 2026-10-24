@@ -195,8 +195,46 @@ document.querySelectorAll('[data-i]').forEach(function(s){var n=s.getAttribute('
 var INFO={arc1:['ArcGIS','Débutant','Organisez un projet SIG et numérisez vos plans.'],arc2:['ArcGIS','Intermédiaire','Relief, pente et analyses spatiales avancées.'],qgis1:['QGIS','Débutant','Votre premier projet SIG, avec un logiciel gratuit.'],qgis2:['QGIS','Intermédiaire','Découpez, croisez et mesurez vos données.'],tele:['Télédétection','Débutant','Lisez la végétation, l\'eau et le bâti vus du ciel.'],web:['Webmapping','Intermédiaire','Publiez votre carte interactive en ligne.'],kobo:['Collecte mobile','Débutant','Collectez vos données de terrain au téléphone.'],google:['Outils','Débutant','Google Earth en complément de votre SIG.']};
 var D=null,code='',P={done:{},notes:{},last:''},PK='',L=[],cur=null,tab='notes';
 function hs(s){var x=5381,i;for(i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return(x>>>0).toString(36)}
-function ld(){try{var p=JSON.parse(localStorage.getItem(PK));if(p)P=p}catch(e){}P.done=P.done||{};P.notes=P.notes||{}}
+function ld(){try{var p=JSON.parse(localStorage.getItem(PK));if(p)P=p}catch(e){}P.done=P.done||{};P.notes=P.notes||{};P.q=P.q||{done:{},notes:{}}}
 function sv(){try{localStorage.setItem(PK,JSON.stringify(P))}catch(e){}}
+
+// ===== Sauvegarde de la progression sur le serveur =====
+// Le téléphone garde une copie (P) et une file des changements à envoyer (P.q), conservée même sans connexion.
+// Valeurs de P.done : date en ms, ou 1 si la date est inconnue (ancienne progression).
+var qt=null,busy=false;
+function queue(){sv();clearTimeout(qt);qt=setTimeout(sync,1500)}
+function setDone(k,v){if(v){if(!P.done[k])P.done[k]=Date.now()}else delete P.done[k];P.q.done[k]=P.done[k]||0;queue()}
+function setNote(k,t){P.notes[k]=t;if(!t)delete P.notes[k];P.q.notes[k]=t;queue()}
+function setLast(k){P.last=k;P.q.last=k;queue()}
+function pending(){return Object.keys(P.q.done).length||Object.keys(P.q.notes).length||P.q.last}
+async function sync(){
+ if(!code||!P.synced||busy||!pending())return;
+ var q=P.q;P.q={done:{},notes:{}};sv();busy=true;
+ try{var r=await fetch(API+'/api/sync',{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({code:code,done:q.done,notes:q.notes,last:q.last})});if(!r.ok)throw 0}
+ catch(e){// Pas de connexion : on remet les changements dans la file (sans écraser les plus récents).
+  var k;for(k in q.done)if(!(k in P.q.done))P.q.done[k]=q.done[k];for(k in q.notes)if(!(k in P.q.notes))P.q.notes[k]=q.notes[k];if(q.last&&!P.q.last)P.q.last=q.last;sv()}
+ finally{busy=false}
+}
+// À la connexion : fusion de la progression du serveur et de celle du téléphone, sans rien perdre.
+function merge(sp){
+ if(!sp)return;// serveur sans sauvegarde : on garde le fonctionnement d'avant
+ var k,done={},notes={};
+ for(k in sp.done)done[k]=sp.done[k];
+ for(k in sp.notes)notes[k]=sp.notes[k];
+ if(!P.synced){// Première connexion sur ce téléphone depuis la mise à jour : on ajoute tout ce qu'il contient.
+  for(k in P.done)if(P.done[k]&&!done[k]){done[k]=P.done[k]>1e12?P.done[k]:1;P.q.done[k]=done[k]}
+  for(k in P.notes){var t=P.notes[k],s=notes[k];if(!t||s===t)continue;
+   notes[k]=!s?t:s.indexOf(t)>-1?s:s+'\n\n--- Notes de mon autre appareil ---\n'+t;P.q.notes[k]=notes[k]}
+  if(P.last&&!sp.last)P.q.last=P.last;
+ }else{// Changements faits hors connexion, pas encore envoyés : ils passent devant.
+  for(k in P.q.done){if(P.q.done[k])done[k]=P.q.done[k];else delete done[k]}
+  for(k in P.q.notes){if(P.q.notes[k])notes[k]=P.q.notes[k];else delete notes[k]}
+ }
+ P.done=done;P.notes=notes;P.last=P.q.last||sp.last||P.last;P.synced=true;sv();sync();
+}
+addEventListener('online',sync);
+addEventListener('pagehide',sync);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')sync()});
 function sec(d){return String(d).split(':').reduce(function(a,b){return a*60+(+b||0)},0)}
 function ftime(s){var hh=Math.floor(s/3600),m=Math.round(s%3600/60);return hh?hh+' h '+(m<10?'0':'')+m:m+' min'}
 function fdate(ms){return new Date(ms).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})}
@@ -209,7 +247,7 @@ async function login(c,silent){
  var b=$('lb');b.disabled=true;
  try{var r=await post('/api/login',{code:c}),j=await r.json();
   if(!r.ok){if(!silent)$('lm').textContent=j.error||'Code invalide.';sessionStorage.removeItem('gc');return}
-  code=c;sessionStorage.setItem('gc',c);D=j;PK='geo:'+hs(c);ld();start()}
+  code=c;sessionStorage.setItem('gc',c);D=j;PK='geo:'+hs(c);ld();merge(j.progress);start()}
  catch(e){if(!silent)$('lm').textContent='Connexion impossible. Vérifiez votre internet.'}
  finally{b.disabled=false}
 }
@@ -269,12 +307,12 @@ function home(){
  row.appendChild(h('div',{class:'card'},h('h3',{text:'Une question, un blocage ?',style:'font-size:16px;margin-bottom:6px'}),h('p',{class:'note',text:'Assistance du formateur incluse pendant 3 mois. Réponse sous 48 heures ouvrables.'}),
   h('a',{class:'btn wa',href:wa('Bonjour GeoExpert Academy, j\'ai une question sur ma formation.'),target:'_blank',rel:'noopener',style:'margin-top:10px'},'Écrire sur WhatsApp')));
  m.appendChild(row);
- m.appendChild(h('p',{class:'note',style:'margin-top:20px',text:'Votre progression et vos notes sont enregistrées sur cet appareil. Accès strictement personnel : ne partagez pas votre code.'}));
+ m.appendChild(h('p',{class:'note',style:'margin-top:20px',text:'Votre progression et vos notes sont sauvegardées sur votre compte. Accès strictement personnel : ne partagez pas votre code.'}));
  side();window.scrollTo(0,0);
 }
 
 function lesson(k){
- var l=L.filter(function(x){return x.k===k})[0];if(!l)return;cur=l;P.last=k;sv();
+ var l=L.filter(function(x){return x.k===k})[0];if(!l)return;cur=l;setLast(k);
  var m=$('main');m.textContent='';var a=acc(),ix=a.indexOf(l);
  
  // Correction : on remonte automatiquement en haut de la page lors du clic sur une vidéo
@@ -285,7 +323,7 @@ function lesson(k){
  var pl=h('div',{class:'pl'});
  var go=h('button',{class:'go','aria-label':'Lancer la vidéo',onclick:function(){play(l,pl)}},ic('play'));
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
- var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){P.done[k]=!P.done[k];if(!P.done[k])delete P.done[k];sv();lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
+ var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){setDone(k,!P.done[k]);lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
 
 var nx=a[ix+1],pv=a[ix-1];
         
@@ -295,8 +333,8 @@ if(!pv) prevBtn.disabled = true; // On désactive proprement si on est à la 1è
 
 // 2. Création du bouton Suivant / Terminer
 var nextBtn = nx 
-  ? h('button',{class:'btn mag',onclick:function(){ P.done[k]=1; sv(); lesson(nx.k); }}, 'Terminer et continuer', ic('right')) 
-  : h('button',{class:'btn mag',onclick:function(){ P.done[k]=1; sv(); home(); }}, 'Terminer le module');
+  ? h('button',{class:'btn mag',onclick:function(){ setDone(k,true); lesson(nx.k); }}, 'Terminer et continuer', ic('right'))
+  : h('button',{class:'btn mag',onclick:function(){ setDone(k,true); home(); }}, 'Terminer le module');
 
 // 3. On ajoute tout ça à la page
 m.appendChild(h('div',{class:'ctl'},
@@ -308,7 +346,7 @@ m.appendChild(h('div',{class:'ctl'},
 
  var tabs=h('div',{class:'tabs'}),pn=h('div',{class:'pn'});
  [['notes','Mes notes'],['ex','Exercices'],['aide','Aide']].forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
- if(tab==='notes'){var ta=h('textarea',{placeholder:'Écrivez vos notes pour cette leçon : elles sont enregistrées automatiquement sur cet appareil.','aria-label':'Mes notes'});ta.value=P.notes[k]||'';var tm;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){P.notes[k]=ta.value;sv()},400)});pn.appendChild(ta)}
+ if(tab==='notes'){var ta=h('textarea',{placeholder:'Écrivez vos notes pour cette leçon : elles sont enregistrées automatiquement sur votre compte.','aria-label':'Mes notes'});ta.value=P.notes[k]||'';var tm;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){setNote(k,ta.value)},400)});pn.appendChild(ta)}
  
  // --- CORRECTION DES BOUTONS D'EXERCICES ---
  if(tab==='ex'){

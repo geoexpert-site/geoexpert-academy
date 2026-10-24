@@ -1,7 +1,11 @@
 // =====================================================================
 // GeoExpert Academy : espace apprenant (Cloudflare Worker)
-// Version complète avec ajout de modules
+// Le même code sert deux Workers, selon la variable ROLE :
+//   ROLE = "apprenant" : uniquement l'API de l'espace apprenant (/api/...)
+//   ROLE = "admin"     : la page d'administration (/) et son API (/admin/...), derrière Cloudflare Access
+//   ROLE absent        : les deux, comme avant (le temps de la transition)
 // =====================================================================
+import ADMIN_HTML from './admin.html';
 
 const CATALOG = [
   {
@@ -301,6 +305,27 @@ function trialLock(rec, k, now) {
   const i = m ? m.videos.findIndex(v => v.k === k) : -1;
   return i >= 0 && i < TRIAL_FREE ? 0 : end;
 }
+// Leçon (vidéo) d'un module de l'apprenant.
+function ownsLesson(rec, k) {
+  const m = findModule(moduleOf(k));
+  return !!m && rec.modules.some(g => g.m === m.key) && m.videos.some(v => v.k === k);
+}
+// Progression enregistrée sur le serveur (base D1). null si la base n'est pas disponible :
+// la page garde alors la progression du téléphone, comme avant.
+async function loadProgress(env, c) {
+  if (!env.DB) return null;
+  try {
+    const [d, n, l] = await env.DB.batch([
+      env.DB.prepare('SELECT k, done_at FROM progress WHERE code = ?').bind(c),
+      env.DB.prepare('SELECT k, text FROM notes WHERE code = ?').bind(c),
+      env.DB.prepare('SELECT last FROM learners WHERE code = ?').bind(c),
+    ]);
+    const done = {}, notes = {};
+    for (const r of d.results) done[r.k] = r.done_at;
+    for (const r of n.results) notes[r.k] = r.text;
+    return { done, notes, last: (l.results[0] && l.results[0].last) || '' };
+  } catch (e) { return null; }
+}
 function entitled(rec, k, now) {
   const g = rec.modules.find(x => x.m === moduleOf(k));
   if (!g) return { ok: false, from: 0, none: true };
@@ -309,16 +334,68 @@ function entitled(rec, k, now) {
   return t ? { ok: false, from: t, trial: true } : { ok: true, from: g.from };
 }
 
+// ---------------------------------------------------------------- Cloudflare Access (administration)
+// Vérifie le jeton que Cloudflare Access ajoute après la connexion par e-mail. Renvoie l'e-mail, ou null.
+let jwks = null, jwksAt = 0;
+function b64u(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(s + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0)); }
+async function accessEmail(req, env) {
+  const team = String(env.ACCESS_TEAM_DOMAIN || '').replace(/\/+$/, '');
+  const token = req.headers.get('Cf-Access-Jwt-Assertion') || '';
+  const parts = token.split('.');
+  if (!team || !env.ACCESS_AUD || parts.length !== 3) return null;
+  try {
+    const head = JSON.parse(new TextDecoder().decode(b64u(parts[0])));
+    const pay = JSON.parse(new TextDecoder().decode(b64u(parts[1])));
+    if (head.alg !== 'RS256') return null;
+    if (!jwks || Date.now() - jwksAt > 3600000 || !jwks.find(k => k.kid === head.kid)) {
+      jwks = (await (await fetch(team + '/cdn-cgi/access/certs')).json()).keys || []; jwksAt = Date.now();
+    }
+    const jwk = jwks.find(k => k.kid === head.kid);
+    if (!jwk) return null;
+    const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64u(parts[2]), enc.encode(parts[0] + '.' + parts[1]));
+    const aud = Array.isArray(pay.aud) ? pay.aud : [pay.aud];
+    if (!ok || pay.iss !== team || !aud.includes(env.ACCESS_AUD) || !(pay.exp * 1000 > Date.now())) return null;
+    const email = String(pay.email || '').toLowerCase();
+    const allowed = String(env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+    return email && (!allowed.length || allowed.includes(email)) ? email : null;
+  } catch (e) { return null; }
+}
+
+// ---------------------------------------------------------------- Journal d'activité (base D1)
+async function journal(env, who, action, code, label, detail) {
+  if (!env.DB) return;
+  try {
+    await env.DB.prepare('INSERT INTO journal (t, who, action, code, label, detail) VALUES (?, ?, ?, ?, ?, ?)')
+      .bind(Date.now(), who || '', action, code || '', label || '', detail || '').run();
+  } catch (e) { /* le journal ne doit jamais bloquer une action */ }
+}
+
+const ADMIN_PAGE_HEADERS = {
+  'Content-Type': 'text/html; charset=utf-8',
+  'Cache-Control': 'no-store',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'no-referrer',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://geoexpertacademy.ci; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+};
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    const role = env.ROLE || 'tout';
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req, env) });
     try {
       if (!env.ACCESS) return reply({ error: 'Configuration incomplète : KV ACCESS manquant.' }, 500, req, env);
       const origin = req.headers.get('Origin');
-      if (origin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
-      if (url.pathname.startsWith('/api/')) return await api(req, env, url);
-      if (url.pathname.startsWith('/admin/')) return await admin(req, env, url);
+      const sameOrigin = role === 'admin' && origin === url.origin;
+      if (origin && !sameOrigin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
+      if (role !== 'admin' && url.pathname.startsWith('/api/')) return await api(req, env, url);
+      if (role !== 'apprenant' && url.pathname.startsWith('/admin/')) return await admin(req, env, url);
+      if (role === 'admin' && url.pathname === '/' && req.method === 'GET') {
+        if (!(await adminAccessOk(req, env))) return new Response('Accès refusé.', { status: 403, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+        return new Response(ADMIN_HTML, { status: 200, headers: ADMIN_PAGE_HEADERS });
+      }
       return reply({ error: 'Introuvable.' }, 404, req, env);
     } catch (e) {
       return reply({ error: 'Erreur serveur.' }, 500, req, env);
@@ -371,7 +448,36 @@ async function api(req, env, url) {
       rec.lastLogin = now;
       await env.ACCESS.put('s:' + c, JSON.stringify(rec));
     }
-    return reply({ label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods }, 200, req, env);
+    const progress = await loadProgress(env, c);
+    return reply({ label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods, progress }, 200, req, env);
+  }
+
+  // Sauvegarde de la progression : la page n'envoie que ce qui a changé.
+  // done : { leçon: date (ms) | 1 (date inconnue) | 0 (plus terminée) } · notes : { leçon: texte } · last : dernière leçon ouverte
+  if (url.pathname === '/api/sync') {
+    if (!env.DB) return reply({ error: 'Sauvegarde indisponible pour le moment.' }, 503, req, env);
+    const st = [];
+    const done = Object.entries(body.done && typeof body.done === 'object' ? body.done : {}).slice(0, 400);
+    for (const [k, v] of done) {
+      if (!ownsLesson(rec, k)) continue;
+      const t = Number(v);
+      if (t === 0) st.push(env.DB.prepare('DELETE FROM progress WHERE code = ? AND k = ?').bind(c, k));
+      else st.push(env.DB.prepare('INSERT INTO progress (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING')
+        .bind(c, k, t === 1 ? 1 : (t > 1.6e12 && t <= now + 60000 ? Math.floor(t) : now)));
+    }
+    const notes = Object.entries(body.notes && typeof body.notes === 'object' ? body.notes : {}).slice(0, 400);
+    for (const [k, v] of notes) {
+      if (!ownsLesson(rec, k)) continue;
+      const text = String(v == null ? '' : v).slice(0, 20000);
+      if (!text.trim()) st.push(env.DB.prepare('DELETE FROM notes WHERE code = ? AND k = ?').bind(c, k));
+      else st.push(env.DB.prepare('INSERT INTO notes (code, k, text, updated) VALUES (?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET text = excluded.text, updated = excluded.updated')
+        .bind(c, k, text, now));
+    }
+    const last = ownsLesson(rec, String(body.last || '')) ? String(body.last) : null;
+    st.push(env.DB.prepare('INSERT INTO learners (code, last, last_activity) VALUES (?, ?, ?) ON CONFLICT (code) DO UPDATE SET last = COALESCE(excluded.last, learners.last), last_activity = excluded.last_activity')
+      .bind(c, last, now));
+    await env.DB.batch(st);
+    return reply({ ok: true }, 200, req, env);
   }
 
   if (url.pathname === '/api/play') {
@@ -421,11 +527,43 @@ async function api(req, env, url) {
 }
 
 // ---------------------------------------------------------------- Administration
+// Worker d'administration : Cloudflare Access est obligatoire (sauf ACCESS_OPTIONAL = "oui", réservé au test).
+// Ancien Worker unique (ROLE absent) : mot de passe seul, comme avant.
+async function adminAccessOk(req, env) {
+  if (env.ROLE !== 'admin') return true;
+  if (env.ACCESS_OPTIONAL === 'oui' && !env.ACCESS_AUD) return true;
+  return !!(await accessEmail(req, env));
+}
+const MAX_FAILS = 5, FAIL_WINDOW = 15 * 60000;
 async function admin(req, env, url) {
   if (!env.ADMIN_PASSWORD || String(env.ADMIN_PASSWORD).length < 12) return reply({ error: 'Mot de passe administrateur non configuré (12 caractères minimum).' }, 500, req, env);
-  const pw = req.headers.get('X-Admin-Password') || '';
-  if (!(await safeEqual(pw, env.ADMIN_PASSWORD))) return reply({ error: 'Mot de passe incorrect.' }, 401, req, env);
   const now = Date.now();
+  if (!(await adminAccessOk(req, env))) return reply({ error: 'Accès refusé : connectez-vous avec votre adresse e-mail autorisée.' }, 403, req, env);
+  const who = (await accessEmail(req, env)) || 'administrateur';
+  // Limite de tentatives : 5 mots de passe faux en 15 minutes depuis la même connexion = blocage 15 minutes.
+  const ip = req.headers.get('CF-Connecting-IP') || '';
+  if (env.DB) {
+    const r = await env.DB.prepare('SELECT COUNT(*) AS n FROM admin_fails WHERE ip = ? AND t > ?').bind(ip, now - FAIL_WINDOW).first();
+    if (r && r.n >= MAX_FAILS) return reply({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }, 429, req, env);
+  }
+  const pw = req.headers.get('X-Admin-Password') || '';
+  if (!(await safeEqual(pw, env.ADMIN_PASSWORD))) {
+    if (env.DB) {
+      await env.DB.batch([
+        env.DB.prepare('INSERT INTO admin_fails (ip, t) VALUES (?, ?)').bind(ip, now),
+        env.DB.prepare('DELETE FROM admin_fails WHERE t < ?').bind(now - 24 * 3600000),
+      ]);
+      await journal(env, who, 'Mot de passe incorrect', '', '', 'Connexion ' + ((req.cf && req.cf.country) || '') + ' ' + ip);
+    }
+    return reply({ error: 'Mot de passe incorrect.' }, 401, req, env);
+  }
+  if (env.DB) await env.DB.prepare('DELETE FROM admin_fails WHERE ip = ?').bind(ip).run();
+
+  if (url.pathname === '/admin/journal' && req.method === 'GET') {
+    if (!env.DB) return reply({ entries: [] }, 200, req, env);
+    const r = await env.DB.prepare('SELECT t, who, action, code, label, detail FROM journal ORDER BY id DESC LIMIT 300').all();
+    return reply({ entries: r.results }, 200, req, env);
+  }
 
   if (url.pathname === '/admin/state' && req.method === 'GET') {
     const cfg = await getCfg(env);
@@ -463,6 +601,7 @@ async function admin(req, env, url) {
       essai: true, mois: b.product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: !!b.immediate,
     };
     await env.ACCESS.put('s:' + code, JSON.stringify(rec));
+    await journal(env, who, 'Code créé', prettyCode(code), label, b.product + (b.immediate ? ', sans période d\'essai' : ', avec période d\'essai'));
     return reply({ code: prettyCode(code), label, expires: rec.expires }, 200, req, env);
   }
 
@@ -481,6 +620,9 @@ async function admin(req, env, url) {
     }
     if (b.unlockNow) { rec.modules.forEach(g => { g.from = Math.min(g.from, now); }); rec.accesComplet = true; }
     await env.ACCESS.put('s:' + c, JSON.stringify(rec));
+    if (typeof b.active === 'boolean') await journal(env, who, b.active ? 'Code réactivé' : 'Code désactivé', prettyCode(c), rec.label);
+    if (b.addDays) await journal(env, who, 'Accès prolongé', prettyCode(c), rec.label, '+' + Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500) + ' jours');
+    if (b.unlockNow) await journal(env, who, 'Tout débloqué', prettyCode(c), rec.label);
     return reply({ ok: true }, 200, req, env);
   }
 
@@ -499,6 +641,7 @@ async function admin(req, env, url) {
     if (!rec.modules.find(g => g.m === mod)) {
       rec.modules.push({ m: mod, from: now });
       await env.ACCESS.put('s:' + c, JSON.stringify(rec));
+      await journal(env, who, 'Module ajouté', prettyCode(c), rec.label, mod);
       return reply({ ok: true, message: 'Module ajouté.' }, 200, req, env);
     } else {
       return reply({ ok: true, message: 'Déjà présent.' }, 200, req, env);
@@ -517,6 +660,7 @@ async function admin(req, env, url) {
       else if (valid.test(id)) { cfg.ids[k] = id; n++; }
     }
     await env.ACCESS.put('cfg', JSON.stringify(cfg));
+    await journal(env, who, 'Vidéos Bunny modifiées', '', '', n + ' identifiant(s)');
     return reply({ ok: true, saved: n }, 200, req, env);
   }
 
@@ -528,6 +672,7 @@ async function admin(req, env, url) {
     await env.ACCESS.put('f:' + k, buf);
     const cfg = await getCfg(env); cfg.files[k] = true;
     await env.ACCESS.put('cfg', JSON.stringify(cfg));
+    await journal(env, who, 'Fichier d\'exercice envoyé', '', '', k + ' (' + Math.round(buf.byteLength / 1024) + ' Ko)');
     return reply({ ok: true }, 200, req, env);
   }
   return reply({ error: 'Introuvable.' }, 404, req, env);

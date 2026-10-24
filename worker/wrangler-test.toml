@@ -1,0 +1,22 @@
+# Environnement de TEST uniquement (jamais utilisé par les apprenants).
+# La version des apprenants (espace-apprenant-api) reste gérée à part.
+name = "espace-apprenant-api-test"
+main = "worker.js"
+compatibility_date = "2026-10-21"
+workers_dev = true
+preview_urls = false
+
+[vars]
+ROLE = "apprenant"
+ALLOWED_ORIGINS = "http://localhost:5501,http://127.0.0.1:5501"
+LIBRARY_ID = "785941"
+PLAYER_HOST = "iframe.mediadelivery.net"
+
+[[kv_namespaces]]
+binding = "ACCESS"
+id = "955c726a9dd643eb84fed30281261636"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "geoexpert-test"
+database_id = "3f7b44aa-686a-40d6-a442-ce09da27c3cf"
