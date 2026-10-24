@@ -305,49 +305,49 @@
     <div><strong>3 mois</strong><span>d'assistance du formateur</span></div>
   </div>
 </section>
+
 <!-- SECTION VIDÉO EXPLICATIVE -->
-<section id="apercu" style="padding: 60px 0; background: #fff; text-align: center;">
-  <div class="container" style="max-width: 900px; margin: 0 auto; padding: 0 15px;">
-    <p class="section-eyebrow" style="justify-content: center;">Aperçu de la plateforme</p>
-    <h2 style="font-size: clamp(24px, 4vw, 36px); margin-bottom: 10px; color: var(--indigo);">Découvrez l'espace apprenant en 30 secondes</h2>
-    <p style="color: var(--ink-dim); margin-bottom: 25px; font-size: 16px;">Cliquez pour lancer l'aperçu de l'interface.</p>
+<section id="apercu" style="padding: 70px 0; background: #fff; text-align: center;">
+  <div class="container" style="max-width: 900px; margin: 0 auto;">
+    <p class="section-eyebrow" style="justify-content: center;">Votre formation en vidéo</p>
+    <h2 style="font-size: clamp(24px, 4vw, 36px); margin-bottom: 10px; color: var(--indigo);">Découvrez la formation en 3 minutes</h2>
+    <p style="color: var(--ink-dim); margin-bottom: 30px; font-size: 17px;">Cliquez pour lancer la présentation des modules et des résultats.</p>
     
-    <!-- VIGNETTE DE LA VIDÉO (Image du tableau de bord) -->
-    <div id="video-container" style="position: relative; width: 100%; max-width: 850px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 40px rgba(75,63,146,0.15); border: 4px solid #fff; cursor: pointer; background: url('images/apercu-dashboard.jpg') center/cover;">
-      <!-- Remplace 'images/tableau_de_bord.jpg' par le nom exact de ta capture d'écran -->
+    <!-- VIGNETTE DE LA VIDÉO -->
+    <!-- On utilise automatiquement la miniature YouTube de ta vidéo -->
+    <div id="video-container" style="position: relative; width: 100%; max-width: 850px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 40px rgba(75,63,146,0.15); border: 4px solid #fff; cursor: pointer; background: url('https://img.youtube.com/vi/-2hlDOABaNY/maxresdefault.jpg') center/cover;">
       
       <!-- Voile sombre -->
-      <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.4); transition: background 0.3s;" id="video-overlay"></div>
+      <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.3); transition: background 0.3s;" id="video-overlay"></div>
       
-      <!-- Bouton Play bien visible -->
+      <!-- Bouton Play -->
       <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;">
-        <div style="width: 75px; height: 75px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: transform 0.2s;" id="play-btn">
-          <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #ffffff; margin-left: 5px;"><path d="M8 5v14l11-7z"/></svg>
+        <div style="width: 80px; height: 80px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: transform 0.2s;" id="play-btn">
+          <svg viewBox="0 0 24 24" style="width: 36px; height: 36px; fill: #ffffff; margin-left: 5px;"><path d="M8 5v14l11-7z"/></svg>
         </div>
-        <span style="color: #ffffff; margin-top: 15px; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Lancer l'aperçu</span>
+        <span style="color: #ffffff; margin-top: 15px; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Lancer la vidéo</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- MODAL PLEIN ÉCRAN (Optimisé Mobile) -->
-<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 99999; align-items: center; justify-content: center; padding: 0;">
+<!-- MODAL (PLEIN ÉCRAN) -->
+<div id="video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box;">
   
-  <!-- Bouton Fermer (Très accessible) -->
-  <button id="close-video" style="position: absolute; top: 20px; right: 20px; background: #ffffff; color: #000000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100000;">&times;</button>
+  <button id="close-video" style="position: absolute; top: 15px; right: 15px; background: #ffffff; color: #000000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;">&times;</button>
   
-  <!-- Conteneur Vidéo (Adapté à l'écran) -->
-  <div style="width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; display: flex; align-items: center; justify-content: center;">
-    <iframe id="video-modal-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen"></iframe>
+  <div style="width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000000; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+    <!-- L'iframe est vide au départ. On y mettra le lien YouTube via le script -->
+    <iframe id="video-modal-iframe" src="" data-video-src="https://www.youtube.com/embed/-2hlDOABaNY?autoplay=1&rel=0" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen; encrypted-media"></iframe>
   </div>
-
-  <!-- Message d'aide clignotant -->
+  
+  <!-- Message pour mobile -->
   <div id="rotate-msg" style="position: absolute; bottom: 25px; width: 100%; text-align: center; pointer-events: none; z-index: 100000; transition: opacity 0.6s ease; opacity: 1;">
     <span class="blink-text" style="display: inline-block; background: #14263d; color: #00D4EE; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #0092A6; box-shadow: 0 4px 15px rgba(0,146,166,0.3);">
       Tournez votre téléphone pour voir en grand
     </span>
   </div>
-</div>      
+</div>     
 
 <!-- POUR QUI -->
 <section id="pour-qui" style="padding: 70px 0; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
@@ -869,45 +869,26 @@
 
     if (videoContainer) {
       videoContainer.addEventListener('click', () => {
-        // On charge la vidéo
-        modalIframe.src = 'motion-design.html';
+        // On récupère le lien YouTube (data-video-src) et on le met dans l'iframe
+        const videoSrc = modalIframe.getAttribute('data-video-src');
+        modalIframe.src = videoSrc;
+        
         videoModal.style.display = 'flex';
 
-        // On tente de passer en plein écran natif
-        if (videoModal.requestFullscreen) {
-          videoModal.requestFullscreen();
-        } else if (videoModal.webkitRequestFullscreen) { /* Safari */
-          videoModal.webkitRequestFullscreen();
-        }
-
-        // GESTION DU MESSAGE CLIGNOTANT
-        // 1. On le remet visible
+        // Message clignotant pendant 7 secondes
         rotateMsg.style.opacity = '1';
-        // 2. On annule l'ancien minuteur s'il y en avait un
         clearTimeout(rotateTimer);
-        // 3. On lance le minuteur pour le faire disparaître après 7 secondes
         rotateTimer = setTimeout(() => {
           rotateMsg.style.opacity = '0';
-        }, 7000); // 7000 millisecondes = 7 secondes
+        }, 7000);
       });
 
       closeVideo.addEventListener('click', () => {
         videoModal.style.display = 'none';
-        modalIframe.src = ''; // On coupe l'animation
-        
-        // On annule le minuteur si on ferme la vidéo avant la fin
+        modalIframe.src = ''; // On coupe la vidéo
         clearTimeout(rotateTimer);
-
-        // On quitte le plein écran
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        }
       });
     }
-
-    // ==========================================
-    // 3. MASQUER L'APERÇU VIDÉO TANT QUE L'ID YOUTUBE N'EST PAS RENSEIGNÉ
-    // ==========================================
 
     // ==========================================
     // 4. GESTION DU CARROUSEL

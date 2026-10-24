@@ -2,299 +2,234 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Publicité GeoExpert</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pub GeoExpert Academy : formations vidéo SIG</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
-
-:root {
-  --bg: #F6F3FA; --teal: #0092A6; --indigo: #4B3F92; --magenta: #A83C93;
-  --ink: #2A2A28; --muted: #6B6A72; --ui-bg: #F4F6FA; --ui-card: #FFFFFF;
-}
-
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: 'Montserrat', sans-serif; }
-body { display: grid; place-items: center; }
-
-.stage {
-  position: relative; width: 100vw; height: 100vh; aspect-ratio: 16 / 9;
-  overflow: hidden; isolation: isolate; color: var(--ink); background: var(--bg);
-}
-
-.blob-1, .blob-2 {
-  position: absolute; width: 60vw; height: 60vw; border-radius: 50%; filter: blur(100px); opacity: 0.2; z-index: 0; pointer-events: none;
-}
-.blob-1 { top: -20%; right: -10%; background: var(--teal); }
-.blob-2 { bottom: -20%; left: -10%; background: var(--indigo); }
-
-.header { position: absolute; z-index: 8; top: 4%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: space-between; }
-.brand img { height: 50px; object-fit: contain; }
-.live { color: var(--indigo); font: 700 10px 'Space Mono', monospace; border: 1px solid var(--indigo); border-radius: 30px; padding: 6px 12px; background: #fff; box-shadow: 0 4px 10px rgba(75,63,146,0.1); }
-
-.scene {
-  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  padding: 5% 8%; text-align: center; opacity: 0; visibility: hidden; transform: scale(1.05);
-  transition: opacity .5s ease, transform .5s cubic-bezier(.2,.75,.25,1), visibility .5s; z-index: 2;
-}
-.scene.active { opacity: 1; visibility: visible; transform: scale(1); z-index: 3; }
-
-h1, h2 { margin: 0; font-size: clamp(36px, 6vw, 65px); line-height: 1.1; font-weight: 900; letter-spacing: -.03em; color: var(--ink); }
-.gradient { background: linear-gradient(100deg, var(--teal) 0%, var(--indigo) 50%, var(--magenta) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.sub { max-width: 650px; margin-top: 15px; color: var(--muted); font-size: clamp(16px, 2vw, 22px); line-height: 1.5; font-weight: 500; }
-
-/* --- SCENE 2 : LE TABLEAU DE BORD --- */
-.dashboard-mockup {
-  width: 90%; max-width: 900px; height: 420px; background: #fff; border-radius: 12px; overflow: hidden;
-  box-shadow: 0 30px 60px rgba(20,38,61,0.2); text-align: left; display: flex; flex-direction: column; border: 1px solid #e5eaf0;
-  transform: translateY(20px); opacity: 0; margin-top: 20px;
-}
-.active .dashboard-mockup { animation: slideUp 0.8s ease 0.2s forwards; }
-
-.db-top { background: var(--indigo); height: 45px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; color: #fff; }
-.db-top-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-.db-logo { height: 22px; background: #fff; border-radius: 4px; padding: 2px 5px; }
-.db-top-right { display: flex; align-items: center; gap: 10px; font-size: 11px; }
-.db-progress-mini { width: 60px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
-.db-progress-mini i { display: block; height: 100%; width: 16%; background: var(--teal); }
-
-.db-body { display: flex; flex: 1; overflow: hidden; background: #F6F3FA; }
-.db-sidebar { width: 280px; background: #fff; border-right: 1px solid #e3e7ee; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-.db-search { width: 100%; padding: 6px 10px; border: 1px solid #e3e7ee; border-radius: 6px; font-size: 11px; background: #f8f9fb; }
-.db-module-list { margin-top: 5px; border: 1px solid #e3e7ee; border-radius: 8px; overflow: hidden; }
-.db-lesson { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 10px; }
-.db-lesson-icon { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc; display: grid; place-items: center; flex-shrink: 0; }
-.db-lesson.done .db-lesson-icon { background: var(--teal); border-color: var(--teal); color: #fff; font-size: 9px; }
-.db-lesson.current { background: #e0f7fa; border-left: 2px solid var(--teal); }
-
-.db-main { flex: 1; padding: 15px; }
-.db-hero { background: linear-gradient(120deg, var(--indigo), var(--teal)); border-radius: 8px; padding: 15px; display: flex; align-items: center; gap: 15px; color: #fff; margin-bottom: 10px; }
-.db-ring { width: 50px; height: 50px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.2); border-top-color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
-.db-hero-text h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
-.db-hero-text p { margin: 0; font-size: 11px; opacity: 0.9; }
-.db-stats { display: flex; gap: 10px; }
-.db-stat-card { background: #fff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #e3e7ee; }
-.db-stat-card h4 { margin: 0 0 2px 0; font-size: 16px; color: var(--indigo); font-weight: 800; }
-.db-stat-card p { margin: 0; font-size: 9px; color: var(--muted); }
-
-/* --- SCENE 3 : TEMOIGNAGES --- */
-.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 850px; margin-top: 20px; }
-.testi-card-small { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left; transform: scale(0.9); opacity: 0; border-top: 3px solid var(--indigo); }
-.active .testi-card-small { animation: popIn 0.5s cubic-bezier(.2,.75,.25,1) forwards; }
-.active .testi-card-small:nth-child(1) { animation-delay: 0.1s; }
-.active .testi-card-small:nth-child(2) { animation-delay: 0.3s; border-top-color: var(--teal); }
-.active .testi-card-small:nth-child(3) { animation-delay: 0.5s; border-top-color: var(--magenta); }
-.testi-text-small { font-size: 12px; font-style: italic; color: var(--ink); line-height: 1.4; margin-bottom: 10px; }
-.testi-author-small { display: flex; align-items: center; gap: 8px; }
-.testi-avatar-small { width: 25px; height: 25px; background: var(--indigo); color: white; border-radius: 50%; display: grid; place-items: center; font-weight: bold; font-size: 10px; }
-.testi-info-small strong { display: block; font-size: 10px; color: var(--ink); }
-.testi-info-small span { display: block; font-size: 9px; color: var(--muted); }
-
-/* --- SCENE 4 : MODULES ET PRIX --- */
-.module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 800px; margin-top: 20px; text-align: center; }
-.module-card { background: #fff; padding: 15px 10px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; gap: 8px; border-bottom: 3px solid #ccc; }
-.active .module-card { animation: slideUp 0.5s ease forwards; }
-.module-card:nth-child(1) { border-color: #589632; }
-.module-card:nth-child(2) { border-color: #0079c1; }
-.module-card:nth-child(3) { border-color: #4285f4; }
-.module-card:nth-child(4) { border-color: #e67e22; }
-.mod-logo { height: 35px; width: auto; object-fit: contain; }
-.module-card strong { display: block; font-size: 12px; color: var(--ink); }
-.price-tag { background: var(--gradient-brand); color: white; padding: 10px 25px; border-radius: 30px; font-size: 20px; font-weight: 800; margin-top: 25px; box-shadow: 0 10px 20px rgba(168,60,147,0.3); animation: pulse 2s infinite; }
-
-/* --- BOUTON REPLAY --- */
-.replay-overlay {
-  position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(15, 10, 31, 0.85); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-}
-.replay-overlay.show { opacity: 1; pointer-events: auto; }
-.replay-overlay button {
-  width: 80px; height: 80px; border-radius: 50%; background: var(--teal); border: none; color: white; cursor: pointer;
-  display: grid; place-items: center; box-shadow: 0 0 40px rgba(0, 146, 166, 0.6); transition: transform 0.2s;
-}
-.replay-overlay button:hover { transform: scale(1.1); background: var(--indigo); }
-.replay-overlay svg { width: 36px; height: 36px; margin-left: 5px; fill: white; }
-.replay-overlay span { color: #fff; margin-top: 20px; font-weight: 700; letter-spacing: 1.5px; font-size: 14px; text-transform: uppercase; }
-
-@keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
-@keyframes popIn { to { transform: scale(1); opacity: 1; } }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-.progress { position: absolute; z-index: 15; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(0,0,0,0.05); }
-.progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--magenta)); }
+:root{--bg:#F6F3FA;--t:#0092A6;--i:#4B3F92;--m:#A83C93;--k:#2A2A28;--u:#6B6A72}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#1b1a22;font-family:Montserrat,sans-serif;overflow:hidden}
+body{display:grid;place-items:center}
+.stage{position:relative;width:min(100vw,56.25vh);height:min(100vh,177.78vw);container-type:inline-size;overflow:hidden;background:var(--bg);color:var(--k);isolation:isolate}
+.bl{position:absolute;width:90cqw;height:90cqw;border-radius:50%;filter:blur(18cqw);opacity:.22;z-index:0}
+.b1{top:-25cqw;right:-25cqw;background:var(--t)}.b2{bottom:-25cqw;left:-25cqw;background:var(--i)}
+.hd{position:absolute;z-index:8;top:4cqw;left:6cqw;right:6cqw;display:flex;justify-content:space-between;align-items:center}
+.hd img{height:9cqw;object-fit:contain}
+.pill{font-weight:700;font-size:2.7cqw;color:var(--i);border:.3cqw solid var(--i);border-radius:9cqw;padding:1.4cqw 3cqw;background:#fff}
+.sc{position:absolute;inset:0;padding:19cqw 6cqw 14cqw;display:flex;flex-direction:column;justify-content:center;gap:3cqw;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s;z-index:2}
+.sc.on{opacity:1;visibility:visible;z-index:3}
+.a{opacity:0;transform:translateY(4cqw)}
+.on .a{animation:in .6s calc(var(--n,0)*.13s) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+@keyframes pl{50%{transform:scale(1.04)}}
+h2{font-size:8.4cqw;line-height:1.08;font-weight:900;letter-spacing:-.03em}
+.g{background:linear-gradient(100deg,var(--t),var(--i) 50%,var(--m));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.s{font-size:3.9cqw;line-height:1.45;color:var(--u);font-weight:500}
+.s small,.nt{font-size:3cqw;color:var(--u);font-weight:500;line-height:1.4}
+.c{background:#fff;border-radius:2.5cqw;box-shadow:0 2cqw 5cqw rgba(20,38,61,.08);padding:3cqw}
+.gr{display:grid;gap:2.5cqw}.g2{grid-template-columns:1fr 1fr}
+.big{font-size:11cqw;font-weight:900;line-height:1}
+.lb{font-size:3.3cqw;color:var(--u);font-weight:600;margin-top:1cqw}
+.row{display:flex;justify-content:space-between;align-items:center;gap:2cqw;font-size:3.6cqw;font-weight:700;padding:2.4cqw 3cqw;border-left:1cqw solid var(--i)}
+.row b{color:var(--m);font-weight:800;white-space:nowrap}
+.tx{font-size:3.5cqw;line-height:1.4;font-weight:600}
+.tx em{display:block;font-style:normal;font-weight:500;color:var(--u);font-size:3cqw;margin-top:.8cqw}
+.li{display:flex;gap:3cqw;align-items:flex-start;padding:2.4cqw 3cqw}
+.ck{flex:none;width:5.5cqw;height:5.5cqw;border-radius:50%;background:var(--t);color:#fff;display:grid;place-items:center;font-size:3.2cqw;font-weight:800}
+.tag{align-self:flex-start;background:linear-gradient(100deg,var(--t),var(--i),var(--m));color:#fff;font-weight:800;font-size:4.6cqw;padding:2.4cqw 5cqw;border-radius:9cqw;animation:pl 2s infinite}
+.old{text-decoration:line-through;color:var(--u);font-size:3.2cqw;font-weight:600}
+.pr{font-size:6cqw;font-weight:900;color:var(--m);line-height:1.1}
+.sv{display:inline-block;background:#e0f7fa;color:var(--t);font-weight:800;font-size:3cqw;padding:.8cqw 2cqw;border-radius:9cqw;margin-top:1cqw}
+.pk{display:flex;justify-content:space-between;align-items:center;gap:3cqw;border-top:1cqw solid var(--t)}
+.pk:nth-child(2){border-color:var(--i)}.pk:nth-child(3){border-color:var(--m)}
+.mk{padding:0;overflow:hidden}
+.mk i{display:block;background:var(--i);color:#fff;font-style:normal;font-weight:700;font-size:3.4cqw;padding:2.5cqw 3cqw}
+.ls{display:flex;gap:2.5cqw;align-items:center;font-size:3.4cqw;font-weight:600;padding:2.2cqw 3cqw;border-bottom:.2cqw solid #eee}
+.ls u{flex:none;width:4.5cqw;height:4.5cqw;border-radius:50%;border:.4cqw solid #ccc;text-decoration:none;display:grid;place-items:center;font-size:2.6cqw;color:#fff}
+.ls.d u{background:var(--t);border-color:var(--t)}.ls.n{background:#e0f7fa}.ls.n u{border-color:var(--t)}
+.st{font-size:3.2cqw;color:#e0a100;letter-spacing:.3cqw}
+.who{font-size:2.9cqw;color:var(--u);font-weight:600;margin-top:1.2cqw}.who strong{color:var(--k)}
+.bt{display:block;text-align:center;text-decoration:none;color:#fff;font-weight:800;font-size:4.6cqw;padding:3.6cqw;border-radius:2.5cqw}
+.bm{background:var(--m);box-shadow:0 2cqw 5cqw rgba(168,60,147,.4);animation:pl 2s infinite}
+.bw{background:#1fa855}
+#rp{position:absolute;z-index:20;bottom:4cqw;left:50%;transform:translateX(-50%);border:0;border-radius:9cqw;background:var(--i);color:#fff;font:700 3.2cqw Montserrat,sans-serif;padding:2cqw 5cqw;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s}
+#rp.show{opacity:1;pointer-events:auto}
+.pg{position:absolute;z-index:15;left:0;right:0;bottom:0;height:1.1cqw;background:rgba(0,0,0,.06)}
+#pf{height:100%;width:0;background:linear-gradient(90deg,var(--t),var(--m))}
+@media(prefers-reduced-motion:reduce){.a{opacity:1;transform:none;animation:none!important}.tag,.bm{animation:none}}
 </style>
 </head>
 <body>
-<div class="stage" id="stage">
-  <div class="blob-1"></div>
-  <div class="blob-2"></div>
+<div class="stage">
+<div class="bl b1"></div><div class="bl b2"></div>
+<header class="hd"><img src="images/logo-full.png" alt="GeoExpert Academy &amp; Consulting"><div class="pill">Formation en ligne</div></header>
 
-  <header class="header">
-    <div class="brand">
-      <img src="images/logo-full.png" alt="GeoExpert Academy">
-    </div>
-    <div class="live">FORMATION EN LIGNE</div>
-  </header>
+<!-- 1. Accroche -->
+<section class="sc on" data-d="5">
+  <p class="s a" style="--n:0;color:var(--t);font-weight:700">Cours pratiques en ligne</p>
+  <h2 class="a" style="--n:1;font-size:10cqw">Développez vos compétences SIG,<br><span class="g">à votre rythme.</span></h2>
+  <p class="s a" style="--n:2">QGIS, ArcGIS, télédétection, Webmapping et collecte de données. Des vidéos pratiques, avec l’assistance du formateur si vous rencontrez un blocage.</p>
+  <div class="tag a" style="--n:3">Formations dès 10 000 FCFA</div>
+</section>
 
-  <!-- SCÈNE 1 : LE PROBLÈME (Hook) -->
-  <section class="scene active" data-duration="4">
-    <h1>Vous galérez avec<br><span class="gradient">QGIS et ArcGIS ?</span></h1>
-    <p class="sub">Arrêtez de perdre du temps sur YouTube. Passez à une méthode claire et structurée.</p>
-  </section>
-
-  <!-- SCÈNE 2 : LA SOLUTION (Tableau de bord) -->
-  <section class="scene" data-duration="5">
-    <h2>Votre espace<br><span class="gradient">d'apprentissage.</span></h2>
-    <p class="sub">Vidéos, exercices, notes. Tout est centralisé.</p>
-    
-    <div class="dashboard-mockup">
-      <div class="db-top">
-        <div class="db-top-left">
-          <img src="images/logo-full.png" class="db-logo" alt="Logo">
-          Votre Espace
-        </div>
-        <div class="db-top-right">
-          16 % <div class="db-progress-mini"><i></i></div>
-        </div>
-      </div>
-      <div class="db-body">
-        <div class="db-sidebar">
-          <div class="db-search">Rechercher une leçon</div>
-          <div class="db-module-list">
-            <div class="db-lesson done"><div class="db-lesson-icon">✓</div>Leçon 1 : Intro</div>
-            <div class="db-lesson done"><div class="db-lesson-icon">✓</div>Leçon 2 : CSV</div>
-            <div class="db-lesson current"><div class="db-lesson-icon">✓</div>Leçon 3 : DXF</div>
-            <div class="db-lesson"><div class="db-lesson-icon"></div>Leçon 4 : GPX</div>
-          </div>
-        </div>
-        <div class="db-main">
-          <div class="db-hero">
-            <div class="db-ring">16%</div>
-            <div class="db-hero-text">
-              <h3>Bonjour Apprenant</h3>
-              <p>Continuez votre progression.</p>
-            </div>
-          </div>
-          <div class="db-stats">
-            <div class="db-stat-card"><h4>4 / 25</h4><p>leçons terminées</p></div>
-            <div class="db-stat-card"><h4>3h 33</h4><p>de vidéo</p></div>
-            <div class="db-stat-card"><h4>2027</h4><p>fin d'accès</p></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SCÈNE 3 : LA PREUVE (Témoignages) -->
-  <section class="scene" data-duration="4">
-    <h2>Ils y sont<br><span class="gradient">déjà arrivés.</span></h2>
-    <p class="sub">Rejoignez plus de 200 professionnels formés.</p>
-    
-    <div class="testi-grid">
-      <div class="testi-card-small">
-        <p class="testi-text-small">"Le formateur est très disponible et patient. L'un des meilleurs que j'ai connu."</p>
-        <div class="testi-author-small">
-          <div class="testi-avatar-small">GM</div>
-          <div class="testi-info-small"><strong>GUINDO M.</strong><span>Ingénieur Eaux & Forêts</span></div>
-        </div>
-      </div>
-      <div class="testi-card-small">
-        <p class="testi-text-small">"Les exercices sont concrets. On sent l'évolution. Je suis engagée à 100%."</p>
-        <div class="testi-author-small">
-          <div class="testi-avatar-small">ZH</div>
-          <div class="testi-info-small"><strong>ZANHAN S.</strong><span>Agent des Eaux & Forêts</span></div>
-        </div>
-      </div>
-      <div class="testi-card-small">
-        <p class="testi-text-small">"Les cours sont top, le formateur une master class. Franchement 5/5."</p>
-        <div class="testi-author-small">
-          <div class="testi-avatar-small">ES</div>
-          <div class="testi-info-small"><strong>Eliam S.</strong><span>Technicien Urbaniste</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SCÈNE 4 : L'OFFRE (Modules + Prix) -->
-  <section class="scene" data-duration="5">
-    <h2>Maîtrisez les<br><span class="gradient">outils clés.</span></h2>
-    
-    <div class="module-grid">
-      <div class="module-card"><img src="https://cdn.simpleicons.org/qgis/589632" class="mod-logo" alt="QGIS"><strong>QGIS</strong></div>
-      <div class="module-card"><img src="https://cdn.simpleicons.org/arcgis/0079c1" class="mod-logo" alt="ArcGIS"><strong>ArcGIS</strong></div>
-      <div class="module-card"><img src="https://cdn.simpleicons.org/googleearth/4285f4" class="mod-logo" alt="Google Earth"><strong>Google Earth</strong></div>
-      <div class="module-card"><svg class="mod-logo" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg><strong>Kobo</strong></div>
-    </div>
-    
-    <div class="price-tag">Dès 10 000 FCFA</div>
-  </section>
-
-  <!-- SCÈNE 5 : L'ACTION (CTA) -->
-  <section class="scene" data-duration="4">
-    <h2>Prêt à<br><span class="gradient">démarrer ?</span></h2>
-    <p class="sub">Accédez immédiatement à votre espace et obtenez votre attestation.</p>
-    <div style="margin-top: 25px; background: var(--magenta); color: white; padding: 15px 40px; border-radius: 10px; font-weight: 800; font-size: 20px; box-shadow: 0 10px 20px rgba(168,60,147,0.4); animation: pulse 2s infinite;">Cliquez ici pour commencer</div>
-  </section>
-
-  <!-- OVERLAY DE REPLAY -->
-  <div class="replay-overlay" id="replay-overlay">
-    <button id="replay-btn" aria-label="Revoir la vidéo">
-      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    </button>
-    <span>Revoir la pub</span>
+<!-- 2. Chiffres -->
+<section class="sc" data-d="5">
+  <h2 class="a">Une formation <span class="g">complète.</span></h2>
+  <div class="gr g2">
+    <div class="c a" style="--n:1"><div class="big g">100 h</div><div class="lb">de vidéos pratiques</div></div>
+    <div class="c a" style="--n:2"><div class="big g">70+</div><div class="lb">vidéos et astuces courtes</div></div>
+    <div class="c a" style="--n:3"><div class="big g">50+</div><div class="lb">exercices pratiques corrigés</div></div>
+    <div class="c a" style="--n:4"><div class="big g">3 mois</div><div class="lb">d’assistance du formateur</div></div>
   </div>
+</section>
 
-  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+<!-- 3. Pour qui -->
+<section class="sc" data-d="6">
+  <h2 class="a">À qui s’adressent<br><span class="g">ces formations ?</span></h2>
+  <p class="s a" style="--n:1">Aucun besoin d’être informaticien. Si vous travaillez avec des cartes, des terrains ou des données localisées, ces cours sont pour vous.</p>
+  <div class="gr g2">
+    <div class="c tx a" style="--n:2">Étudiants et jeunes diplômés</div>
+    <div class="c tx a" style="--n:3">Techniciens et ingénieurs</div>
+    <div class="c tx a" style="--n:4">Urbanistes et géomètres</div>
+    <div class="c tx a" style="--n:5">ONG, projets et collectivités</div>
+    <div class="c tx a" style="--n:6">Chercheurs et doctorants</div>
+    <div class="c tx a" style="--n:7">Reconversion et montée en compétences</div>
+  </div>
+</section>
+
+<!-- 4. Aperçu de l'espace apprenant -->
+<section class="sc" data-d="6">
+  <h2 class="a">Apprenez par la <span class="g">pratique.</span></h2>
+  <p class="s a" style="--n:1">Suivez les démonstrations selon votre disponibilité et revoyez les vidéos autant que nécessaire.</p>
+  <div class="c mk a" style="--n:2">
+    <i>Votre espace apprenant</i>
+    <div class="ls d"><u>✓</u>Créer un projet SIG bien organisé</div>
+    <div class="ls d"><u>✓</u>Importer vos tableaux Excel ou CSV et points GPS</div>
+    <div class="ls n"><u></u>Importer un plan DXF</div>
+    <div class="ls"><u></u>Convertir vos données au format SHP</div>
+  </div>
+  <div class="gr g2">
+    <div class="c tx a" style="--n:3">Vidéos pratiques</div>
+    <div class="c tx a" style="--n:4">Exercices corrigés</div>
+  </div>
+</section>
+
+<!-- 5. Résultats -->
+<section class="sc" data-d="8">
+  <h2 class="a">Ce que vous saurez<br><span class="g">faire à la fin.</span></h2>
+  <div class="c a" style="--n:1;padding:1cqw 0">
+    <div class="li"><span class="ck">✓</span><span class="tx">Construire une base de données SIG propre : points GPS, plans et fichiers Excel</span></div>
+    <div class="li"><span class="ck">✓</span><span class="tx">Numériser un ancien plan papier ou une parcelle</span></div>
+    <div class="li"><span class="ck">✓</span><span class="tx">Produire des courbes de niveau, des cartes de relief, de pente et de zones tampons</span></div>
+    <div class="li"><span class="ck">✓</span><span class="tx">Suivre la végétation, l’eau et l’extension des zones bâties sur des images satellites</span></div>
+    <div class="li"><span class="ck">✓</span><span class="tx">Collecter des données sur le terrain avec votre téléphone, puis les cartographier</span></div>
+    <div class="li"><span class="ck">✓</span><span class="tx">Publier une carte interactive consultable en ligne</span></div>
+  </div>
+</section>
+
+<!-- 6. Formations et prix -->
+<section class="sc" data-d="8">
+  <h2 class="a">Choisissez votre <span class="g">formation.</span></h2>
+  <div class="gr" style="gap:1.8cqw">
+    <div class="c row a" style="--n:1;border-color:#589632">QGIS · Module 1<b>15 000 FCFA</b></div>
+    <div class="c row a" style="--n:2;border-color:#589632">QGIS · Module 2<b>20 000 FCFA</b></div>
+    <div class="c row a" style="--n:3;border-color:#0079c1">ArcGIS · Module 1<b>15 000 FCFA</b></div>
+    <div class="c row a" style="--n:4;border-color:#0079c1">ArcGIS · Module 2<b>20 000 FCFA</b></div>
+    <div class="c row a" style="--n:5">Télédétection<b>25 000 FCFA</b></div>
+    <div class="c row a" style="--n:6">Webmapping<b>20 000 FCFA</b></div>
+    <div class="c row a" style="--n:7">Collecte mobile KoboToolbox<b>15 000 FCFA</b></div>
+    <div class="c row a" style="--n:8;border-color:#4285f4">Google Earth<b>10 000 FCFA</b></div>
+  </div>
+  <p class="nt a" style="--n:9">Chaque formation s’achète séparément. Assistance du formateur pendant 3 mois, attestation et garantie 7 jours inclus.</p>
+</section>
+
+<!-- 7. QGIS ou ArcGIS -->
+<section class="sc" data-d="7">
+  <h2 class="a"><span class="g">QGIS</span> ou <span class="g">ArcGIS ?</span></h2>
+  <p class="s a" style="--n:1">Les deux font le même métier. Apprendre l’un vous aidera à comprendre l’autre.</p>
+  <div class="gr g2">
+    <div class="c a" style="--n:2;border-top:1cqw solid #589632"><div class="tx">QGIS<em>Logiciel gratuit, idéal pour apprendre seul sans dépenser.</em></div></div>
+    <div class="c a" style="--n:3;border-top:1cqw solid #0079c1"><div class="tx">ArcGIS<em>Licence payante, souvent fournie par un employeur ou une école.</em></div></div>
+  </div>
+  <div class="c tx a" style="--n:4">Vous débutez et voulez un outil gratuit ? Commencez par QGIS Module 1.<em>Votre travail utilise ArcGIS ? Commencez par ArcGIS Module 1, puis passez au Module 2 pour analyser un territoire.</em></div>
+</section>
+
+<!-- 8. Packs -->
+<section class="sc" data-d="8">
+  <h2 class="a">Économisez avec<br><span class="g">nos packs.</span></h2>
+  <div class="gr">
+    <div class="c pk a" style="--n:1"><div class="tx">Pack QGIS<em>Modules 1 et 2, assistance de 3 mois</em><span class="sv">Vous économisez 5 000 FCFA</span></div><div style="text-align:right"><div class="old">30 000 FCFA</div><div class="pr">25 000</div></div></div>
+    <div class="c pk a" style="--n:2"><div class="tx">Pack ArcGIS<em>Modules 1 et 2 avec astuces, assistance de 3 mois</em><span class="sv">Vous économisez 5 000 FCFA</span></div><div style="text-align:right"><div class="old">30 000 FCFA</div><div class="pr">25 000</div></div></div>
+    <div class="c pk a" style="--n:3"><div class="tx">Pack Géomaticien opérationnel<em>QGIS et ArcGIS (modules 1 et 2), Télédétection, Webmapping, KoboToolbox, Google Earth</em><span class="sv">Vous économisez 40 000 FCFA</span></div><div style="text-align:right"><div class="old">140 000 FCFA</div><div class="pr">100 000</div></div></div>
+  </div>
+</section>
+
+<!-- 9. Accompagnement -->
+<section class="sc" data-d="8">
+  <h2 class="a">Vous n’êtes pas <span class="g">seul.</span></h2>
+  <div class="gr">
+    <div class="c li a" style="--n:1"><span class="ck">✓</span><span class="tx">Assistance pendant 3 mois<em>Une aide pour vos questions liées aux cours achetés, par WhatsApp avec le formateur. Réponse sous 48 h ouvrables.</em></span></div>
+    <div class="c li a" style="--n:2"><span class="ck">✓</span><span class="tx">Attestation de fin de formation<em>Un document professionnel pour valoriser votre CV.</em></span></div>
+    <div class="c li a" style="--n:3"><span class="ck">✓</span><span class="tx">Garantie 7 jours<em>Testez sans risque. Si la formation ne vous convient pas, contactez-nous dans les 7 jours suivant la réception de vos accès.</em></span></div>
+  </div>
+  <p class="nt a" style="--n:4">L’assistance porte sur les cours et exercices achetés. Un projet complet se fait sur devis.</p>
+</section>
+
+<!-- 10. Comment ça marche -->
+<section class="sc" data-d="8">
+  <h2 class="a">Comment ça <span class="g">marche ?</span></h2>
+  <div class="gr">
+    <div class="c li a" style="--n:1"><span class="ck">1</span><span class="tx">Choisissez votre cours<em>Comparez les modules et les packs, puis sélectionnez la formation qui vous intéresse.</em></span></div>
+    <div class="c li a" style="--n:2"><span class="ck">2</span><span class="tx">Payez en ligne, en toute sécurité<em>Réglez directement par Wave ou Orange Money.</em></span></div>
+    <div class="c li a" style="--n:3"><span class="ck">3</span><span class="tx">Accédez à vos vidéos<em>Dès réception de votre paiement, nous vous envoyons votre code d’accès personnel par WhatsApp.</em></span></div>
+  </div>
+  <p class="nt a" style="--n:4">À prévoir : un ordinateur pour refaire les manipulations (Windows 10 ou 11, 8 Go de RAM conseillés), une connexion internet et quelques heures par semaine.</p>
+</section>
+
+<!-- 11. Témoignages -->
+<section class="sc" data-d="10">
+  <h2 class="a">Ils ont suivi la<br><span class="g">formation.</span></h2>
+  <div class="gr" style="gap:2cqw">
+    <div class="c a" style="--n:1;border-left:1cqw solid var(--i)"><div class="st">★★★★★</div><div class="tx">« Le formateur est très disponible et patient avec nous les apprenants. »</div><div class="who"><strong>GUINDO Mamadou</strong>, Ingénieur des techniques des Eaux et Forêts</div></div>
+    <div class="c a" style="--n:2;border-left:1cqw solid var(--t)"><div class="st">★★★★★</div><div class="tx">« Les exercices sont en fonction des modules enseignés et on sent l’évolution. »</div><div class="who"><strong>ZANHAN Sossihey Herbert Melanie</strong>, Agent des eaux et forêts</div></div>
+    <div class="c a" style="--n:3;border-left:1cqw solid var(--m)"><div class="st">★★★★★</div><div class="tx">« Les cours sont top, le formateur une master class. Franchement 5/5 pour moi. »</div><div class="who"><strong>Eliam Sauveur</strong>, Technicien Urbaniste</div></div>
+    <div class="c a" style="--n:4;border-left:1cqw solid var(--i)"><div class="st">★★★★★</div><div class="tx">« La formation que je trouve excellente vu la disponibilité, la qualité et le professionnalisme »</div><div class="who"><strong>KAKOU Anoh</strong>, Environnementaliste</div></div>
+  </div>
+</section>
+
+<!-- 12. Appel à l'action -->
+<section class="sc" data-d="8">
+  <h2 class="a">Prêt à <span class="g">démarrer ?</span></h2>
+  <p class="s a" style="--n:1">Choisissez votre formation, payez par Wave ou Orange Money et recevez votre code d’accès par WhatsApp.</p>
+  <a class="bt bm a" style="--n:2" id="cta" href="https://geoexpertacademy.ci/formations-video-geoexpert.html?utm_source=social&amp;utm_medium=video_ad&amp;utm_campaign=formations_video#formations" target="_blank" rel="noopener">Voir les formations</a>
+  <a class="bt bw a" style="--n:3" id="wa" href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20d%C3%A9bute%20en%20SIG%2C%20quelle%20formation%20vid%C3%A9o%20me%20conseillez-vous%20%3F" target="_blank" rel="noopener">Demander conseil sur WhatsApp</a>
+  <p class="nt a" style="--n:4;text-align:center">Pas encore prêt ? Recevez notre kit de démarrage SIG gratuit sur geoexpertacademy.ci</p>
+</section>
+
+<button id="rp" type="button">↻ Revoir la pub</button>
+<div class="pg"><div id="pf"></div></div>
 </div>
 
 <script>
-(() => {
-  const scenes = [...document.querySelectorAll('.scene')];
-  const progress = document.getElementById('progressFill');
-  const replayOverlay = document.getElementById('replay-overlay');
-  const replayBtn = document.getElementById('replay-btn');
-  
-  const durations = scenes.map(s => Number(s.dataset.duration) * 1000);
-  const totalDuration = durations.reduce((a, b) => a + b, 0);
-  let current = 0, sceneStart = performance.now(), running = true, frameId;
-
-  function showScene(index) {
-    scenes.forEach((s, i) => s.classList.toggle('active', i === index));
-    sceneStart = performance.now();
+(()=>{
+const S=[...document.querySelectorAll('.sc')],D=S.map(s=>+s.dataset.d*1000),T=D.reduce((a,b)=>a+b,0),
+pf=document.getElementById('pf'),rp=document.getElementById('rp');
+let i=0,t0=0,run=false,raf;
+const show=n=>{S.forEach((s,k)=>s.classList.toggle('on',k===n));t0=performance.now()};
+function tick(now){
+  if(!run)return;
+  const e=now-t0,done=D.slice(0,i).reduce((a,b)=>a+b,0);
+  pf.style.width=(Math.min(done+Math.min(e,D[i]),T)/T*100)+'%';
+  if(e>=D[i]){
+    if(i<S.length-1){i++;show(i)}
+    else{run=false;pf.style.width='100%';rp.classList.add('show');return}
   }
-
-  function animate(now) {
-    if (!running) return;
-    const elapsed = now - sceneStart;
-    const duration = durations[current];
-
-    progress.style.width = ((current * durations[0] + durations.slice(1, current).reduce((a, b) => a + b, 0) + elapsed) / totalDuration * 100) + '%';
-
-    if (elapsed >= duration) {
-      if (current < scenes.length - 1) { 
-        current++; 
-        showScene(current); 
-      } else { 
-        running = false; 
-        progress.style.width = '100%'; 
-        replayOverlay.classList.add('show'); 
-        return; 
-      }
-    }
-    frameId = requestAnimationFrame(animate);
-  }
-
-  function start() {
-    replayOverlay.classList.remove('show'); 
-    cancelAnimationFrame(frameId); 
-    current = 0; 
-    running = true; 
-    progress.style.width = '0%';
-    showScene(0); 
-    frameId = requestAnimationFrame(animate);
-  }
-
-  replayBtn.addEventListener('click', start);
-  start(); 
+  raf=requestAnimationFrame(tick);
+}
+function start(){rp.classList.remove('show');cancelAnimationFrame(raf);i=0;run=true;pf.style.width='0%';show(0);raf=requestAnimationFrame(tick)}
+rp.addEventListener('click',start);
+['cta','wa'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{if(typeof gtag==='function')gtag('event','ad_cta_click',{cta:id})}));
+start();
 })();
 </script>
 </body>
