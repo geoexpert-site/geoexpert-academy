@@ -495,6 +495,28 @@
     .price-new{ font-size:32px; }
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -584,9 +606,139 @@
   </div>
 </section>
 
+<!-- ============ FORMATIONS VIDÉO À LA DEMANDE ============ -->
+<section class="tarifs-section alt" id="formations-video">
+  <div class="tarifs-container">
+    <h2>Formations vidéo <span class="text-accent">à la demande</span></h2>
+    <p class="section-lead">
+      Apprenez à votre rythme, avec 3 mois d'assistance du formateur sur WhatsApp.
+      Paiement en une seule fois, en ligne, sur notre plateforme sécurisée.
+    </p>
+
+    <h3 style="font-size:19px; font-weight:700; margin:0 0 16px; color:var(--ink);">Formations seules</h3>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">ArcGIS · Module 1</span>
+        <h3>Votre premier projet SIG avec ArcGIS</h3>
+        <p>Organiser un projet SIG, importer ses données et numériser un ancien plan avec ArcGIS.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">15 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">ArcGIS · Module 2</span>
+        <h3>Analyser un territoire avec ArcGIS</h3>
+        <p>Relief, pente, Clip, Intersect, Buffer et Near avec ArcGIS.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">20 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">QGIS · Module 1</span>
+        <h3>Votre premier projet SIG avec QGIS</h3>
+        <p>Créer une base de données et importer ses données avec QGIS, logiciel gratuit.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">15 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">QGIS · Module 2</span>
+        <h3>Analyser un territoire avec QGIS</h3>
+        <p>Relief, pente, Clip, Intersect, Buffer et proximité avec QGIS.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">20 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">Télédétection</span>
+        <h3>Lire la Terre vue du ciel</h3>
+        <p>Indices NDVI, NDWI, NDBI, classification et mise en page cartographique.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">25 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">Webmapping</span>
+        <h3>Publier votre carte interactive sur internet</h3>
+        <p>Créer et publier une application de webmapping avec ArcGIS Online.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">20 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">Collecte mobile</span>
+        <h3>Collecter des données de terrain avec votre téléphone</h3>
+        <p>Collecte mobile avec KoboToolbox et intégration dans un SIG.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">15 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <span class="price-note" style="text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">Outils complémentaires</span>
+        <h3>Gagner du temps avec Google Earth</h3>
+        <p>Utiliser Google Earth en complément d'un logiciel SIG.</p>
+        <div class="spec-card-footer">
+          <span class="spec-devis">10 000 FCFA</span>
+          <span class="price-note">Accès 12 mois</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px; font-weight:700; margin:40px 0 16px; color:var(--ink);">Packs</h3>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h3>Pack QGIS</h3>
+        <p>QGIS modules 1 et 2 : des bases de données à l'analyse spatiale.</p>
+        <div class="spec-card-footer" style="flex-wrap:wrap;">
+          <span class="price-old" style="width:100%; font-size:14px;">Au lieu de 30 000 FCFA</span>
+          <span class="spec-devis">25 000 FCFA</span>
+          <span class="price-note">Vous économisez 5 000 FCFA · Accès 24 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <h3>Pack ArcGIS</h3>
+        <p>ArcGIS modules 1 et 2 et astuces associées, de la gestion des données à l'analyse spatiale.</p>
+        <div class="spec-card-footer" style="flex-wrap:wrap;">
+          <span class="price-old" style="width:100%; font-size:14px;">Au lieu de 30 000 FCFA</span>
+          <span class="spec-devis">25 000 FCFA</span>
+          <span class="price-note">Vous économisez 5 000 FCFA · Accès 24 mois</span>
+        </div>
+      </div>
+      <div class="spec-card">
+        <h3>Pack Géomaticien opérationnel</h3>
+        <p>Tout le catalogue : QGIS et ArcGIS modules 1 et 2, Télédétection, Webmapping, KoboToolbox et Google Earth. Plus de 100 h de vidéos.</p>
+        <div class="spec-card-footer" style="flex-wrap:wrap;">
+          <span class="price-old" style="width:100%; font-size:14px;">Au lieu de 140 000 FCFA</span>
+          <span class="spec-devis">100 000 FCFA</span>
+          <span class="price-note">Vous économisez 40 000 FCFA · Accès 24 mois</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-note">
+      <strong>Bon à savoir</strong>
+      Accès aux vidéos pendant 12 mois pour une formation seule, et pendant 24 mois pour un pack.<br>
+      7 jours d'essai accompagné : remboursement intégral si la formation ne vous convient pas.<br>
+      Paiement sécurisé : Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire.
+    </div>
+
+    <div style="text-align:center; margin-top:28px;">
+      <a href="formations-video-geoexpert.html#formations" class="btn btn-primary">Voir les formations vidéo</a>
+    </div>
+  </div>
+</section>
+
 <!-- ============ FORMATION PRINCIPALE ============ -->
 <section class="tarifs-section">
   <div class="tarifs-container">
+    <p class="section-eyebrow">Formations en présentiel</p>
     <h2>Notre <span class="text-accent">formation principale</span></h2>
     <p class="section-lead">
       Le programme phare de GeoExpert Academy pour devenir opérationnel en géomatique.

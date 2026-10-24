@@ -247,6 +247,28 @@
     .faq-category h2{ font-size:20px; }
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -361,6 +383,50 @@
 <!-- ============ FAQ ============ -->
 <section class="faq-section">
   <div class="faq-container">
+
+    <!-- FORMATIONS VIDÉO À LA DEMANDE -->
+    <div style="margin-bottom:50px;">
+    <div class="faq-category">
+      <h2>Formations vidéo à la demande</h2>
+      <div class="faq-list">
+        <details class="faq-item-faq">
+          <summary>Comment payer une formation vidéo ?</summary>
+          <p>Vous pouvez payer directement par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire en cliquant sur le bouton de la formation souhaitée, sur la page des <a href="formations-video-geoexpert.html#formations">formations vidéo</a>.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Comment recevoir mon code d'accès ?</summary>
+          <p>Après le paiement, vous êtes redirigé vers votre espace apprenant. Cliquez sur « Demander mon code d'accès » pour recevoir votre code personnel par WhatsApp.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Combien de temps ai-je accès aux vidéos ?</summary>
+          <p>Vous avez accès aux vidéos pendant 12 mois pour une formation seule, et pendant 24 mois pour un pack, à compter de la réception de votre code d'accès.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Comment fonctionne la garantie de 7 jours ?</summary>
+          <p>Garantie 7 jours, avec accompagnement : pendant les 7 premiers jours, vous accédez à l'introduction et aux 2 premières leçons de votre formation, et le formateur vous suit sur WhatsApp pour s'assurer que vous comprenez. Si, après ces leçons, la formation ne vous convient pas, demandez le remboursement par WhatsApp dans ce délai : il est intégral. Sinon, toutes les autres leçons se débloquent à partir du 8e jour.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Pourquoi toutes les leçons ne sont-elles pas disponibles tout de suite ?</summary>
+          <p>Les 7 premiers jours sont une période d'essai accompagnée : vous suivez l'introduction et les 2 premières leçons avec l'aide du formateur, et vous pouvez être remboursé intégralement si la formation ne vous convient pas. À partir du 8e jour, toutes les leçons sont débloquées.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Puis-je suivre les cours sur mon téléphone ?</summary>
+          <p>Vous pouvez regarder les vidéos sur un téléphone, mais pour pratiquer avec les logiciels, il vous faut un ordinateur.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>L'assistance du formateur est-elle incluse ?</summary>
+          <p>Oui, 3 mois d'assistance du formateur sur WhatsApp sont inclus, avec une réponse sous 48 heures ouvrables, pour les questions liées aux cours et aux exercices achetés.</p>
+        </details>
+        <details class="faq-item-faq">
+          <summary>Comment obtenir l'attestation de fin de formation ?</summary>
+          <p>L'attestation de fin de formation vous est délivrée lorsque vous avez terminé toutes les leçons de la formation et que le formateur a validé votre exercice final, envoyé par WhatsApp. Elle vous est envoyée au format PDF, avec un code unique vérifiable sur notre site, dans la section « Vérifier un certificat ». Pour un pack, vous recevez une attestation pour chaque formation terminée.</p>
+        </details>
+      </div>
+    </div>
+    </div>
+
+    <p class="section-eyebrow" style="margin-bottom:24px;">Formations en présentiel</p>
+    <div>
 
     <!-- CATÉGORIE 1 : Formations -->
     <div class="faq-category">
@@ -535,6 +601,7 @@
       </div>
     </div>
 
+    </div>
   </div>
 </section>
 

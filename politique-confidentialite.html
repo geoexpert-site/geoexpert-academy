@@ -56,6 +56,28 @@
     font-size:14px;
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -209,10 +231,15 @@
         <strong>Microsoft Clarity</strong> : comportement de navigation anonymisé
         (défilement, clics), utilisé uniquement pour améliorer l'ergonomie du site.
       </li>
+      <li>
+        <strong>Pixel Meta (Facebook)</strong> : pages visitées et actions sur le site
+        (clic sur WhatsApp, inscription, commande), associées le cas échéant à votre
+        compte Facebook ou Instagram.
+      </li>
     </ul>
     <p>
-      Ces données sont <strong>anonymisées</strong> et ne permettent pas de vous identifier
-      personnellement.
+      Les données de Google Analytics et de Microsoft Clarity sont <strong>anonymisées</strong>
+      et ne permettent pas de vous identifier personnellement.
     </p>
 
     <h2>3. Pourquoi nous utilisons vos données</h2>
@@ -251,7 +278,10 @@
       désactiver les cookies dans les paramètres de votre navigateur à tout moment.
     </p>
     <p>
-      Aucun cookie publicitaire ou de traçage inter-sites n'est utilisé sur notre site.
+      Notre site utilise également le <strong>pixel Meta</strong> (Facebook) pour mesurer
+      l'efficacité de nos publicités et vous proposer des publicités adaptées sur Facebook
+      et Instagram. Vous pouvez gérer vos préférences publicitaires à tout moment dans les
+      paramètres de votre compte Facebook (rubrique « Préférences publicitaires »).
     </p>
 
     <h2>7. Vos droits</h2>
@@ -286,7 +316,7 @@
     </p>
 
     <div class="legal-update">
-      <strong>Dernière mise à jour :</strong> 6 octobre 2026
+      <strong>Dernière mise à jour :</strong> 24 octobre 2026
     </div>
 
   </div>

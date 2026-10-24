@@ -84,6 +84,28 @@
   gtag('js', new Date());
   gtag('config', 'G-8G929FPVZ8');
 </script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -415,7 +437,7 @@
         <span class="formation-tag" style="background: var(--magenta); color: #fff;">Nouveau · 100% en ligne</span>
         <h3>Formations vidéo à la demande</h3>
         <p class="formation-desc">
-          Apprenez QGIS, ArcGIS et la télédétection à votre rythme. Accédez à plus de 100h de vidéos et bénéficiez d'un <strong>espace membre privé</strong> avec suivi de progression et assistance par WhatsApp.
+          Apprenez QGIS, ArcGIS et la télédétection à votre rythme. Accédez à plus de 100 h de vidéos au catalogue et bénéficiez d'un <strong>espace membre privé</strong> avec suivi de progression et assistance par WhatsApp.
         </p>
         
         <!-- Liste à puces valorisant l'espace apprenant -->
@@ -435,7 +457,7 @@
         
         <div class="formation-price">
           <span class="price-amount">À partir de 10 000 FCFA</span>
-          <span class="price-detail">Paiement sécurisé par Wave ou Orange Money</span>
+          <span class="price-detail">Paiement sécurisé : Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire</span>
         </div>
         
         <a href="formations-video-geoexpert.html" class="btn btn-primary btn-block" style="background: var(--magenta); border: 0; margin-top: 10px;">Découvrir l'espace apprenant</a>
@@ -443,7 +465,7 @@
 
       <!-- FORMATION CONFIRMÉE -->
       <article class="formation-card featured">
-        <span class="formation-tag">Session confirmée · Octobre 2026</span>
+        <span class="formation-tag">Prochaine session : novembre 2026 · Inscriptions ouvertes</span>
         <h3>Devenez Géomaticien Opérationnel</h3>
         <p class="formation-desc">
         40 heures pour apprendre les Systèmes d’Information Géographique, l’analyse spatiale, 
@@ -505,7 +527,7 @@
 <!-- ============ PROGRAMME DÉTAILLÉ ============ -->
 <section class="programme" id="programme">
   <div class="container">
-    <p class="section-eyebrow">Session Octobre 2026</p>
+    <p class="section-eyebrow">Session novembre 2026</p>
     <h2>Devenez Géomaticien Opérationnel</h2>
     <p class="section-lead">Aucun prérequis - débutants acceptés. Formation en ligne et présentielle, ouverte à tous les secteurs d'activité.</p>
 
@@ -974,7 +996,7 @@
       </p>
 
       <div class="payment-block">
-        <h4>Moyens de paiement</h4>
+        <h4>Paiement des formations en présentiel</h4>
         <div class="payment-methods-grid">
           <div class="payment-method-card">
             <div class="payment-method-head">
@@ -1037,7 +1059,7 @@
         Formation souhaitée
         <select id="fFormation" name="formation" required>
           <option value="">— Choisir une formation —</option>
-          <option value="Devenez Géomaticien Opérationnel (Octobre 2026)">Devenez Géomaticien Opérationnel (Octobre 2026)</option>
+          <option value="Devenez Géomaticien Opérationnel (Novembre 2026)">Devenez Géomaticien Opérationnel (Novembre 2026)</option>
           <option value="Initiation à AutoCAD">Initiation à AutoCAD</option>
           <option value="Analyse d'Images Satellitaires & Télédétection">Analyse d'Images Satellitaires & Télédétection</option>
           <option value="Collecte Mobile de Données & SIG">Collecte Mobile de Données & SIG</option>

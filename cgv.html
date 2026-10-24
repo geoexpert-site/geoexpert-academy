@@ -95,6 +95,28 @@
     color:var(--ink-dim);
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -215,6 +237,7 @@
     </p>
     <ul>
       <li>Des <strong>formations professionnelles</strong> en géomatique, SIG, cartographie et télédétection</li>
+      <li>Des <strong>formations vidéo à la demande</strong> (voir article 12)</li>
       <li>Des <strong>prestations de consulting</strong> et d'accompagnement de projets</li>
       <li>Des <strong>prestations de production cartographique</strong></li>
       <li>Des <strong>services d'accompagnement personnalisé</strong></li>
@@ -400,7 +423,9 @@
     <p>
       Les informations personnelles transmises lors de l'inscription sont traitées
       conformément à notre <a href="politique-confidentialite.html">politique de
-      confidentialité</a>. Elles ne sont jamais vendues ni transmises à des tiers.
+      confidentialité</a>. Elles ne sont jamais vendues. Elles sont transmises uniquement aux prestataires
+      nécessaires au service (paiement, mesure d'audience et publicité), comme décrit dans
+      notre politique de confidentialité.
     </p>
 
     <h2>Article 11 - Droit applicable et litiges</h2>
@@ -411,7 +436,77 @@
       des tribunaux d'Abidjan, Côte d'Ivoire.
     </p>
 
-    <h2>Article 12 - Contact</h2>
+    <h2>Article 12 - Formations vidéo à la demande</h2>
+    <h3>12.1 Champ d'application</h3>
+    <p>
+      Les articles 2 à 6 s'appliquent aux formations en présentiel et en direct. Les
+      formations vidéo à la demande sont régies par le présent article.
+    </p>
+
+    <h3>12.2 Objet</h3>
+    <p>
+      Les formations vidéo donnent un <strong>accès en ligne</strong>, via un espace
+      apprenant, à des vidéos de formation, des exercices et des jeux de données.
+    </p>
+
+    <h3>12.3 Prix</h3>
+    <p>
+      Les prix sont indiqués en <strong>francs CFA (FCFA)</strong> sur la page
+      <a href="formations-video-geoexpert.html">Formations vidéo</a>.
+    </p>
+
+    <h3>12.4 Paiement</h3>
+    <p>
+      Le paiement s'effectue <strong>en une seule fois, en ligne</strong>, sur la plateforme
+      sécurisée DigitalPaye, par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire.
+    </p>
+
+    <h3>12.5 Remise du code d'accès</h3>
+    <p>
+      Après le paiement, l'apprenant est redirigé vers son espace apprenant et demande son
+      <strong>code d'accès personnel</strong>, qui lui est envoyé par WhatsApp.
+    </p>
+
+    <h3>12.6 Durée d'accès</h3>
+    <p>
+      L'accès aux vidéos est de <strong>12 mois pour une formation seule</strong> et de
+      <strong>24 mois pour un pack</strong>, à compter de la réception du code d'accès.
+    </p>
+
+    <h3>12.7 Période d'essai accompagnée et remboursement</h3>
+    <p>
+      Pendant les <strong>7 premiers jours</strong> suivant la réception du code d'accès,
+      l'apprenant accède à l'introduction et aux 2 premières leçons de sa formation, et le
+      formateur le suit sur WhatsApp pour s'assurer qu'il comprend les cours. Si, après ces
+      leçons, la formation ne lui convient pas, l'apprenant demande le remboursement par
+      WhatsApp dans ce délai de 7 jours : il est <strong>intégralement remboursé</strong>.
+      Sinon, toutes les autres leçons se débloquent à partir du 8e jour.
+    </p>
+
+    <h3>12.8 Assistance du formateur</h3>
+    <p>
+      L'apprenant bénéficie de <strong>3 mois d'assistance</strong> du formateur sur
+      WhatsApp, avec une réponse sous 48 heures ouvrables, pour les questions liées aux
+      cours et aux exercices achetés.
+    </p>
+
+    <h3>12.9 Attestation</h3>
+    <p>
+      L'attestation de fin de formation est délivrée lorsque l'apprenant a terminé toutes
+      les leçons de la formation et que le formateur a validé son exercice final, envoyé
+      par WhatsApp. Elle est envoyée au format PDF, avec un code unique vérifiable sur le
+      site. Pour un pack, une attestation est délivrée pour chaque formation terminée.
+    </p>
+
+    <h3>12.10 Usage strictement personnel</h3>
+    <p>
+      Le code d'accès et les vidéos sont <strong>strictement personnels</strong>. Il est
+      interdit de partager le code, de télécharger, d'enregistrer, de copier ou de diffuser
+      les vidéos. En cas de non-respect, GeoExpert Academy & Consulting peut
+      <strong>suspendre l'accès</strong>, sans remboursement.
+    </p>
+
+    <h2>Article 13 - Contact</h2>
     <p>
       Pour toute question relative aux présentes CGV :
     </p>
@@ -421,7 +516,7 @@
     </p>
 
     <div class="cgv-update">
-      <strong>Dernière mise à jour :</strong> 9 octobre 2026
+      <strong>Dernière mise à jour :</strong> 24 octobre 2026
     </div>
 
   </div>

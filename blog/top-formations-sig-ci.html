@@ -47,6 +47,28 @@
   .article-cta h3{ margin-top:0; margin-bottom:12px; font-size:20px; }
   .article-cta p{ margin-bottom:20px; font-size:15px; }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -293,7 +315,7 @@
   <div class="container job-banner-inner">
     <div class="job-banner-text">
       <h3>Réservez votre place maintenant</h3>
-      <p>Places limitées pour la session d'octobre 2026.</p>
+      <p>Places limitées pour la session de novembre 2026.</p>
     </div>
     <a href="../index.html#inscription" class="btn btn-primary">S'inscrire</a>
   </div>

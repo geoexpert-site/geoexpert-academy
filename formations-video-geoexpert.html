@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://geoexpertacademy.ci/formations-video-geoexpert.html">
 <meta property="og:title" content="Formations vidéo SIG : QGIS, ArcGIS, télédétection | GeoExpert Academy">
-<meta property="og:description" content="Apprenez le SIG à votre rythme, avec 3 mois d'assistance du formateur. Formations dès 5 000 FCFA.">
+<meta property="og:description" content="Apprenez le SIG à votre rythme, avec 3 mois d'assistance du formateur. Formations dès 10 000 FCFA.">
 <meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": 1, "item": {"@type": "Course", "name": "Votre premier projet SIG avec ArcGIS", "description": "Organiser un projet SIG, importer ses données et numériser un ancien plan avec ArcGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "15000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 2, "item": {"@type": "Course", "name": "Analyser un territoire avec ArcGIS", "description": "Relief, pente, Clip, Intersect, Buffer et Near avec ArcGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "20000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 3, "item": {"@type": "Course", "name": "Votre premier projet SIG avec QGIS", "description": "Créer une base de données et importer ses données avec QGIS, logiciel gratuit.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "15000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 4, "item": {"@type": "Course", "name": "Analyser un territoire avec QGIS", "description": "Relief, pente, Clip, Intersect, Buffer et proximité avec QGIS.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "20000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 5, "item": {"@type": "Course", "name": "Lire la Terre vue du ciel : télédétection", "description": "Indices NDVI, NDWI, NDBI, classification et mise en page cartographique.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "25000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 6, "item": {"@type": "Course", "name": "Publier votre carte interactive sur internet", "description": "Créer et publier une application de webmapping avec ArcGIS Online.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "20000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 7, "item": {"@type": "Course", "name": "Collecter des données de terrain avec KoboToolbox", "description": "Collecte mobile avec KoboToolbox et intégration dans un SIG.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "15000", "priceCurrency": "XOF", "category": "Paid"}}}, {"@type": "ListItem", "position": 8, "item": {"@type": "Course", "name": "Gagner du temps avec Google Earth", "description": "Utiliser Google Earth en complément d'un logiciel SIG.", "provider": {"@type": "Organization", "name": "GeoExpert Academy & Consulting", "sameAs": "https://geoexpertacademy.ci"}, "inLanguage": "fr", "offers": {"@type": "Offer", "price": "10000", "priceCurrency": "XOF", "category": "Paid"}}}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -202,8 +202,47 @@
 .blink-text {
   animation: blink 1.5s infinite;
 }
+
+/* --- Barre d'action fixe sur mobile --- */
+.mobile-cta { display: none; }
+@media (max-width: 767px) {
+  .mobile-cta {
+    display: flex; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.97); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgba(15,10,31,.12);
+    transform: translateY(110%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s;
+  }
+  .mobile-cta.show { transform: translateY(0); visibility: visible; transition: transform .25s ease; }
+  .mobile-cta a { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 46px; border-radius: 10px; color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
+  .mobile-cta .mc-formations { background: #A83C93; }
+  .mobile-cta .mc-whatsapp { background: #1FA855; }
+  body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+}
 </style>
 
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'Formations vidéo', content_category: 'Formation en ligne' });
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -291,13 +330,14 @@
       <div class="benefit"><span class="check">✓</span><div><strong>Vidéos pratiques</strong><small>Suivez les démonstrations selon votre disponibilité.</small></div></div>
       <div class="benefit"><span class="check">✓</span><div><strong>Assistance pendant 3 mois</strong><small>Une aide pour vos questions liées aux cours achetés.</small></div></div>
       <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-      <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+      <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
     </aside>
   </div>
 </section>
 
 <!-- CHIFFRES -->
 <section class="stats-band" aria-label="Chiffres clés">
+  <p class="section-eyebrow" style="display:flex; justify-content:center; margin:0 0 14px;">Au total dans notre catalogue</p>
   <div class="stats-grid">
     <div><strong>100 h</strong><span>de vidéos pratiques</span></div>
     <div><strong>70+</strong><span>vidéos et astuces courtes</span></div>
@@ -394,10 +434,10 @@
         <span class="course-tag">ArcGIS · Module 1</span>
         <h3>Votre premier projet SIG avec ArcGIS</h3>
         <p>Rangez vos points GPS, vos plans et vos données de terrain dans un projet propre, même sans aucune expérience.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Créer un projet SIG bien organisé dès le départ</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP, le format SIG le plus courant</li><li>Transformer un vieux plan papier en carte numérique (vectorisation)</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces ArcMap</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/l0sNNklrbHcH" data-product="ArcGIS — Module 1 : bases et gestion des données" data-price="15 000 FCFA">Je m'inscris</button>
       </article>
@@ -405,10 +445,10 @@
         <span class="course-tag">ArcGIS · Module 2</span>
         <h3>Analyser un territoire avec ArcGIS</h3>
         <p>Répondez à des questions concrètes avec une carte : quelles zones sont proches d'une route, quelle est la pente d'un terrain.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (outil Clip)</li><li>Croiser des couches et mesurer des distances (Intersect, Buffer, Near)</li><li>Télécharger gratuitement des données spatiales (Raster et données vectorielles)</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/qKk96zGepbQ0" data-product="ArcGIS — Module 2 : analyse spatiale avancée" data-price="20 000 FCFA">Je m'inscris</button>
       </article>
@@ -416,10 +456,10 @@
         <span class="course-tag">QGIS · Module 1</span>
         <h3>Votre premier projet SIG avec QGIS, 100 % gratuit</h3>
         <p>Le logiciel libre pour démarrer : organisez vos données et transformez un vieux plan en carte numérique.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Créer une base de données GeoPackage et vos couches</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP ou GeoPackage</li><li>Transformer un ancien plan en base de données parcellaire</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces QGIS</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/EVli5Yhhk9QD" data-product="QGIS — Module 1 : données et bases de données" data-price="15 000 FCFA">Je m'inscris</button>
       </article>
@@ -427,10 +467,10 @@
         <span class="course-tag">QGIS · Module 2</span>
         <h3>Analyser un territoire avec QGIS</h3>
         <p>Découpez, croisez et mesurez vos données pour produire des résultats utiles à un vrai projet.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (Clip, extraction par masque)</li><li>Croiser des couches et créer des zones tampons (Intersect, Buffer)</li><li>Mesurer des distances entre objets (proximité)</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/cK0Q6QrMdEBB" data-product="QGIS — Module 2 : analyse spatiale" data-price="20 000 FCFA">Je m'inscris</button>
       </article>
@@ -438,10 +478,10 @@
         <span class="course-tag">Télédétection</span>
         <h3>Lire la Terre vue du ciel</h3>
         <p>Repérez la végétation, l'eau et les zones construites sur des images satellites, puis présentez vos cartes.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant en télédétection</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant en télédétection</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Afficher et interpréter une image satellite (compositions colorées)</li><li>Suivre l'état de la végétation avec l'indice NDVI</li><li>Repérer l'eau et les zones bâties (NDWI, MNDWI, NDBI)</li><li>Suivre l'évolution des feux de brousse</li><li>Classer une image automatiquement, occupation du sol et réaliser une carte professionnelle</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/amqThnoWczd8" data-product="Télédétection — module vidéo complet" data-price="25 000 FCFA">Je m'inscris</button>
       </article>
@@ -449,10 +489,10 @@
         <span class="course-tag">Webmapping</span>
         <h3>Publier votre carte interactive sur internet</h3>
         <p>Créez une carte en ligne consultable sur téléphone, tablette ou site web.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Préparer, nettoyer, organiser les données</li><li>Créer une application cartographique avec ArcGIS Online</li><li>La rendre utilisable sur smartphone et tablette</li><li>La publier sur votre site web</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/DBeEmN5qdD0F" data-product="Webmapping — création et déploiement d&#x27;application" data-price="20 000 FCFA">Je m'inscris</button>
       </article>
@@ -460,10 +500,10 @@
         <span class="course-tag">Collecte mobile</span>
         <h3>Collecter des données de terrain avec votre téléphone</h3>
         <p>Remplacez les fiches papier par un questionnaire sur smartphone, puis transformez les réponses en carte.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Créer votre compte et configurer KoboToolbox</li><li>Mettre en place un formulaire d'enquête</li><li>Collecter des données sur le terrain avec votre mobile</li><li>Importer les réponses dans un SIG et les cartographier pour un rapport</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/t1orZESwHB7C" data-product="KoboToolbox — collecte mobile et intégration SIG" data-price="15 000 FCFA">Je m'inscris</button>
       </article>
@@ -471,10 +511,10 @@
         <span class="course-tag">Outils complémentaires</span>
         <h3>Gagner du temps avec Google Earth</h3>
         <p>Utilisez Google Earth en complément de votre logiciel SIG pour préparer et vérifier vos cartes.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span></div>
+        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
         <ul><li>Comprendre les fonctionnalités de Google Earth</li><li>Utiliser Google Earth à côté de votre logiciel SIG</li><li>Créer des polygones, des points et des lignes</li><li>Numériser des cultures, forêts, bâtiments, réseaux routiers, des lieux sur Google Earth</li><li>Suivre l'évolution d'un phénomène entre deux dates</li><li>Importer un fichier KML (vos tracés Google Earth) dans ArcGIS</li></ul>
         <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>Testez sans risque. Remboursé si vous n'êtes pas satisfait.</small></div></div>
+        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
         <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/xiscuujN3y8w" data-product="Google Earth et outils complémentaires aux SIG" data-price="10 000 FCFA">Je m'inscris</button>
       </article>
@@ -516,7 +556,7 @@
         <span class="course-tag">2 modules + astuces</span>
         <h3>Pack QGIS</h3>
         <p>Des bases de données à l'analyse spatiale, pour développer votre autonomie sur QGIS.</p>
-        <ul><li>QGIS module 1</li><li>QGIS module 2</li><li>Assistance du formateur pendant 3 mois</li></ul>
+        <ul><li>QGIS module 1</li><li>QGIS module 2</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul>
         <div class="price-old">Au lieu de 30 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-primary order-btn" data-link="https://checkout.digitalpaye.com/pay/iuiqjHbR5b7a" data-product="Pack QGIS — modules 1 et 2" data-price="25 000 FCFA">Choisir le pack QGIS</button>
@@ -525,7 +565,7 @@
         <span class="course-tag">2 modules + astuces</span>
         <h3>Pack ArcGIS</h3>
         <p>Un parcours sur ArcMap, de la gestion des données aux outils d'analyse spatiale.</p>
-        <ul><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li><li>Assistance du formateur pendant 3 mois</li></ul>
+        <ul><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul>
         <div class="price-old">Au lieu de 30 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
         <!-- ⚠️ ATTENTION : LIEN DUPLIQUÉ ICI ! C'est le même que le Pack QGIS. Il faut le remplacer. DEJA FAIT -->
@@ -535,7 +575,7 @@
         <span class="course-tag">Parcours complet</span>
         <h3>Pack Géomaticien opérationnel</h3>
         <p>Une sélection de formations complémentaires pour développer vos compétences en géomatique.</p>
-        <ul><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li></ul>
+        <ul><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li><li>Plus de 100 h de vidéos</li><li>Accès aux vidéos pendant 24 mois</li></ul>
         <div class="price-old">Au lieu de 140 000 FCFA</div><span class="save-tag">Vous économisez 40 000 FCFA</span>
         <div class="price-row"><span class="price">100 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/Al3BVi8KpMq9" data-product="Pack Géomaticien opérationnel - toutes les formations listées" data-price="100 000 FCFA">Choisir le pack complet</button>
@@ -569,7 +609,7 @@
       <div class="guarantee-badge"><span>7<small>jours</small></span></div>
       <div>
         <h3>Testez sans risque</h3>
-        <p>Si la formation ne vous convient pas, contactez-nous dans les 7 jours suivant la réception de vos accès. Les conditions détaillées de remboursement vous sont confirmées lors de la commande.</p>
+        <p>Garantie 7 jours, avec accompagnement : pendant les 7 premiers jours, vous accédez à l'introduction et aux 2 premières leçons de votre formation, et le formateur vous suit sur WhatsApp pour s'assurer que vous comprenez. Si, après ces leçons, la formation ne vous convient pas, demandez le remboursement par WhatsApp dans ce délai : il est intégral. Sinon, toutes les autres leçons se débloquent à partir du 8e jour.</p>
       </div>
     </div>
   </div>
@@ -616,8 +656,8 @@
     </div>
     <div class="steps">
       <div class="step"><span class="step-num">ÉTAPE 01</span><h3>Choisissez votre cours</h3><p>Comparez les modules et les packs, puis sélectionnez la formation qui vous intéresse.</p></div>
-      <div class="step"><span class="step-num">ÉTAPE 02</span><h3>Paiement sécurisé</h3><p>Cliquez sur le bouton et réglez directement en ligne par Wave ou Orange Money sur notre plateforme sécurisée.</p></div>
-      <div class="step"><span class="step-num">ÉTAPE 03</span><h3>Accédez à vos vidéos</h3><p>Dès réception de votre paiement, nous vous envoyons votre code d'accès personnel par WhatsApp pour démarrer.</p></div>
+      <div class="step"><span class="step-num">ÉTAPE 02</span><h3>Paiement sécurisé</h3><p>Cliquez sur le bouton et réglez directement en ligne par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire sur notre plateforme sécurisée.</p></div>
+      <div class="step"><span class="step-num">ÉTAPE 03</span><h3>Accédez à vos vidéos</h3><p>Après le paiement, vous arrivez sur votre espace apprenant. Cliquez sur « Demander mon code d'accès » : votre code personnel vous est envoyé par WhatsApp.<br><strong>7 jours d'essai accompagné, puis accès à toutes les leçons.</strong></p></div>
     </div>
   </div>
 </section>
@@ -626,6 +666,7 @@
 <section style="padding: 70px 0; background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
   <div class="container">
     <div class="section-head">
+      <p class="section-eyebrow" style="justify-content: center;">Plus de 200 apprenants formés en présentiel</p>
       <h2>Ils ont suivi la formation et témoignent</h2>
       <p>Découvrez les retours de professionnels qui ont déjà utilisé nos méthodes et nos vidéos.</p>
     </div>
@@ -713,17 +754,18 @@
       <h2>Questions fréquentes</h2>
     </div>
     <div class="faq-wrap">
-      <details><summary>Dois-je suivre les vidéos à une heure précise ?</summary><p>Non. Le principe de la formation vidéo est de vous permettre d'apprendre selon votre disponibilité. Les modalités d'accès vous seront précisées lors de la commande.</p></details>
+      <details><summary>Dois-je suivre les vidéos à une heure précise ?</summary><p>Non. Le principe de la formation vidéo est de vous permettre d'apprendre selon votre disponibilité. Vous avez accès aux vidéos pendant 12 mois pour une formation seule, et 24 mois pour un pack.</p></details>
       <details><summary>L'assistance du formateur est-elle incluse ?</summary><p>Oui, trois mois d'assistance sont inclus pour les questions et blocages liés au contenu de la formation achetée et à ses exercices.</p></details>
       <details><summary>L'assistance permet-elle de faire réaliser mon projet professionnel ?</summary><p>Elle aide à comprendre les cours et à résoudre les difficultés rencontrées pendant les exercices. La réalisation complète d'un projet personnel ou professionnel peut faire l'objet d'un devis séparé.</p></details>
-      <details><summary>Comment payer et recevoir les vidéos ?</summary><p>Vous pouvez payer directement par Wave ou Orange Money en cliquant sur le bouton de la formation souhaitée. Dès réception du paiement, nous vous envoyons votre code d'accès personnel par WhatsApp.</p></details>
+      <details><summary>Comment payer et recevoir les vidéos ?</summary><p>Vous pouvez payer directement par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire en cliquant sur le bouton de la formation souhaitée. Après le paiement, vous êtes redirigé vers votre espace apprenant. Cliquez sur « Demander mon code d'accès » pour recevoir votre code personnel par WhatsApp.</p></details>
       <details><summary>Je suis totalement débutant, puis-je suivre ?</summary><p>Oui. Les Modules 1 de QGIS et d'ArcGIS, KoboToolbox et Google Earth ne demandent aucun prérequis. Les Modules 2 sont à suivre après le Module 1.</p></details>
       <details><summary>Puis-je acheter un seul module ?</summary><p>Oui. Chaque formation s'achète séparément. Les packs sont plus avantageux si vous voulez plusieurs modules.</p></details>
       <details><summary>De quel ordinateur et de quels logiciels ai-je besoin ?</summary><p>Un ordinateur est nécessaire pour refaire les manipulations. QGIS est gratuit, ArcGIS demande une licence. Voir la section « Ce dont vous avez besoin » plus haut sur cette page.</p></details>
       <details><summary>Puis-je suivre les cours sur mon téléphone ?</summary><p>Vous pouvez regarder les vidéos sur un téléphone, mais pour pratiquer avec les logiciels, il vous faut un ordinateur.</p></details>
-      <details><summary>Combien de temps ai-je accès aux vidéos ?</summary><p>La durée d'accès et les modalités de remise des vidéos sont confirmées lors de la commande.</p></details>
-      <details><summary>Comment fonctionne la garantie de 7 jours ?</summary><p>Si la formation ne vous convient pas, contactez-nous dans les 7 jours suivant la réception de vos accès. Les conditions détaillées vous sont confirmées lors de la commande.</p></details>
-      <details><summary>Comment obtenir l'attestation de fin de formation ?</summary><p>L'attestation est délivrée à la fin de la formation. Les conditions pour l'obtenir vous sont précisées lors de la commande.</p></details>
+      <details><summary>Combien de temps ai-je accès aux vidéos ?</summary><p>Vous avez accès aux vidéos pendant 12 mois pour une formation seule, et pendant 24 mois pour un pack, à compter de la réception de votre code d'accès.</p></details>
+      <details><summary>Comment fonctionne la garantie de 7 jours ?</summary><p>Garantie 7 jours, avec accompagnement : pendant les 7 premiers jours, vous accédez à l'introduction et aux 2 premières leçons de votre formation, et le formateur vous suit sur WhatsApp pour s'assurer que vous comprenez. Si, après ces leçons, la formation ne vous convient pas, demandez le remboursement par WhatsApp dans ce délai : il est intégral. Sinon, toutes les autres leçons se débloquent à partir du 8e jour.</p></details>
+      <details><summary>Pourquoi toutes les leçons ne sont-elles pas disponibles tout de suite ?</summary><p>Les 7 premiers jours sont une période d'essai accompagnée : vous suivez l'introduction et les 2 premières leçons avec l'aide du formateur, et vous pouvez être remboursé intégralement si la formation ne vous convient pas. À partir du 8e jour, toutes les leçons sont débloquées.</p></details>
+      <details><summary>Comment obtenir l'attestation de fin de formation ?</summary><p>L'attestation de fin de formation vous est délivrée lorsque vous avez terminé toutes les leçons de la formation et que le formateur a validé votre exercice final, envoyé par WhatsApp. Elle vous est envoyée au format PDF, avec un code unique vérifiable sur notre site, dans la section « Vérifier un certificat ». Pour un pack, vous recevez une attestation pour chaque formation terminée.</p></details>
       <details><summary>Quelle différence avec la formation en présentiel ?</summary><p>La formation en présentiel se déroule en salle avec le formateur. Les formations vidéo se suivent à votre rythme, avec 3 mois d'assistance. Consultez nos <a href="tarifs.html" style="color:var(--teal);">tarifs</a> pour comparer.</p></details>
     </div>
   </div>
@@ -787,6 +829,12 @@
   </div>
 </footer>
 
+<!-- BARRE D'ACTION FIXE (MOBILE) -->
+<div class="mobile-cta" id="mobileCta">
+  <a href="#formations" class="mc-formations">Voir les formations</a>
+  <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j%27aimerais%20un%20conseil%20pour%20choisir%20ma%20formation%20vid%C3%A9o." class="mc-whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+</div>
+
 <!-- Assistant GeoExpert (Tidio) -->
 <script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
 
@@ -810,15 +858,24 @@
         const nomFormation = this.getAttribute('data-product') || '';
         const prixFormation = this.getAttribute('data-price');
         
+        const valeur = parseInt((prixFormation || '').replace(/\D/g, ''), 10) || 0;
+
         // Tracking Google Analytics (Optionnel)
         if (typeof gtag === 'function') {
-          const valeur = parseInt((prixFormation || '').replace(/\D/g, ''), 10) || 0;
           gtag('event', 'begin_checkout', { currency: 'XOF', value: valeur, items: [{ item_name: nomFormation, price: valeur }] });
         }
 
+        // Pixel Meta : début de commande
+        if (typeof fbq === 'function') {
+          fbq('track', 'InitiateCheckout', { content_name: nomFormation, value: valeur, currency: 'XOF' });
+        }
+        // On mémorise le choix pour l'événement Purchase de l'espace apprenant
+        try { localStorage.setItem('geo:last-checkout', JSON.stringify({ n: nomFormation, v: valeur, t: Date.now() })); } catch (err) {}
+
         // Si un lien DigitalPaye est présent, on redirige le client vers le paiement
         if (link) {
-          window.location.href = link;
+          // Court délai pour laisser le pixel envoyer l'événement avant de quitter la page
+          setTimeout(function () { window.location.href = link; }, 300);
         } else {
           // Sinon, on ouvre la Pop-up WhatsApp (Fallback de sécurité)
           const modal = document.getElementById('modalAchat');
@@ -888,6 +945,27 @@
         modalIframe.src = ''; // On coupe la vidéo
         clearTimeout(rotateTimer);
       });
+    }
+
+    // ==========================================
+    // 5. BARRE D'ACTION FIXE SUR MOBILE
+    // ==========================================
+    // Visible après un léger défilement, masquée quand la section des formations est à l'écran
+    const mobileCta = document.getElementById('mobileCta');
+    const sectionFormations = document.getElementById('formations');
+    if (mobileCta && sectionFormations) {
+      let formationsVisible = false;
+      const majBarre = () => {
+        mobileCta.classList.toggle('show', window.scrollY > 300 && !formationsVisible);
+      };
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+          formationsVisible = entries[0].isIntersecting;
+          majBarre();
+        }).observe(sectionFormations);
+      }
+      window.addEventListener('scroll', majBarre, { passive: true });
+      majBarre();
     }
 
     // ==========================================

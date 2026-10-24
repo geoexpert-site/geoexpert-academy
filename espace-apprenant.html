@@ -93,6 +93,28 @@ aside{position:fixed;left:0;top:56px;bottom:0;width:86%;max-width:350px;z-index:
 body.so aside{transform:none}body.so .back{display:block}.tp{display:none}main{padding:16px}.stats{grid-template-columns:1fr}.hero{padding:18px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -114,7 +136,7 @@ body.so aside{transform:none}body.so .back{display:block}.tp{display:none}main{p
       <h1>Donnez une dimension spatiale à votre carrière</h1>
       <p>Votre espace de formation GeoExpert Academy : vidéos, exercices, notes et suivi de progression.</p>
       <ul>
-        <li><span class="ic" data-i="check"></span>Reprenez exactement où vous vous êtes arrêté</li>
+        <li><span class="ic" data-i="check"></span>Reprenez à la leçon où vous vous êtes arrêté</li>
         <li><span class="ic" data-i="check"></span>Exercices et notes au même endroit</li>
         <li><span class="ic" data-i="check"></span>Assistance du formateur pendant 3 mois</li>
       </ul>
@@ -130,6 +152,7 @@ body.so aside{transform:none}body.so .back{display:block}.tp{display:none}main{p
     <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e3e7ee; text-align: center;">
       <p style="font-size: 14px; color: #6B6A72; margin-bottom: 12px;">Vous venez de payer sur DigitalPaye et vous n'avez pas encore votre code ? C'est normal !</p>
       <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20viens%20de%20finaliser%20mon%20paiement%20sur%20DigitalPaye.%20Je%20n'ai%20pas%20encore%20mon%20code%20d'acc%C3%A8s.%20Mon%20nom%20est%20%3A%20" 
+           id="askCode" data-fbq-skip
            target="_blank" 
            rel="noopener"
            style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-size: 14px; font-weight: 600; color: #fff; background-color: #22b455; padding: 12px; border-radius: 10px; text-decoration: none;">
@@ -369,6 +392,22 @@ $('burger').addEventListener('click',function(){document.body.classList.toggle('
 $('theme').addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark'?'':'dark';if(d)document.documentElement.setAttribute('data-theme','dark');else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('geo:theme',d)}catch(e){}});
 try{if(localStorage.getItem('geo:theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}
 var sc=sessionStorage.getItem('gc');if(sc)login(sc,true);
+
+// Pixel Meta : Purchase au clic sur « Demander mon code d'accès » (1 fois par navigateur et par 24 h).
+// Jamais lors d'une simple connexion avec un code. Montant repris du dernier « Je m'inscris » (moins de 24 h).
+(function(){
+  var a=$('askCode');if(!a)return;
+  a.addEventListener('click',function(){
+    var K='geo:fbq-purchase',now=Date.now(),last=0,c=null;
+    try{last=parseInt(localStorage.getItem(K),10)||0}catch(e){}
+    if(now-last<86400000)return;
+    try{localStorage.setItem(K,String(now))}catch(e){}
+    try{c=JSON.parse(localStorage.getItem('geo:last-checkout'))}catch(e){}
+    var d={currency:'XOF'};
+    if(c&&c.v&&now-c.t<86400000){d.value=c.v;d.content_name=c.n}
+    if(typeof fbq==='function')fbq('track','Purchase',d);
+  });
+})();
 
 // Script du carrousel de la page de connexion
 setInterval(function() {

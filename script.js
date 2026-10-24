@@ -11,6 +11,7 @@
 //   6. Simulateur de parcours
 //   7. Carte interactive Leaflet
 //   8. Vérification de certificat
+//   10. Pixel Meta : Lead
 // ==========================================================
 
 (function () {
@@ -291,7 +292,7 @@
   try {
   const simData = {
     "Étudiant": {
-      formation: "Devenez Géomaticien Opérationnel (Octobre 2026)",
+      formation: "Devenez Géomaticien Opérationnel (Novembre 2026)",
       desc: "Une excellente porte d'entrée dans les SIG, avec un contenu appliqué et recherché sur le marché de l'emploi, quel que soit votre secteur."
     },
     "Géographe": {
@@ -299,11 +300,11 @@
       desc: "Approfondissez vos compétences avec une spécialisation directement liée à votre formation initiale."
     },
     "Géologue": {
-      formation: "Devenez Géomaticien Opérationnel (Octobre 2026)",
+      formation: "Devenez Géomaticien Opérationnel (Novembre 2026)",
       desc: "Renforcez vos compétences SIG pour la cartographie géologique, la prospection et le suivi de sites miniers."
     },
     "Ingénieur": {
-      formation: "Devenez Géomaticien Opérationnel (Octobre 2026)",
+      formation: "Devenez Géomaticien Opérationnel (Novembre 2026)",
       desc: "Une formation complète en SIG et cartographie, directement applicable à vos projets d'ingénierie, quel que soit votre secteur."
     },
     "Urbaniste": {
@@ -709,6 +710,21 @@
       })();
   } catch (err) {
     console.error('[Section 9] erreur :', err);
+  }
+
+  // ==========================================================
+  // 10. PIXEL META : LEAD (kit gratuit et newsletter)
+  // ==========================================================
+  try {
+  document.querySelectorAll('form.sysio-form, #sib-form').forEach((f) => {
+    f.addEventListener('submit', () => {
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', { content_name: f.id === 'sib-form' ? 'Newsletter' : 'Kit de démarrage gratuit' });
+      }
+    }, true);
+  });
+  } catch (err) {
+    console.error('[Section 10] erreur :', err);
   }
 
   }
