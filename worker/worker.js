@@ -198,6 +198,11 @@ const PRODUCTS = {
 };
 
 const DAY = 86400000;
+// Période d'essai (codes créés après la mise à jour, marqués "essai": true)
+const TRIAL_DAYS = 7;   // déblocage complet à 0 h (UTC, heure d'Abidjan) le 8e jour
+const TRIAL_FREE = 3;   // introduction + 2 premières leçons de chaque module
+const MONTHS_SINGLE = 12;
+const MONTHS_PACK = 24;
 const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 const enc = new TextEncoder();
 
@@ -265,12 +270,43 @@ async function findStudent(env, code) {
 }
 function studentStatus(rec, now) {
   if (!rec.active) return 'revoked';
-  if (now > rec.expires) return 'expired';
+  if (rec.expires && now > rec.expires) return 'expired';
   return 'ok';
+}
+function addMonths(ms, n) {
+  const d = new Date(ms); d.setUTCMonth(d.getUTCMonth() + n); return d.getTime();
+}
+function fmtDate(ms) {
+  return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+// Fin de l'essai : 0 h UTC du 8e jour après la première utilisation. 0 = pas d'essai (ancien code ou accès complet).
+function trialEnd(rec) {
+  if (!rec.essai || rec.accesComplet || !rec.premiereUtilisation) return 0;
+  const d = new Date(rec.premiereUtilisation);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + TRIAL_DAYS);
+}
+// Première utilisation d'un nouveau code : démarre l'essai et fixe la date de fin d'accès.
+function startAccess(rec, now) {
+  if (!rec.essai || rec.premiereUtilisation) return false;
+  rec.premiereUtilisation = now;
+  rec.expires = addMonths(now, rec.mois || MONTHS_SINGLE) + (rec.joursBonus || 0) * DAY;
+  delete rec.joursBonus;
+  return true;
+}
+// Leçon (vidéo) ou exercice verrouillé par l'essai : renvoie la date de déblocage, sinon 0.
+function trialLock(rec, k, now) {
+  const end = trialEnd(rec);
+  if (!end || now >= end) return 0;
+  const m = findModule(moduleOf(k));
+  const i = m ? m.videos.findIndex(v => v.k === k) : -1;
+  return i >= 0 && i < TRIAL_FREE ? 0 : end;
 }
 function entitled(rec, k, now) {
   const g = rec.modules.find(x => x.m === moduleOf(k));
-  return g ? { ok: now >= g.from, from: g.from } : { ok: false, from: 0, none: true };
+  if (!g) return { ok: false, from: 0, none: true };
+  if (now < g.from) return { ok: false, from: g.from };
+  const t = trialLock(rec, k, now);
+  return t ? { ok: false, from: t, trial: true } : { ok: true, from: g.from };
 }
 
 export default {
@@ -302,17 +338,26 @@ async function api(req, env, url) {
   const st = studentStatus(rec, now);
   if (st === 'revoked') return reply(generic, 401, req, env);
   if (st === 'expired') return reply({ error: 'Votre accès a expiré. Écrivez-nous sur WhatsApp pour le renouveler.' }, 403, req, env);
+  if (startAccess(rec, now)) await env.ACCESS.put('s:' + c, JSON.stringify(rec));
 
   if (url.pathname === '/api/login') {
     const cfg = await getCfg(env);
+    // Pendant l'essai, une leçon bloquée ne renvoie que son titre, sa durée et sa date de déblocage.
     const mods = rec.modules.map(g => {
       const m = findModule(g.m); if (!m) return null;
       return {
         key: m.key, title: m.title, meta: m.meta, locked: now < g.from, unlockAt: g.from,
-        videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k] })),
-        exercises: m.exercises.map(e => ({ k: e.k, title: e.title, ready: !!cfg.files[e.k] })),
+        videos: m.videos.map(v => {
+          const t = trialLock(rec, v.k, now);
+          return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k] };
+        }),
+        exercises: m.exercises.map(e => {
+          const t = trialLock(rec, e.k, now);
+          return t ? { k: e.k, title: e.title, locked: true, unlockAt: t } : { k: e.k, title: e.title, ready: !!cfg.files[e.k] };
+        }),
       };
     }).filter(Boolean);
+    const te = trialEnd(rec);
     
     const ip = req.headers.get('CF-Connecting-IP') || '';
     const h = (await sha256hex((env.ADMIN_PASSWORD || '') + ip)).slice(0, 10);
@@ -326,14 +371,15 @@ async function api(req, env, url) {
       rec.lastLogin = now;
       await env.ACCESS.put('s:' + c, JSON.stringify(rec));
     }
-    return reply({ label: rec.label, expires: rec.expires, modules: mods }, 200, req, env);
+    return reply({ label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods }, 200, req, env);
   }
 
   if (url.pathname === '/api/play') {
     const k = String(body.k || '');
     const e = entitled(rec, k, now);
     if (e.none) return reply({ error: 'Cette vidéo ne fait pas partie de votre formation.' }, 403, req, env);
-    if (!e.ok) return reply({ error: 'Ce module sera débloqué le ' + new Date(e.from).toLocaleDateString('fr-FR') + '.' }, 403, req, env);
+    if (e.trial) return reply({ error: 'Cette leçon sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
+    if (!e.ok) return reply({ error: 'Ce module sera débloqué le ' + fmtDate(e.from) + '.' }, 403, req, env);
     const cfg = await getCfg(env);
     const id = cfg.ids[k];
     if (!id) return reply({ error: 'Cette vidéo sera disponible prochainement.' }, 404, req, env);
@@ -347,6 +393,7 @@ async function api(req, env, url) {
   if (url.pathname === '/api/file') {
     const k = String(body.k || '');
     const e = entitled(rec, k, now);
+    if (e.trial) return reply({ error: 'Cet exercice sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
 
     // On cherche le nom du fichier pour le navigateur
@@ -390,6 +437,7 @@ async function admin(req, env, url) {
         code: prettyCode(k.name.slice(2)), label: rec.label, created: rec.created, expires: rec.expires, active: rec.active,
         logins: rec.logins || 0, lastLogin: rec.lastLogin || 0, networks: (rec.seen || []).length, countries: [...new Set((rec.seen || []).map(x => x.c).filter(Boolean))],
         modules: rec.modules.map(g => ({ m: g.m, from: g.from })),
+        essai: !!rec.essai, premiereUtilisation: rec.premiereUtilisation || 0, finEssai: trialEnd(rec), accesComplet: !!rec.accesComplet, mois: rec.mois || 0,
       });
     }
     students.sort((a, b) => b.created - a.created);
@@ -405,12 +453,15 @@ async function admin(req, env, url) {
     const prod = PRODUCTS[b.product];
     if (!label) return reply({ error: 'Indiquez un nom ou des initiales.' }, 400, req, env);
     if (!prod) return reply({ error: 'Produit inconnu.' }, 400, req, env);
-    const days = Math.min(Math.max(parseInt(b.days, 10) || 365, 1), 1500);
-    const hold = Math.min(Math.max(parseInt(b.holdDays, 10) || 8, 0), 60);
-    const modules = prod.now.map(m => ({ m, from: now })).concat(prod.later.map(m => ({ m, from: b.immediate ? now : now + hold * DAY })));
+    // Nouveaux codes : tous les modules du produit dès le départ, limités par l'essai de 7 jours.
+    // La date de fin (12 ou 24 mois) est fixée à la première utilisation du code.
+    const modules = prod.now.concat(prod.later).map(m => ({ m, from: now }));
     let code, tries = 0;
     do { code = randomCode(12); tries++; } while ((await env.ACCESS.get('s:' + code)) && tries < 5);
-    const rec = { label, modules, created: now, expires: now + days * DAY, active: true, logins: 0, seen: [] };
+    const rec = {
+      label, product: b.product, modules, created: now, expires: null, active: true, logins: 0, seen: [],
+      essai: true, mois: b.product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: !!b.immediate,
+    };
     await env.ACCESS.put('s:' + code, JSON.stringify(rec));
     return reply({ code: prettyCode(code), label, expires: rec.expires }, 200, req, env);
   }
@@ -422,8 +473,13 @@ async function admin(req, env, url) {
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw);
     if (typeof b.active === 'boolean') rec.active = b.active;
-    if (b.addDays) rec.expires = Math.max(rec.expires, now) + Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500) * DAY;
-    if (b.unlockNow) rec.modules.forEach(g => { g.from = Math.min(g.from, now); });
+    if (b.addDays) {
+      const add = Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500);
+      // Code pas encore utilisé : les jours s'ajouteront à la date de fin calculée à la première utilisation.
+      if (rec.essai && !rec.premiereUtilisation) rec.joursBonus = (rec.joursBonus || 0) + add;
+      else rec.expires = Math.max(rec.expires, now) + add * DAY;
+    }
+    if (b.unlockNow) { rec.modules.forEach(g => { g.from = Math.min(g.from, now); }); rec.accesComplet = true; }
     await env.ACCESS.put('s:' + c, JSON.stringify(rec));
     return reply({ ok: true }, 200, req, env);
   }

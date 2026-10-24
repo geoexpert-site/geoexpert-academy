@@ -87,6 +87,7 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-top:8px}.tabs button{border:0;background:none;color:var(--dim);padding:10px 14px;font-weight:600;border-bottom:3px solid transparent}.tabs button.on{color:var(--ink);border-color:var(--teal)}
 .pn{padding:16px 0}.pn textarea{width:100%;min-height:150px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:15px Inter;resize:vertical}
 .ex{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.ex span:nth-child(2){flex:1}.note{color:var(--dim);font-size:13px}
+.trial{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-weight:500}.trial .ic{flex:0 0 18px;margin-top:2px;color:var(--mag)}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
 aside{position:fixed;left:0;top:56px;bottom:0;width:86%;max-width:350px;z-index:20;transform:translateX(-100%);transition:transform .25s;max-height:none}
@@ -198,7 +199,7 @@ function ld(){try{var p=JSON.parse(localStorage.getItem(PK));if(p)P=p}catch(e){}
 function sv(){try{localStorage.setItem(PK,JSON.stringify(P))}catch(e){}}
 function sec(d){return String(d).split(':').reduce(function(a,b){return a*60+(+b||0)},0)}
 function ftime(s){var hh=Math.floor(s/3600),m=Math.round(s%3600/60);return hh?hh+' h '+(m<10?'0':'')+m:m+' min'}
-function fdate(ms){return new Date(ms).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}
+function fdate(ms){return new Date(ms).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})}
 function post(p,b){return fetch(API+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})}
 function wa(t){return'https://wa.me/'+WA+'?text='+encodeURIComponent(t)}
 
@@ -213,7 +214,7 @@ async function login(c,silent){
  finally{b.disabled=false}
 }
 function start(){
- L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,m:m,i:i,lock:m.locked})})});
+ L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,m:m,i:i,lock:m.locked||!!v.locked,at:v.locked?v.unlockAt:m.unlockAt})})});
  // Correction : on supprime totalement la page de login pour ne pas laisser de vide
  $('login').style.display = 'none'; 
  $('app').hidden=false;$('who').textContent=D.label;
@@ -236,7 +237,7 @@ function side(){
   d.appendChild(h('summary',null,m.locked?ic('lock'):null,h('span',{text:m.title.split(' : ')[0]}),h('span',{class:'n',text:m.locked?'bientôt':mp.n+'/'+mp.t})));
   L.filter(function(l){return l.m===m}).forEach(function(l){
    var done=P.done[l.k],b=h('button',{class:'ls'+(cur&&cur.k===l.k?' on':''),onclick:function(){lesson(l.k);closeS()}},
-    h('span',{class:'dot'+(done?' d':'')},done?ic('check'):l.lock?ic('lock'):null),h('span',null,l.t,h('small',{text:l.d})));
+    h('span',{class:'dot'+(done?' d':'')},done?ic('check'):l.lock?ic('lock'):null),h('span',null,l.t,h('small',{text:l.lock&&l.at?'Disponible à partir du '+fdate(l.at):l.d})));
    if(l.lock)b.disabled=true;d.appendChild(b)});
   s.appendChild(d)});
  top();
@@ -250,6 +251,7 @@ function home(){
  var a=acc(),next=P.last&&a.filter(function(l){return l.k===P.last})[0]||a.filter(function(l){return!P.done[l.k]})[0]||a[0];
  var left=a.filter(function(l){return!P.done[l.k]}).reduce(function(s,l){return s+sec(l.d)},0);
  var finished=p.t&&p.n===p.t;
+ if(D.trialEnd)m.appendChild(h('div',{class:'trial',role:'status'},ic('lock'),h('span',{text:'Période d\'essai : votre formateur vous accompagne sur WhatsApp. Toutes les leçons se débloquent le '+fdate(D.trialEnd)+'.'})));
  m.appendChild(h('div',{class:'card hero'},ring(p.p),h('div',null,h('h1',{text:'Bonjour '+D.label}),h('p',{text:finished?'Bravo, vous avez terminé toutes les leçons disponibles.':(p.n?'Vous avez terminé '+p.n+' leçon(s) sur '+p.t+'. Continuez sur votre lancée.':'Prêt à commencer ? Lancez votre première leçon.')}),
   next?h('button',{class:'btn mag',onclick:function(){lesson(next.k)}},ic('play'),(p.n?'Reprendre : ':'Commencer : ')+next.t):null)));
  m.appendChild(h('div',{class:'stats'},h('div',{class:'card'},h('b',{text:p.n+' / '+p.t}),h('span',{text:'leçons terminées'})),h('div',{class:'card'},h('b',{text:ftime(left)}),h('span',{text:'de vidéo restant'})),h('div',{class:'card'},h('b',{text:fdate(D.expires)}),h('span',{text:'fin de votre accès'}))));
@@ -258,7 +260,7 @@ function home(){
  D.modules.forEach(function(md){var mp=mprog(md),f=INFO[md.key]||['','',''],first=L.filter(function(l){return l.m===md})[0];
   g.appendChild(h('div',{class:'card mc'},h('span',{class:'tag',text:f[0]+' · '+f[1]}),h('h3',{text:md.title}),h('p',{text:md.locked?'Disponible le '+fdate(md.unlockAt)+'.':f[2]}),
    h('div',{class:'bar'},h('i',{style:'width:'+mp.p+'%'})),
-   h('button',{class:'btn alt',disabled:md.locked?'':null,onclick:function(){var x=L.filter(function(l){return l.m===md&&!P.done[l.k]})[0]||first;if(x)lesson(x.k)}},md.locked?'Verrouillé':(mp.p?'Continuer ('+mp.p+' %)':'Ouvrir'))))});
+   h('button',{class:'btn alt',disabled:md.locked?'':null,onclick:function(){var x=L.filter(function(l){return l.m===md&&!l.lock&&!P.done[l.k]})[0]||first;if(x)lesson(x.k)}},md.locked?'Verrouillé':(mp.p?'Continuer ('+mp.p+' %)':'Ouvrir'))))});
  m.appendChild(g);
  m.appendChild(h('h2',{class:'s',text:'Attestation et assistance'}));
  var row=h('div',{class:'grid'});
@@ -282,7 +284,7 @@ function lesson(k){
  m.appendChild(h('h1',{class:'lt',text:l.t}));
  var pl=h('div',{class:'pl'});
  var go=h('button',{class:'go','aria-label':'Lancer la vidéo',onclick:function(){play(l,pl)}},ic('play'));
- pl.appendChild(l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
+ pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){P.done[k]=!P.done[k];if(!P.done[k])delete P.done[k];sv();lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
 
 var nx=a[ix+1],pv=a[ix-1];
@@ -313,7 +315,10 @@ m.appendChild(h('div',{class:'ctl'},
    if(!l.m.exercises.length) pn.appendChild(h('p',{class:'note',text:'Ce module ne contient pas d\'exercice PDF.'}));
    l.m.exercises.forEach(function(x){
      var btn = h('button', {class:'btn alt', onclick: function(e){ openFile(x.k, e.currentTarget); }});
-     if (x.ready && !l.lock) {
+     if (x.locked) {
+       btn.textContent = 'Disponible à partir du ' + fdate(x.unlockAt);
+       btn.disabled = true;
+     } else if (x.ready && !l.lock) {
        btn.textContent = 'Ouvrir le PDF';
      } else {
        btn.textContent = 'Bientôt';
