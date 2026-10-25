@@ -157,7 +157,7 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
   - Worker de test : `DP_LIENS_TEST` = `Ez59IkOJHAO1` → google ; versions `espace-apprenant-api-test` ada0776e, `geoexpert-admin-test` c559f972
   - ⚠️ l'admin de test a son propre mot de passe (`GeoExpert-Outils\mot-de-passe-admin-TEST.txt`) : bien le préciser
 - [x] **Mise en ligne — EN SERVICE le 25/10/2026** (accord de l'administrateur donné)
-  - sauvegarde : `GeoExpert-Sauvegardes6-10-25-avant-mise-en-ligne-paiements\` ; table `paiements` ajoutée dans `geoexpert-prod`
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-25-avant-mise-en-ligne-paiements\` ; table `paiements` ajoutée dans `geoexpert-prod`
   - `geoexpert-admin` → d9240891 (avant : e6713b5d) ; `espace-apprenant-api` → 0c9d319f (avant : 76f93681)
   - clé DigitalPaye Production « Site GeoExpert » (sans « Retrait »), 3 secrets installés par l'administrateur via le Terminal (vérifiés par nom)
   - vérifié : connexion apprenant et certificats inchangés, admin protégé par Access, faux webhook refusé (401), « Envoyer un test » de DigitalPaye livré (200)
