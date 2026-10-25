@@ -73,7 +73,7 @@
   - [x] 9. Site publié : commit cab2244 sur `main` (GitHub Pages). `_config.yml` : documents internes et `worker/` plus publiés
   - [x] 10. Vérifications en production avec un code de test : 7/7 (connexion, vidéo signée, verrou d'essai, sauvegarde,
         progression retrouvée sur un 2e appareil) ; code de test ensuite supprimé (données de production revenues à 3 clés)
-  - **Phase 1 EN LIGNE le 25/10/2026** — en attente de validation par l'administrateur
+  - **Phase 1 EN LIGNE le 25/10/2026 — VALIDÉE par l'administrateur le 25/10/2026**
 
 ## Phase 2 — Régularité (≈ 14 h)
 
@@ -150,6 +150,15 @@
 - Mise en ligne lancée : étapes 1 à 3 faites ; Worker apprenant de production et site non touchés (vérifié).
   Petite amélioration : l'admin vérifie la connexion e-mail AVANT tout le reste (ne révèle rien sans connexion).
 - Mise en ligne terminée (étapes 1 à 10). Production vérifiée : 7/7.
-- **Prochaine étape : validation de la phase 1 par l'administrateur**, puis phase 2 (commencer par relire ce fichier).
-  Retour en arrière possible à tout moment : voir `MISE-EN-LIGNE-PHASE-1.md`.
+- Phase 1 validée par l'administrateur. Retour en arrière toujours possible : voir `MISE-EN-LIGNE-PHASE-1.md`.
+
+### Prochaine session — démarrer la phase 2
+1. Relire ce fichier en entier.
+2. Avant de coder : nouvelle sauvegarde (code + données de production), nouvelle étiquette git, nouvelle branche `phase-2`.
+3. Travailler sur l'environnement de test, avec la règle n° 1 (on ajoute, on ne change pas l'existant) et la preuve pixel
+   (`comparer-elements.mjs … cacher`), puis captures avant / après.
+4. Ordre conseillé : suppression des données d'un apprenant (engagement de la politique de confidentialité), annonces,
+   objectif de la semaine + série + badges, « Mes notes », case « J'ai fait l'exercice », mini-quiz, économie de données.
+5. En attente côté administrateur (non bloquant) : vidéos Bunny de Télédétection / Webmapping / KoboToolbox / Google Earth,
+   fichier de l'exercice 2 d'ArcGIS chapitre 1, numéro WhatsApp de l'apprenant actuel.
   Ensuite : validation de la phase 1 par l'administrateur, puis phase 2.
