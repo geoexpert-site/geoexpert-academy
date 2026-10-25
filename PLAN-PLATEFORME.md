@@ -99,7 +99,7 @@
   - site publié : `main` = 62f6315 ; ancienne page + nouveau Worker vérifiée avant publication (connexion, vidéo, verrou d'essai)
   - production vérifiée avec un code de test : 8/8 (Mes progrès, objectif, vidéo signée + économie de données, exercice,
     Mes notes, enregistrement serveur, 2e appareil) ; code de test ensuite supprimé (production revenue à 3 clés)
-  - en attente : validation de la phase 2 par l'administrateur
+  - **Phase 2 VALIDÉE par l'administrateur le 25/10/2026**
 - [x] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité — testé 11/11, **pas encore en ligne**
   - fiche → « Supprimer définitivement ses données » (taper SUPPRIMER) ; efface aussi les anciens codes remplacés ; journal gardé sans le nom · route `/admin/purge`
   - rappel en haut de « Apprenants » + note du tableau de bord quand un accès est fini depuis plus de 12 mois
