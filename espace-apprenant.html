@@ -109,6 +109,9 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .qzc{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:8px;cursor:pointer}.qzc:hover{background:var(--soft)}.qzc input{margin-top:3px;accent-color:var(--teal)}
 .qzc.bon{background:rgba(10,122,59,.12);font-weight:600}.qzc.faux{background:rgba(192,57,43,.12)}.qze{margin:8px 4px 2px;font-size:13.5px}.qze.bon{color:#0a7a3b}.qze.faux{color:#c0392b}[data-theme=dark] .qze.bon{color:#5fd08f}[data-theme=dark] .qze.faux{color:#ff8a7a}
 .qzr{margin-top:12px;font-weight:600}.qzr.ok{color:#0a7a3b}.qzr.ko{color:#c0392b}[data-theme=dark] .qzr.ok{color:#5fd08f}
+.cert{border:1.5px solid var(--mag)}.certb{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.certb .btn{padding:9px 14px;font-size:14px}
+.stars{display:flex;gap:4px;margin:6px 0 8px}.stars button{border:0;background:none;font-size:28px;line-height:1;color:var(--line);padding:0 2px}.stars button.on{color:#f0a500}
+.avis textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:14px Inter;resize:vertical}.consent{margin:8px 0 10px;align-items:flex-start}.consent input{margin-top:2px;flex:none}
 .eco{display:flex;align-items:center;gap:8px;margin:10px 2px 0;font-size:13px;color:var(--dim);cursor:pointer;width:max-content;max-width:100%}.eco input{width:16px;height:16px;accent-color:var(--teal)}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
@@ -400,6 +403,66 @@ function notesPage(){
  side();
  var b=$('side').querySelector('.mesnotes');if(b)b.classList.add('on');
 }
+// ===== Fin de formation : « Mon attestation » (une carte par attestation) et « Votre avis » (formation terminée).
+var VERIF='https://geoexpertacademy.ci/verifier-certificat.html?code=';
+function modDone(m){var ls=L.filter(function(l){return l.m===m});return ls.length&&ls.every(function(l){return!l.lock&&P.done[l.k]})}
+function endCards(row){
+ (D.certificats||[]).forEach(function(c){
+  var b=h('button',{class:'btn mag'},ic('pdf'),'Télécharger (PDF)');
+  b.addEventListener('click',function(){certPdf(c,b)});
+  row.appendChild(h('div',{class:'card cert'},h('h3',{text:'🎓 Mon attestation',style:'font-size:16px;margin-bottom:6px'}),
+   h('p',{class:'note',text:c.title.split(' : ')[0]+' · délivrée le '+fdate(c.t)+' · N° '+c.id}),
+   h('div',{class:'certb'},b,h('a',{class:'btn alt',href:VERIF+c.id,target:'_blank',rel:'noopener'},'Lien de vérification'))));
+ });
+ D.modules.forEach(function(m){if(modDone(m)&&(D.avisDonnes||[]).indexOf(m.key)<0)row.appendChild(avisCard(m))});
+}
+function avisCard(m){
+ var st=0,c=h('div',{class:'card avis'}),stars=h('div',{class:'stars',role:'radiogroup','aria-label':'Votre note'});
+ for(var i=1;i<=5;i++)(function(i){stars.appendChild(h('button',{type:'button',role:'radio','aria-label':i+' étoile'+(i>1?'s':''),onclick:function(){st=i;stars.querySelectorAll('button').forEach(function(x,j){x.classList.toggle('on',j<i);x.setAttribute('aria-checked',j===i-1)})}},'★'))})(i);
+ var ta=h('textarea',{maxlength:'1000',rows:'3',placeholder:'Qu\'avez-vous pensé de la formation ? Qu\'est-ce qui vous a servi ?','aria-label':'Votre commentaire'});
+ var ok=h('input',{type:'checkbox'}),msg=h('p',{class:'note',role:'status'});
+ var send=h('button',{class:'btn'},'Envoyer mon avis');
+ send.addEventListener('click',async function(){
+  if(!st){msg.textContent='Choisissez d\'abord une note (de 1 à 5 étoiles).';return}
+  send.disabled=true;
+  try{var r=await post('/api/avis',{code:code,module:m.key,stars:st,text:ta.value,consent:ok.checked}),j=await r.json();if(!r.ok)throw new Error(j.error)
+   D.avisDonnes=(D.avisDonnes||[]).concat(m.key);c.textContent='';c.appendChild(h('h3',{text:'Merci pour votre avis !',style:'font-size:16px;margin-bottom:6px'}));c.appendChild(h('p',{class:'note',text:'Il nous aide à améliorer nos formations.'}))}
+  catch(e){msg.textContent=e.message||'Envoi impossible. Vérifiez votre connexion.';send.disabled=false}
+ });
+ c.appendChild(h('h3',{text:'Votre avis sur '+m.title.split(' : ')[0],style:'font-size:16px;margin-bottom:6px'}));
+ c.appendChild(h('p',{class:'note',text:'Bravo, vous avez terminé cette formation ! Votre avis nous aide beaucoup.'}));
+ c.appendChild(stars);c.appendChild(ta);
+ c.appendChild(h('label',{class:'exd consent'},ok,'J\'accepte que mon prénom et mon avis soient publiés par GeoExpert Academy.'));
+ c.appendChild(send);c.appendChild(msg);
+ return c;
+}
+// PDF de l'attestation, fabriqué sur le téléphone (bibliothèques chargées seulement à ce moment-là).
+function loadJs(src,sri){return new Promise(function(ok,ko){var x=document.createElement('script');x.src=src;x.integrity=sri;x.crossOrigin='anonymous';x.onload=ok;x.onerror=ko;document.head.appendChild(x)})}
+async function certPdf(c,b){
+ b.disabled=true;b.lastChild.textContent='Préparation...';
+ try{
+  if(!window.jspdf)await loadJs('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk');
+  if(!window.qrcode)await loadJs('https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js','sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1');
+  var logo=await new Promise(function(ok){var i=new Image();i.onload=function(){var w=Math.min(600,i.naturalWidth),hh=Math.round(w*i.naturalHeight/i.naturalWidth),cv=document.createElement('canvas'),g=cv.getContext('2d');cv.width=w;cv.height=hh;g.fillStyle='#F6F3FA';g.fillRect(0,0,w,hh);g.drawImage(i,0,0,w,hh);ok({d:cv.toDataURL('image/jpeg',.9),r:w/hh})};i.onerror=function(){ok(null)};i.src='images/logo-full.png'});
+  var doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true}),W=297,H=210,url=VERIF+c.id;
+  doc.setFillColor(246,243,250);doc.rect(0,0,W,H,'F');
+  doc.setDrawColor(75,63,146);doc.setLineWidth(1.6);doc.rect(9,9,W-18,H-18);doc.setDrawColor(0,146,166);doc.setLineWidth(.5);doc.rect(13,13,W-26,H-26);
+  if(logo){var lh=20,lw=lh*logo.r;doc.addImage(logo.d,'JPEG',(W-lw)/2,20,lw,lh)}
+  doc.setTextColor(75,63,146);doc.setFont('helvetica','bold');doc.setFontSize(26);doc.text('ATTESTATION DE FIN DE FORMATION',W/2,58,{align:'center'});
+  doc.setTextColor(42,42,40);doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text('Cette attestation est décernée à',W/2,74,{align:'center'});
+  doc.setTextColor(168,60,147);doc.setFont('helvetica','bold');doc.setFontSize(30);doc.text(c.name,W/2,90,{align:'center'});
+  doc.setTextColor(42,42,40);doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text('pour avoir suivi avec succès la formation vidéo',W/2,104,{align:'center'});
+  doc.setTextColor(0,146,166);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text(doc.splitTextToSize(c.title,230),W/2,116,{align:'center'});
+  doc.setTextColor(107,106,114);doc.setFont('helvetica','normal');doc.setFontSize(11);
+  doc.text('Durée des vidéos : '+(c.hours||'')+'   ·   Délivrée le '+fdate(c.t),W/2,136,{align:'center'});
+  doc.setTextColor(42,42,40);doc.setFontSize(11);doc.text('GeoExpert Academy & Consulting',30,170);doc.setTextColor(107,106,114);doc.setFontSize(9.5);doc.text('Abidjan, Côte d\'Ivoire · geoexpertacademy.ci',30,176);
+  var q=window.qrcode(0,'M');q.addData(url);q.make();doc.addImage(q.createDataURL(6,0),'GIF',W-62,148,32,32);
+  doc.setTextColor(42,42,40);doc.setFontSize(10);doc.text('N° '+c.id,W-46,185,{align:'center'});
+  doc.setTextColor(107,106,114);doc.setFontSize(8);doc.text('Vérifiable sur geoexpertacademy.ci/verifier-certificat.html',W-19,190,{align:'right'});
+  doc.save('Attestation-GeoExpert-'+c.id+'.pdf');
+ }catch(e){alert('Le PDF n\'a pas pu être préparé. Vérifiez votre connexion internet et réessayez.')}
+ finally{b.disabled=false;b.lastChild.textContent='Télécharger (PDF)'}
+}
 // ===== Annonces du formateur (au-dessus du message du jour) ; « × » les masque sur cet appareil.
 function annonces(){
  var hid=[];try{hid=JSON.parse(localStorage.getItem('geo:ann-hidden'))||[]}catch(e){}
@@ -456,6 +519,7 @@ function home(){
   h('a',{class:'btn alt',href:wa('Bonjour GeoExpert Academy, j\'ai terminé ma formation ('+D.label+'). Je souhaite recevoir mon attestation.'),target:'_blank',rel:'noopener',style:'margin-top:10px',onclick:null},'Demander mon attestation')));
  row.appendChild(h('div',{class:'card'},h('h3',{text:'Une question, un blocage ?',style:'font-size:16px;margin-bottom:6px'}),h('p',{class:'note',text:'Assistance du formateur incluse pendant 3 mois. Réponse sous 48 heures ouvrables.'}),
   h('a',{class:'btn wa',href:wa('Bonjour GeoExpert Academy, j\'ai une question sur ma formation.'),target:'_blank',rel:'noopener',style:'margin-top:10px'},'Écrire sur WhatsApp')));
+ endCards(row);
  m.appendChild(row);
  m.appendChild(h('p',{class:'note',style:'margin-top:20px',text:'Votre progression et vos notes sont sauvegardées sur votre compte. Accès strictement personnel : ne partagez pas votre code.'}));
  side();window.scrollTo(0,0);

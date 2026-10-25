@@ -108,6 +108,33 @@ CREATE TABLE IF NOT EXISTS quiz_results (
   PRIMARY KEY (code, k)
 );
 
+-- Attestations de fin de formation (une par formation terminée), vérifiables publiquement par leur numéro.
+CREATE TABLE IF NOT EXISTS certificates (
+  id TEXT PRIMARY KEY,
+  code TEXT NOT NULL,
+  module TEXT NOT NULL,
+  name TEXT NOT NULL,
+  title TEXT NOT NULL,
+  hours TEXT,
+  t INTEGER NOT NULL,
+  who TEXT,
+  revoked INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS certificates_code ON certificates (code);
+
+-- Avis de fin de formation. consent = 1 si l'apprenant accepte la publication ; status : nouveau / publiable / masque.
+CREATE TABLE IF NOT EXISTS reviews (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT NOT NULL,
+  module TEXT NOT NULL,
+  name TEXT,
+  stars INTEGER NOT NULL,
+  text TEXT,
+  consent INTEGER NOT NULL DEFAULT 0,
+  t INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'nouveau'
+);
+
 -- Préférences de l'apprenant : objectif de la semaine (nombre de leçons, 0 = pas d'objectif).
 CREATE TABLE IF NOT EXISTS prefs (
   code TEXT PRIMARY KEY,

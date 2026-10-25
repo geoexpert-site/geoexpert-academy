@@ -201,6 +201,7 @@
       <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
       <button data-t="ann">📢 Annonces</button>
       <button data-t="quiz">❓ Quiz</button>
+      <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
@@ -232,6 +233,20 @@
         <h2>Suivi de la période d'essai</h2>
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants dont l'essai de 7 jours est en cours, avec le jour où ils en sont.</p>
         <div id="trialList"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Attestations & avis -->
+    <div data-p="att" hidden>
+      <div class="a-card">
+        <h2>Avis des apprenants</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Donnés à la fin d'une formation. Un avis ne peut être marqué « publiable » que si l'apprenant l'a accepté. « Copier » vous donne le texte prêt à mettre sur le site ou les réseaux.</p>
+        <div id="avList"></div>
+      </div>
+      <div class="a-card">
+        <h2>Attestations délivrées</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Pour délivrer une attestation : ouvrez la <b>fiche</b> de l'apprenant → « Actions » → « Attestation ». Chacune est vérifiable par tous sur <b>geoexpertacademy.ci/verifier-certificat.html</b>.</p>
+        <div id="attList"></div>
       </div>
     </div>
 
@@ -373,7 +388,54 @@
     renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
     QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
+    renderAttestations(await call('/admin/attestations', 'GET'));
     renderLog((await call('/admin/journal', 'GET')).entries);
+  }
+
+  // ----- Attestations & avis
+  var VERIF = 'https://geoexpertacademy.ci/verifier-certificat.html?code=';
+  function stars(n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
+  function renderAttestations(d) {
+    var nNew = d.avis.filter(function (a) { return a.status === 'nouveau'; }).length;
+    $('avCount').textContent = nNew; $('avCount').hidden = !nNew;
+    var av = $('avList'); av.textContent = '';
+    if (!d.avis.length) av.appendChild(el('p', '', 'Aucun avis pour le moment.'));
+    var w1 = el('div', 'acts'); if (d.avis.length) av.appendChild(w1);
+    d.avis.forEach(function (a) {
+      var r = actRow(stars(a.stars) + '  ' + (a.text || '(sans commentaire)'),
+        a.name + ' · ' + modTitle(a.module) + ' · ' + fdt(a.t) + ' · ' + (a.consent ? 'publication acceptée' : 'publication NON acceptée') + ' · ' + ({ nouveau: 'nouveau', publiable: '✓ publiable', masque: 'masqué' })[a.status]);
+      if (a.status === 'masque') r.row.classList.add('fin');
+      function act(label, status, cls) {
+        var b = el('button', 'b sec ' + (cls || ''), label); b.type = 'button';
+        b.addEventListener('click', async function () { b.disabled = true; try { await call('/admin/avis-statut', 'POST', { id: a.id, status: status }); await load(); } catch (e) { alert(e.message); b.disabled = false; } });
+        r.ctl.appendChild(b);
+      }
+      if (a.consent && a.status !== 'publiable') act('Marquer publiable', 'publiable', 'fic');
+      if (a.status === 'publiable') {
+        var cp = el('button', 'b sec', 'Copier'); cp.type = 'button';
+        cp.addEventListener('click', function () { navigator.clipboard.writeText('« ' + (a.text || '') + ' » — ' + a.name + ', ' + modTitle(a.module) + ' (' + a.stars + '/5)').then(function () { cp.textContent = 'Copié !'; }); });
+        r.ctl.appendChild(cp);
+      }
+      if (a.status !== 'masque') act('Masquer', 'masque', 'red'); else act('Réafficher', 'nouveau');
+      w1.appendChild(r.row);
+    });
+    var at = $('attList'); at.textContent = '';
+    if (!d.certificats.length) at.appendChild(el('p', '', 'Aucune attestation délivrée pour le moment.'));
+    var w2 = el('div', 'acts'); if (d.certificats.length) at.appendChild(w2);
+    d.certificats.forEach(function (c) {
+      var r = actRow(c.name + ' — ' + c.title.split(' : ')[0], c.id + ' · délivrée le ' + fdt(c.t) + ' · code ' + c.code + (c.revoked ? ' · RÉVOQUÉE' : ''));
+      if (c.revoked) r.row.classList.add('fin');
+      else {
+        var v = el('a', 'b sec', 'Vérifier'); v.href = VERIF + c.id; v.target = '_blank'; v.rel = 'noopener'; r.ctl.appendChild(v);
+        var b = el('button', 'b sec red', 'Révoquer'); b.type = 'button';
+        b.addEventListener('click', async function () {
+          if (!confirm('Révoquer l\'attestation ' + c.id + ' de ' + c.name + ' ?\n\nLa page de vérification indiquera qu\'elle n\'est plus valable. Cette action ne peut pas être annulée.')) return;
+          b.disabled = true; try { await call('/admin/certificat-revoke', 'POST', { id: c.id }); await load(); if (fCode) await openFiche(fCode); } catch (e) { alert(e.message); b.disabled = false; }
+        });
+        r.ctl.appendChild(b);
+      }
+      w2.appendChild(r.row);
+    });
   }
 
   // ----- Mini-quiz
@@ -711,6 +773,23 @@
       b3.addEventListener('click', function () { ficheAction(b3, CONFIRM.unlock(CONF), '/admin/update', { code: f.code, unlockNow: true }); });
       r3.ctl.appendChild(b3); box.appendChild(r3.row);
     }
+    // Attestation de fin de formation (une par formation)
+    f.modules.forEach(function (m) {
+      var c = (f.certificats || []).filter(function (x) { return x.module === m.key; })[0];
+      var n = m.lessons.filter(function (l) { return l.done; }).length, tot = m.lessons.length;
+      var ra = actRow('Attestation — ' + m.title.split(' : ')[0], c ? '✓ ' + c.id + ' délivrée le ' + fdt(c.t) + ' au nom de « ' + c.name + ' »' : n + ' / ' + tot + ' leçons terminées. Délivrez-la après avoir validé son exercice final.');
+      if (c) {
+        var v = el('a', 'b sec', 'Vérifier'); v.href = VERIF + c.id; v.target = '_blank'; v.rel = 'noopener'; ra.ctl.appendChild(v);
+      } else {
+        var nm = el('input'); nm.type = 'text'; nm.maxLength = 80; nm.value = f.label; nm.placeholder = 'Nom complet'; nm.setAttribute('aria-label', 'Nom complet sur l\'attestation');
+        var bt = el('button', 'b sec fic', 'Délivrer'); bt.type = 'button';
+        bt.addEventListener('click', function () {
+          ficheAction(bt, 'Valider l\'exercice final et délivrer l\'attestation ?\n\nFormation : ' + m.title + '\nNom sur l\'attestation : ' + nm.value.trim() + (n < tot ? '\n\n⚠️ Attention : seulement ' + n + ' leçon(s) sur ' + tot + ' sont terminées.' : '') + '\n\nL\'apprenant pourra la télécharger depuis son espace.', '/admin/certificat', { code: f.code, module: m.key, name: nm.value });
+        });
+        ra.ctl.appendChild(nm); ra.ctl.appendChild(bt);
+      }
+      box.appendChild(ra.row);
+    });
     // Code perdu
     if (f.active) {
       var r4 = actRow('Code perdu ?', 'Crée un nouveau code avec la même formation, les mêmes dates et toute sa progression. L\'ancien code ne marchera plus.');
@@ -733,7 +812,7 @@
     b5.addEventListener('click', function () { ficheAction(b5, CONFIRM.active(CONF), '/admin/update', { code: f.code, active: !f.active }); });
     r5.ctl.appendChild(b5); box.appendChild(r5.row);
     // Supprimer définitivement les données (droit à l'effacement / fin de la durée de conservation)
-    var r6 = actRow('Supprimer définitivement ses données', (f.expires && f.expires < now ? 'Accès terminé le ' + fdt(f.expires) + '. ' : '') + 'Efface son code, sa progression, ses notes, son numéro et vos notes de suivi. Irréversible.');
+    var r6 = actRow('Supprimer définitivement ses données', (f.expires && f.expires < now ? 'Accès terminé le ' + fdt(f.expires) + '. ' : '') + 'Efface son code, sa progression, ses notes, son numéro, ses avis et vos notes de suivi (ses attestations restent vérifiables). Irréversible.');
     var b6 = el('button', 'b sec red', 'Supprimer les données'); b6.type = 'button';
     b6.addEventListener('click', async function () {
       var t = prompt('Supprimer DÉFINITIVEMENT toutes les données de ' + f.label + ' ?\n\nSon code ne fonctionnera plus et rien ne pourra être récupéré.\n\nPour confirmer, tapez SUPPRIMER en majuscules :');

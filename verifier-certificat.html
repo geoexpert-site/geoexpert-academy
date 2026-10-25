@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vérifier un certificat | GeoExpert Academy & Consulting</title>
+<meta name="description" content="Vérifiez l'authenticité d'une attestation de formation délivrée par GeoExpert Academy & Consulting, grâce à son numéro.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://geoexpertacademy.ci/verifier-certificat.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="stylesheet" href="style.css">
+
+<style>
+  .vc-page{padding:60px 0 80px;background:var(--bg)}
+  .vc-container{max-width:720px;margin:0 auto;padding:0 24px}
+  .vc-back{display:inline-flex;gap:8px;font-size:14px;color:var(--teal);font-weight:500;margin-bottom:24px;text-decoration:none}
+  .vc-back:hover{text-decoration:underline}
+  .vc-page h1{font-size:clamp(28px,4vw,40px);margin-bottom:12px;font-weight:700}
+  .vc-intro{font-size:16px;color:var(--ink-dim);line-height:1.7;margin-bottom:28px}
+  .vc-form{display:flex;gap:10px;flex-wrap:wrap}
+  .vc-form input{flex:1 1 240px;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;font:600 17px Inter;letter-spacing:1px;text-transform:uppercase;background:#fff;color:var(--ink)}
+  .vc-form button{padding:14px 24px;border:0;border-radius:12px;background:var(--teal);color:#fff;font:600 16px Inter;cursor:pointer}
+  .vc-form button:hover{filter:brightness(.92)}
+  .vc-res{margin-top:24px;border-radius:14px;padding:22px 24px;background:#fff;border:1px solid var(--line)}
+  .vc-res[hidden]{display:none}
+  .vc-res.ok{border-left:5px solid #0a7a3b}
+  .vc-res.ko{border-left:5px solid #c0392b}
+  .vc-res h2{font-size:20px;margin:0 0 10px}
+  .vc-res.ok h2{color:#0a7a3b}.vc-res.ko h2{color:#c0392b}
+  .vc-res dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:15px}
+  .vc-res dt{color:var(--ink-dim)}.vc-res dd{margin:0;font-weight:600;color:var(--ink)}
+  .vc-note{margin-top:28px;font-size:14px;color:var(--ink-dim);line-height:1.7}
+</style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header" id="header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager" decoding="async">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="formations-video-geoexpert.html">
+            <strong>Formations vidéo</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
+       class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- CONTENU -->
+<main class="vc-page">
+  <div class="vc-container">
+    <a href="index.html" class="vc-back">← Retour à l'accueil</a>
+    <h1>Vérifier un certificat</h1>
+    <p class="vc-intro">Chaque attestation de formation délivrée par GeoExpert Academy porte un numéro unique (par exemple <strong>ATT-7K2M-Q9XP</strong>), en bas à droite du document, à côté du code QR. Entrez-le ci-dessous pour vérifier qu'elle est authentique.</p>
+    <form class="vc-form" id="vcForm" autocomplete="off">
+      <input id="vcCode" maxlength="20" placeholder="ATT-XXXX-XXXX" aria-label="Numéro de l'attestation" spellcheck="false">
+      <button type="submit">Vérifier</button>
+    </form>
+    <div class="vc-res" id="vcRes" role="status" aria-live="polite" hidden></div>
+    <p class="vc-note">Une question sur une attestation ? Écrivez-nous sur WhatsApp au <strong>07 87 01 50 30</strong> ou à <strong>contact@geoexpertacademy.ci</strong>.</p>
+  </div>
+</main>
+<script>
+(function () {
+  var API = 'https://espace-apprenant-api.geographe07.workers.dev';
+  var form = document.getElementById('vcForm'), input = document.getElementById('vcCode'), res = document.getElementById('vcRes');
+  function el(t, x) { var e = document.createElement(t); if (x !== undefined) e.textContent = x; return e; }
+  function show(cls, title, rows, text) {
+    res.className = 'vc-res ' + cls; res.hidden = false; res.textContent = '';
+    res.appendChild(el('h2', title));
+    if (rows) { var dl = el('dl'); rows.forEach(function (r) { dl.appendChild(el('dt', r[0])); dl.appendChild(el('dd', r[1])); }); res.appendChild(dl); }
+    if (text) res.appendChild(el('p', text));
+  }
+  async function verify(code) {
+    code = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+    if (/^ATT[A-Z0-9]{8}$/.test(code)) code = 'ATT-' + code.slice(3, 7) + '-' + code.slice(7);
+    input.value = code;
+    if (!/^ATT-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) { show('ko', 'Numéro incomplet', null, 'Le numéro a la forme ATT-XXXX-XXXX (lettres et chiffres).'); return; }
+    show('', 'Vérification en cours…');
+    try {
+      var j = await (await fetch(API + '/api/certificat?id=' + encodeURIComponent(code))).json();
+      if (j.valid) show('ok', '✓ Attestation authentique', [
+        ['Décernée à', j.name], ['Formation', j.title], ['Durée des vidéos', j.hours || '-'],
+        ['Délivrée le', new Date(j.t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })], ['Numéro', j.id]
+      ], 'Délivrée par GeoExpert Academy & Consulting, Abidjan (Côte d\'Ivoire).');
+      else if (j.revoked) show('ko', 'Attestation révoquée', null, 'L\'attestation ' + j.id + ' a existé mais n\'est plus valable.');
+      else show('ko', 'Aucune attestation trouvée', null, 'Aucune attestation ne correspond au numéro ' + code + '. Vérifiez la saisie (attention à ne pas confondre 0 et O, 1 et I : ces caractères ne sont jamais utilisés).');
+    } catch (e) { show('ko', 'Vérification impossible pour le moment', null, 'Vérifiez votre connexion internet et réessayez.'); }
+  }
+  form.addEventListener('submit', function (e) { e.preventDefault(); verify(input.value); });
+  var q = new URLSearchParams(location.search).get('code');
+  if (q) verify(q);
+})();
+</script>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="images/logo-full.webp" type="image/webp">
+        <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/profile.php?id=61590209789158" target="_blank" rel="noopener" aria-label="Facebook GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@geoexpertacademy" target="_blank" rel="noopener" aria-label="TikTok GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82c-1.02-.9-1.64-2.16-1.7-3.6h-3.15v13.9c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1-2.94-2.94 2.94 2.94 0 0 1 2.94-2.94c.3 0 .59.05.86.13v-3.2a6.15 6.15 0 0 0-.86-.06A6.14 6.14 0 0 0 2.7 16.19a6.14 6.14 0 0 0 6.11 6.13 6.14 6.14 0 0 0 6.11-6.13V9.07a8.7 8.7 0 0 0 5.08 1.63V7.55a5.32 5.32 0 0 1-3.4-1.73Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@geoexpertacademyconsulting0794" target="_blank" rel="noopener" aria-label="YouTube GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.02-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.98.13c-.4.05-1.26.05-2.02.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.2 3.28.2 3.28s.2 1.4.8 2.02c.77.8 1.77.78 2.22.86C6.8 19.05 12 19.1 12 19.1s4.1-.01 6.98-.14c.4-.05 1.26-.05 2.02-.85.6-.62.8-2.02.8-2.02s.2-1.64.2-3.28v-1.44c0-1.64-.2-3.28-.2-3.28ZM9.98 14.6V8.85l5.4 2.88-5.4 2.87Z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/geoexpert-academy-consulting" target="_blank" rel="noopener" aria-label="LinkedIn GeoExpert Academy">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
+      </a>
+    </div>
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script defer src="script.js"></script>
+</body>
+</html>

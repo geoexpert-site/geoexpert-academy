@@ -280,6 +280,34 @@ function studentStatus(rec, now) {
 function addMonths(ms, n) {
   const d = new Date(ms); d.setUTCMonth(d.getUTCMonth() + n); return d.getTime();
 }
+// Numéro d'attestation : ATT-XXXX-XXXX (différent des codes d'accès GEO-…).
+function certId() { const s = randomCode(8); return 'ATT-' + s.slice(0, 4) + '-' + s.slice(4); }
+// Durée totale des vidéos d'une formation, ex. « 3 h 12 ».
+function moduleHours(m) {
+  const s = m.videos.reduce((a, v) => a + String(v.dur).split(':').reduce((x, y) => x * 60 + (+y || 0), 0), 0);
+  const h = Math.floor(s / 3600), mn = Math.round(s % 3600 / 60);
+  return h ? h + ' h ' + String(mn).padStart(2, '0') : mn + ' min';
+}
+// Attestations valides et avis déjà donnés d'un apprenant (pour sa page).
+async function loadCertsAndReviews(env, c) {
+  if (!env.DB) return { certs: [], reviewed: [] };
+  try {
+    const [a, r] = await env.DB.batch([
+      env.DB.prepare('SELECT id, module, name, title, hours, t FROM certificates WHERE code = ? AND revoked = 0 ORDER BY t').bind(c),
+      env.DB.prepare('SELECT module FROM reviews WHERE code = ?').bind(c),
+    ]);
+    return { certs: a.results, reviewed: r.results.map(x => x.module) };
+  } catch (e) { return { certs: [], reviewed: [] }; }
+}
+// Vérification publique d'une attestation (page « Vérifier un certificat ») : aucun code d'accès nécessaire.
+async function publicCert(req, env, url) {
+  const id = String(url.searchParams.get('id') || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20);
+  if (!env.DB || !/^ATT-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/.test(id)) return reply({ valid: false }, 200, req, env);
+  const row = await env.DB.prepare('SELECT id, name, title, hours, t, revoked FROM certificates WHERE id = ?').bind(id).first();
+  if (!row) return reply({ valid: false }, 200, req, env);
+  if (row.revoked) return reply({ valid: false, revoked: true, id: row.id }, 200, req, env);
+  return reply({ valid: true, id: row.id, name: row.name, title: row.title, hours: row.hours, t: row.t }, 200, req, env, { 'Cache-Control': 'public, max-age=300' });
+}
 function fmtDate(ms) {
   return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
@@ -429,6 +457,7 @@ export default {
       const origin = req.headers.get('Origin');
       const sameOrigin = role === 'admin' && origin === url.origin;
       if (origin && !sameOrigin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
+      if (role !== 'admin' && url.pathname === '/api/certificat' && req.method === 'GET') return await publicCert(req, env, url);
       if (role !== 'admin' && url.pathname.startsWith('/api/')) return await api(req, env, url);
       if (role !== 'apprenant' && url.pathname.startsWith('/admin/')) return await admin(req, env, url);
       if (role === 'admin' && url.pathname === '/' && req.method === 'GET') {
@@ -498,6 +527,7 @@ async function api(req, env, url) {
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
       quiz: await loadQuizKeys(env, rec),
+      ...(await (async () => { const x = await loadCertsAndReviews(env, c); return { certificats: x.certs, avisDonnes: x.reviewed }; })()),
     }, 200, req, env);
   }
 
@@ -523,6 +553,21 @@ async function api(req, env, url) {
       env.DB.prepare('INSERT INTO learners (code, last, last_activity) VALUES (?, NULL, ?) ON CONFLICT (code) DO UPDATE SET last_activity = excluded.last_activity').bind(c, now),
     ]);
     return reply({ score, total: qs.length, ok, answers: qs.map(x => x.answer), explain: qs.map(x => x.explain || '') }, 200, req, env);
+  }
+
+  // Avis de fin de formation (un par formation ; une nouvelle réponse remplace l'ancienne).
+  if (url.pathname === '/api/avis') {
+    if (!env.DB) return reply({ error: 'Avis indisponible pour le moment.' }, 503, req, env);
+    const module = String(body.module || '');
+    if (!rec.modules.some(g => g.m === module) || !findModule(module)) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    const stars = parseInt(body.stars, 10);
+    if (!(stars >= 1 && stars <= 5)) return reply({ error: 'Choisissez une note de 1 à 5 étoiles.' }, 400, req, env);
+    const text = String(body.text || '').trim().slice(0, 1000), consent = body.consent ? 1 : 0;
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM reviews WHERE code = ? AND module = ?').bind(c, module),
+      env.DB.prepare("INSERT INTO reviews (code, module, name, stars, text, consent, t, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'nouveau')").bind(c, module, rec.label, stars, text, consent, now),
+    ]);
+    return reply({ ok: true }, 200, req, env);
   }
 
   // Sauvegarde de la progression : la page n'envoie que ce qui a changé.
@@ -824,7 +869,7 @@ async function admin(req, env, url) {
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
-      adminNotes: notes, phone, relances,
+      adminNotes: notes, phone, relances, certificats: (await loadCertsAndReviews(env, c)).certs,
     }, 200, req, env);
   }
 
@@ -871,6 +916,55 @@ async function admin(req, env, url) {
     await env.DB.batch([env.DB.prepare('DELETE FROM quizzes WHERE k = ?').bind(k), env.DB.prepare('DELETE FROM quiz_results WHERE k = ?').bind(k)]);
     const m = findModule(moduleOf(k)), v = m && m.videos.find(x => x.k === k);
     await journal(env, who, 'Quiz supprimé', '', '', v ? m.title.split(' : ')[0] + ' / ' + v.title.slice(0, 50) : k);
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Attestations et avis : liste, création d'une attestation, révocation, statut d'un avis.
+  if (url.pathname === '/admin/attestations' && req.method === 'GET') {
+    if (!env.DB) return reply({ certificats: [], avis: [] }, 200, req, env);
+    const [a, r] = await env.DB.batch([
+      env.DB.prepare('SELECT id, code, module, name, title, hours, t, who, revoked FROM certificates ORDER BY t DESC LIMIT 500'),
+      env.DB.prepare('SELECT id, code, module, name, stars, text, consent, t, status FROM reviews ORDER BY t DESC LIMIT 500'),
+    ]);
+    const pc = x => ({ ...x, code: prettyCode(x.code) });
+    return reply({ certificats: a.results.map(pc), avis: r.results.map(pc) }, 200, req, env);
+  }
+  if (url.pathname === '/admin/certificat' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const rec = JSON.parse(raw), m = findModule(String(b.module || ''));
+    if (!m || !rec.modules.some(g => g.m === m.key)) return reply({ error: 'Cette formation ne fait pas partie de son accès.' }, 400, req, env);
+    const name = String(b.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+    if (name.length < 3) return reply({ error: 'Écrivez le nom complet qui figurera sur l\'attestation.' }, 400, req, env);
+    const existing = await env.DB.prepare('SELECT id FROM certificates WHERE code = ? AND module = ? AND revoked = 0').bind(c, m.key).first();
+    if (existing) return reply({ error: 'Une attestation existe déjà pour cette formation (' + existing.id + '). Révoquez-la d\'abord pour en créer une nouvelle.' }, 400, req, env);
+    let id, tries = 0;
+    do { id = certId(); tries++; } while ((await env.DB.prepare('SELECT id FROM certificates WHERE id = ?').bind(id).first()) && tries < 5);
+    await env.DB.prepare('INSERT INTO certificates (id, code, module, name, title, hours, t, who) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(id, c, m.key, name, m.title, moduleHours(m), now, who).run();
+    await journal(env, who, 'Attestation délivrée', prettyCode(c), rec.label, id + ' · ' + m.title.split(' : ')[0] + ' · ' + name);
+    return reply({ ok: true, id }, 200, req, env);
+  }
+  if (url.pathname === '/admin/certificat-revoke' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const row = await env.DB.prepare('SELECT id, code, name FROM certificates WHERE id = ?').bind(String(b.id || '')).first();
+    if (!row) return reply({ error: 'Attestation introuvable.' }, 404, req, env);
+    await env.DB.prepare('UPDATE certificates SET revoked = 1 WHERE id = ?').bind(row.id).run();
+    await journal(env, who, 'Attestation révoquée', prettyCode(row.code), row.name, row.id);
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/avis-statut' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const row = await env.DB.prepare('SELECT id, consent, name FROM reviews WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!row) return reply({ error: 'Avis introuvable.' }, 404, req, env);
+    if (!['nouveau', 'publiable', 'masque'].includes(b.status)) return reply({ error: 'Statut inconnu.' }, 400, req, env);
+    if (b.status === 'publiable' && !row.consent) return reply({ error: 'L\'apprenant n\'a pas accepté que cet avis soit publié.' }, 400, req, env);
+    await env.DB.prepare('UPDATE reviews SET status = ? WHERE id = ?').bind(b.status, row.id).run();
+    await journal(env, who, b.status === 'publiable' ? 'Avis marqué publiable' : b.status === 'masque' ? 'Avis masqué' : 'Avis remis en « nouveau »', '', row.name, '');
     return reply({ ok: true }, 200, req, env);
   }
 
@@ -922,7 +1016,7 @@ async function admin(req, env, url) {
     if (env.DB) {
       const st = [];
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
       }
       await env.DB.batch(st);
@@ -1004,6 +1098,8 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE exercises SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE prefs SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE quiz_results SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE certificates SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE reviews SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;
