@@ -258,3 +258,8 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 - Sauvegarde, branche `paiements`, Worker + admin + tests (49/49), Worker de test déployé, documents.
 - Test Sandbox réussi de bout en bout ; mode de secours ajouté (API parfois bloquée, webhook minimal).
 - **Mise en ligne faite le 25/10/2026** : réception des paiements en service en production (test DigitalPaye livré, HTTP 200).
+- Les 2 apprenants de production (« Abenan Joelle Yao » et « AKA JEAN EUDES TEST ») étaient des **tests de l'administrateur** :
+  supprimés par lui le 25/10/2026 (bouton « Supprimer définitivement ses données »). Production vide d'apprenants (KV : `cfg`, `f:arc1-e1`).
+  Il n'y a donc **pas d'apprenant actuel** dont il faudrait ajouter le numéro WhatsApp.
+- Petit défaut connu (sans effet visible) : juste après une suppression, la liste KV peut encore montrer le code pendant ~60 s et
+  `listCodes()` le remet dans l'index `codes` (ligne orpheline, ignorée à l'affichage). Une ligne de ce type a été retirée à la main.
