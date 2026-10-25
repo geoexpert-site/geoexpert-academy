@@ -180,3 +180,11 @@ CREATE TABLE IF NOT EXISTS paiements (
 );
 CREATE INDEX IF NOT EXISTS paiements_statut ON paiements (statut);
 CREATE INDEX IF NOT EXISTS paiements_code ON paiements (code);
+
+-- Codes dont les données ont été supprimées (bouton « Supprimer définitivement ses données ») : le code seul, sans
+-- aucune donnée personnelle. Sert à ne pas remettre un code supprimé dans l'index « codes » pendant les ~60 s où la
+-- liste KV le montre encore.
+CREATE TABLE IF NOT EXISTS codes_supprimes (
+  code TEXT PRIMARY KEY,
+  t INTEGER NOT NULL
+);

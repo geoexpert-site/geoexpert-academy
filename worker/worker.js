@@ -821,6 +821,8 @@ async function saveLessons(env, key, videos, who, maxNum) {
 
 // Tous les codes : liste KV complète (sans limite de 500) + index D1. La liste KV peut mettre jusqu'à 60 s
 // à montrer un nouveau code ; l'index D1, rempli à la création, le montre tout de suite.
+// De même, elle peut montrer encore ~60 s un code supprimé : les codes supprimés (table codes_supprimes)
+// sont donc écartés, pour ne jamais les remettre dans l'index.
 async function listCodes(env) {
   const set = new Set();
   let cursor = null;
@@ -830,6 +832,9 @@ async function listCodes(env) {
     cursor = l.list_complete ? null : l.cursor;
   } while (cursor);
   if (env.DB) {
+    try {
+      (await env.DB.prepare('SELECT code FROM codes_supprimes').all()).results.forEach(r => set.delete(r.code));
+    } catch (e) { /* table pas encore créée : comme avant */ }
     try {
       const known = new Set((await env.DB.prepare('SELECT code FROM codes').all()).results.map(r => r.code));
       const missing = [...set].filter(c => !known.has(c));
@@ -1194,6 +1199,7 @@ async function admin(req, env, url) {
       for (const x of all) {
         for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
+        st.push(env.DB.prepare('INSERT OR IGNORE INTO codes_supprimes (code, t) VALUES (?, ?)').bind(x, now));
       }
       await env.DB.batch(st);
     }

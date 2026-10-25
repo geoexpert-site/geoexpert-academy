@@ -261,5 +261,8 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 - Les 2 apprenants de production (« Abenan Joelle Yao » et « AKA JEAN EUDES TEST ») étaient des **tests de l'administrateur** :
   supprimés par lui le 25/10/2026 (bouton « Supprimer définitivement ses données »). Production vide d'apprenants (KV : `cfg`, `f:arc1-e1`).
   Il n'y a donc **pas d'apprenant actuel** dont il faudrait ajouter le numéro WhatsApp.
-- Petit défaut connu (sans effet visible) : juste après une suppression, la liste KV peut encore montrer le code pendant ~60 s et
-  `listCodes()` le remet dans l'index `codes` (ligne orpheline, ignorée à l'affichage). Une ligne de ce type a été retirée à la main.
+- **Corrigé et en ligne (25/10/2026)** : juste après une suppression, la liste KV pouvait encore montrer le code ~60 s et
+  `listCodes()` le remettait dans l'index `codes`. Désormais la suppression note le code (seul, sans donnée) dans la table
+  `codes_supprimes`, que `listCodes()` écarte. Test `test-purge.mjs` 15/15 (liste KV en retard simulée) ; non-régression 203/203.
+  Sauvegarde `GeoExpert-Sauvegardes\2026-10-25-avant-correctif-index\` ; `geoexpert-admin` → a1f554e9 (avant : d9240891),
+  `espace-apprenant-api` → fe27980e (avant : 0c9d319f).
