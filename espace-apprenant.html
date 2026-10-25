@@ -282,7 +282,7 @@ async function login(c,silent){
  finally{b.disabled=false}
 }
 function start(){
- L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,m:m,i:i,lock:m.locked||!!v.locked,at:v.locked?v.unlockAt:m.unlockAt})})});
+ L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,files:v.files||[],m:m,i:i,lock:m.locked||!!v.locked,at:v.locked?v.unlockAt:m.unlockAt})})});
  // Correction : on supprime totalement la page de login pour ne pas laisser de vide
  $('login').style.display = 'none'; 
  $('app').hidden=false;$('who').textContent=D.label;
@@ -566,7 +566,10 @@ m.appendChild(h('div',{class:'ctl'},
  
  // --- CORRECTION DES BOUTONS D'EXERCICES ---
  if(tab==='ex'){
-   if(!l.m.exercises.length) pn.appendChild(h('p',{class:'note',text:'Ce module ne contient pas d\'exercice PDF.'}));
+   // Fichiers joints à cette leçon (données, consignes…), avant les exercices du module
+   l.files.forEach(function(f){var fb=h('button',{class:'btn alt',onclick:function(e){openFile(f.k,e.currentTarget)}},f.ready?'Télécharger':'Bientôt');if(!f.ready)fb.disabled=true;
+    pn.appendChild(h('div',{class:'ex'},ic('pdf'),h('span',{text:f.title}),fb))});
+   if(!l.m.exercises.length&&!l.files.length) pn.appendChild(h('p',{class:'note',text:'Ce module ne contient pas d\'exercice PDF.'}));
    l.m.exercises.forEach(function(x){
      var btn = h('button', {class:'btn alt', onclick: function(e){ openFile(x.k, e.currentTarget); }});
      if (x.locked) {

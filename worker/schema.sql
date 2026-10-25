@@ -108,6 +108,16 @@ CREATE TABLE IF NOT EXISTS quiz_results (
   PRIMARY KEY (code, k)
 );
 
+-- Contenu modifié dans l'administration (une seule ligne, id = 1). data = JSON
+-- { "modules": { "qgis1": [ { "k", "title", "dur", "hidden"?, "files"?: [{ "k", "title" }] }, ... ] }, "maxNum": { "qgis1": 21 } }
+-- Une formation absente de « modules » garde la liste de leçons écrite dans le code.
+CREATE TABLE IF NOT EXISTS content (
+  id INTEGER PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated INTEGER,
+  who TEXT
+);
+
 -- Attestations de fin de formation (une par formation terminée), vérifiables publiquement par leur numéro.
 CREATE TABLE IF NOT EXISTS certificates (
   id TEXT PRIMARY KEY,

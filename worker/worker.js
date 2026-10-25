@@ -231,7 +231,26 @@ async function safeEqual(a, b) {
   return d === 0;
 }
 function moduleOf(k) { return String(k).split('-')[0]; }
-function findModule(m) { return CATALOG.find(x => x.key === m); }
+// Catalogue courant : celui du code (CATALOG), ou la version modifiée dans l'administration (table D1 « content »).
+// Pour chaque formation, la liste des leçons (ordre, titre, durée, masquée, fichiers) peut être remplacée ;
+// les formations, leurs titres et leurs exercices restent ceux du code.
+let CAT = CATALOG, catAt = 0, catRaw = null;
+async function loadCatalog(env, force) {
+  if (!env.DB) { CAT = CATALOG; return CAT; }
+  if (!force && Date.now() - catAt < 30000) return CAT;
+  try {
+    const row = await env.DB.prepare('SELECT data FROM content WHERE id = 1').first();
+    catRaw = row ? JSON.parse(row.data) : null;
+    CAT = CATALOG.map(m => catRaw && catRaw.modules && catRaw.modules[m.key] ? Object.assign({}, m, { videos: catRaw.modules[m.key] }) : m);
+    catAt = Date.now();
+  } catch (e) { CAT = CATALOG; }
+  return CAT;
+}
+function findModule(m) { return CAT.find(x => x.key === m); }
+// Leçons visibles par les apprenants (les leçons masquées gardent la progression, mais disparaissent de leur page).
+function vis(m) { return m.videos.filter(v => !v.hidden); }
+// Leçon d'un fichier de leçon (ex. « qgis1-v05-f2 » → « qgis1-v05 »).
+function lessonOfFile(k) { return String(k).replace(/-f\d+$/, ''); }
 
 function allowedOrigins(env) {
   return String(env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -244,6 +263,7 @@ function corsHeaders(req, env) {
     h['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS';
     h['Access-Control-Allow-Headers'] = 'Content-Type, X-Admin-Password';
     h['Access-Control-Max-Age'] = '600';
+    h['Access-Control-Expose-Headers'] = 'Content-Disposition'; // la page peut lire le vrai nom du fichier téléchargé
   }
   return h;
 }
@@ -263,7 +283,7 @@ async function readJson(req) {
 async function getCfg(env) {
   const raw = await env.ACCESS.get('cfg');
   const c = raw ? JSON.parse(raw) : {};
-  return { ids: c.ids || {}, files: c.files || {} };
+  return { ids: c.ids || {}, files: c.files || {}, names: c.names || {} };
 }
 async function findStudent(env, code) {
   const c = normCode(code);
@@ -284,7 +304,7 @@ function addMonths(ms, n) {
 function certId() { const s = randomCode(8); return 'ATT-' + s.slice(0, 4) + '-' + s.slice(4); }
 // Durée totale des vidéos d'une formation, ex. « 3 h 12 ».
 function moduleHours(m) {
-  const s = m.videos.reduce((a, v) => a + String(v.dur).split(':').reduce((x, y) => x * 60 + (+y || 0), 0), 0);
+  const s = vis(m).reduce((a, v) => a + String(v.dur).split(':').reduce((x, y) => x * 60 + (+y || 0), 0), 0);
   const h = Math.floor(s / 3600), mn = Math.round(s % 3600 / 60);
   return h ? h + ' h ' + String(mn).padStart(2, '0') : mn + ' min';
 }
@@ -329,8 +349,8 @@ function startAccess(rec, now) {
 function trialLock(rec, k, now) {
   const end = trialEnd(rec);
   if (!end || now >= end) return 0;
-  const m = findModule(moduleOf(k));
-  const i = m ? m.videos.findIndex(v => v.k === k) : -1;
+  const m = findModule(moduleOf(k)), lk = lessonOfFile(k);
+  const i = m ? vis(m).findIndex(v => v.k === lk) : -1;
   return i >= 0 && i < TRIAL_FREE ? 0 : end;
 }
 // Annonces en cours pour un apprenant (toutes formations, ou une de ses formations). [] si la base est absente.
@@ -367,7 +387,7 @@ function cleanQuiz(qs) {
 // Leçon (vidéo) d'un module de l'apprenant.
 function ownsLesson(rec, k) {
   const m = findModule(moduleOf(k));
-  return !!m && rec.modules.some(g => g.m === m.key) && m.videos.some(v => v.k === k);
+  return !!m && rec.modules.some(g => g.m === m.key) && vis(m).some(v => v.k === k);
 }
 // Exercice d'un module de l'apprenant.
 function ownsExercise(rec, k) {
@@ -454,6 +474,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req, env) });
     try {
       if (!env.ACCESS) return reply({ error: 'Configuration incomplète : KV ACCESS manquant.' }, 500, req, env);
+      await loadCatalog(env);
       const origin = req.headers.get('Origin');
       const sameOrigin = role === 'admin' && origin === url.origin;
       if (origin && !sameOrigin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
@@ -492,9 +513,10 @@ async function api(req, env, url) {
       const m = findModule(g.m); if (!m) return null;
       return {
         key: m.key, title: m.title, meta: m.meta, locked: now < g.from, unlockAt: g.from,
-        videos: m.videos.map(v => {
+        videos: vis(m).map(v => {
           const t = trialLock(rec, v.k, now);
-          return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k] };
+          return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k],
+            files: (v.files || []).map(f => ({ k: f.k, title: f.title, ready: !!cfg.files[f.k] })) };
         }),
         exercises: m.exercises.map(e => {
           const t = trialLock(rec, e.k, now);
@@ -614,6 +636,7 @@ async function api(req, env, url) {
 
   if (url.pathname === '/api/play') {
     const k = String(body.k || '');
+    if (!ownsLesson(rec, k)) return reply({ error: 'Cette vidéo ne fait pas partie de votre formation.' }, 403, req, env);
     const e = entitled(rec, k, now);
     if (e.none) return reply({ error: 'Cette vidéo ne fait pas partie de votre formation.' }, 403, req, env);
     if (e.trial) return reply({ error: 'Cette leçon sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
@@ -633,13 +656,15 @@ async function api(req, env, url) {
     const e = entitled(rec, k, now);
     if (e.trial) return reply({ error: 'Cet exercice sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
+    if (/-f\d+$/.test(k) && !ownsLesson(rec, lessonOfFile(k))) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
 
     // On cherche le nom du fichier pour le navigateur
     const m = findModule(moduleOf(k));
-    let filename = k + '.pdf';
+    const cfgF = await getCfg(env), ext = ((cfgF.names[k] || '').match(/\.[a-z0-9]{1,5}$/i) || ['.pdf'])[0].toLowerCase();
+    let filename = k + ext;
     if (m) {
-      const ex = m.exercises.find(x => x.k === k);
-      if (ex) filename = ex.title.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
+      const ex = m.exercises.find(x => x.k === k) || (m.videos.find(v => v.k === lessonOfFile(k)) || { files: [] }).files.find(x => x.k === k);
+      if (ex) filename = ex.title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '') + ext;
     }
 
     const buf = await env.ACCESS.get('f:' + k, 'arrayBuffer');
@@ -667,6 +692,18 @@ async function adminAccessOk(req, env) {
   return !!(await accessEmail(req, env));
 }
 const MAX_FAILS = 5, FAIL_WINDOW = 15 * 60000;
+
+// Enregistre la liste des leçons d'une formation dans D1 (null = revenir à la liste du code).
+async function saveLessons(env, key, videos, who, maxNum) {
+  await loadCatalog(env, true);
+  const data = catRaw ? JSON.parse(JSON.stringify(catRaw)) : { modules: {}, maxNum: {} };
+  data.modules = data.modules || {}; data.maxNum = data.maxNum || {};
+  if (videos) data.modules[key] = videos; else delete data.modules[key];
+  if (maxNum) data.maxNum[key] = Math.max(maxNum, data.maxNum[key] || 0);
+  await env.DB.prepare('INSERT INTO content (id, data, updated, who) VALUES (1, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET data = excluded.data, updated = excluded.updated, who = excluded.who')
+    .bind(JSON.stringify(data), Date.now(), who || '').run();
+  await loadCatalog(env, true);
+}
 
 // Tous les codes : liste KV complète (sans limite de 500) + index D1. La liste KV peut mettre jusqu'à 60 s
 // à montrer un nouveau code ; l'index D1, rempli à la création, le montre tout de suite.
@@ -696,7 +733,7 @@ async function progressSummary(env) {
   try {
     const since = Date.now() - 30 * DAY;
     const [p, l, r, ct, rl, xs] = await env.DB.batch([
-      env.DB.prepare('SELECT code, COUNT(*) AS n, MAX(done_at) AS lastDone FROM progress GROUP BY code'),
+      env.DB.prepare('SELECT code, k, done_at FROM progress'),
       env.DB.prepare('SELECT code, last, last_activity FROM learners'),
       env.DB.prepare("SELECT substr(k, 1, instr(k, '-') - 1) AS m, COUNT(*) AS n FROM progress WHERE done_at > ? GROUP BY m").bind(since),
       env.DB.prepare('SELECT code, phone FROM contacts'),
@@ -704,7 +741,11 @@ async function progressSummary(env) {
       env.DB.prepare('SELECT code, COUNT(*) AS n FROM exercises GROUP BY code'),
     ]);
     const at = c => out.byCode[c] = out.byCode[c] || {};
-    for (const x of p.results) Object.assign(at(x.code), { n: x.n, lastDone: x.lastDone > 1 ? x.lastDone : 0, seen: true });
+    const visible = new Set(); CAT.forEach(m => vis(m).forEach(v => visible.add(v.k)));
+    for (const x of p.results) {
+      const o = Object.assign(at(x.code), { seen: true }); o.n = (o.n || 0) + (visible.has(x.k) ? 1 : 0);
+      if (x.done_at > 1 && x.done_at > (o.lastDone || 0)) o.lastDone = x.done_at;
+    }
     for (const x of l.results) Object.assign(at(x.code), { act: x.last_activity || 0, last: x.last || '', seen: true });
     for (const x of r.results) out.recentByModule[x.m] = x.n;
     for (const x of ct.results) at(x.code).phone = x.phone;
@@ -750,7 +791,7 @@ function dashboardStats(students, prog, now) {
   const valid = students.filter(s => s.active && !(s.expires && s.expires < now));
   const used = valid.filter(s => s.premiereUtilisation || s.logins || s.lastActivity);
   const withProg = used.filter(s => s.synced && s.lessons);
-  const modules = CATALOG.map(m => ({
+  const modules = CAT.map(m => ({
     key: m.key, title: m.title,
     inscrits: valid.filter(s => s.modules.some(g => g.m === m.key)).length,
     lecons30j: prog.recentByModule[m.key] || 0,
@@ -815,7 +856,7 @@ async function admin(req, env, url) {
         logins: rec.logins || 0, lastLogin: rec.lastLogin || 0, networks: (rec.seen || []).length, countries: [...new Set((rec.seen || []).map(x => x.c).filter(Boolean))],
         modules: rec.modules.map(g => ({ m: g.m, from: g.from })),
         essai: !!rec.essai, premiereUtilisation: rec.premiereUtilisation || 0, finEssai: trialEnd(rec), accesComplet: !!rec.accesComplet, mois: rec.mois || 0,
-        done: p.n || 0, lessons: rec.modules.reduce((s, g) => s + ((findModule(g.m) || { videos: [] }).videos.length), 0),
+        done: p.n || 0, lessons: rec.modules.reduce((s, g) => { const m = findModule(g.m); return s + (m ? vis(m).length : 0); }, 0),
         lastActivity: Math.max(rec.lastLogin || 0, p.act || 0, p.lastDone || 0), synced: !!p.seen, remplace: !!rec.remplacePar,
         lastLesson: p.last ? ((findModule(moduleOf(p.last)) || { videos: [] }).videos.find(v => v.k === p.last) || {}).title || '' : '',
         phone: p.phone || '', marks: p.marks || {}, exDone: p.ex || 0,
@@ -826,7 +867,7 @@ async function admin(req, env, url) {
     students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
-      catalog: CATALOG.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, id: cfg.ids[v.k] || '' })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
+      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => ({ k: f.k, title: f.title, has: !!cfg.files[f.k] })) })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
       products: Object.keys(PRODUCTS), students, stats: dashboardStats(students, prog, now),
     }, 200, req, env);
   }
@@ -864,7 +905,7 @@ async function admin(req, env, url) {
       lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
       modules: rec.modules.map(g => {
         const m = findModule(g.m); if (!m) return null;
-        return { key: m.key, title: m.title, from: g.from, lessons: m.videos.map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })),
+        return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })),
           exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0 })) };
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
@@ -1175,13 +1216,71 @@ async function admin(req, env, url) {
     }
   }
 
+  // Contenu : enregistrer la liste des leçons d'une formation (ordre, titres, durées, masquées, ajoutées, supprimées).
+  if (url.pathname === '/admin/content' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const m = findModule(String(b.module || ''));
+    if (!m) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    const list = Array.isArray(b.videos) ? b.videos : [];
+    if (!list.length || list.length > 200) return reply({ error: 'La formation doit garder au moins une leçon.' }, 400, req, env);
+    const old = new Map(m.videos.map(v => [v.k, v]));
+    // Numéro le plus haut déjà utilisé (code, version actuelle, historique) : une nouvelle leçon ne reprend jamais une ancienne clé.
+    const nums = [...CATALOG.find(x => x.key === m.key).videos, ...m.videos].map(v => +v.k.split('-v')[1] || 0);
+    let next = Math.max(...nums, (catRaw && catRaw.maxNum && catRaw.maxNum[m.key]) || 0);
+    const seen = new Set(), out = [];
+    for (let i = 0; i < list.length; i++) {
+      const x = list[i] || {}, n = i + 1;
+      const title = String(x.title || '').trim().replace(/\s+/g, ' ').slice(0, 200);
+      const dur = String(x.dur || '').trim();
+      if (!title) return reply({ error: 'Leçon n° ' + n + ' : écrivez un titre.' }, 400, req, env);
+      if (!/^\d{1,2}(:\d{2}){1,2}$/.test(dur)) return reply({ error: 'Leçon n° ' + n + ' (« ' + title.slice(0, 40) + ' ») : durée au format 12:34 ou 1:02:03.' }, 400, req, env);
+      let k = String(x.k || '');
+      if (k) { if (!old.has(k) || seen.has(k)) return reply({ error: 'Leçon n° ' + n + ' : leçon inconnue.' }, 400, req, env); }
+      else { next++; k = m.key + '-v' + String(next).padStart(2, '0'); }
+      seen.add(k);
+      const v = { k, title, dur };
+      if (x.hidden) v.hidden = true;
+      const files = old.has(k) ? (old.get(k).files || []) : [];   // les fichiers se gèrent à part (envoi / suppression)
+      if (files.length) v.files = files;
+      out.push(v);
+    }
+    if (!out.some(v => !v.hidden)) return reply({ error: 'Au moins une leçon doit rester visible.' }, 400, req, env);
+    const removed = m.videos.filter(v => !seen.has(v.k));
+    await saveLessons(env, m.key, out, who, next);
+    const added = out.filter(v => !old.has(v.k)).length, hid = out.filter(v => v.hidden).length;
+    await journal(env, who, 'Contenu modifié', '', '', m.title.split(' : ')[0] + ' : ' + out.length + ' leçon(s)' + (added ? ', ' + added + ' ajoutée(s)' : '') + (removed.length ? ', ' + removed.length + ' supprimée(s)' : '') + (hid ? ', ' + hid + ' masquée(s)' : ''));
+    return reply({ ok: true, added: out.filter(v => !old.has(v.k)).map(v => v.k) }, 200, req, env);
+  }
+  // Contenu : revenir au contenu d'origine d'une formation (celui du code).
+  if (url.pathname === '/admin/content-reset' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const m = CATALOG.find(x => x.key === String(b.module || ''));
+    if (!m) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    await saveLessons(env, m.key, null, who);
+    await journal(env, who, 'Contenu remis à l\'origine', '', '', m.title.split(' : ')[0]);
+    return reply({ ok: true }, 200, req, env);
+  }
+  // Contenu : retirer un fichier d'une leçon.
+  if (url.pathname === '/admin/lesson-file-delete' && req.method === 'POST') {
+    const b = await readJson(req);
+    const k = String(b.k || ''), m = findModule(moduleOf(k)), v = m && m.videos.find(x => x.k === lessonOfFile(k));
+    if (!v || !(v.files || []).some(f => f.k === k)) return reply({ error: 'Fichier introuvable.' }, 404, req, env);
+    await saveLessons(env, m.key, m.videos.map(x => x.k === v.k ? Object.assign({}, x, { files: x.files.filter(f => f.k !== k) }) : x), who);
+    await env.ACCESS.delete('f:' + k);
+    const cfg = await getCfg(env); delete cfg.files[k]; delete cfg.names[k]; await env.ACCESS.put('cfg', JSON.stringify(cfg));
+    await journal(env, who, 'Fichier de leçon retiré', '', '', k);
+    return reply({ ok: true }, 200, req, env);
+  }
+
   if (url.pathname === '/admin/ids' && req.method === 'PUT') {
     const b = await readJson(req);
     const cfg = await getCfg(env);
     const valid = /^[0-9a-fA-F-]{36}$/;
     let n = 0;
     for (const [k, v] of Object.entries(b.ids || {})) {
-      if (!/^[a-z0-9]+-v\d{2}$/.test(k)) continue;
+      if (!/^[a-z0-9]+-v\d{2,3}$/.test(k)) continue;
       const id = String(v || '').trim();
       if (!id) { delete cfg.ids[k]; n++; }
       else if (valid.test(id)) { cfg.ids[k] = id; n++; }
@@ -1193,13 +1292,21 @@ async function admin(req, env, url) {
 
   if (url.pathname === '/admin/file' && req.method === 'PUT') {
     const k = url.searchParams.get('k') || '';
-    if (!/^[a-z0-9]+-e\d+$/.test(k)) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    const lessonFile = /^[a-z0-9]+-v\d{2,3}-f\d+$/.test(k);
+    if (!/^[a-z0-9]+-e\d+$/.test(k) && !lessonFile) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    const lesson = lessonFile && (findModule(moduleOf(k)) || { videos: [] }).videos.find(v => v.k === lessonOfFile(k));
+    if (lessonFile && !lesson) return reply({ error: 'Leçon inconnue.' }, 400, req, env);
+    const fname = String(url.searchParams.get('name') || '').replace(/[^\w.\- ]/g, '').slice(-80);
     const buf = await req.arrayBuffer();
     if (buf.byteLength < 100 || buf.byteLength > 10 * 1024 * 1024) return reply({ error: 'Fichier vide ou supérieur à 10 Mo.' }, 400, req, env);
     await env.ACCESS.put('f:' + k, buf);
-    const cfg = await getCfg(env); cfg.files[k] = true;
+    const cfg = await getCfg(env); cfg.files[k] = true; if (fname) cfg.names[k] = fname;
     await env.ACCESS.put('cfg', JSON.stringify(cfg));
-    await journal(env, who, 'Fichier d\'exercice envoyé', '', '', k + ' (' + Math.round(buf.byteLength / 1024) + ' Ko)');
+    if (lessonFile && !(lesson.files || []).some(f => f.k === k)) {
+      const title = String(url.searchParams.get('title') || fname.replace(/\.[^.]*$/, '') || 'Fichier').trim().slice(0, 120);
+      await saveLessons(env, moduleOf(k), findModule(moduleOf(k)).videos.map(v => v.k === lesson.k ? Object.assign({}, v, { files: (v.files || []).concat({ k, title }) }) : v), who);
+    }
+    await journal(env, who, lessonFile ? 'Fichier de leçon envoyé' : 'Fichier d\'exercice envoyé', '', '', k + (fname ? ' · ' + fname : '') + ' (' + Math.round(buf.byteLength / 1024) + ' Ko)');
     return reply({ ok: true }, 200, req, env);
   }
   return reply({ error: 'Introuvable.' }, 404, req, env);

@@ -126,6 +126,24 @@
   .a-card .arow select { width: auto; max-width: 260px; padding: 7px 10px; font-size: 13px; }
   .acts .warn { margin: 12px 14px; display: block; }
   .acts > .b { margin: 0 14px 12px; }
+  /* Contenu */
+  .cl { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; background: var(--card); }
+  .cl.cache { opacity: .6; background: var(--soft); }
+  .cl.neuf { border-color: var(--teal); }
+  .cl .clr { display: grid; grid-template-columns: 34px 1fr 90px auto; gap: 8px; align-items: center; }
+  .cl .num { font: 700 13px Montserrat; color: var(--indigo); text-align: center; }
+  .a-card .cl input[type=text] { padding: 8px 10px; font-size: 14px; }
+  .cl .clb { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .cl .clb .b.sec { padding: 5px 9px; }
+  .cl .clf { margin: 8px 0 0 42px; font-size: 13px; color: var(--dim); display: flex; flex-direction: column; gap: 4px; }
+  .cl .clf span { display: flex; gap: 8px; align-items: center; }
+  .cl .clf button { border: 0; background: none; color: #c0392b; cursor: pointer; font: 600 12px Inter; }
+  .cl .clf label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--teal); font-weight: 600; }
+  .cl .clf input[type=file] { font-size: 12px; max-width: 230px; }
+  .cbar { position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 12px 0 4px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .cbar .dirty { color: var(--mag); font-weight: 600; font-size: 13px; }
+  @media (max-width: 768px) { .cl .clr { grid-template-columns: 28px 1fr 70px; } .cl .clb { grid-column: 1 / -1; justify-content: flex-start; } .cl .clf { margin-left: 0; } }
+
   /* Quiz */
   .qq { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 12px; }
   .qq h4 { margin: 0 0 8px; font: 700 14px Montserrat; color: var(--indigo); display: flex; justify-content: space-between; align-items: center; }
@@ -204,6 +222,7 @@
       <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
+      <button data-t="cont">📚 Contenu</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
       <button data-t="pdf">📄 Fichiers (PDF/ZIP)</button>
       <button data-t="log">📜 Journal</button>
@@ -233,6 +252,17 @@
         <h2>Suivi de la période d'essai</h2>
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants dont l'essai de 7 jours est en cours, avec le jour où ils en sont.</p>
         <div id="trialList"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Contenu -->
+    <div data-p="cont" hidden>
+      <div class="a-card">
+        <h2>Contenu des formations</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Renommez, réordonnez, masquez ou ajoutez des leçons, et joignez des fichiers à une leçon. Rien ne change pour les apprenants tant que vous n'avez pas cliqué sur <b>Enregistrer</b>. Les changements apparaissent chez eux en moins d'une minute.</p>
+        <label for="cMod">Formation</label>
+        <select id="cMod"></select>
+        <div id="cList" style="margin-top:14px;"></div>
       </div>
     </div>
 
@@ -389,8 +419,111 @@
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
     QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
     renderAttestations(await call('/admin/attestations', 'GET'));
+    renderContent(true);
     renderLog((await call('/admin/journal', 'GET')).entries);
   }
+
+  // ----- Contenu des formations
+  var CED = null; // copie de travail de la formation affichée (non enregistrée)
+  function renderContent(keep) {
+    var sel = $('cMod'), v = sel.value; sel.textContent = '';
+    state.catalog.forEach(function (m) { var o = el('option', '', m.title.split(' : ')[0] + ' (' + m.videos.filter(function (x) { return !x.hidden; }).length + ' leçons)'); o.value = m.key; sel.appendChild(o); });
+    sel.value = v || state.catalog[0].key;
+    var m = state.catalog.filter(function (c) { return c.key === sel.value; })[0];
+    if (!keep || !CED || CED.key !== m.key || !dirty()) CED = { key: m.key, title: m.title, videos: JSON.parse(JSON.stringify(m.videos)), orig: JSON.stringify(m.videos.map(strip)), removed: [] };
+    drawContent();
+  }
+  function strip(v) { return { k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden }; }
+  function dirty() { return JSON.stringify(CED.videos.map(strip)) !== CED.orig; }
+  $('cMod').addEventListener('change', function (e) {
+    if (CED && dirty() && !confirm('Vous avez des changements non enregistrés sur cette formation. Les abandonner ?')) { e.target.value = CED.key; return; }
+    renderContent();
+  });
+  function drawContent() {
+    var box = $('cList'); box.textContent = '';
+    CED.videos.forEach(function (v, i) {
+      var d = el('div', 'cl' + (v.hidden ? ' cache' : '') + (v.k ? '' : ' neuf')), r = el('div', 'clr');
+      r.appendChild(el('span', 'num', String(i + 1)));
+      var t = el('input'); t.type = 'text'; t.maxLength = 200; t.value = v.title; t.placeholder = 'Titre de la leçon'; t.setAttribute('aria-label', 'Titre de la leçon ' + (i + 1));
+      t.addEventListener('input', function () { v.title = t.value; mark(); });
+      var du = el('input'); du.type = 'text'; du.maxLength = 8; du.value = v.dur || ''; du.placeholder = '12:34'; du.setAttribute('aria-label', 'Durée de la leçon ' + (i + 1));
+      du.addEventListener('input', function () { v.dur = du.value.trim(); mark(); });
+      var bt = el('div', 'clb');
+      function btn(label, title, fn, cls) { var b = el('button', 'b sec ' + (cls || ''), label); b.type = 'button'; b.title = title; b.setAttribute('aria-label', title); b.addEventListener('click', fn); bt.appendChild(b); return b; }
+      var up = btn('↑', 'Monter la leçon ' + (i + 1), function () { CED.videos.splice(i - 1, 0, CED.videos.splice(i, 1)[0]); drawContent(); }); up.disabled = i === 0;
+      var dn = btn('↓', 'Descendre la leçon ' + (i + 1), function () { CED.videos.splice(i + 1, 0, CED.videos.splice(i, 1)[0]); drawContent(); }); dn.disabled = i === CED.videos.length - 1;
+      btn(v.hidden ? 'Afficher' : 'Masquer', v.hidden ? 'Rendre la leçon visible' : 'Masquer la leçon aux apprenants', function () { v.hidden = !v.hidden; drawContent(); });
+      btn('Supprimer', 'Supprimer la leçon', function () {
+        if (!confirm('Supprimer la leçon « ' + (v.title || 'sans titre') + ' » ?' + (v.k ? '\n\nElle disparaîtra pour tous les apprenants. Leur progression sur cette leçon ne comptera plus.\nPour la retirer temporairement, préférez « Masquer ».' : ''))) return;
+        CED.videos.splice(i, 1); if (v.k) CED.removed.push(v.title); drawContent();
+      }, 'red');
+      r.appendChild(t); r.appendChild(du); r.appendChild(bt); d.appendChild(r);
+      // Fichiers joints à la leçon (gérés tout de suite, sans attendre « Enregistrer »)
+      var fz = el('div', 'clf');
+      (v.files || []).forEach(function (f) {
+        var line = el('span'); line.appendChild(el('span', '', '📎 ' + f.title + (f.has ? '' : ' (envoi en attente)')));
+        var x = el('button', '', 'Retirer'); x.type = 'button';
+        x.addEventListener('click', async function () {
+          if (!confirm('Retirer le fichier « ' + f.title + ' » de cette leçon ?\n\nIl sera supprimé et les apprenants ne pourront plus le télécharger.')) return;
+          try { await call('/admin/lesson-file-delete', 'POST', { k: f.k }); await reloadContent(); } catch (e) { alert(e.message); }
+        });
+        line.appendChild(x); fz.appendChild(line);
+      });
+      if (v.k) {
+        var lab = el('label'); lab.appendChild(document.createTextNode('📎 Joindre un fichier (10 Mo max.) :'));
+        var inp = el('input'); inp.type = 'file'; inp.setAttribute('aria-label', 'Joindre un fichier à la leçon ' + (i + 1)); lab.appendChild(inp); fz.appendChild(lab);
+        inp.addEventListener('change', async function () {
+          var file = inp.files[0]; if (!file) return;
+          if (file.size > 10 * 1024 * 1024) { alert('Fichier trop volumineux (10 Mo au maximum).'); inp.value = ''; return; }
+          if (dirty() && !confirm('Vous avez des changements non enregistrés : enregistrez-les d\'abord, sinon ils seront perdus. Continuer quand même ?')) { inp.value = ''; return; }
+          var title = prompt('Nom du fichier tel que les apprenants le verront :', file.name.replace(/\.[^.]*$/, ''));
+          if (title === null) { inp.value = ''; return; }
+          var n = 1 + Math.max.apply(null, [0].concat((v.files || []).map(function (f) { return +f.k.split('-f')[1] || 0; })));
+          var k = v.k + '-f' + n;
+          try { await call('/admin/file?k=' + encodeURIComponent(k) + '&name=' + encodeURIComponent(file.name) + '&title=' + encodeURIComponent(title.trim() || file.name), 'PUT', null, file); await reloadContent(); alert('Fichier joint à la leçon.'); }
+          catch (e) { alert(e.message); inp.value = ''; }
+        });
+      } else fz.appendChild(el('span', '', 'Enregistrez d\'abord la nouvelle leçon pour pouvoir y joindre un fichier.'));
+      d.appendChild(fz); box.appendChild(d);
+    });
+    var bar = el('div', 'cbar');
+    var add = el('button', 'b sec', '+ Ajouter une leçon'); add.type = 'button';
+    add.addEventListener('click', function () { CED.videos.push({ k: '', title: '', dur: '' }); drawContent(); var ins = $('cList').querySelectorAll('.cl.neuf input[type=text]'); if (ins.length) ins[ins.length - 2].focus(); });
+    var save = el('button', 'b', 'Enregistrer'); save.type = 'button'; save.style.marginTop = '0';
+    var cancel = el('button', 'b sec', 'Annuler les changements'); cancel.type = 'button';
+    cancel.addEventListener('click', function () { renderContent(); });
+    var reset = el('button', 'b sec red', 'Revenir au contenu d\'origine'); reset.type = 'button';
+    reset.addEventListener('click', async function () {
+      if (!confirm('Revenir à la liste de leçons d\'origine pour « ' + CED.title.split(' : ')[0] + ' » ?\n\nToutes vos modifications sur cette formation (titres, ordre, leçons ajoutées ou masquées, fichiers de leçon) seront annulées.')) return;
+      try { await call('/admin/content-reset', 'POST', { module: CED.key }); await reloadContent(); } catch (e) { alert(e.message); }
+    });
+    var st = el('span', 'dirty'); st.id = 'cDirty';
+    bar.appendChild(add); bar.appendChild(save); bar.appendChild(cancel); bar.appendChild(reset); bar.appendChild(st);
+    box.appendChild(bar);
+    var msg = el('div'); msg.id = 'cMsg'; box.appendChild(msg);
+    save.addEventListener('click', async function () {
+      msg.className = ''; msg.textContent = '';
+      if (!dirty()) { msg.className = 'ok'; msg.textContent = 'Aucun changement à enregistrer.'; return; }
+      var o = JSON.parse(CED.orig), byK = {}; o.forEach(function (x) { byK[x.k] = x; });
+      var added = CED.videos.filter(function (x) { return !x.k; }).length, renamed = CED.videos.filter(function (x) { return x.k && byK[x.k] && byK[x.k].title !== x.title; }).length;
+      var hid = CED.videos.filter(function (x) { return x.hidden && !(byK[x.k] || {}).hidden; }).length;
+      var sum = [];
+      if (added) sum.push(added + ' leçon(s) ajoutée(s)'); if (renamed) sum.push(renamed + ' renommée(s)'); if (hid) sum.push(hid + ' masquée(s)');
+      if (CED.removed.length) sum.push(CED.removed.length + ' SUPPRIMÉE(S) : ' + CED.removed.join(', '));
+      if (!confirm('Enregistrer les changements de « ' + CED.title.split(' : ')[0] + ' » ?\n\n' + (sum.join('\n') || 'Ordre ou durées modifiés') + '\n\nIls seront visibles par les apprenants en moins d\'une minute.')) return;
+      save.disabled = true; save.textContent = 'Enregistrement...';
+      try {
+        var r = await call('/admin/content', 'POST', { module: CED.key, videos: CED.videos.map(strip) });
+        await reloadContent();
+        var m2 = $('cMsg'); m2.className = 'ok';
+        m2.textContent = '✅ Changements enregistrés.' + (r.added.length ? ' N\'oubliez pas d\'ajouter la vidéo Bunny de la nouvelle leçon dans l\'onglet « Vidéos Bunny ».' : '');
+      } catch (e) { msg.className = 'err'; msg.textContent = e.message; save.disabled = false; save.textContent = 'Enregistrer'; }
+    });
+    mark();
+  }
+  function mark() { var d = $('cDirty'); if (d) d.textContent = dirty() ? '● Changements non enregistrés' : ''; }
+  async function reloadContent() { await load(); renderContent(); }
+  window.addEventListener('beforeunload', function (e) { if (CED && dirty()) { e.preventDefault(); e.returnValue = ''; } });
 
   // ----- Attestations & avis
   var VERIF = 'https://geoexpertacademy.ci/verifier-certificat.html?code=';
@@ -1055,7 +1188,7 @@
     state.catalog.forEach(function (m) {
       box.appendChild(el('h3', '', m.title)).style.cssText = 'font-size:16px;margin:24px 0 10px;color:var(--teal);';
       m.videos.forEach(function (v) {
-        var r = el('div', 'vid'); r.appendChild(el('span', '', v.title));
+        var r = el('div', 'vid'); r.appendChild(el('span', '', v.title + (v.hidden ? ' (masquée)' : '')));
         var i = el('input'); i.type = 'text'; i.value = v.id; i.setAttribute('data-k', v.k); i.setAttribute('data-orig', v.id); i.placeholder = 'Coller le Video ID ici'; i.spellcheck = false;
         r.appendChild(i); box.appendChild(r);
       });
