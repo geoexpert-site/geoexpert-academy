@@ -68,8 +68,12 @@
   - [x] 4. 👤 Access activé sur `geoexpert-admin` (POLICY_AUD dans `worker/wrangler-admin-prod.toml`)
   - [x] 5. 👤 Mot de passe admin installé (présence vérifiée, valeur jamais vue)
   - [x] 6. `geoexpert-admin` configuré avec Access ; sans e-mail → renvoi vers la connexion Cloudflare ; faux jeton refusé
-  - [ ] 7. 👤 Test de connexion par l'administrateur
-  - [ ] 8 à 10 : voir MISE-EN-LIGNE-PHASE-1.md
+  - [x] 7. 👤 Test de connexion par l'administrateur réussi
+  - [x] 8. Worker `espace-apprenant-api` mis à jour (version 6ff55243 ; avant : 17015681) — l'ancienne page fonctionnait avec (5/5)
+  - [x] 9. Site publié : commit cab2244 sur `main` (GitHub Pages). `_config.yml` : documents internes et `worker/` plus publiés
+  - [x] 10. Vérifications en production avec un code de test : 7/7 (connexion, vidéo signée, verrou d'essai, sauvegarde,
+        progression retrouvée sur un 2e appareil) ; code de test ensuite supprimé (données de production revenues à 3 clés)
+  - **Phase 1 EN LIGNE le 25/10/2026** — en attente de validation par l'administrateur
 
 ## Phase 2 — Régularité (≈ 14 h)
 
@@ -145,5 +149,7 @@
 - Export CSV, nettoyage, politique de confidentialité, config de production, livrables : faits.
 - Mise en ligne lancée : étapes 1 à 3 faites ; Worker apprenant de production et site non touchés (vérifié).
   Petite amélioration : l'admin vérifie la connexion e-mail AVANT tout le reste (ne révèle rien sans connexion).
-- **Prochaine étape : mise en ligne, étapes 4 et 5 (administrateur)**, puis 6 à 10 (Claude), en suivant `MISE-EN-LIGNE-PHASE-1.md`.
+- Mise en ligne terminée (étapes 1 à 10). Production vérifiée : 7/7.
+- **Prochaine étape : validation de la phase 1 par l'administrateur**, puis phase 2 (commencer par relire ce fichier).
+  Retour en arrière possible à tout moment : voir `MISE-EN-LIGNE-PHASE-1.md`.
   Ensuite : validation de la phase 1 par l'administrateur, puis phase 2.

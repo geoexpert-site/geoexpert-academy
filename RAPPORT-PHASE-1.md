@@ -1,7 +1,10 @@
 # Rapport de fin de phase 1 — GeoExpert Academy
 
-**Date :** 25 octobre 2026 · **État :** terminé et testé sur l'environnement de test · **Pas encore en ligne**
-(voir `MISE-EN-LIGNE-PHASE-1.md`).
+**Date :** 25 octobre 2026 · **État :** **en ligne depuis le 25 octobre 2026** (vérifications en production : 7/7)
+· Procédure et retour en arrière : `MISE-EN-LIGNE-PHASE-1.md`.
+
+**Adresses :** espace apprenant https://geoexpertacademy.ci/espace-apprenant.html ·
+administration https://geoexpert-admin.geographe07.workers.dev
 
 ## 1. Ce qui a été fait
 
@@ -43,6 +46,7 @@ Seuls textes existants modifiés (décision 3) : « …sauvegardées **sur votre
 | Relances | 5 règles, « Fait », retour de la relance « inactif » après 7 jours, numéros (format, refus), messages complets, suivi de l'essai, téléphone | **25 / 25** |
 | Export | fichier daté, accents Excel, colonnes, protection contre les formules, journal | **8 / 8** |
 | Côté apprenant | 6 situations du message du jour, carte essai/assistance, ordre des blocs, téléphone clair/sombre, ancien Worker | **15 / 15** |
+| **Production (vrai site)** | ancienne page + nouveau Worker : 5/5 ; nouvelle page : connexion, vidéo signée, verrou d'essai, sauvegarde d'une leçon, progression retrouvée sur un téléphone, aucune erreur | **7 / 7** |
 | **Existant inchangé** | page d'origine vs nouvelle page, bloc par bloc, au pixel (connexion, barre du haut, colonne de gauche, bandeau d'essai, bandeau de bienvenue, chiffres, Vos modules, Attestation) — ordinateur + téléphone, clair + sombre | **34 / 34 identiques** (nouveautés masquées) |
 
 Les tests peuvent être relancés à tout moment : `node tous-les-tests.mjs` dans `C:\Users\HP\Documents\GeoExpert-Outils`.
@@ -64,7 +68,10 @@ Voir **`MISE-EN-LIGNE-PHASE-1.md`** : 10 étapes (dont 3 pour vous), et pour cha
 
 ## 5. Points d'attention
 
-- **Le dépôt GitHub est public** : l'ancienne adresse de l'admin y est visible. La mise en ligne de la phase 1 corrige ce risque.
+- **Le dépôt GitHub est public** : l'ancienne adresse de l'admin y est visible, mais elle ne fait plus que renvoyer vers la nouvelle,
+  protégée par Access. Le Worker des apprenants n'accepte plus aucune action d'administration.
+- **Vidéos non configurées en production** : Télédétection, Webmapping, KoboToolbox et Google Earth n'ont pas encore
+  d'identifiant Bunny (« disponible prochainement » pour les apprenants concernés) → onglet « Vidéos Bunny ».
 - **Durée de conservation** annoncée (12 mois après la fin de l'accès) : la suppression se fera à la main jusqu'au bouton prévu en phase 2.
 - **Exercice 2 d'ArcGIS chapitre 1** : marqué « en ligne » mais fichier absent → à renvoyer depuis l'onglet Fichiers.
 - **Vidéos en test** : elles ne se lisent pas tant que la clé Bunny de test n'est pas installée (sans effet sur la production).
