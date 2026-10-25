@@ -168,7 +168,7 @@
   `sauvegarde-avant-phase-2` ; branche `phase-2`.
 - L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
 - Faits et testés : suppression des données d'un apprenant ; annonces ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice » ; mini-quiz ; économie de données.
-- **Phase 2 terminée et testée (pas encore en ligne).** Prochaine étape : mise en ligne avec l'accord de l'administrateur (), puis validation, puis phase 3.
+- **Phase 2 terminée et testée (pas encore en ligne).** Prochaine étape : mise en ligne avec l'accord de l'administrateur (voir MISE-EN-LIGNE-PHASE-2.md), puis validation, puis phase 3.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
 ### (Rappel) Démarrer une phase
