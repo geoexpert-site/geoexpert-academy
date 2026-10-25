@@ -95,6 +95,16 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .ear small{color:var(--dim);font-size:13px}.ear .bar{flex:none;height:8px;background:var(--soft);border-radius:9px;overflow:hidden}.ear .bar i{background:var(--teal)}
 .jour.ann{border-left-color:var(--mag);overflow-wrap:anywhere}.jour.ann>.ic{color:var(--mag)}.jour.ann>span:not(.ic){flex:1;white-space:pre-wrap}
 .annx{flex:0 0 auto;border:0;background:none;color:var(--dim);font-size:20px;line-height:1;padding:0 2px;margin:-2px -4px 0 0}.annx:hover{color:var(--ink)}
+/* Mes notes (colonne de gauche) + Mes progrès + exercices faits (ajouts phase 2) */
+.home.mesnotes{background:none;border:1px solid var(--line);font-weight:600}.home.mesnotes.on{background:rgba(0,146,166,.12);box-shadow:inset 3px 0 var(--teal)}
+.home .nb{margin-left:auto;font:600 12px Inter;color:var(--dim);background:var(--soft);border-radius:99px;padding:1px 8px}
+.prog .pg h3{font-size:16px;margin-bottom:8px}.pg .big{display:block;font:800 26px Montserrat;color:var(--indigo);margin-bottom:6px}[data-theme=dark] .pg .big{color:#9d92ee}
+.pg .bar{flex:none;height:8px;background:var(--soft);border-radius:9px;overflow:hidden;margin-bottom:8px}.pg .bar i{background:var(--teal)}
+.pg select{margin-top:10px;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:14px Inter}
+.bdg{grid-column:1/-1}.bdg h3{margin-bottom:4px}.bd{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.bd b{display:block;font-size:14px}.bd small{color:var(--dim);font-size:12.5px}
+.bi{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--dim)}.bi .ic{width:15px;height:15px}.bd.on .bi{background:var(--teal);color:#fff}
+.exd{display:flex;align-items:center;gap:8px;margin:-4px 0 6px 30px;font-size:13.5px;color:var(--dim);cursor:pointer}.exd input{width:17px;height:17px;accent-color:var(--teal)}.exd.on{color:var(--teal);font-weight:600}
+.nt{margin-bottom:12px}.nt h3{font-size:16px;margin:2px 0 8px}.ntx{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;font-size:14.5px}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
@@ -195,7 +205,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 var API="https://espace-apprenant-api.geographe07.workers.dev";
 var WA="2250787015030";
 var $=function(i){return document.getElementById(i)};
-var IC={check:'<path d="M5 13l4 4L19 7"/>',play:'<path d="M8 5v14l11-7z"/>',lock:'<path d="M6 11V8a6 6 0 0112 0v3M5 11h14v10H5z"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',moon:'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>',left:'<path d="M15 18l-6-6 6-6"/>',right:'<path d="M9 6l6 6-6 6"/>',home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',pdf:'<path d="M7 3h8l4 4v14H7zM14 3v5h5"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',help:'<path d="M12 17v.5M9.5 9a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="12" r="9"/>',ann:'<path d="M3 10v4h3l6 4V6L6 10zM16 9a4 4 0 010 6M19 6a8 8 0 010 12"/>'};
+var IC={check:'<path d="M5 13l4 4L19 7"/>',play:'<path d="M8 5v14l11-7z"/>',lock:'<path d="M6 11V8a6 6 0 0112 0v3M5 11h14v10H5z"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',moon:'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>',left:'<path d="M15 18l-6-6 6-6"/>',right:'<path d="M9 6l6 6-6 6"/>',home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',pdf:'<path d="M7 3h8l4 4v14H7zM14 3v5h5"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',help:'<path d="M12 17v.5M9.5 9a2.5 2.5 0 115 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="12" r="9"/>',ann:'<path d="M3 10v4h3l6 4V6L6 10zM16 9a4 4 0 010 6M19 6a8 8 0 010 12"/>',note:'<path d="M6 3h9l4 4v14H6zM9 10h7M9 14h7M9 18h4"/>'};
 function ic(n){var s=document.createElement('span');s.className='ic';s.innerHTML='<svg viewBox="0 0 24 24">'+IC[n]+'</svg>';return s}
 function h(t,a){var e=document.createElement(t),k,i,c;if(a)for(k in a){if(k==='class')e.className=a[k];else if(k==='text')e.textContent=a[k];else if(k.slice(0,2)==='on')e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k])}
 for(i=2;i<arguments.length;i++){c=arguments[i];if(c==null)continue;e.appendChild(typeof c==='string'?document.createTextNode(c):c)}return e}
@@ -203,7 +213,7 @@ document.querySelectorAll('[data-i]').forEach(function(s){var n=s.getAttribute('
 var INFO={arc1:['ArcGIS','Débutant','Organisez un projet SIG et numérisez vos plans.'],arc2:['ArcGIS','Intermédiaire','Relief, pente et analyses spatiales avancées.'],qgis1:['QGIS','Débutant','Votre premier projet SIG, avec un logiciel gratuit.'],qgis2:['QGIS','Intermédiaire','Découpez, croisez et mesurez vos données.'],tele:['Télédétection','Débutant','Lisez la végétation, l\'eau et le bâti vus du ciel.'],web:['Webmapping','Intermédiaire','Publiez votre carte interactive en ligne.'],kobo:['Collecte mobile','Débutant','Collectez vos données de terrain au téléphone.'],google:['Outils','Débutant','Google Earth en complément de votre SIG.']};
 var D=null,code='',P={done:{},notes:{},last:''},PK='',L=[],cur=null,tab='notes';
 function hs(s){var x=5381,i;for(i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return(x>>>0).toString(36)}
-function ld(){try{var p=JSON.parse(localStorage.getItem(PK));if(p)P=p}catch(e){}P.done=P.done||{};P.notes=P.notes||{};P.q=P.q||{done:{},notes:{}}}
+function ld(){try{var p=JSON.parse(localStorage.getItem(PK));if(p)P=p}catch(e){}P.done=P.done||{};P.notes=P.notes||{};P.ex=P.ex||{};P.q=P.q||{done:{},notes:{}};P.q.ex=P.q.ex||{}}
 function sv(){try{localStorage.setItem(PK,JSON.stringify(P))}catch(e){}}
 
 // ===== Sauvegarde de la progression sur le serveur =====
@@ -214,20 +224,23 @@ function queue(){sv();clearTimeout(qt);qt=setTimeout(sync,1500)}
 function setDone(k,v){if(v){if(!P.done[k])P.done[k]=Date.now()}else delete P.done[k];P.q.done[k]=P.done[k]||0;queue()}
 function setNote(k,t){P.notes[k]=t;if(!t)delete P.notes[k];P.q.notes[k]=t;queue()}
 function setLast(k){P.last=k;P.q.last=k;queue()}
-function pending(){return Object.keys(P.q.done).length||Object.keys(P.q.notes).length||P.q.last}
+function setEx(k,v){if(v){if(!P.ex[k])P.ex[k]=Date.now()}else delete P.ex[k];P.q.ex[k]=P.ex[k]||0;queue()}
+function setGoal(n){P.goal=n;P.q.goal=n;queue()}
+function pending(){return Object.keys(P.q.done).length||Object.keys(P.q.notes).length||Object.keys(P.q.ex).length||P.q.last||P.q.goal!==undefined}
 async function sync(){
  if(!code||!P.synced||busy||!pending())return;
- var q=P.q;P.q={done:{},notes:{}};sv();busy=true;
- try{var r=await fetch(API+'/api/sync',{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({code:code,done:q.done,notes:q.notes,last:q.last})});if(!r.ok)throw 0}
+ var q=P.q;P.q={done:{},notes:{},ex:{}};sv();busy=true;
+ try{var r=await fetch(API+'/api/sync',{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({code:code,done:q.done,notes:q.notes,ex:q.ex,goal:q.goal,last:q.last})});if(!r.ok)throw 0}
  catch(e){// Pas de connexion : on remet les changements dans la file (sans écraser les plus récents).
-  var k;for(k in q.done)if(!(k in P.q.done))P.q.done[k]=q.done[k];for(k in q.notes)if(!(k in P.q.notes))P.q.notes[k]=q.notes[k];if(q.last&&!P.q.last)P.q.last=q.last;sv()}
+  var k;for(k in q.done)if(!(k in P.q.done))P.q.done[k]=q.done[k];for(k in q.notes)if(!(k in P.q.notes))P.q.notes[k]=q.notes[k];for(k in q.ex)if(!(k in P.q.ex))P.q.ex[k]=q.ex[k];if(q.goal!==undefined&&P.q.goal===undefined)P.q.goal=q.goal;if(q.last&&!P.q.last)P.q.last=q.last;sv()}
  finally{busy=false}
 }
 // À la connexion : fusion de la progression du serveur et de celle du téléphone, sans rien perdre.
 function merge(sp){
  if(!sp)return;// serveur sans sauvegarde : on garde le fonctionnement d'avant
- var k,done={},notes={};
+ var k,done={},notes={},ex={};
  for(k in sp.done)done[k]=sp.done[k];
+ for(k in sp.ex||{})ex[k]=sp.ex[k];
  for(k in sp.notes)notes[k]=sp.notes[k];
  if(!P.synced){// Première connexion sur ce téléphone depuis la mise à jour : on ajoute tout ce qu'il contient.
   for(k in P.done)if(P.done[k]&&!done[k]){done[k]=P.done[k]>1e12?P.done[k]:1;P.q.done[k]=done[k]}
@@ -237,8 +250,9 @@ function merge(sp){
  }else{// Changements faits hors connexion, pas encore envoyés : ils passent devant.
   for(k in P.q.done){if(P.q.done[k])done[k]=P.q.done[k];else delete done[k]}
   for(k in P.q.notes){if(P.q.notes[k])notes[k]=P.q.notes[k];else delete notes[k]}
+  for(k in P.q.ex){if(P.q.ex[k])ex[k]=P.q.ex[k];else delete ex[k]}
  }
- P.done=done;P.notes=notes;P.last=P.q.last||sp.last||P.last;P.synced=true;sv();sync();
+ P.done=done;P.notes=notes;P.ex=ex;P.goal=P.q.goal!==undefined?P.q.goal:(sp.goal||0);P.last=P.q.last||sp.last||P.last;P.synced=true;sv();sync();
 }
 addEventListener('online',sync);
 addEventListener('pagehide',sync);
@@ -277,6 +291,8 @@ function side(){
  q.addEventListener('input',function(){var v=q.value.toLowerCase();s.querySelectorAll('.ls').forEach(function(b){b.style.display=b.textContent.toLowerCase().indexOf(v)>-1?'':'none'});if(v)s.querySelectorAll('details.m').forEach(function(d){d.open=true})});
  s.appendChild(q);
  s.appendChild(h('button',{class:'home',onclick:function(){home();closeS()}},ic('home'),'Tableau de bord'));
+ var nn=Object.keys(P.notes).filter(function(k){return P.notes[k]&&L.some(function(l){return l.k===k})}).length;
+ s.appendChild(h('button',{class:'home mesnotes',onclick:function(){notesPage();closeS()}},ic('note'),'Mes notes',nn?h('span',{class:'nb',text:String(nn)}):null));
  D.modules.forEach(function(m){
   var mp=mprog(m),d=h('details',{class:'m'});
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
@@ -313,6 +329,71 @@ function dayMessage(p,next,finished){
  else if(p.t-p.n<=Math.max(2,Math.ceil(p.t*.2))){var n=p.t-p.n;b='Presque fini !';t='Plus que '+n+' leçon'+(n>1?'s':'')+' avant la fin de votre formation. Prochaine : '+nx+'.'}
  else{b='Prochaine leçon : '+nx+'.';t='Astuce du jour : '+TIPS[Math.floor(now/DAYMS)%TIPS.length]}
  return h('div',{class:'jour',role:'status'},ic('right'),h('span',null,h('b',{text:b}),' '+t));
+}
+// ===== Régularité : semaines (du lundi 0 h au dimanche, heure d'Abidjan = UTC), uniquement avec de vraies dates.
+var WEEK=7*DAYMS;
+function weekStart(ms){var d=new Date(ms);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-(d.getUTCDay()+6)%7)}
+function dated(){var o=[],k;for(k in P.done)if(P.done[k]>1e12&&L.some(function(l){return l.k===k}))o.push(P.done[k]);return o}
+function thisWeek(){var w=weekStart(Date.now());return dated().filter(function(t){return t>=w}).length}
+// Série : semaines d'affilée avec au moins une leçon terminée (la semaine en cours compte si elle a déjà une leçon).
+function streak(){
+ var weeks={};dated().forEach(function(t){weeks[weekStart(t)]=1});
+ var w=weekStart(Date.now()),n=0,cur=!!weeks[w];if(!cur)w-=WEEK;
+ while(weeks[w]){n++;w-=WEEK}
+ return{n:n,cur:cur};
+}
+function badges(){
+ var B=[],ds=dated(),first=ds.length?Math.min.apply(null,ds):0,k,anyDone=false;
+ for(k in P.done)if(P.done[k]&&L.some(function(l){return l.k===k}))anyDone=true;
+ for(k in P.done)if(P.done[k]&&!(P.done[k]>1e12)&&L.some(function(l){return l.k===k}))first=0;// une leçon plus ancienne sans date : on ne donne pas de date fausse
+ B.push({t:'Première leçon',d:'Terminer une première leçon.',ok:anyDone,at:first});
+ var chap=0;D.modules.forEach(function(m){var ls=L.filter(function(l){return l.m===m});
+  if(ls.length&&ls.every(function(l){return!l.lock&&P.done[l.k]})){var at=Math.max.apply(null,ls.map(function(l){return P.done[l.k]}));if(at>1e12&&(!chap||at<chap))chap=at;else if(!chap)chap=1}});
+ B.push({t:'Premier chapitre terminé',d:'Terminer toutes les leçons d\'un module.',ok:!!chap,at:chap});
+ var exs=Object.keys(P.ex).map(function(k){return P.ex[k]}).filter(Boolean);
+ B.push({t:'Premier exercice fait',d:'Cocher « J\'ai fait l\'exercice » sous une leçon.',ok:exs.length>0,at:exs.length?Math.min.apply(null,exs):0});
+ var st=streak();
+ B.push({t:'4 semaines d\'affilée',d:'Terminer au moins une leçon par semaine, 4 semaines de suite.',ok:st.n>=4,at:0});
+ var all=L.length&&L.every(function(l){return!l.lock&&P.done[l.k]});
+ B.push({t:'Formation terminée',d:'Terminer toutes les leçons de votre formation.',ok:all,at:all?Math.max.apply(null,L.map(function(l){return P.done[l.k]})):0});
+ return B;
+}
+// Section « Mes progrès » (sous « Vos modules ») : objectif de la semaine, série, badges.
+function progres(m){
+ m.appendChild(h('h2',{class:'s progt',text:'Mes progrès'}));
+ var g=h('div',{class:'grid prog'}),n=thisWeek(),goal=P.goal||0,now=Date.now();
+ var left=Math.max(1,Math.ceil((weekStart(now)+WEEK-now)/DAYMS));
+ var c1=h('div',{class:'card pg'},h('h3',{text:'Objectif de la semaine'}));
+ if(goal){
+  c1.appendChild(h('b',{class:'big',text:Math.min(n,goal)+' / '+goal}));
+  c1.appendChild(h('div',{class:'bar'},h('i',{style:'width:'+Math.min(100,Math.round(n*100/goal))+'%'})));
+  c1.appendChild(h('p',{class:'note',text:n>=goal?'Objectif atteint cette semaine, bravo !'+(n>goal?' ('+n+' leçons)':''):'Encore '+(goal-n)+' leçon'+(goal-n>1?'s':'')+' d\'ici dimanche ('+left+' jour'+(left>1?'s':'')+' restant'+(left>1?'s':'')+').'}));
+ }else c1.appendChild(h('p',{class:'note',text:'Choisissez combien de leçons vous voulez terminer chaque semaine. Un petit objectif tenu vaut mieux qu\'un grand abandonné.'}));
+ var sel=h('select',{'aria-label':'Objectif de la semaine'});
+ [[0,goal?'Pas d\'objectif':'Choisir un objectif'],[1,'1 leçon par semaine'],[2,'2 leçons par semaine'],[3,'3 leçons par semaine'],[5,'5 leçons par semaine'],[7,'7 leçons par semaine']].forEach(function(o){var x=h('option',{value:String(o[0])},o[1]);if(o[0]===goal)x.selected=true;sel.appendChild(x)});
+ sel.addEventListener('change',function(){setGoal(+sel.value);home()});
+ c1.appendChild(sel);g.appendChild(c1);
+ var st=streak(),c2=h('div',{class:'card pg'},h('h3',{text:'Semaines actives d\'affilée'}),h('b',{class:'big',text:String(st.n)}));
+ c2.appendChild(h('p',{class:'note',text:!st.n?'Terminez une leçon cette semaine pour lancer votre série.':st.cur?'Cette semaine compte déjà. Revenez la semaine prochaine pour continuer.':'Terminez une leçon d\'ici dimanche pour ne pas perdre votre série.'}));
+ g.appendChild(c2);
+ var B=badges(),c3=h('div',{class:'card pg bdg'},h('h3',{text:'Badges ('+B.filter(function(b){return b.ok}).length+' / '+B.length+')'}));
+ B.forEach(function(b){c3.appendChild(h('div',{class:'bd'+(b.ok?' on':'')},h('span',{class:'bi'},ic(b.ok?'check':'lock')),
+  h('span',null,h('b',{text:b.t}),h('small',{text:b.ok?(b.at>1e12?'Obtenu le '+fdate(b.at):'Obtenu'):b.d}))))});
+ g.appendChild(c3);m.appendChild(g);
+}
+// ===== Page « Mes notes » (entrée de la colonne de gauche) : toutes les notes, leçon par leçon.
+function notesPage(){
+ cur=null;var m=$('main');m.textContent='';window.scrollTo(0,0);
+ m.appendChild(h('div',{class:'crumb',text:'Espace apprenant'}));
+ m.appendChild(h('h1',{class:'lt',text:'Mes notes'}));
+ var ls=L.filter(function(l){return P.notes[l.k]});
+ if(!ls.length)m.appendChild(h('div',{class:'card'},h('p',{class:'note',text:'Vous n\'avez pas encore de notes. Sous chaque leçon, l\'onglet « Mes notes » vous permet d\'écrire ce que vous voulez retenir : vous les retrouverez toutes ici, sur tous vos appareils.'})));
+ ls.forEach(function(l){
+  m.appendChild(h('div',{class:'card nt'},h('div',{class:'crumb',text:l.m.title.split(' : ')[0]}),h('h3',{text:l.t}),h('p',{class:'ntx',text:P.notes[l.k]}),
+   h('button',{class:'btn alt',onclick:function(){tab='notes';lesson(l.k)}},'Ouvrir la leçon')));
+ });
+ side();
+ var b=$('side').querySelector('.mesnotes');if(b)b.classList.add('on');
 }
 // ===== Annonces du formateur (au-dessus du message du jour) ; « × » les masque sur cet appareil.
 function annonces(){
@@ -363,6 +444,7 @@ function home(){
    h('div',{class:'bar'},h('i',{style:'width:'+mp.p+'%'})),
    h('button',{class:'btn alt',disabled:md.locked?'':null,onclick:function(){var x=L.filter(function(l){return l.m===md&&!l.lock&&!P.done[l.k]})[0]||first;if(x)lesson(x.k)}},md.locked?'Verrouillé':(mp.p?'Continuer ('+mp.p+' %)':'Ouvrir'))))});
  m.appendChild(g);
+ progres(m);
  m.appendChild(h('h2',{class:'s',text:'Attestation et assistance'}));
  var row=h('div',{class:'grid'});
  row.appendChild(h('div',{class:'card'},h('h3',{text:'Attestation de fin de formation',style:'font-size:16px;margin-bottom:6px'}),h('p',{class:'note',text:'Terminez toutes vos leçons, puis demandez votre attestation au formateur.'}),
@@ -426,6 +508,8 @@ m.appendChild(h('div',{class:'ctl'},
        btn.disabled = true; // Désactivation propre
      }
      pn.appendChild(h('div',{class:'ex'}, ic('pdf'), h('span',{text:x.title}), btn));
+     if(!x.locked&&!l.lock){var cb=h('input',{type:'checkbox'});cb.checked=!!P.ex[x.k];cb.addEventListener('change',function(){setEx(x.k,cb.checked);lesson(k)});
+      pn.appendChild(h('label',{class:'exd'+(P.ex[x.k]?' on':'')},cb,P.ex[x.k]?'Exercice fait'+(P.ex[x.k]>1e12?' le '+fdate(P.ex[x.k]):'')+' ✓':"J'ai fait l'exercice"))}
    });
  }
  

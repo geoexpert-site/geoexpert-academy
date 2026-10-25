@@ -112,6 +112,7 @@
   .fmod li span:first-child { flex: 0 0 18px; color: var(--teal); font-weight: 700; }
   .fmod li span:nth-child(2) { flex: 1; }
   .fmod li small { color: var(--dim); white-space: nowrap; }
+  .fmod li.exh { font-weight: 700; color: var(--indigo); padding-top: 12px; }
   .fnote { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 14px; white-space: pre-wrap; }
   .fnote small { display: flex; justify-content: space-between; color: var(--dim); font-size: 12px; margin-bottom: 4px; white-space: normal; }
   .fnote button { border: 0; background: none; color: #c0392b; cursor: pointer; font: 600 12px Inter; }
@@ -505,14 +506,14 @@
   }
   function d10(ms) { return ms ? new Date(ms).toLocaleDateString('fr-FR') : ''; }
   $('export').addEventListener('click', async function () {
-    var now = Date.now(), head = ['Nom', 'Code', 'Numéro WhatsApp', 'Formations', 'Statut', 'Code créé le', 'Première connexion', 'Fin de l\'essai', 'Fin de l\'accès', 'Fin de l\'assistance', 'Leçons terminées', 'Total leçons', 'Progression (%)', 'Dernière visite', 'Connexions', 'À relancer'];
+    var now = Date.now(), head = ['Nom', 'Code', 'Numéro WhatsApp', 'Formations', 'Statut', 'Code créé le', 'Première connexion', 'Fin de l\'essai', 'Fin de l\'accès', 'Fin de l\'assistance', 'Leçons terminées', 'Total leçons', 'Progression (%)', 'Exercices faits', 'Dernière visite', 'Connexions', 'À relancer'];
     var rows = state.students.map(function (s) {
       var statut = !s.active ? (s.remplace ? 'Remplacé' : 'Désactivé') : (s.expires && s.expires < now) ? 'Expiré' : s.finEssai > now ? 'En essai' : (s.essai && !s.premiereUtilisation) ? 'Pas encore utilisé' : 'Accès complet';
       var start = s.premiereUtilisation || (s.essai ? 0 : s.created), assist = '';
       if (start) { var d = new Date(start); d.setUTCMonth(d.getUTCMonth() + 3); assist = d10(d.getTime()); }
       return [s.label, s.code, s.phone ? '+' + s.phone : '', s.modules.map(function (g) { return LABELS[g.m] || g.m; }).join(', '), statut,
         d10(s.created), d10(s.premiereUtilisation), d10(s.finEssai), d10(s.expires), assist,
-        s.synced ? s.done : '', s.lessons, s.synced && s.lessons ? Math.round(s.done * 100 / s.lessons) : '', d10(s.lastActivity), s.logins,
+        s.synced ? s.done : '', s.lessons, s.synced && s.lessons ? Math.round(s.done * 100 / s.lessons) : '', s.exTotal ? s.exDone + ' / ' + s.exTotal : '', d10(s.lastActivity), s.logins,
         (s.due || []).map(function (k) { return REL[k]; }).join(', ')];
     });
     var csv = '﻿' + [head].concat(rows).map(function (r) { return r.map(csvCell).join(';'); }).join('\r\n');
@@ -694,6 +695,16 @@
         li.appendChild(el('small', '', l.done > 1 ? fdt(l.done) : l.done ? 'date inconnue' : ''));
         ul.appendChild(li);
       });
+      if (m.exercises && m.exercises.length) {
+        var ne = m.exercises.filter(function (x) { return x.done; }).length;
+        ul.appendChild(el('li', 'exh', 'Exercices faits : ' + ne + ' / ' + m.exercises.length));
+        m.exercises.forEach(function (x) {
+          var li = el('li'); li.appendChild(el('span', '', x.done ? '✓' : ''));
+          li.appendChild(el('span', '', x.title));
+          li.appendChild(el('small', '', x.done > 1 ? fdt(x.done) : ''));
+          ul.appendChild(li);
+        });
+      }
       d.appendChild(ul); body.appendChild(d);
     });
 

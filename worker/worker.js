@@ -319,20 +319,28 @@ function ownsLesson(rec, k) {
   const m = findModule(moduleOf(k));
   return !!m && rec.modules.some(g => g.m === m.key) && m.videos.some(v => v.k === k);
 }
+// Exercice d'un module de l'apprenant.
+function ownsExercise(rec, k) {
+  const m = findModule(moduleOf(k));
+  return !!m && rec.modules.some(g => g.m === m.key) && m.exercises.some(e => e.k === k);
+}
 // Progression enregistrée sur le serveur (base D1). null si la base n'est pas disponible :
 // la page garde alors la progression du téléphone, comme avant.
 async function loadProgress(env, c) {
   if (!env.DB) return null;
   try {
-    const [d, n, l] = await env.DB.batch([
+    const [d, n, l, x, g] = await env.DB.batch([
       env.DB.prepare('SELECT k, done_at FROM progress WHERE code = ?').bind(c),
       env.DB.prepare('SELECT k, text FROM notes WHERE code = ?').bind(c),
       env.DB.prepare('SELECT last, last_activity FROM learners WHERE code = ?').bind(c),
+      env.DB.prepare('SELECT k, done_at FROM exercises WHERE code = ?').bind(c),
+      env.DB.prepare('SELECT goal FROM prefs WHERE code = ?').bind(c),
     ]);
-    const done = {}, notes = {};
+    const done = {}, notes = {}, ex = {};
     for (const r of d.results) done[r.k] = r.done_at;
     for (const r of n.results) notes[r.k] = r.text;
-    return { done, notes, last: (l.results[0] && l.results[0].last) || '', act: (l.results[0] && l.results[0].last_activity) || 0 };
+    for (const r of x.results) ex[r.k] = r.done_at;
+    return { done, notes, ex, goal: (g.results[0] && g.results[0].goal) || 0, last: (l.results[0] && l.results[0].last) || '', act: (l.results[0] && l.results[0].last_activity) || 0 };
   } catch (e) { return null; }
 }
 function entitled(rec, k, now) {
@@ -491,6 +499,20 @@ async function api(req, env, url) {
       else st.push(env.DB.prepare('INSERT INTO notes (code, k, text, updated) VALUES (?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET text = excluded.text, updated = excluded.updated')
         .bind(c, k, text, now));
     }
+    // Exercices faits : { exercice: date (ms) | 0 (décoché) }
+    const exs = Object.entries(body.ex && typeof body.ex === 'object' ? body.ex : {}).slice(0, 100);
+    for (const [k, v] of exs) {
+      if (!ownsExercise(rec, k)) continue;
+      const t = Number(v);
+      if (!t) st.push(env.DB.prepare('DELETE FROM exercises WHERE code = ? AND k = ?').bind(c, k));
+      else st.push(env.DB.prepare('INSERT INTO exercises (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING')
+        .bind(c, k, t > 1.6e12 && t <= now + 60000 ? Math.floor(t) : now));
+    }
+    // Objectif de la semaine : 0 (aucun) à 7 leçons
+    if (body.goal !== undefined && body.goal !== null) {
+      const goal = Math.min(Math.max(parseInt(body.goal, 10) || 0, 0), 7);
+      st.push(env.DB.prepare('INSERT INTO prefs (code, goal, updated) VALUES (?, ?, ?) ON CONFLICT (code) DO UPDATE SET goal = excluded.goal, updated = excluded.updated').bind(c, goal, now));
+    }
     const last = ownsLesson(rec, String(body.last || '')) ? String(body.last) : null;
     st.push(env.DB.prepare('INSERT INTO learners (code, last, last_activity) VALUES (?, ?, ?) ON CONFLICT (code) DO UPDATE SET last = COALESCE(excluded.last, learners.last), last_activity = excluded.last_activity')
       .bind(c, last, now));
@@ -581,18 +603,20 @@ async function progressSummary(env) {
   if (!env.DB) return out;
   try {
     const since = Date.now() - 30 * DAY;
-    const [p, l, r, ct, rl] = await env.DB.batch([
+    const [p, l, r, ct, rl, xs] = await env.DB.batch([
       env.DB.prepare('SELECT code, COUNT(*) AS n, MAX(done_at) AS lastDone FROM progress GROUP BY code'),
       env.DB.prepare('SELECT code, last, last_activity FROM learners'),
       env.DB.prepare("SELECT substr(k, 1, instr(k, '-') - 1) AS m, COUNT(*) AS n FROM progress WHERE done_at > ? GROUP BY m").bind(since),
       env.DB.prepare('SELECT code, phone FROM contacts'),
       env.DB.prepare('SELECT code, kind, MAX(t) AS t FROM relances GROUP BY code, kind'),
+      env.DB.prepare('SELECT code, COUNT(*) AS n FROM exercises GROUP BY code'),
     ]);
     const at = c => out.byCode[c] = out.byCode[c] || {};
     for (const x of p.results) Object.assign(at(x.code), { n: x.n, lastDone: x.lastDone > 1 ? x.lastDone : 0, seen: true });
     for (const x of l.results) Object.assign(at(x.code), { act: x.last_activity || 0, last: x.last || '', seen: true });
     for (const x of r.results) out.recentByModule[x.m] = x.n;
     for (const x of ct.results) at(x.code).phone = x.phone;
+    for (const x of xs.results) at(x.code).ex = x.n;
     for (const x of rl.results) (at(x.code).marks = at(x.code).marks || {})[x.kind] = x.t;
   } catch (e) { /* tableau de bord sans progression plutôt qu'en erreur */ }
   return out;
@@ -702,7 +726,8 @@ async function admin(req, env, url) {
         done: p.n || 0, lessons: rec.modules.reduce((s, g) => s + ((findModule(g.m) || { videos: [] }).videos.length), 0),
         lastActivity: Math.max(rec.lastLogin || 0, p.act || 0, p.lastDone || 0), synced: !!p.seen, remplace: !!rec.remplacePar,
         lastLesson: p.last ? ((findModule(moduleOf(p.last)) || { videos: [] }).videos.find(v => v.k === p.last) || {}).title || '' : '',
-        phone: p.phone || '', marks: p.marks || {},
+        phone: p.phone || '', marks: p.marks || {}, exDone: p.ex || 0,
+        exTotal: rec.modules.reduce((s, g) => s + ((findModule(g.m) || { exercises: [] }).exercises.length), 0),
       };
     }))).filter(Boolean);
     // À supprimer : accès terminé depuis plus de 12 mois (durée annoncée dans la politique de confidentialité).
@@ -747,7 +772,8 @@ async function admin(req, env, url) {
       lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
       modules: rec.modules.map(g => {
         const m = findModule(g.m); if (!m) return null;
-        return { key: m.key, title: m.title, from: g.from, lessons: m.videos.map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })) };
+        return { key: m.key, title: m.title, from: g.from, lessons: m.videos.map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })),
+          exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0 })) };
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
@@ -816,7 +842,7 @@ async function admin(req, env, url) {
     if (env.DB) {
       const st = [];
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
       }
       await env.DB.batch(st);
@@ -895,6 +921,8 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE admin_notes SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE contacts SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE relances SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE exercises SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE prefs SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;

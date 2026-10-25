@@ -81,6 +81,21 @@ CREATE TABLE IF NOT EXISTS admin_fails (
 );
 CREATE INDEX IF NOT EXISTS admin_fails_ip ON admin_fails (ip, t);
 
+-- Exercices que l'apprenant a cochés « J'ai fait l'exercice » (done_at = date).
+CREATE TABLE IF NOT EXISTS exercises (
+  code TEXT NOT NULL,
+  k TEXT NOT NULL,
+  done_at INTEGER NOT NULL,
+  PRIMARY KEY (code, k)
+);
+
+-- Préférences de l'apprenant : objectif de la semaine (nombre de leçons, 0 = pas d'objectif).
+CREATE TABLE IF NOT EXISTS prefs (
+  code TEXT PRIMARY KEY,
+  goal INTEGER NOT NULL DEFAULT 0,
+  updated INTEGER
+);
+
 -- Une ligne par apprenant : dernière leçon ouverte et dernière activité.
 CREATE TABLE IF NOT EXISTS learners (
   code TEXT PRIMARY KEY,

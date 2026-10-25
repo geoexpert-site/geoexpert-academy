@@ -77,14 +77,17 @@
 
 ## Phase 2 — Régularité (≈ 14 h)
 
-- [ ] Objectif de la semaine + jauge
-- [ ] Série de semaines actives
-- [ ] Badges liés à de vraies étapes (section « Mes progrès » sous « Vos modules »)
+- [x] Objectif de la semaine + jauge — section « Mes progrès » sous « Vos modules » ; 1, 2, 3, 5 ou 7 leçons ; semaine du lundi au dimanche (UTC) ; table `prefs`
+- [x] Série de semaines actives — semaines d'affilée avec au moins une leçon datée ; la semaine en cours compte dès sa 1re leçon
+- [x] Badges liés à de vraies étapes : 1re leçon, 1er chapitre, 1er exercice fait, 4 semaines d'affilée, formation terminée (date seulement si elle est sûre)
+  - testés ensemble avec « Mes notes » et les exercices : 14/14 apprenant + 3/3 admin, **pas encore en ligne**
 - [x] Annonces du formateur (écriture dans l'admin, affichage côté apprenant) — testé 10/10 admin + 6/6 apprenant, **pas encore en ligne**
   - onglet admin « 📢 Annonces » (3e) : texte + cible (toutes / une formation) + durée (7, 14, 30 j, sans fin) + aperçu ; retirer avec confirmation
   - apprenant : 3 annonces max., au-dessus du message du jour (décision 1), « × » pour masquer sur l'appareil · table `annonces`, `/api/login` → `annonces`
-- [ ] Entrée « Mes notes » dans la colonne de gauche
-- [ ] Case « J'ai fait l'exercice » (visible dans la fiche apprenant)
+- [x] Entrée « Mes notes » dans la colonne de gauche (sous « Tableau de bord », avec le nombre de notes) → page listant toutes les notes
+- [x] Case « J'ai fait l'exercice » (visible dans la fiche apprenant) — sous chaque exercice disponible ; table `exercises` ; fiche admin « Exercices faits X / Y » ; colonne dans l'export
+- [x] **Preuve pixel phase 2** (`comparer-elements.mjs … cacher phase-2`) : 42/42 blocs identiques à la page en ligne (fin de phase 1) ;
+  et 34/34 identiques à la page d'origine des vidéos publicitaires (tous les ajouts masqués) → `geoexpert-captures\preuve-existant-phase-2\`
 - [ ] Mini-quiz modifiables depuis l'admin (onglet « Quiz » sur la page de leçon)
 - [ ] Mode économie de données (à vérifier avec le lecteur Bunny)
 - [x] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité — testé 11/11, **pas encore en ligne**
@@ -160,7 +163,7 @@
 - Sauvegarde avant phase 2 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-2\` (KV + export D1 + code) ; étiquette
   `sauvegarde-avant-phase-2` ; branche `phase-2`.
 - L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
-- Faits et testés : suppression des données d'un apprenant ; annonces du formateur.
+- Faits et testés : suppression des données d'un apprenant ; annonces du formateur ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice ».
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
 ### (Rappel) Démarrer une phase
