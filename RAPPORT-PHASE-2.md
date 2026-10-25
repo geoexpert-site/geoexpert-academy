@@ -1,6 +1,6 @@
 # Rapport de fin de phase 2 — GeoExpert Academy
 
-**Date :** 25 octobre 2026 · **État :** terminé et testé sur l'environnement de test · **Pas encore en ligne**
+**Date :** 25 octobre 2026 · **État :** **en ligne depuis le 25 octobre 2026** (vérifications en production : 8/8)
 (voir `MISE-EN-LIGNE-PHASE-2.md`).
 
 ## 1. Ce qui a été fait

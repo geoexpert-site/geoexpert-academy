@@ -93,7 +93,13 @@
 - [x] Mode économie de données (à vérifier avec le lecteur Bunny) — case sous la vidéo, `levelCap=true` (Bunny n'a pas de réglage de qualité imposée) ; auto si connexion lente — 7/7
 - [x] Fin de phase 2 : tous les tests relancés (voir `RAPPORT-PHASE-2.md`), captures `apres-phase-2-apprenant`, guide (§6 à §8),
   politique de confidentialité, `MISE-EN-LIGNE-PHASE-2.md` (sans étape technique pour l'administrateur)
-- [ ] **Mise en ligne de la phase 2** (attend l'accord de l'administrateur)
+- [x] **Mise en ligne de la phase 2 — EN LIGNE le 25/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-25-avant-mise-en-ligne-phase-2\` ; tables ajoutées dans `geoexpert-prod` (14 tables)
+  - `geoexpert-admin` → version 26e1e07e (avant : 02697476) ; `espace-apprenant-api` → version 7a610aab (avant : 6ff55243)
+  - site publié : `main` = 62f6315 ; ancienne page + nouveau Worker vérifiée avant publication (connexion, vidéo, verrou d'essai)
+  - production vérifiée avec un code de test : 8/8 (Mes progrès, objectif, vidéo signée + économie de données, exercice,
+    Mes notes, enregistrement serveur, 2e appareil) ; code de test ensuite supprimé (production revenue à 3 clés)
+  - en attente : validation de la phase 2 par l'administrateur
 - [x] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité — testé 11/11, **pas encore en ligne**
   - fiche → « Supprimer définitivement ses données » (taper SUPPRIMER) ; efface aussi les anciens codes remplacés ; journal gardé sans le nom · route `/admin/purge`
   - rappel en haut de « Apprenants » + note du tableau de bord quand un accès est fini depuis plus de 12 mois
@@ -168,7 +174,7 @@
   `sauvegarde-avant-phase-2` ; branche `phase-2`.
 - L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
 - Faits et testés : suppression des données d'un apprenant ; annonces ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice » ; mini-quiz ; économie de données.
-- **Phase 2 terminée et testée (pas encore en ligne).** Prochaine étape : mise en ligne avec l'accord de l'administrateur (voir MISE-EN-LIGNE-PHASE-2.md), puis validation, puis phase 3.
+- **Phase 2 en ligne le 25/10/2026** (production vérifiée 8/8). Prochaine étape : validation de la phase 2 par l'administrateur, puis phase 3.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
 ### (Rappel) Démarrer une phase
