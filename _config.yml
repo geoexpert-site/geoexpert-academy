@@ -8,5 +8,7 @@ exclude:
   - MISE-EN-LIGNE-PHASE-1.md
   - RAPPORT-PHASE-2.md
   - MISE-EN-LIGNE-PHASE-2.md
+  - RAPPORT-PHASE-3.md
+  - MISE-EN-LIGNE-PHASE-3.md
   - worker/
   - settings.json

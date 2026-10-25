@@ -183,7 +183,51 @@ Dans la liste, vous voyez combien d'apprenants ont répondu et leur **moyenne**.
 
 ---
 
-## 8. Ce que l'apprenant voit de nouveau (phase 2)
+## 7 bis. Attestations et avis (onglet **🎓 Attestations & avis**)
+
+### Délivrer une attestation (après avoir validé l'exercice final reçu sur WhatsApp)
+1. Ouvrez la **fiche** de l'apprenant → partie **Actions** → ligne **« Attestation — [formation] »**
+   (une ligne par formation ; elle indique combien de leçons sont terminées).
+2. Vérifiez le **nom complet** qui sera écrit sur l'attestation (pré-rempli avec le nom du code ; corrigez-le si besoin).
+3. **Délivrer**, puis confirmez (un avertissement s'affiche si toutes les leçons ne sont pas terminées).
+
+L'attestation reçoit un **numéro unique** (ex. `ATT-7K2M-Q9XP`). L'apprenant voit aussitôt une carte **« 🎓 Mon attestation »**
+dans son espace et télécharge son **PDF** (avec un code QR). N'importe qui (un employeur, par exemple) peut la vérifier
+sur **geoexpertacademy.ci/verifier-certificat.html** avec ce numéro, ou en scannant le code QR.
+
+Pour un pack, délivrez une attestation par formation terminée.
+**Révoquer** (dans l'onglet) : la page de vérification indiquera qu'elle n'est plus valable ; vous pourrez en délivrer une nouvelle.
+
+### Avis
+Quand un apprenant a terminé toutes les leçons d'une formation, une carte **« Votre avis »** lui propose une note
+(1 à 5 étoiles), un commentaire, et une case pour **accepter la publication**.
+Dans l'onglet (chiffre rose = nouveaux avis) :
+- **Marquer publiable** : seulement si l'apprenant l'a accepté. Puis **Copier** donne le texte prêt à mettre sur le site ou les réseaux.
+- **Masquer** : l'avis est mis de côté (vous pouvez le **Réafficher**).
+
+---
+
+## 7 ter. Contenu des formations (onglet **📚 Contenu**)
+
+Choisissez une **formation** : toutes ses leçons s'affichent dans l'ordre.
+- **Renommer** : modifiez le titre ; **durée** au format `12:34` (ou `1:02:03`).
+- **↑ / ↓** : changer l'ordre.
+- **Masquer** : la leçon disparaît pour les apprenants (leur progression est gardée) ; **Afficher** pour la remettre.
+- **Supprimer** : à éviter (préférez Masquer) ; la progression des apprenants sur cette leçon ne comptera plus.
+- **+ Ajouter une leçon** : titre + durée. Après l'enregistrement, ajoutez sa vidéo dans l'onglet **🎬 Vidéos Bunny**.
+- **📎 Joindre un fichier** (10 Mo max., par exemple les données du TP en .zip) : choisissez le fichier, donnez-lui un nom ;
+  il apparaît tout de suite dans l'onglet « Exercices » de la leçon chez l'apprenant. **Retirer** pour l'enlever.
+
+Rien ne change chez les apprenants avant **Enregistrer** (une fenêtre résume les changements). Ils voient la nouvelle version
+en moins d'une minute. **Annuler les changements** efface ce que vous n'avez pas enregistré.
+**Revenir au contenu d'origine** remet la liste de leçons d'origine de cette formation.
+
+⚠️ Pendant l'essai, ce sont **les 3 premières leçons visibles** qui sont ouvertes : si vous changez l'ordre du début d'une
+formation, les leçons offertes pendant l'essai changent aussi.
+
+---
+
+## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3)
 
 - **Mes progrès** (sous « Vos modules ») : objectif de la semaine qu'il choisit (1 à 7 leçons) avec une jauge,
   nombre de **semaines actives d'affilée**, et 5 **badges** liés à de vraies étapes (1re leçon, 1er chapitre terminé,
@@ -192,6 +236,9 @@ Dans la liste, vous voyez combien d'apprenants ont répondu et leur **moyenne**.
 - **J'ai fait l'exercice** : une case sous chaque exercice ; vous le voyez dans sa fiche.
 - **Économie de données** : une case sous la vidéo ; la qualité est limitée à la taille de l'écran (beaucoup moins de
   données sur téléphone). Elle se coche toute seule si le téléphone signale une connexion lente.
+- **Mon attestation** (phase 3) : carte dans « Attestation et assistance », après les deux cartes habituelles ; PDF + lien de vérification.
+- **Votre avis** (phase 3) : carte au même endroit, quand une formation est terminée.
+- **Fichiers de la leçon** (phase 3) : dans l'onglet « Exercices » de la leçon, avant les exercices du module.
 
 ---
 
@@ -224,4 +271,4 @@ Onglet **📜 Journal** de l'administration : tout ce qui a été fait, du plus 
 (300 dernières actions) avec la date, l'action, l'apprenant concerné, le détail et l'adresse e-mail de la personne connectée.
 
 Actions enregistrées : code créé, code désactivé / réactivé, accès prolongé, tout débloqué, module ajouté,
-code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, annonce publiée / retirée, quiz enregistré / supprimé, données d'un apprenant supprimées, mot de passe incorrect.
+code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, annonce publiée / retirée, quiz enregistré / supprimé, attestation délivrée / révoquée, avis publiable / masqué, contenu modifié, fichier de leçon envoyé / retiré, données d'un apprenant supprimées, mot de passe incorrect.

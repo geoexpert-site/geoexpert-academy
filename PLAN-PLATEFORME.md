@@ -106,9 +106,19 @@
 
 ## Phase 3 — Fin de parcours et contenu (≈ 16 h)
 
-- [ ] Attestation PDF avec code unique + page publique « Vérifier un certificat »
-- [ ] Avis de fin de formation + choix des avis publiables dans l'admin
-- [ ] Gestion du contenu sans coder (ajouter, renommer, réordonner, masquer, fichiers par leçon)
+- [x] Attestation PDF avec code unique + page publique « Vérifier un certificat » — 16/16 admin + 16/16 apprenant/vérification, **pas encore en ligne**
+  - délivrée par l'admin dans la fiche (décision 2 : après validation de l'exercice final ; nom complet modifiable) ; numéro `ATT-XXXX-XXXX` ; révocable
+  - apprenant : carte « 🎓 Mon attestation » APRÈS les 2 cartes existantes ; PDF A4 paysage fait sur l'appareil (jsPDF + QR, chargés à la demande avec SRI), 68 Ko
+  - `verifier-certificat.html` (en-tête et pied du site) + route publique `GET /api/certificat?id=` ; lien ajouté dans la FAQ ; tables `certificates`
+- [x] Avis de fin de formation + choix des avis publiables dans l'admin — carte « Votre avis » (étoiles, commentaire, accord de publication) ;
+  onglet admin « 🎓 Attestations & avis » : publiable seulement avec accord, Copier, Masquer ; table `reviews`
+- [x] Gestion du contenu sans coder (ajouter, renommer, réordonner, masquer, fichiers par leçon) — 18/18 admin + 7/7 apprenant, **pas encore en ligne**
+  - onglet « 📚 Contenu » ; table `content` (liste de leçons par formation, le code reste la référence ; « Revenir au contenu d'origine »)
+  - clés de leçon jamais réutilisées (`maxNum`) ; leçons masquées : progression gardée, exclues des comptes ; essai = 3 premières leçons visibles
+  - fichiers par leçon (`<leçon>-fN`), vrai nom/extension gardés ; catalogue mis en cache 30 s dans le Worker
+  - **corrigé au passage (bug déjà en ligne)** : les téléchargements arrivaient tous en « Exercice_GeoExpert.pdf » (en-tête non exposé) → vrai nom + extension
+- [x] Fin de phase 3 : guide (§7 bis, §7 ter, §8), politique de confidentialité, `MISE-EN-LIGNE-PHASE-3.md`, `RAPPORT-PHASE-3.md`
+- [ ] **Mise en ligne de la phase 3** (attend l'accord de l'administrateur)
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
@@ -174,7 +184,14 @@
   `sauvegarde-avant-phase-2` ; branche `phase-2`.
 - L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
 - Faits et testés : suppression des données d'un apprenant ; annonces ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice » ; mini-quiz ; économie de données.
-- **Phase 2 en ligne le 25/10/2026** (production vérifiée 8/8). Prochaine étape : validation de la phase 2 par l'administrateur, puis phase 3.
+- **Phase 2 en ligne le 25/10/2026** (production vérifiée 8/8), validée par l'administrateur.
+
+### 25 octobre 2026 — Session 2 (suite) : phase 3
+- Sauvegarde avant phase 3 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-3\` ; étiquette `sauvegarde-avant-phase-3` ; branche `phase-3`.
+- Faits et testés : attestations + page « Vérifier un certificat », avis, gestion du contenu, fichiers par leçon.
+- Preuve pixel phase 3 : `comparer-elements.mjs … cacher phase-3` (référence = fin de phase 2).
+- Prochaine étape : mise en ligne de la phase 3 avec l'accord de l'administrateur (voir MISE-EN-LIGNE-PHASE-3.md), puis validation.
+- Après le codage : l'administrateur ajoutera les vidéos manquantes, le fichier de l'exercice 2 ArcGIS 1 et les numéros WhatsApp.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
 ### (Rappel) Démarrer une phase
