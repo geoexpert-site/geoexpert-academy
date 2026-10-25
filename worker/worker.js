@@ -458,6 +458,106 @@ async function journal(env, who, action, code, label, detail) {
   } catch (e) { /* le journal ne doit jamais bloquer une action */ }
 }
 
+// ---------------------------------------------------------------- Paiements DigitalPaye (webhooks)
+// Liens de paiement du site (formations-video-geoexpert.html, attribut data-link) → produit. Prix attendus en FCFA.
+const LIENS = {
+  'l0sNNklrbHcH': 'arc1', 'qKk96zGepbQ0': 'arc2', 'EVli5Yhhk9QD': 'qgis1', 'cK0Q6QrMdEBB': 'qgis2',
+  'amqThnoWczd8': 'tele', 'DBeEmN5qdD0F': 'web', 't1orZESwHB7C': 'kobo', 'rxlgDDoMiBCu': 'google',
+  'iuiqjHbR5b7a': 'pack-qgis', 'y1udN30HlczI': 'pack-arcgis', 'Al3BVi8KpMq9': 'pack-complet',
+};
+const PRIX = { arc1: 15000, arc2: 20000, qgis1: 15000, qgis2: 20000, tele: 25000, web: 20000, kobo: 15000, google: 10000, 'pack-qgis': 25000, 'pack-arcgis': 25000, 'pack-complet': 100000 };
+const PAY_OK = ['transaction.successful', 'payment_link.paid', 'order.paid'];
+
+// Liens de la Sandbox (environnement de test uniquement, variable DP_LIENS_TEST) : ils ne remplacent jamais les vrais.
+function liensConnus(env) {
+  let extra = {};
+  try { extra = env.DP_LIENS_TEST ? JSON.parse(env.DP_LIENS_TEST) : {}; } catch (e) { extra = {}; }
+  return Object.assign({}, extra, LIENS);
+}
+async function hmacHex(secret, data) {
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return [...new Uint8Array(await crypto.subtle.sign('HMAC', key, data))].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+// API DigitalPaye : jeton valable 10 minutes (on le renouvelle au bout de 8).
+let dpToken = null, dpTokenAt = 0;
+async function dpApi(env, path) {
+  const base = String(env.DP_API_URL || 'https://api.digitalpaye.com').replace(/\/+$/, '');
+  if (!dpToken || Date.now() - dpTokenAt > 8 * 60000) {
+    const r = await fetch(base + '/v1/auth/token', { method: 'POST', headers: { 'Authorization': 'Basic ' + btoa(env.DP_API_KEY + ':' + env.DP_API_SECRET) } });
+    const j = await r.json().catch(() => ({}));
+    const t = j.access_token || (j.data && j.data.access_token);
+    if (!r.ok || !t) throw new Error('auth');
+    dpToken = t; dpTokenAt = Date.now();
+  }
+  const r = await fetch(base + path, { headers: { 'Authorization': 'Bearer ' + dpToken } });
+  if (r.status === 401) dpToken = null;
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error('api ' + r.status);
+  const j = await r.json();
+  return j.data && typeof j.data === 'object' && (j.data.reference || j.data.status) ? j.data : j;
+}
+function cleanText(s, n) { return String(s || '').replace(/[\u0000-\u001f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n); }
+function capitalize(s) { return String(s || '').toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase()); }
+// Date de déblocage si l'apprenant se connecte aujourd'hui (0 h UTC du 8e jour, comme trialEnd).
+function unlockFrom(now) { const d = new Date(now); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + TRIAL_DAYS); }
+
+// Réception d'un webhook : signature vérifiée, puis paiement confirmé auprès de l'API DigitalPaye avant d'être enregistré.
+async function webhookDigitalPaye(req, env) {
+  const R = (d, s) => reply(d, s, req, env);
+  if (req.method !== 'POST') return R({ error: 'Méthode non autorisée.' }, 405);
+  if (!env.DB || !env.DP_WEBHOOK_SECRET || !env.DP_API_KEY || !env.DP_API_SECRET) return R({ error: 'Réception des paiements non configurée.' }, 503);
+  const body = new Uint8Array(await req.arrayBuffer());
+  if (body.byteLength > 65536) return R({ error: 'Contenu trop volumineux.' }, 413);
+  const sig = String(req.headers.get('X-DigitalPaye-Signature') || '').trim().toLowerCase();
+  if (!sig || !(await safeEqual(sig, 'sha256=' + await hmacHex(env.DP_WEBHOOK_SECRET, body)))) return R({ error: 'Signature invalide.' }, 401);
+  let ev;
+  try { ev = JSON.parse(new TextDecoder().decode(body)); } catch (e) { return R({ error: 'Contenu invalide.' }, 400); }
+  const type = String(ev.event || req.headers.get('X-DigitalPaye-Event') || '');
+  if (!PAY_OK.includes(type)) return R({ ok: true, ignore: type }, 200); // échoué, annulé, initié… : rien à faire
+  const d = ev.data || {}, tx = ev.transaction || d.transaction || d;
+  const ref = String(tx.reference || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
+  if (!ref) return R({ ok: true, ignore: 'sans référence' }, 200);
+  if (await env.DB.prepare('SELECT 1 FROM paiements WHERE ref = ?').bind(ref).first()) return R({ ok: true, deja: true }, 200);
+
+  // Seule la réponse de DigitalPaye fait foi (statut, montant, client, lien payé).
+  let t;
+  try { t = await dpApi(env, '/v1/collect/' + encodeURIComponent(ref)); } catch (e) { return R({ error: 'DigitalPaye injoignable : réessayez plus tard.' }, 502); }
+  if (!t) return R({ ok: true, ignore: 'transaction inconnue de DigitalPaye' }, 200);
+  const status = String((t.status && t.status.value) || t.status || '').toLowerCase();
+  if (status === 'pending' || status === 'initiated') return R({ error: 'Paiement pas encore confirmé.' }, 503); // DigitalPaye renverra le webhook
+  if (status !== 'successful') return R({ ok: true, ignore: status }, 200);
+  let meta = t.metadata || t.meta || {};
+  if (typeof meta === 'string') { try { meta = JSON.parse(meta); } catch (e) { meta = {}; } }
+  let txMeta = tx.metadata || {};
+  if (typeof txMeta === 'string') { try { txMeta = JSON.parse(txMeta); } catch (e) { txMeta = {}; } }
+  const sandbox = t.environment === 'sandbox' || meta.sandbox === true || meta.sandbox === 'true';
+  if (sandbox && env.DP_SANDBOX !== 'oui') return R({ ok: true, ignore: 'paiement de test (Sandbox)' }, 200);
+  const devise = String((t.amounts && t.amounts.currency) || t.currency || 'XOF').toUpperCase();
+  const montant = Math.round(Number((t.amounts && t.amounts.charged) || t.amount) || 0);
+  const c = t.customer || {}, payer = t.payer || {};
+  const prenom = capitalize(cleanText(c.first_name || payer.first_name, 40));
+  const nom = capitalize(cleanText(c.last_name || payer.last_name, 40));
+  const phone = normPhone(t.payer_phone || c.phone || payer.phone) || '';
+  const lien = cleanText(meta.payment_link_token || t.payment_link_token || (t.payment_link && (t.payment_link.token || t.payment_link.id)) ||
+    txMeta.payment_link_token || tx.payment_link_token || d.payment_link_token || (d.payment_link && d.payment_link.token), 40);
+  const quand = Date.parse(t.processed_at || t.created_at || '') || Date.now();
+
+  // Formation payée : par le lien ; le montant doit correspondre au prix (sinon : « À vérifier », sans code).
+  let product = liensConnus(env)[lien] || '', statut = 'a_envoyer', raison = '';
+  if (devise !== 'XOF') { statut = 'a_verifier'; raison = 'Devise inattendue : ' + devise; }
+  else if (!product) {
+    statut = 'a_verifier';
+    raison = lien ? 'Lien de paiement inconnu (' + lien + ')' : 'Lien de paiement non transmis par DigitalPaye';
+    const memePrix = Object.keys(PRIX).filter(p => PRIX[p] === montant);
+    product = memePrix.length === 1 ? memePrix[0] : ''; // simple suggestion, à confirmer par l'administrateur
+  } else if (montant < PRIX[product]) { statut = 'a_verifier'; raison = 'Montant reçu ' + montant + ' FCFA au lieu de ' + PRIX[product] + ' FCFA'; }
+
+  const r = await env.DB.prepare('INSERT OR IGNORE INTO paiements (ref, t, recu, prenom, nom, phone, montant, lien, product, statut, raison) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(ref, quand, Date.now(), prenom, nom, phone, montant, lien, product, statut, raison).run();
+  if (r.meta && r.meta.changes) await journal(env, 'DigitalPaye', statut === 'a_verifier' ? 'Paiement reçu (à vérifier)' : 'Paiement reçu', '', '', ref + ' · ' + montant + ' FCFA' + (product ? ' · ' + product : '') + (raison ? ' · ' + raison : ''));
+  return R({ ok: true }, 200);
+}
+
 const ADMIN_PAGE_HEADERS = {
   'Content-Type': 'text/html; charset=utf-8',
   'Cache-Control': 'no-store',
@@ -479,6 +579,8 @@ export default {
       const sameOrigin = role === 'admin' && origin === url.origin;
       if (origin && !sameOrigin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
       if (role !== 'admin' && url.pathname === '/api/certificat' && req.method === 'GET') return await publicCert(req, env, url);
+      // Webhooks DigitalPaye : sur le Worker apprenant (public). Le Worker admin, derrière Access, ne les reçoit qu'en local (tests).
+      if (url.pathname === '/webhook/digitalpaye' && (role !== 'admin' || env.ACCESS_OPTIONAL === 'oui')) return await webhookDigitalPaye(req, env);
       if (role !== 'admin' && url.pathname.startsWith('/api/')) return await api(req, env, url);
       if (role !== 'apprenant' && url.pathname.startsWith('/admin/')) return await admin(req, env, url);
       if (role === 'admin' && url.pathname === '/' && req.method === 'GET') {
@@ -812,6 +914,27 @@ function dashboardStats(students, prog, now) {
     modules,
   };
 }
+// Nouveau code libre (12 caractères).
+async function freeCode(env) {
+  let code, tries = 0;
+  do { code = randomCode(12); tries++; } while ((await env.ACCESS.get('s:' + code)) && tries < 5);
+  return code;
+}
+// Nouveaux codes : tous les modules du produit dès le départ, limités par l'essai de 7 jours.
+// La date de fin (12 ou 24 mois) est fixée à la première utilisation du code.
+async function createAccess(env, code, label, product, phone, immediate, now) {
+  const prod = PRODUCTS[product];
+  const modules = prod.now.concat(prod.later).map(m => ({ m, from: now }));
+  const rec = {
+    label, product, modules, created: now, expires: null, active: true, logins: 0, seen: [],
+    essai: true, mois: product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: immediate,
+  };
+  await env.ACCESS.put('s:' + code, JSON.stringify(rec));
+  if (env.DB) await env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, ?)').bind(code, now).run();
+  if (env.DB && phone) await env.DB.prepare('INSERT OR REPLACE INTO contacts (code, phone, updated) VALUES (?, ?, ?)').bind(code, phone, now).run();
+  return rec;
+}
+
 async function admin(req, env, url) {
   const now = Date.now();
   // D'abord la connexion par e-mail (Access) : sans elle, on ne révèle rien, même pas l'état de la configuration.
@@ -1057,7 +1180,7 @@ async function admin(req, env, url) {
     if (env.DB) {
       const st = [];
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
       }
       await env.DB.batch(st);
@@ -1141,6 +1264,7 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE quiz_results SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE certificates SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE reviews SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE paiements SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;
@@ -1157,20 +1281,65 @@ async function admin(req, env, url) {
     if (!prod) return reply({ error: 'Produit inconnu.' }, 400, req, env);
     const phone = normPhone(b.phone);
     if (phone === null) return reply({ error: 'Numéro WhatsApp invalide. Exemple : 07 87 01 50 30 ou +225 07 87 01 50 30.' }, 400, req, env);
-    // Nouveaux codes : tous les modules du produit dès le départ, limités par l'essai de 7 jours.
-    // La date de fin (12 ou 24 mois) est fixée à la première utilisation du code.
-    const modules = prod.now.concat(prod.later).map(m => ({ m, from: now }));
-    let code, tries = 0;
-    do { code = randomCode(12); tries++; } while ((await env.ACCESS.get('s:' + code)) && tries < 5);
-    const rec = {
-      label, product: b.product, modules, created: now, expires: null, active: true, logins: 0, seen: [],
-      essai: true, mois: b.product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: !!b.immediate,
-    };
-    await env.ACCESS.put('s:' + code, JSON.stringify(rec));
-    if (env.DB) await env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, ?)').bind(code, now).run();
-    if (env.DB && phone) await env.DB.prepare('INSERT OR REPLACE INTO contacts (code, phone, updated) VALUES (?, ?, ?)').bind(code, phone, now).run();
+    const code = await freeCode(env);
+    const rec = await createAccess(env, code, label, b.product, phone, !!b.immediate, now);
     await journal(env, who, 'Code créé', prettyCode(code), label, b.product + (b.immediate ? ', sans période d\'essai' : ', avec période d\'essai'));
     return reply({ code: prettyCode(code), label, expires: rec.expires }, 200, req, env);
+  }
+
+  // Paiements reçus de DigitalPaye (les plus récents d'abord) + compteurs.
+  if (url.pathname === '/admin/paiements' && req.method === 'GET') {
+    if (!env.DB) return reply({ paiements: [], aEnvoyer: 0, aVerifier: 0 }, 200, req, env);
+    const [l, n] = await env.DB.batch([
+      env.DB.prepare('SELECT ref, t, prenom, nom, phone, montant, lien, product, statut, raison, code, envoye_t, who FROM paiements ORDER BY t DESC LIMIT 300'),
+      env.DB.prepare('SELECT statut, COUNT(*) AS n FROM paiements GROUP BY statut'),
+    ]);
+    const paiements = await Promise.all(l.results.map(async p => {
+      const o = Object.assign({}, p, { code: p.code ? prettyCode(p.code) : '' });
+      if (p.code) {
+        const raw = await env.ACCESS.get('s:' + p.code), rec = raw ? JSON.parse(raw) : null;
+        o.debloque = rec ? (rec.accesComplet ? 0 : rec.premiereUtilisation ? trialEnd(rec) : unlockFrom(now)) : 0;
+        o.codeActif = !!(rec && rec.active);
+      }
+      return o;
+    }));
+    const cnt = s => (n.results.find(x => x.statut === s) || { n: 0 }).n;
+    return reply({ paiements, aEnvoyer: cnt('a_envoyer'), aVerifier: cnt('a_verifier'), prix: PRIX }, 200, req, env);
+  }
+
+  // « Créer le code et envoyer sur WhatsApp » : un seul code par paiement, même en cas de double clic.
+  if (url.pathname === '/admin/paiement-code' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const p = await env.DB.prepare('SELECT * FROM paiements WHERE ref = ?').bind(String(b.ref || '')).first();
+    if (!p) return reply({ error: 'Paiement introuvable.' }, 404, req, env);
+    const label = (p.prenom + ' ' + p.nom).trim().slice(0, 40) || 'Client ' + p.ref;
+    const out = (code, product, deja) => reply({ code: prettyCode(code), label, prenom: p.prenom || '', phone: p.phone, product, debloque: unlockFrom(now), deja: !!deja }, 200, req, env);
+    if (p.code) return out(p.code, p.product, true);
+    if (p.statut === 'ignore') return reply({ error: 'Ce paiement a été marqué « ignoré ».' }, 400, req, env);
+    const product = p.statut === 'a_verifier' ? String(b.product || '') : p.product;
+    if (!PRODUCTS[product]) return reply({ error: 'Choisissez d\'abord la formation payée.' }, 400, req, env);
+    const code = await freeCode(env);
+    const claim = await env.DB.prepare("UPDATE paiements SET code = ?, product = ?, statut = 'envoye', envoye_t = ?, who = ? WHERE ref = ? AND code IS NULL")
+      .bind(code, product, now, who, p.ref).run();
+    if (!claim.meta || claim.meta.changes !== 1) { // un autre clic a été plus rapide : on renvoie son code
+      const again = await env.DB.prepare('SELECT code, product FROM paiements WHERE ref = ?').bind(p.ref).first();
+      return out(again.code, again.product, true);
+    }
+    await createAccess(env, code, label, product, p.phone || '', false, now);
+    await journal(env, who, 'Code créé depuis un paiement', prettyCode(code), label, product + ', avec période d\'essai · paiement ' + p.ref);
+    return out(code, product, false);
+  }
+
+  // Ignorer un paiement sans code (par exemple votre propre paiement de test), ou le remettre « À vérifier ».
+  if (url.pathname === '/admin/paiement-statut' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    if (!['ignore', 'a_verifier'].includes(b.statut)) return reply({ error: 'Statut inconnu.' }, 400, req, env);
+    const r = await env.DB.prepare('UPDATE paiements SET statut = ?, who = ? WHERE ref = ? AND code IS NULL').bind(b.statut, who, String(b.ref || '')).run();
+    if (!r.meta || r.meta.changes !== 1) return reply({ error: 'Paiement introuvable ou code déjà créé.' }, 400, req, env);
+    await journal(env, who, b.statut === 'ignore' ? 'Paiement ignoré' : 'Paiement remis à vérifier', '', '', String(b.ref));
+    return reply({ ok: true }, 200, req, env);
   }
 
   if (url.pathname === '/admin/update' && req.method === 'POST') {

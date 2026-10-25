@@ -68,6 +68,42 @@ Un nouveau code apparaît désormais **tout de suite** dans la liste « Apprenan
 
 ---
 
+## 2 bis. Paiements reçus (onglet **💳 Paiements reçus**) — au quotidien
+
+Chaque paiement **réussi** sur DigitalPaye arrive tout seul dans cet onglet, en quelques secondes :
+nom du client, téléphone (s'il est transmis), formation, montant, date et référence de la transaction.
+Les paiements échoués ou annulés n'apparaissent pas. Un même paiement n'apparaît jamais deux fois.
+
+**Le matin (ou dès que vous voyez le bandeau) :**
+1. Sur le tableau de bord, le bandeau **« 💳 X code(s) à envoyer »** vous prévient. Cliquez sur **Voir les paiements**
+   (ou sur l'onglet, qui affiche le même nombre dans une pastille).
+2. Pour chaque ligne **« Code à envoyer »**, cliquez sur **Créer le code et envoyer sur WhatsApp** :
+   - le code est créé pour la bonne formation, avec l'essai de 7 jours, puis 12 mois (24 mois pour un pack),
+     comptés à partir de la première connexion du client ;
+   - WhatsApp s'ouvre sur la conversation du client avec le message déjà écrit (code compris) :
+     **il ne reste qu'à appuyer sur Envoyer** ;
+   - la ligne passe à **« Code envoyé »**, et son numéro est enregistré pour les relances.
+3. Si le numéro n'a pas été transmis, le bouton s'appelle **Créer le code (à copier)** : le message s'affiche
+   sous la ligne, avec **Copier le message** et **Ouvrir WhatsApp (choisir le contact)**.
+
+**« À vérifier » (en orange) :** la formation n'a pas été reconnue avec certitude (lien de paiement inconnu ou non transmis,
+ou montant plus faible que le prix). La raison est écrite sous le nom. Vérifiez dans DigitalPaye → Transactions,
+choisissez la formation dans la liste (une suggestion est parfois déjà choisie), puis **Créer le code et envoyer sur WhatsApp**.
+Si c'est par exemple **votre propre paiement de test**, cliquez sur **Ignorer** (aucun code n'est créé ;
+**Remettre à vérifier** permet de revenir en arrière).
+
+**Bon à savoir :**
+- Double-cliquer ne crée jamais deux codes : un paiement = un code.
+- **Voir le message** (sur une ligne « Code envoyé ») permet de renvoyer le même message au client.
+- La date de déblocage du message (« Toutes les autres leçons se débloquent le … ») suppose que le client se connecte
+  le jour même. S'il se connecte plus tard, sa vraie date s'affiche dans son espace et dans sa fiche.
+- **Si vous créez un nouveau lien de paiement** sur DigitalPaye (nouvelle formation, nouveau prix) : ses paiements
+  arriveront en « À vérifier » tant que Claude n'a pas ajouté ce lien à la liste du Worker. Pensez à le signaler.
+- Tout est noté dans le **Journal** (« Paiement reçu », « Code créé depuis un paiement », « Paiement ignoré »).
+- L'onglet **➕ Nouvel accès** fonctionne toujours comme avant (paiement en espèces, cadeau, etc.).
+
+---
+
 ## 3. Fiche de chaque apprenant et notes de suivi
 
 **Ouvrir une fiche :**

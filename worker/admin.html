@@ -171,6 +171,14 @@
   .b.sec.wa { background: #22b455; color: #fff; border-color: #22b455; text-decoration: none; }
   .b.sec.wa:hover { filter: brightness(.95); color: #fff; }
   .okt { color: #0a7a3b; font-weight: 600; font-size: 13px; }
+  /* Paiements reçus */
+  .pst { display: inline-block; font: 700 11.5px Inter; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .pst.a_envoyer { background: #fde8f1; color: var(--mag); } .pst.envoye { background: #e8f5e9; color: #0a7a3b; }
+  .pst.a_verifier { background: #fff3e0; color: #b45309; } .pst.ignore { background: var(--bg); color: var(--dim); }
+  .prow .why { color: #b45309; font-weight: 600; } .prow .pcode { font: 700 14px monospace; color: var(--indigo); }
+  .prow .pact { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .a-card .prow .pact select { width: auto; max-width: 240px; padding: 6px 10px; font-size: 13px; }
+  .prow .box { flex: 1 1 100%; margin-top: 6px; }
   .a-card .arow input[type=text] { width: auto; max-width: 200px; padding: 7px 10px; font-size: 13px; }
   @media (max-width: 768px) { .a-card .arow input[type=text] { max-width: none; flex: 1 1 0; } }
   .fiche, .fiche * { min-width: 0; }
@@ -216,6 +224,7 @@
   <div id="app" hidden>
     <div class="tabs" id="tabs">
       <button data-t="dash" class="on">📊 Tableau de bord</button>
+      <button data-t="pay">💳 Paiements reçus <span id="payCount" class="cnt" hidden></span></button>
       <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
       <button data-t="ann">📢 Annonces</button>
       <button data-t="quiz">❓ Quiz</button>
@@ -231,6 +240,7 @@
     <!-- Onglet Nouvel Accès -->
     <!-- Onglet Tableau de bord -->
     <div data-p="dash">
+      <div class="todo" id="payTodo" hidden></div>
       <div class="todo" id="todo" hidden></div>
       <div class="kpis" id="kpis"></div>
       <div class="a-card">
@@ -239,6 +249,15 @@
         <div id="mods"></div>
       </div>
       <p id="dashNote" style="font-size:13px; color:var(--dim); margin:0 4px;"></p>
+    </div>
+
+    <!-- Onglet Paiements reçus -->
+    <div data-p="pay" hidden>
+      <div class="a-card">
+        <h2>Paiements reçus</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Chaque paiement réussi sur DigitalPaye arrive ici tout seul. <b>Créer le code et envoyer sur WhatsApp</b> crée l'accès (essai de 7 jours, puis 12 mois, ou 24 mois pour un pack) et ouvre WhatsApp avec le message prêt : il ne reste qu'à appuyer sur Envoyer. <b>À vérifier</b> : la formation n'a pas été reconnue ; choisissez-la avant de créer le code.</p>
+        <div id="payList"></div>
+      </div>
     </div>
 
     <!-- Onglet Relances -->
@@ -416,6 +435,8 @@
     var sel = $('nProd'); sel.textContent = '';
     state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
     renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
+    try { PAY = await call('/admin/paiements', 'GET'); } catch (e) { PAY = null; }
+    renderPaiements();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
     QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
     renderAttestations(await call('/admin/attestations', 'GET'));
@@ -756,6 +777,109 @@
       go.addEventListener('click', function () { document.querySelector('[data-t=rel]').click(); });
       todo.appendChild(go);
     }
+  }
+
+  // ----- Paiements reçus (DigitalPaye)
+  var PAY = null, PAYMSG = {};
+  function fdu(ms) { return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); }
+  // Message envoyé au client avec son code (texte validé par l'administrateur).
+  function payMessage(prenom, product, code, debloque) {
+    return 'Bonjour' + (prenom ? ' ' + prenom : '') + ', merci pour votre achat de la formation ' + (LABELS[product] || product) + '.\n' +
+      'Voici votre code d\'accès personnel : ' + code + '\n' +
+      'Connectez-vous ici : ' + ESPACE_URL + '\n' +
+      'Pendant 7 jours, vous avez accès à l\'introduction et aux 2 premières leçons, et je vous accompagne ici sur WhatsApp. Toutes les autres leçons se débloquent le ' + fdu(debloque) + '.\n' +
+      'Ce code est strictement personnel, merci de ne pas le partager.\n' +
+      'Bonne formation !';
+  }
+  var PST = { a_envoyer: 'Code à envoyer', envoye: 'Code envoyé', a_verifier: 'À vérifier', ignore: 'Ignoré' };
+  function payBox(row, msg, phone) {
+    row.appendChild(el('div', 'box', msg));
+    var bt = el('div', 'pact'); bt.style.marginTop = '8px';
+    var c = el('button', 'b sec', 'Copier le message'); c.type = 'button';
+    c.addEventListener('click', function () { navigator.clipboard.writeText(msg).then(function () { c.textContent = 'Copié !'; }); });
+    var w = el('a', 'b sec wa', phone ? 'Ouvrir WhatsApp' : 'Ouvrir WhatsApp (choisir le contact)'); w.href = waLink(phone, msg); w.target = '_blank'; w.rel = 'noopener';
+    bt.appendChild(c); bt.appendChild(w); row.appendChild(bt);
+  }
+  async function payCreate(p, product, btn) {
+    if (p.statut === 'a_verifier' && !confirm('Créer un code « ' + (LABELS[product] || product) + ' » pour ' + ((p.prenom + ' ' + p.nom).trim() || p.ref) + ' ?')) return;
+    // Fenêtre ouverte tout de suite (au clic) : sinon le navigateur la bloque après l'attente du serveur.
+    var win = p.phone ? window.open('', '_blank') : null;
+    btn.disabled = true; btn.textContent = 'Création du code...';
+    try {
+      var j = await call('/admin/paiement-code', 'POST', { ref: p.ref, product: product });
+      var msg = payMessage(j.prenom, j.product, j.code, j.debloque);
+      if (win) { win.opener = null; win.location.href = waLink(j.phone, msg); }
+      PAYMSG[p.ref] = true; // le message reste affiché sous la ligne (pour le copier)
+      await load();
+    } catch (e) {
+      if (win) win.close();
+      alert(e.message); btn.disabled = false; btn.textContent = p.phone ? 'Créer le code et envoyer sur WhatsApp' : 'Créer le code (à copier)';
+    }
+  }
+  function renderPaiements() {
+    var list = $('payList'), todo = $('payTodo'); list.textContent = ''; todo.textContent = '';
+    if (!PAY) { list.appendChild(el('p', '', 'Paiements indisponibles pour le moment.')); todo.hidden = true; $('payCount').hidden = true; return; }
+    var n = PAY.aEnvoyer + PAY.aVerifier;
+    $('payCount').textContent = n; $('payCount').hidden = !n;
+    // Compteur du tableau de bord
+    todo.hidden = !n;
+    if (n) {
+      todo.appendChild(el('span', '', '💳 ' + PAY.aEnvoyer + ' code(s) à envoyer' + (PAY.aVerifier ? ' · ' + PAY.aVerifier + ' paiement(s) à vérifier' : '')));
+      var go = el('button', 'b sec fic', 'Voir les paiements'); go.type = 'button';
+      go.addEventListener('click', function () { document.querySelector('[data-t=pay]').click(); });
+      todo.appendChild(go);
+    }
+    PAY.paiements.forEach(function (p) {
+      var r = el('div', 'rrow prow'), who = el('div'), name = (p.prenom + ' ' + p.nom).trim();
+      who.appendChild(el('b', '', name || 'Nom non transmis'));
+      who.appendChild(el('small', '', new Date(p.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + ' · ' + Number(p.montant).toLocaleString('fr-FR') + ' FCFA · ' +
+        (p.product ? (LABELS[p.product] || p.product) + (p.statut === 'a_verifier' ? ' (suggestion)' : '') : 'formation non reconnue') + ' · ' + (p.phone ? '+' + p.phone : 'numéro non transmis') + ' · réf. ' + p.ref));
+      if (p.statut === 'a_verifier' && p.raison) who.appendChild(el('small', 'why', p.raison));
+      if (p.code) {
+        var cs = el('small', ''); cs.appendChild(document.createTextNode('Code : ')); cs.appendChild(el('span', 'pcode', p.code));
+        if (!p.codeActif) cs.appendChild(document.createTextNode(' (désactivé ou remplacé)'));
+        who.appendChild(cs);
+      }
+      r.appendChild(who);
+      var act = el('div', 'pact'); act.appendChild(el('span', 'pst ' + p.statut, PST[p.statut] || p.statut));
+      if (p.statut === 'a_envoyer' || p.statut === 'a_verifier') {
+        var sel = null;
+        if (p.statut === 'a_verifier') {
+          sel = el('select'); sel.setAttribute('aria-label', 'Formation payée');
+          var o0 = el('option', '', 'Choisir la formation…'); o0.value = ''; sel.appendChild(o0);
+          state.products.forEach(function (k) { var o = el('option', '', (LABELS[k] || k) + (PAY.prix && PAY.prix[k] ? ' · ' + PAY.prix[k].toLocaleString('fr-FR') + ' F' : '')); o.value = k; sel.appendChild(o); });
+          sel.value = p.product || '';
+          act.appendChild(sel);
+        }
+        var b = el('button', 'b sec wa', p.phone ? 'Créer le code et envoyer sur WhatsApp' : 'Créer le code (à copier)'); b.type = 'button';
+        b.addEventListener('click', function () {
+          var prod = sel ? sel.value : p.product;
+          if (!prod) { alert('Choisissez d\'abord la formation payée.'); return; }
+          payCreate(p, prod, b);
+        });
+        act.appendChild(b);
+        if (p.statut === 'a_verifier') {
+          var ig = el('button', 'b sec', 'Ignorer'); ig.type = 'button'; ig.title = 'Par exemple votre propre paiement de test : aucun code ne sera créé';
+          ig.addEventListener('click', async function () {
+            if (!confirm('Ignorer ce paiement ? Aucun code ne sera créé. Vous pourrez le remettre « À vérifier ».')) return;
+            try { await call('/admin/paiement-statut', 'POST', { ref: p.ref, statut: 'ignore' }); await load(); } catch (e) { alert(e.message); }
+          });
+          act.appendChild(ig);
+        }
+      } else if (p.statut === 'ignore') {
+        var back = el('button', 'b sec', 'Remettre à vérifier'); back.type = 'button';
+        back.addEventListener('click', async function () { try { await call('/admin/paiement-statut', 'POST', { ref: p.ref, statut: 'a_verifier' }); await load(); } catch (e) { alert(e.message); } });
+        act.appendChild(back);
+      } else if (p.code) {
+        var more = el('button', 'b sec', PAYMSG[p.ref] ? 'Masquer le message' : 'Voir le message'); more.type = 'button';
+        more.addEventListener('click', function () { PAYMSG[p.ref] = !PAYMSG[p.ref]; renderPaiements(); });
+        act.appendChild(more);
+      }
+      r.appendChild(act);
+      if (p.code && PAYMSG[p.ref]) payBox(r, payMessage(p.prenom || name, p.product, p.code, p.debloque || Date.now()), p.phone);
+      list.appendChild(r);
+    });
+    if (!PAY.paiements.length) list.appendChild(el('p', '', 'Aucun paiement reçu pour le moment. Ils apparaîtront ici dès que DigitalPaye les enverra.'));
   }
 
   function renderDash() {

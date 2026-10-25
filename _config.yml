@@ -10,5 +10,6 @@ exclude:
   - MISE-EN-LIGNE-PHASE-2.md
   - RAPPORT-PHASE-3.md
   - MISE-EN-LIGNE-PHASE-3.md
+  - MISE-EN-LIGNE-PAIEMENTS.md
   - worker/
   - settings.json

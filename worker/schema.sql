@@ -158,3 +158,25 @@ CREATE TABLE IF NOT EXISTS learners (
   last TEXT,
   last_activity INTEGER
 );
+
+-- Paiements reçus de DigitalPaye (webhook vérifié + confirmé par l'API). Une ligne par transaction (ref = référence DigitalPaye).
+-- statut : a_envoyer (code à créer et envoyer) / envoye (code créé) / a_verifier (formation non reconnue, aucun code créé) / ignore.
+-- Seulement le nécessaire : prénom, nom, téléphone, montant, lien payé, formation. Supprimé avec les données de l'apprenant (code).
+CREATE TABLE IF NOT EXISTS paiements (
+  ref TEXT PRIMARY KEY,
+  t INTEGER NOT NULL,
+  recu INTEGER NOT NULL,
+  prenom TEXT,
+  nom TEXT,
+  phone TEXT,
+  montant INTEGER,
+  lien TEXT,
+  product TEXT,
+  statut TEXT NOT NULL,
+  raison TEXT,
+  code TEXT,
+  envoye_t INTEGER,
+  who TEXT
+);
+CREATE INDEX IF NOT EXISTS paiements_statut ON paiements (statut);
+CREATE INDEX IF NOT EXISTS paiements_code ON paiements (code);

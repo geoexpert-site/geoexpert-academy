@@ -126,6 +126,34 @@
     « Exercice_pratique_1.pdf » avec son vrai nom ; code de test, attestation et avis de test supprimés (production propre)
   - **Phase 3 VALIDÉE par l'administrateur le 25/10/2026 — le plan des 3 phases est terminé.**
 
+## Paiements automatiques DigitalPaye (demande du 25/10/2026)
+
+Objectif : chaque paiement réussi arrive seul dans l'admin ; un bouton crée le code et ouvre WhatsApp avec le message prêt.
+Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et retour en arrière : `MISE-EN-LIGNE-PAIEMENTS.md`.
+
+- [x] Étape 1 : documentation DigitalPaye lue (https://digitalpaye.gitbook.io/docs ; docs.digitalpaye.com répond 403)
+  - webhooks signés HMAC-SHA256 (`X-DigitalPaye-Signature: sha256=…`), événements `transaction.successful` / `failed`…, 5 renvois max.
+  - API : `POST /v1/auth/token` (Basic clé:secret, jeton 10 min) puis `GET /v1/collect/:reference`
+  - **Le lien payé est connu** : métadonnée `payment_link_token` (vu dans le détail d'une vraie transaction, ex. `rxlgDDoMiBCu` = Google Earth)
+  - Sandbox : sélecteur SANDBOX/PRODUCTION du tableau de bord ; numéros 0700000000 (réussi), 0700000001 (échoué)
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-25-avant-paiements\` (4 clés KV + D1 prod + D1 test + code) ; étiquette `sauvegarde-avant-paiements` ; branche `paiements`
+  - nouvel outil : `GeoExpert-Outils\sauvegarde-prod.mjs <dossier>`
+- [x] Worker : route `/webhook/digitalpaye` (Worker apprenant seulement ; en local aussi pour les tests) — `webhookDigitalPaye()`
+  - signature vérifiée → confirmation par l'API (seule sa réponse fait foi) → `INSERT OR IGNORE` par référence
+  - liens du site → produit : constante `LIENS` ; prix : `PRIX` ; montant plus faible / lien inconnu / devise → « À vérifier » (sans code)
+  - Sandbox refusée sauf si `DP_SANDBOX = "oui"` (Worker de test) ; liens Sandbox : `DP_LIENS_TEST` (test seulement)
+  - secrets : `DP_WEBHOOK_SECRET`, `DP_API_KEY`, `DP_API_SECRET` (installés par l'administrateur, jamais vus) ; `DP_API_URL` (tests locaux)
+  - table `paiements` ; routes `/admin/paiements`, `/admin/paiement-code` (un code par paiement, même en double clic), `/admin/paiement-statut` (Ignorer)
+  - création de code partagée avec « Nouvel accès » (`createAccess`, comportement identique) ; suppression des données et remplacement de code suivent le paiement
+- [x] Admin : onglet « 💳 Paiements reçus » (2e) + bandeau « X code(s) à envoyer » sur le tableau de bord ; écrans existants inchangés
+- [x] Tests locaux `test-paiements.mjs` : 49/49 (faux serveur DigitalPaye sur 127.0.0.1:8798) ; captures `avant-paiements` / `apres-paiements`
+- [x] Worker de test déployé (`espace-apprenant-api-test` 49c8a92e, `geoexpert-admin-test` f60b065d) + table dans `geoexpert-test`
+- [x] Guide (§2 bis), politique de confidentialité (§2.3, §3, §4 — sur la branche, pas encore publiée), `MISE-EN-LIGNE-PAIEMENTS.md`
+- [ ] 👤 Test Sandbox de bout en bout (partie A de `MISE-EN-LIGNE-PAIEMENTS.md`) — **prochaine étape**
+- [ ] Mise en ligne (partie B), après accord de l'administrateur
+- Points à suivre : date de déblocage du message = si le client se connecte le jour même ; un nouveau lien de paiement
+  doit être ajouté à `LIENS` (sinon « À vérifier ») ; paiements ignorés sans code : pas encore de suppression automatique.
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
@@ -212,3 +240,8 @@
 5. En attente côté administrateur (non bloquant) : vidéos Bunny de Télédétection / Webmapping / KoboToolbox / Google Earth,
    fichier de l'exercice 2 d'ArcGIS chapitre 1, numéro WhatsApp de l'apprenant actuel.
   Ensuite : validation de la phase 1 par l'administrateur, puis phase 2.
+
+### 25 octobre 2026 — Session 3 : paiements automatiques DigitalPaye
+- Étape 1 (documentation) validée par l'administrateur ; le lien payé est transmis (`payment_link_token`).
+- Sauvegarde, branche `paiements`, Worker + admin + tests (49/49), Worker de test déployé, documents.
+- En attente : test Sandbox par l'administrateur (secrets + URL de webhook), puis accord pour la mise en ligne.

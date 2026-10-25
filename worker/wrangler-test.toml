@@ -11,6 +11,11 @@ ROLE = "apprenant"
 ALLOWED_ORIGINS = "http://localhost:5501,http://127.0.0.1:5501"
 LIBRARY_ID = "785941"
 PLAYER_HOST = "iframe.mediadelivery.net"
+# Paiements DigitalPaye (TEST) : accepte les paiements de la Sandbox. Secrets à installer par l'administrateur :
+#   DP_WEBHOOK_SECRET, DP_API_KEY (pk_test_...), DP_API_SECRET  → npx wrangler secret put <NOM> -c wrangler-test.toml
+DP_SANDBOX = "oui"
+# Liens de paiement créés dans la Sandbox → formation, ex. { "AbCdEf123456": "google" } (jamais utilisé en production).
+DP_LIENS_TEST = "{}"
 
 [[kv_namespaces]]
 binding = "ACCESS"
