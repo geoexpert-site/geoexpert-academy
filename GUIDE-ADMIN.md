@@ -86,6 +86,11 @@ Les paiements échoués ou annulés n'apparaissent pas. Un même paiement n'appa
 3. Si le numéro n'a pas été transmis, le bouton s'appelle **Créer le code (à copier)** : le message s'affiche
    sous la ligne, avec **Copier le message** et **Ouvrir WhatsApp (choisir le contact)**.
 
+**« Client à compléter » :** parfois, DigitalPaye ne transmet que la référence et le montant (le nom et le numéro manquent).
+La ligne affiche alors deux champs : **Prénom et nom du client** (obligatoire : il apparaît en filigrane sur ses vidéos)
+et **WhatsApp** (facultatif). Retrouvez-les dans DigitalPaye → **Transactions** → la référence indiquée sur la ligne
+(ou dans le message WhatsApp du client), puis cliquez sur le bouton : tout se passe ensuite comme d'habitude.
+
 **« À vérifier » (en orange) :** la formation n'a pas été reconnue avec certitude (lien de paiement inconnu ou non transmis,
 ou montant plus faible que le prix). La raison est écrite sous le nom. Vérifiez dans DigitalPaye → Transactions,
 choisissez la formation dans la liste (une suggestion est parfois déjà choisie), puis **Créer le code et envoyer sur WhatsApp**.

@@ -6,15 +6,25 @@
 ## Ce qui change
 
 - Le Worker des apprenants reçoit les webhooks de DigitalPaye sur une nouvelle adresse : `/webhook/digitalpaye`.
-  Chaque webhook est **vérifié** (signature HMAC-SHA256 avec votre secret), puis le paiement est **confirmé auprès de
-  l'API DigitalPaye** (statut, montant, client, lien payé) avant d'être enregistré. Un faux webhook ne crée jamais de paiement.
+  Chaque webhook est **vérifié** (signature HMAC-SHA256 avec votre secret) : un faux webhook ne crée jamais de paiement.
+  Le paiement est ensuite **confirmé auprès de l'API DigitalPaye**, qui donne le client et le lien payé.
+  Si l'API ne répond pas (le 25/10/2026, elle a d'abord refusé les appels venant de Cloudflare : « HTTP 520 », puis a répondu),
+  le paiement est enregistré sur la foi de la signature, avec la référence et le montant ; la ligne affiche alors
+  « Client à compléter » (nom et numéro à recopier depuis DigitalPaye → Transactions) et la formation est reconnue par le
+  montant quand une seule formation a ce prix (sinon « À vérifier »).
 - Nouvelle table `paiements` dans la base (rien d'ancien n'est modifié).
 - Administration : nouvel onglet **💳 Paiements reçus** + bandeau « X code(s) à envoyer » sur le tableau de bord.
   Les autres écrans ne changent pas.
 - Site : seule la politique de confidentialité change (informations de paiement reçues de DigitalPaye).
 - **Rien ne change pour vos clients** : même lien de paiement, même redirection vers l'espace apprenant, code toujours envoyé par WhatsApp.
 
-## Partie A — Test complet dans la Sandbox (sans argent réel)
+## Partie A — Test complet dans la Sandbox (sans argent réel) — ✅ RÉUSSI le 25/10/2026
+
+Résultat : clé « Site GeoExpert test » (sans permission « Retrait ») ; 3 secrets installés ; « Envoyer un test » livré (200) ;
+lien Sandbox `Ez59IkOJHAO1` = Google Earth ; paiement réussi DP4B1DEA47 reçu avec le prénom, le numéro et le lien payé →
+« Code à envoyer » → code créé (Google Earth, essai, 12 mois) et message WhatsApp conforme ; paiement échoué DPBAF9E1AA ignoré.
+Contenu réel d'un webhook DigitalPaye : `{ event, sent_at, delivery_id, data: { id, reference, status, amount, currency, operator_ref, failure_reason } }`
+(ni client, ni lien : ils viennent de l'API).
 
 Le Worker de test est déjà en ligne avec la nouveauté : `https://espace-apprenant-api-test.geographe07.workers.dev`
 (administration de test : `https://geoexpert-admin-test.geographe07.workers.dev`).
@@ -53,8 +63,8 @@ Tant que ces 3 secrets ne sont pas installés, l'adresse répond « non configur
 | B1 | Claude | Nouvelle sauvegarde complète de la production (KV + base D1) | aucun |
 | B2 | Claude | Ajout de la table `paiements` dans `geoexpert-prod` | aucun |
 | B3 | Claude | Mise à jour de `geoexpert-admin` puis de `espace-apprenant-api` ; vérification de la connexion apprenant et d'une vidéo | aucune coupure |
-| B4 | 👤 | En **PRODUCTION** dans DigitalPaye → **Clés API** : clé `pk_live_…`, son secret et le secret de webhook. Installez-les sur le Worker **de production** (mêmes commandes qu'en A2, avec `wrangler-prod.toml` à la place de `wrangler-test.toml`). | aucun |
-| B5 | 👤 | En **PRODUCTION** → **Clés API** → URL de webhook : `https://espace-apprenant-api.geographe07.workers.dev/webhook/digitalpaye` | aucun |
+| B4 | 👤 | En **PRODUCTION** dans DigitalPaye → **Clés API** → **Créer une clé** : nom `Site GeoExpert`, URL du webhook `https://espace-apprenant-api.geographe07.workers.dev/webhook/digitalpaye`, « Tous les événements », **décocher « Retrait (Payout) »**, Générer. **Ne pas montrer l'écran à Claude.** | aucun |
+| B5 | Claude + 👤 | Claude lance les 3 commandes dans le panneau Terminal (Worker **de production**, `wrangler-prod.toml`) ; vous collez la clé secrète `sk_live_…` (affichée une seule fois), puis la clé publique `pk_live_…`, puis le secret webhook. Claude vérifie la présence des 3 secrets (jamais leur valeur). | aucun |
 | B6 | 👤 + Claude | DigitalPaye → **Webhooks** → **Envoyer un test** : la livraison doit apparaître avec la réponse 200. | aucun |
 | B7 | Claude (+ 👤 connexion GitHub si demandée) | Publication du site (politique de confidentialité) : fusion de la branche `paiements` dans `main` | nouvelle politique en 1 à 2 minutes |
 | B8 | 👤 | Au premier vrai paiement : il apparaît dans **💳 Paiements reçus** ; créez le code avec le bouton. | le client reçoit son code comme avant |
@@ -72,7 +82,7 @@ Les paiements de la Sandbox sont **refusés** par la production (ils ne peuvent 
 | **Données** | Une table ajoutée (`paiements`) ; rien d'ancien n'est transformé. Sauvegarde : `GeoExpert-Sauvegardes\2026-10-25-avant-paiements\`. Les codes déjà créés restent valables. | Claude |
 | **Secrets** | `npx wrangler secret delete DP_WEBHOOK_SECRET -c ..\GitHub\geoexpert-academy\worker\wrangler-prod.toml` (idem pour `DP_API_KEY` et `DP_API_SECRET`) | Vous ou Claude |
 
-## Tests réalisés (Worker local + faux serveur DigitalPaye) : 49 / 49
+## Tests réalisés (Worker local + faux serveur DigitalPaye) : 66 / 66
 
 `GeoExpert-Outils\test-paiements.mjs` (`node tests-locaux.mjs test-paiements.mjs`) : webhook authentique enregistré ;
 faux webhooks refusés (signature fausse, absente, autre secret, contenu modifié) ; webhook signé mais inconnu ou échoué
@@ -81,5 +91,7 @@ production : ignorés ; « pas encore confirmé » : DigitalPaye réessaie ; les
 lien inconnu / non transmis / montant trop faible : « À vérifier » ; double clic : un seul code ; pack = 8 formations, essai,
 24 mois ; formation seule = 12 mois ; WhatsApp ouvert vers le bon numéro avec **exactement** le message demandé ;
 sans numéro : message à copier ; Ignorer ; compteurs ; téléphone sans débordement ; journal sans nom de client ;
-suppression des données de l'apprenant = paiement supprimé aussi.
+suppression des données de l'apprenant = paiement supprimé aussi ; API bloquée (HTTP 520) : webhook signé au format réel
+enregistré, faux webhook toujours refusé, formation par le montant, « Client à compléter » (nom obligatoire, numéro facultatif
+et vérifié), WhatsApp vers le numéro saisi.
 Captures : `geoexpert-captures\avant-paiements\` et `geoexpert-captures\apres-paiements\`.

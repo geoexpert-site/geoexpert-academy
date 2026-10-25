@@ -149,8 +149,14 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 - [x] Tests locaux `test-paiements.mjs` : 49/49 (faux serveur DigitalPaye sur 127.0.0.1:8798) ; captures `avant-paiements` / `apres-paiements`
 - [x] Worker de test déployé (`espace-apprenant-api-test` 49c8a92e, `geoexpert-admin-test` f60b065d) + table dans `geoexpert-test`
 - [x] Guide (§2 bis), politique de confidentialité (§2.3, §3, §4 — sur la branche, pas encore publiée), `MISE-EN-LIGNE-PAIEMENTS.md`
-- [ ] 👤 Test Sandbox de bout en bout (partie A de `MISE-EN-LIGNE-PAIEMENTS.md`) — **prochaine étape**
-- [ ] Mise en ligne (partie B), après accord de l'administrateur
+- [x] Test Sandbox de bout en bout **réussi** (25/10/2026) : DP4B1DEA47 reçu (prénom, numéro, lien) → code Google Earth + message conforme ; échoué ignoré
+  - l'API DigitalPaye a d'abord refusé les appels de Cloudflare (HTTP 520, même avec identifiants factices), puis a répondu ;
+    le webhook ne contient que `data: { reference, status, amount, currency… }` → **mode de secours** : signature seule,
+    formation par le montant si un seul prix, « Client à compléter » (nom + WhatsApp saisis dans l'admin). Tests : 66/66
+  - secrets installés par l'administrateur via le panneau Terminal (Claude lance la commande, l'administrateur colle) : méthode à reprendre en production
+  - Worker de test : `DP_LIENS_TEST` = `Ez59IkOJHAO1` → google ; versions `espace-apprenant-api-test` ada0776e, `geoexpert-admin-test` c559f972
+  - ⚠️ l'admin de test a son propre mot de passe (`GeoExpert-Outils\mot-de-passe-admin-TEST.txt`) : bien le préciser
+- [ ] Mise en ligne (partie B), après accord de l'administrateur — **prochaine étape**
 - Points à suivre : date de déblocage du message = si le client se connecte le jour même ; un nouveau lien de paiement
   doit être ajouté à `LIENS` (sinon « À vérifier ») ; paiements ignorés sans code : pas encore de suppression automatique.
 
@@ -244,4 +250,4 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 ### 25 octobre 2026 — Session 3 : paiements automatiques DigitalPaye
 - Étape 1 (documentation) validée par l'administrateur ; le lien payé est transmis (`payment_link_token`).
 - Sauvegarde, branche `paiements`, Worker + admin + tests (49/49), Worker de test déployé, documents.
-- En attente : test Sandbox par l'administrateur (secrets + URL de webhook), puis accord pour la mise en ligne.
+- Test Sandbox réussi de bout en bout ; mode de secours ajouté (API parfois bloquée, webhook minimal). En attente : accord pour la mise en ligne.

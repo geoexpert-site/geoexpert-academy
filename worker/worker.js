@@ -486,13 +486,13 @@ async function dpApi(env, path) {
     const r = await fetch(base + '/v1/auth/token', { method: 'POST', headers: { 'Authorization': 'Basic ' + btoa(env.DP_API_KEY + ':' + env.DP_API_SECRET) } });
     const j = await r.json().catch(() => ({}));
     const t = j.access_token || (j.data && j.data.access_token);
-    if (!r.ok || !t) throw new Error('auth');
+    if (!r.ok || !t) throw new Error('jeton ' + r.status + ' ' + JSON.stringify(j.error || j.message || j.code || '').slice(0, 150));
     dpToken = t; dpTokenAt = Date.now();
   }
   const r = await fetch(base + path, { headers: { 'Authorization': 'Bearer ' + dpToken } });
   if (r.status === 401) dpToken = null;
   if (r.status === 404) return null;
-  if (!r.ok) throw new Error('api ' + r.status);
+  if (!r.ok) throw new Error('transaction ' + r.status + ' ' + (await r.text().catch(() => '')).slice(0, 150));
   const j = await r.json();
   return j.data && typeof j.data === 'object' && (j.data.reference || j.data.status) ? j.data : j;
 }
@@ -501,11 +501,14 @@ function capitalize(s) { return String(s || '').toLowerCase().replace(/(^|[\s'-]
 // Date de déblocage si l'apprenant se connecte aujourd'hui (0 h UTC du 8e jour, comme trialEnd).
 function unlockFrom(now) { const d = new Date(now); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + TRIAL_DAYS); }
 
-// Réception d'un webhook : signature vérifiée, puis paiement confirmé auprès de l'API DigitalPaye avant d'être enregistré.
+// Réception d'un webhook : signature vérifiée (obligatoire), puis confirmation auprès de l'API DigitalPaye quand elle répond.
+// Le 25/10/2026, l'API refuse les appels venant de Cloudflare (HTTP 520) et le webhook ne contient que la référence,
+// le statut et le montant : le paiement est alors enregistré sur la foi de la signature, et l'administrateur complète
+// le nom, le téléphone (et la formation si plusieurs ont le même prix). Si l'API répond un jour, tout se remplit seul.
 async function webhookDigitalPaye(req, env) {
   const R = (d, s) => reply(d, s, req, env);
   if (req.method !== 'POST') return R({ error: 'Méthode non autorisée.' }, 405);
-  if (!env.DB || !env.DP_WEBHOOK_SECRET || !env.DP_API_KEY || !env.DP_API_SECRET) return R({ error: 'Réception des paiements non configurée.' }, 503);
+  if (!env.DB || !env.DP_WEBHOOK_SECRET) return R({ error: 'Réception des paiements non configurée.' }, 503);
   const body = new Uint8Array(await req.arrayBuffer());
   if (body.byteLength > 65536) return R({ error: 'Contenu trop volumineux.' }, 413);
   const sig = String(req.headers.get('X-DigitalPaye-Signature') || '').trim().toLowerCase();
@@ -519,10 +522,15 @@ async function webhookDigitalPaye(req, env) {
   if (!ref) return R({ ok: true, ignore: 'sans référence' }, 200);
   if (await env.DB.prepare('SELECT 1 FROM paiements WHERE ref = ?').bind(ref).first()) return R({ ok: true, deja: true }, 200);
 
-  // Seule la réponse de DigitalPaye fait foi (statut, montant, client, lien payé).
-  let t;
-  try { t = await dpApi(env, '/v1/collect/' + encodeURIComponent(ref)); } catch (e) { return R({ error: 'DigitalPaye injoignable : réessayez plus tard.' }, 502); }
-  if (!t) return R({ ok: true, ignore: 'transaction inconnue de DigitalPaye' }, 200);
+  // Quand l'API répond, c'est elle qui fait foi (statut, montant, client, lien payé) ; sinon, le contenu signé du webhook.
+  let t = null;
+  if (env.DP_API_KEY && env.DP_API_SECRET) {
+    try {
+      t = await dpApi(env, '/v1/collect/' + encodeURIComponent(ref));
+      if (!t) return R({ ok: true, ignore: 'transaction inconnue de DigitalPaye' }, 200);
+    } catch (e) { console.log('API DigitalPaye indisponible, webhook signé utilisé :', e.message); t = null; }
+  }
+  if (!t) t = tx;
   const status = String((t.status && t.status.value) || t.status || '').toLowerCase();
   if (status === 'pending' || status === 'initiated') return R({ error: 'Paiement pas encore confirmé.' }, 503); // DigitalPaye renverra le webhook
   if (status !== 'successful') return R({ ok: true, ignore: status }, 200);
@@ -540,17 +548,21 @@ async function webhookDigitalPaye(req, env) {
   const phone = normPhone(t.payer_phone || c.phone || payer.phone) || '';
   const lien = cleanText(meta.payment_link_token || t.payment_link_token || (t.payment_link && (t.payment_link.token || t.payment_link.id)) ||
     txMeta.payment_link_token || tx.payment_link_token || d.payment_link_token || (d.payment_link && d.payment_link.token), 40);
-  const quand = Date.parse(t.processed_at || t.created_at || '') || Date.now();
+  const quand = Date.parse(t.processed_at || t.created_at || ev.sent_at || '') || Date.now();
 
-  // Formation payée : par le lien ; le montant doit correspondre au prix (sinon : « À vérifier », sans code).
+  // Formation payée : par le lien s'il est connu, sinon par le montant quand une seule formation a ce prix.
+  // Lien inconnu, plusieurs formations au même prix, montant trop faible : « À vérifier » (aucun code sans votre choix).
   let product = liensConnus(env)[lien] || '', statut = 'a_envoyer', raison = '';
+  const memePrix = Object.keys(PRIX).filter(p => PRIX[p] === montant);
+  const fcfa = n => n.toLocaleString('fr-FR') + ' FCFA';
   if (devise !== 'XOF') { statut = 'a_verifier'; raison = 'Devise inattendue : ' + devise; }
-  else if (!product) {
-    statut = 'a_verifier';
-    raison = lien ? 'Lien de paiement inconnu (' + lien + ')' : 'Lien de paiement non transmis par DigitalPaye';
-    const memePrix = Object.keys(PRIX).filter(p => PRIX[p] === montant);
-    product = memePrix.length === 1 ? memePrix[0] : ''; // simple suggestion, à confirmer par l'administrateur
-  } else if (montant < PRIX[product]) { statut = 'a_verifier'; raison = 'Montant reçu ' + montant + ' FCFA au lieu de ' + PRIX[product] + ' FCFA'; }
+  else if (!product && lien) {
+    statut = 'a_verifier'; raison = 'Lien de paiement inconnu (' + lien + ')';
+    product = memePrix.length === 1 ? memePrix[0] : ''; // simple suggestion, à confirmer
+  } else if (!product) {
+    if (memePrix.length === 1) product = memePrix[0];
+    else { statut = 'a_verifier'; raison = memePrix.length ? memePrix.length + ' formations coûtent ' + fcfa(montant) + ' : choisissez la bonne' : 'Aucune formation ne coûte ' + fcfa(montant); }
+  } else if (montant < PRIX[product]) { statut = 'a_verifier'; raison = 'Montant reçu ' + fcfa(montant) + ' au lieu de ' + fcfa(PRIX[product]); }
 
   const r = await env.DB.prepare('INSERT OR IGNORE INTO paiements (ref, t, recu, prenom, nom, phone, montant, lien, product, statut, raison) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     .bind(ref, quand, Date.now(), prenom, nom, phone, montant, lien, product, statut, raison).run();
@@ -1313,6 +1325,17 @@ async function admin(req, env, url) {
     const b = await readJson(req);
     const p = await env.DB.prepare('SELECT * FROM paiements WHERE ref = ?').bind(String(b.ref || '')).first();
     if (!p) return reply({ error: 'Paiement introuvable.' }, 404, req, env);
+    // Nom et numéro non transmis par DigitalPaye : ceux saisis par l'administrateur.
+    if (!p.code && !(p.prenom || p.nom)) {
+      const parts = capitalize(cleanText(b.nom, 60)).split(' ').filter(Boolean);
+      if (!parts.length) return reply({ error: 'Indiquez le prénom et le nom du client (visibles en filigrane sur ses vidéos).' }, 400, req, env);
+      p.prenom = parts[0].slice(0, 40); p.nom = parts.slice(1).join(' ').slice(0, 40);
+    }
+    if (!p.code && !p.phone && b.phone) {
+      const ph = normPhone(b.phone);
+      if (ph === null) return reply({ error: 'Numéro WhatsApp invalide. Exemple : 07 87 01 50 30 ou +225 07 87 01 50 30.' }, 400, req, env);
+      p.phone = ph;
+    }
     const label = (p.prenom + ' ' + p.nom).trim().slice(0, 40) || 'Client ' + p.ref;
     const out = (code, product, deja) => reply({ code: prettyCode(code), label, prenom: p.prenom || '', phone: p.phone, product, debloque: unlockFrom(now), deja: !!deja }, 200, req, env);
     if (p.code) return out(p.code, p.product, true);
@@ -1320,8 +1343,8 @@ async function admin(req, env, url) {
     const product = p.statut === 'a_verifier' ? String(b.product || '') : p.product;
     if (!PRODUCTS[product]) return reply({ error: 'Choisissez d\'abord la formation payée.' }, 400, req, env);
     const code = await freeCode(env);
-    const claim = await env.DB.prepare("UPDATE paiements SET code = ?, product = ?, statut = 'envoye', envoye_t = ?, who = ? WHERE ref = ? AND code IS NULL")
-      .bind(code, product, now, who, p.ref).run();
+    const claim = await env.DB.prepare("UPDATE paiements SET code = ?, product = ?, statut = 'envoye', envoye_t = ?, who = ?, prenom = ?, nom = ?, phone = ? WHERE ref = ? AND code IS NULL")
+      .bind(code, product, now, who, p.prenom || '', p.nom || '', p.phone || '', p.ref).run();
     if (!claim.meta || claim.meta.changes !== 1) { // un autre clic a été plus rapide : on renvoie son code
       const again = await env.DB.prepare('SELECT code, product FROM paiements WHERE ref = ?').bind(p.ref).first();
       return out(again.code, again.product, true);

@@ -179,6 +179,9 @@
   .prow .pact { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .a-card .prow .pact select { width: auto; max-width: 240px; padding: 6px 10px; font-size: 13px; }
   .prow .box { flex: 1 1 100%; margin-top: 6px; }
+  .prow .pform { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .a-card .prow .pform input[type=text] { flex: 1 1 190px; width: auto; padding: 8px 10px; font-size: 14px; }
+  .prow .pform small { flex: 1 1 100%; }
   .a-card .arow input[type=text] { width: auto; max-width: 200px; padding: 7px 10px; font-size: 13px; }
   @media (max-width: 768px) { .a-card .arow input[type=text] { max-width: none; flex: 1 1 0; } }
   .fiche, .fiche * { min-width: 0; }
@@ -255,7 +258,7 @@
     <div data-p="pay" hidden>
       <div class="a-card">
         <h2>Paiements reçus</h2>
-        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Chaque paiement réussi sur DigitalPaye arrive ici tout seul. <b>Créer le code et envoyer sur WhatsApp</b> crée l'accès (essai de 7 jours, puis 12 mois, ou 24 mois pour un pack) et ouvre WhatsApp avec le message prêt : il ne reste qu'à appuyer sur Envoyer. <b>À vérifier</b> : la formation n'a pas été reconnue ; choisissez-la avant de créer le code.</p>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Chaque paiement réussi sur DigitalPaye arrive ici tout seul. <b>Créer le code et envoyer sur WhatsApp</b> crée l'accès (essai de 7 jours, puis 12 mois, ou 24 mois pour un pack) et ouvre WhatsApp avec le message prêt : il ne reste qu'à appuyer sur Envoyer. <b>À vérifier</b> : la formation n'a pas été reconnue ; choisissez-la avant de créer le code. <b>Client à compléter</b> : DigitalPaye n'a pas transmis le nom ni le numéro ; recopiez-les depuis DigitalPaye → Transactions (référence indiquée sur la ligne).</p>
         <div id="payList"></div>
       </div>
     </div>
@@ -800,20 +803,23 @@
     var w = el('a', 'b sec wa', phone ? 'Ouvrir WhatsApp' : 'Ouvrir WhatsApp (choisir le contact)'); w.href = waLink(phone, msg); w.target = '_blank'; w.rel = 'noopener';
     bt.appendChild(c); bt.appendChild(w); row.appendChild(bt);
   }
-  async function payCreate(p, product, btn) {
-    if (p.statut === 'a_verifier' && !confirm('Créer un code « ' + (LABELS[product] || product) + ' » pour ' + ((p.prenom + ' ' + p.nom).trim() || p.ref) + ' ?')) return;
+  // extra = nom et numéro saisis quand DigitalPaye ne les a pas transmis.
+  async function payCreate(p, product, btn, extra) {
+    var who = (p.prenom + ' ' + p.nom).trim() || extra.nom || p.ref;
+    if (p.statut === 'a_verifier' && !confirm('Créer un code « ' + (LABELS[product] || product) + ' » pour ' + who + ' ?')) return;
+    var label = btn.textContent;
     // Fenêtre ouverte tout de suite (au clic) : sinon le navigateur la bloque après l'attente du serveur.
-    var win = p.phone ? window.open('', '_blank') : null;
+    var win = p.phone || extra.phone ? window.open('', '_blank') : null;
     btn.disabled = true; btn.textContent = 'Création du code...';
     try {
-      var j = await call('/admin/paiement-code', 'POST', { ref: p.ref, product: product });
+      var j = await call('/admin/paiement-code', 'POST', { ref: p.ref, product: product, nom: extra.nom, phone: extra.phone });
       var msg = payMessage(j.prenom, j.product, j.code, j.debloque);
-      if (win) { win.opener = null; win.location.href = waLink(j.phone, msg); }
+      if (win && j.phone) { win.opener = null; win.location.href = waLink(j.phone, msg); } else if (win) win.close();
       PAYMSG[p.ref] = true; // le message reste affiché sous la ligne (pour le copier)
       await load();
     } catch (e) {
       if (win) win.close();
-      alert(e.message); btn.disabled = false; btn.textContent = p.phone ? 'Créer le code et envoyer sur WhatsApp' : 'Créer le code (à copier)';
+      alert(e.message); btn.disabled = false; btn.textContent = label;
     }
   }
   function renderPaiements() {
@@ -831,7 +837,7 @@
     }
     PAY.paiements.forEach(function (p) {
       var r = el('div', 'rrow prow'), who = el('div'), name = (p.prenom + ' ' + p.nom).trim();
-      who.appendChild(el('b', '', name || 'Nom non transmis'));
+      who.appendChild(el('b', '', name || 'Client à compléter'));
       who.appendChild(el('small', '', new Date(p.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + ' · ' + Number(p.montant).toLocaleString('fr-FR') + ' FCFA · ' +
         (p.product ? (LABELS[p.product] || p.product) + (p.statut === 'a_verifier' ? ' (suggestion)' : '') : 'formation non reconnue') + ' · ' + (p.phone ? '+' + p.phone : 'numéro non transmis') + ' · réf. ' + p.ref));
       if (p.statut === 'a_verifier' && p.raison) who.appendChild(el('small', 'why', p.raison));
@@ -843,7 +849,15 @@
       r.appendChild(who);
       var act = el('div', 'pact'); act.appendChild(el('span', 'pst ' + p.statut, PST[p.statut] || p.statut));
       if (p.statut === 'a_envoyer' || p.statut === 'a_verifier') {
-        var sel = null;
+        var sel = null, iName = null, iPhone = null;
+        // DigitalPaye ne transmet pas toujours le client : petit formulaire pour le nom et le numéro WhatsApp.
+        if (!name || !p.phone) {
+          var f = el('div', 'pform');
+          if (!name) { iName = el('input'); iName.type = 'text'; iName.maxLength = 60; iName.placeholder = 'Prénom et nom du client'; iName.setAttribute('aria-label', 'Prénom et nom du client'); f.appendChild(iName); }
+          if (!p.phone) { iPhone = el('input'); iPhone.type = 'text'; iPhone.maxLength = 24; iPhone.inputMode = 'tel'; iPhone.autocomplete = 'off'; iPhone.placeholder = 'WhatsApp, ex. 07 87 01 50 30'; iPhone.setAttribute('aria-label', 'Numéro WhatsApp du client'); f.appendChild(iPhone); }
+          f.appendChild(el('small', '', 'À retrouver dans DigitalPaye → Transactions → réf. ' + p.ref + ' (ou dans le message WhatsApp du client).'));
+          who.appendChild(f);
+        }
         if (p.statut === 'a_verifier') {
           sel = el('select'); sel.setAttribute('aria-label', 'Formation payée');
           var o0 = el('option', '', 'Choisir la formation…'); o0.value = ''; sel.appendChild(o0);
@@ -852,10 +866,12 @@
           act.appendChild(sel);
         }
         var b = el('button', 'b sec wa', p.phone ? 'Créer le code et envoyer sur WhatsApp' : 'Créer le code (à copier)'); b.type = 'button';
+        if (iPhone) iPhone.addEventListener('input', function () { b.textContent = iPhone.value.trim() ? 'Créer le code et envoyer sur WhatsApp' : 'Créer le code (à copier)'; });
         b.addEventListener('click', function () {
           var prod = sel ? sel.value : p.product;
           if (!prod) { alert('Choisissez d\'abord la formation payée.'); return; }
-          payCreate(p, prod, b);
+          if (iName && !iName.value.trim()) { alert('Indiquez le prénom et le nom du client (ils apparaissent en filigrane sur ses vidéos).'); iName.focus(); return; }
+          payCreate(p, prod, b, { nom: iName ? iName.value.trim() : '', phone: iPhone ? iPhone.value.trim() : '' });
         });
         act.appendChild(b);
         if (p.statut === 'a_verifier') {

@@ -15,7 +15,7 @@ PLAYER_HOST = "iframe.mediadelivery.net"
 #   DP_WEBHOOK_SECRET, DP_API_KEY (pk_test_...), DP_API_SECRET  → npx wrangler secret put <NOM> -c wrangler-test.toml
 DP_SANDBOX = "oui"
 # Liens de paiement créés dans la Sandbox → formation, ex. { "AbCdEf123456": "google" } (jamais utilisé en production).
-DP_LIENS_TEST = "{}"
+DP_LIENS_TEST = "{\"Ez59IkOJHAO1\": \"google\"}"
 
 [[kv_namespaces]]
 binding = "ACCESS"
