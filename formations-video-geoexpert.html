@@ -874,8 +874,17 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 
         // Si un lien DigitalPaye est présent, on redirige le client vers le paiement
         if (link) {
-          // Court délai pour laisser le pixel envoyer l'événement avant de quitter la page
-          setTimeout(function () { window.location.href = link; }, 300);
+          // On quitte la page dès que le pixel a fini d'envoyer InitiateCheckout (au plus 1,5 s d'attente).
+          // Sans pixel (bloqueur de pub), on part tout de suite.
+          let parti = false;
+          const partir = function () { if (!parti) { parti = true; window.location.href = link; } };
+          if (typeof fbq !== 'function') { partir(); return; }
+          try {
+            new PerformanceObserver(function (liste) {
+              if (liste.getEntries().some(function (en) { return /facebook\.com\/tr.*ev=InitiateCheckout/.test(en.name); })) partir();
+            }).observe({ type: 'resource' });
+          } catch (err) {}
+          setTimeout(partir, 1500);
         } else {
           // Sinon, on ouvre la Pop-up WhatsApp (Fallback de sécurité)
           const modal = document.getElementById('modalAchat');
