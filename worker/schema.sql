@@ -52,6 +52,17 @@ CREATE TABLE IF NOT EXISTS relances (
 );
 CREATE INDEX IF NOT EXISTS relances_code ON relances (code, kind, t);
 
+-- Annonces du formateur, affichées sur le tableau de bord des apprenants.
+-- module vide = toutes les formations ; until = date de fin d'affichage (0 = sans fin).
+CREATE TABLE IF NOT EXISTS annonces (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  t INTEGER NOT NULL,
+  who TEXT,
+  text TEXT NOT NULL,
+  module TEXT NOT NULL DEFAULT '',
+  until INTEGER NOT NULL DEFAULT 0
+);
+
 -- Journal d'activité de l'administration (qui a fait quoi et quand).
 CREATE TABLE IF NOT EXISTS journal (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

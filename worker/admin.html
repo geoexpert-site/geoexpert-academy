@@ -125,6 +125,11 @@
   .a-card .arow select { width: auto; max-width: 260px; padding: 7px 10px; font-size: 13px; }
   .acts .warn { margin: 12px 14px; display: block; }
   .acts > .b { margin: 0 14px 12px; }
+  /* Annonces */
+  .annprev { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: 12px; padding: 12px 16px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .annprev b { font-family: Montserrat, sans-serif; }
+  .arow.fin { opacity: .55; }
+
   /* Relances */
   .cnt { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 99px; background: var(--mag); color: #fff; font-size: 12px; line-height: 18px; text-align: center; margin-left: 4px; }
   .todo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: var(--r); padding: 14px 18px; margin-bottom: 16px; font-weight: 600; }
@@ -184,6 +189,7 @@
     <div class="tabs" id="tabs">
       <button data-t="dash" class="on">📊 Tableau de bord</button>
       <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
+      <button data-t="ann">📢 Annonces</button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
@@ -218,6 +224,29 @@
       </div>
     </div>
 
+    <!-- Onglet Annonces -->
+    <div data-p="ann" hidden>
+      <div class="a-card">
+        <h2>Publier une annonce</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Elle s'affiche en haut du tableau de bord des apprenants concernés, juste sous « Bonjour… ». Exemples : nouvelle leçon en ligne, conseil, live à venir.</p>
+        <label for="aText">Texte de l'annonce (400 caractères maximum)</label>
+        <textarea id="aText" maxlength="400" rows="3" placeholder="Ex : Nouvelle leçon en ligne dans QGIS chapitre 2 : la mise en page professionnelle !" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:15px Inter;background:var(--bg);resize:vertical;"></textarea>
+        <div class="a-row" style="grid-template-columns:1fr 1fr;">
+          <div><label for="aMod">Pour qui ?</label><select id="aMod"></select></div>
+          <div><label for="aDays">Afficher pendant</label>
+            <select id="aDays"><option value="7">7 jours</option><option value="14" selected>14 jours</option><option value="30">30 jours</option><option value="0">Jusqu'à ce que je la retire</option></select></div>
+        </div>
+        <label>Aperçu (ce que verra l'apprenant)</label>
+        <div class="annprev" id="aPrev"><b>📢 Annonce du formateur :</b> <span id="aPrevT">…</span></div>
+        <button class="b" id="aPub" type="button" style="width:100%;">Publier l'annonce</button>
+        <div id="aMsg"></div>
+      </div>
+      <div class="a-card">
+        <h2>Annonces publiées</h2>
+        <div id="annList"></div>
+      </div>
+    </div>
+
     <div class="a-card" data-p="new" hidden>
       <h2>Créer un accès après un paiement</h2>
       <label for="nLabel">Nom ou initiales de l'apprenant (visible sur ses vidéos en filigrane)</label>
@@ -242,6 +271,7 @@
     <!-- Onglet Liste -->
     <div class="a-card" data-p="list" hidden>
       <h2>Suivi des apprenants</h2>
+      <div class="todo" id="purge" hidden></div>
       <button class="b sec" id="export" type="button" style="margin:0 0 12px;">📥 Exporter la liste (Excel / CSV)</button>
       <input type="text" id="find" placeholder="Rechercher un apprenant (nom ou code)" aria-label="Rechercher un apprenant" style="margin-bottom:6px;">
       <div style="overflow-x:auto;">
@@ -318,8 +348,43 @@
     var sel = $('nProd'); sel.textContent = '';
     state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
     renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
+    renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
     renderLog((await call('/admin/journal', 'GET')).entries);
   }
+
+  // ----- Annonces
+  function modTitle(k) { var m = state.catalog.filter(function (c) { return c.key === k; })[0]; return m ? m.title.split(' : ')[0] : k; }
+  function renderAnnonces(list) {
+    var sel = $('aMod'), v = sel.value; sel.textContent = '';
+    var o = el('option', '', 'Tous les apprenants (toutes les formations)'); o.value = ''; sel.appendChild(o);
+    state.catalog.forEach(function (m) { var x = el('option', '', 'Seulement : ' + m.title.split(' : ')[0]); x.value = m.key; sel.appendChild(x); });
+    sel.value = v || '';
+    var box = $('annList'), now = Date.now(); box.textContent = '';
+    if (!list.length) box.appendChild(el('p', '', 'Aucune annonce pour le moment.'));
+    var wrap = el('div', 'acts'); if (list.length) box.appendChild(wrap);
+    list.forEach(function (a) {
+      var fin = a.until && a.until < now;
+      var r = actRow(a.text, fdt(a.t) + ' · ' + (a.module ? modTitle(a.module) : 'tous les apprenants') + ' · ' + (fin ? 'terminée le ' + fdt(a.until) : a.until ? 'affichée jusqu\'au ' + fdt(a.until) : 'affichée jusqu\'à ce que vous la retiriez'));
+      if (fin) r.row.classList.add('fin');
+      var b = el('button', 'b sec red', fin ? 'Effacer' : 'Retirer'); b.type = 'button';
+      b.addEventListener('click', async function () {
+        if (!confirm((fin ? 'Effacer' : 'Retirer') + ' cette annonce ?\n\n« ' + a.text.slice(0, 120) + ' »\n\nLes apprenants ne la verront plus.')) return;
+        b.disabled = true;
+        try { await call('/admin/annonce-delete', 'POST', { id: a.id }); await load(); } catch (e) { alert(e.message); b.disabled = false; }
+      });
+      r.ctl.appendChild(b); wrap.appendChild(r.row);
+    });
+  }
+  $('aText').addEventListener('input', function () { $('aPrevT').textContent = this.value.trim() || '…'; });
+  $('aPub').addEventListener('click', async function () {
+    var text = $('aText').value.trim(), m = $('aMod'), d = $('aDays'), msg = $('aMsg'); msg.textContent = ''; msg.className = '';
+    if (!text) { msg.className = 'err'; msg.textContent = 'Écrivez d\'abord le texte de l\'annonce.'; return; }
+    if (!confirm('Publier cette annonce ?\n\nPour : ' + m.options[m.selectedIndex].text + '\nDurée : ' + d.options[d.selectedIndex].text + '\n\n« ' + text.slice(0, 160) + ' »')) return;
+    var btn = $('aPub'); btn.disabled = true; btn.textContent = 'Publication...';
+    try { await call('/admin/annonce', 'POST', { text: text, module: m.value, days: +d.value }); $('aText').value = ''; $('aPrevT').textContent = '…'; await load(); msg.className = 'ok'; msg.textContent = '✅ Annonce publiée : elle apparaît à la prochaine ouverture du tableau de bord des apprenants.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { btn.disabled = false; btn.textContent = 'Publier l\'annonce'; }
+  });
 
   // ----- Relances WhatsApp
   var REL = {
@@ -428,7 +493,7 @@
     if (!s.modules.length) mods.appendChild(el('p', '', 'Aucun apprenant inscrit pour le moment.'));
     var hors = [];
     if (s.desactives) hors.push(s.desactives + ' code(s) désactivé(s) ou remplacé(s)');
-    if (s.expires) hors.push(s.expires + ' accès expiré(s)');
+    if (s.expires) hors.push(s.expires + ' accès expiré(s)' + (s.apurger ? ', dont ' + s.apurger + ' depuis plus de 12 mois (données à supprimer, voir « Apprenants »)' : ''));
     $('dashNote').textContent = (hors.length ? 'Non comptés : ' + hors.join(' et ') + '. ' : '') + 'Chiffres mis à jour à chaque ouverture de l\'administration.';
   }
 
@@ -570,6 +635,18 @@
     var b5 = el('button', 'b sec' + (f.active ? ' red' : ''), f.active ? 'Désactiver' : 'Réactiver'); b5.type = 'button';
     b5.addEventListener('click', function () { ficheAction(b5, CONFIRM.active(CONF), '/admin/update', { code: f.code, active: !f.active }); });
     r5.ctl.appendChild(b5); box.appendChild(r5.row);
+    // Supprimer définitivement les données (droit à l'effacement / fin de la durée de conservation)
+    var r6 = actRow('Supprimer définitivement ses données', (f.expires && f.expires < now ? 'Accès terminé le ' + fdt(f.expires) + '. ' : '') + 'Efface son code, sa progression, ses notes, son numéro et vos notes de suivi. Irréversible.');
+    var b6 = el('button', 'b sec red', 'Supprimer les données'); b6.type = 'button';
+    b6.addEventListener('click', async function () {
+      var t = prompt('Supprimer DÉFINITIVEMENT toutes les données de ' + f.label + ' ?\n\nSon code ne fonctionnera plus et rien ne pourra être récupéré.\n\nPour confirmer, tapez SUPPRIMER en majuscules :');
+      if (t === null) return;
+      if (t.trim() !== 'SUPPRIMER') { alert('Suppression annulée : il fallait taper SUPPRIMER.'); return; }
+      b6.disabled = true; b6.textContent = '...';
+      try { await call('/admin/purge', 'POST', { code: f.code, confirm: 'SUPPRIMER' }); closeFiche(); await load(); alert('Les données de ' + f.label + ' ont été supprimées.'); }
+      catch (e) { alert(e.message); b6.disabled = false; b6.textContent = 'Supprimer les données'; }
+    });
+    r6.ctl.appendChild(b6); box.appendChild(r6.row);
     body.appendChild(box);
   }
   function closeFiche() { $('ov').hidden = true; document.body.style.overflow = ''; fCode = ''; }
@@ -774,6 +851,16 @@
       tr.appendChild(a); tb.appendChild(tr);
     });
     $('find').dispatchEvent(new Event('input')); // garde la recherche après une action
+    // Rappel : accès terminés depuis plus de 12 mois → données à supprimer (politique de confidentialité)
+    var pg = $('purge'), old = state.students.filter(function (s) { return s.purgeable; });
+    pg.textContent = ''; pg.hidden = !old.length;
+    if (old.length) {
+      var txt = el('div'); txt.appendChild(el('span', '', '🗑️ ' + old.length + ' apprenant(s) dont l\'accès est terminé depuis plus de 12 mois : supprimez leurs données (engagement de la politique de confidentialité).'));
+      pg.appendChild(txt);
+      var lst = el('span', 'relb');
+      old.forEach(function (s) { var b = el('button', 'b sec', s.label); b.type = 'button'; b.addEventListener('click', function () { openFiche(s.code); }); lst.appendChild(b); });
+      pg.appendChild(lst);
+    }
     if (!state.students.length) { var tr = el('tr'); var td = el('td', '', 'Aucun apprenant pour le moment.'); td.colSpan = 6; td.style.textAlign = 'center'; td.style.padding = '30px'; td.style.color = 'var(--dim)'; tr.appendChild(td); tb.appendChild(tr); }
   }
 

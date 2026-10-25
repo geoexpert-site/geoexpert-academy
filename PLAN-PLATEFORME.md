@@ -80,12 +80,16 @@
 - [ ] Objectif de la semaine + jauge
 - [ ] Série de semaines actives
 - [ ] Badges liés à de vraies étapes (section « Mes progrès » sous « Vos modules »)
-- [ ] Annonces du formateur (écriture dans l'admin, affichage côté apprenant)
+- [x] Annonces du formateur (écriture dans l'admin, affichage côté apprenant) — testé 10/10 admin + 6/6 apprenant, **pas encore en ligne**
+  - onglet admin « 📢 Annonces » (3e) : texte + cible (toutes / une formation) + durée (7, 14, 30 j, sans fin) + aperçu ; retirer avec confirmation
+  - apprenant : 3 annonces max., au-dessus du message du jour (décision 1), « × » pour masquer sur l'appareil · table `annonces`, `/api/login` → `annonces`
 - [ ] Entrée « Mes notes » dans la colonne de gauche
 - [ ] Case « J'ai fait l'exercice » (visible dans la fiche apprenant)
 - [ ] Mini-quiz modifiables depuis l'admin (onglet « Quiz » sur la page de leçon)
 - [ ] Mode économie de données (à vérifier avec le lecteur Bunny)
-- [ ] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité
+- [x] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité — testé 11/11, **pas encore en ligne**
+  - fiche → « Supprimer définitivement ses données » (taper SUPPRIMER) ; efface aussi les anciens codes remplacés ; journal gardé sans le nom · route `/admin/purge`
+  - rappel en haut de « Apprenants » + note du tableau de bord quand un accès est fini depuis plus de 12 mois
 
 ## Phase 3 — Fin de parcours et contenu (≈ 16 h)
 
@@ -152,7 +156,14 @@
 - Mise en ligne terminée (étapes 1 à 10). Production vérifiée : 7/7.
 - Phase 1 validée par l'administrateur. Retour en arrière toujours possible : voir `MISE-EN-LIGNE-PHASE-1.md`.
 
-### Prochaine session — démarrer la phase 2
+### 25 octobre 2026 — Session 2 (phase 2)
+- Sauvegarde avant phase 2 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-2\` (KV + export D1 + code) ; étiquette
+  `sauvegarde-avant-phase-2` ; branche `phase-2`.
+- L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
+- Faits et testés : suppression des données d'un apprenant ; annonces du formateur.
+- Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
+
+### (Rappel) Démarrer une phase
 1. Relire ce fichier en entier.
 2. Avant de coder : nouvelle sauvegarde (code + données de production), nouvelle étiquette git, nouvelle branche `phase-2`.
 3. Travailler sur l'environnement de test, avec la règle n° 1 (on ajoute, on ne change pas l'existant) et la preuve pixel

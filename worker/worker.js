@@ -305,6 +305,15 @@ function trialLock(rec, k, now) {
   const i = m ? m.videos.findIndex(v => v.k === k) : -1;
   return i >= 0 && i < TRIAL_FREE ? 0 : end;
 }
+// Annonces en cours pour un apprenant (toutes formations, ou une de ses formations). [] si la base est absente.
+async function loadAnnonces(env, rec, now) {
+  if (!env.DB) return [];
+  try {
+    const r = await env.DB.prepare('SELECT id, t, text, module FROM annonces WHERE (until = 0 OR until > ?) ORDER BY t DESC LIMIT 20').bind(now).all();
+    const mine = new Set(rec.modules.map(g => g.m));
+    return r.results.filter(a => !a.module || mine.has(a.module)).slice(0, 3).map(a => ({ id: a.id, t: a.t, text: a.text }));
+  } catch (e) { return []; }
+}
 // Leçon (vidéo) d'un module de l'apprenant.
 function ownsLesson(rec, k) {
   const m = findModule(moduleOf(k));
@@ -457,6 +466,7 @@ async function api(req, env, url) {
       trialStart: te > now ? rec.premiereUtilisation : 0,
       assistanceEnd: startAt ? addMonths(startAt, 3) : 0,
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
+      annonces: await loadAnnonces(env, rec, now),
     }, 200, req, env);
   }
 
@@ -639,6 +649,7 @@ function dashboardStats(students, prog, now) {
     progression: withProg.length ? Math.round(withProg.reduce((a, s) => a + Math.min(100, s.done * 100 / s.lessons), 0) / withProg.length) : null,
     progressionSur: withProg.length,
     arelancer: students.filter(s => s.due && s.due.length).length,
+    apurger: students.filter(s => s.purgeable).length,
     desactives: students.filter(s => !s.active).length,
     expires: students.filter(s => s.active && s.expires && s.expires < now).length,
     modules,
@@ -694,7 +705,8 @@ async function admin(req, env, url) {
         phone: p.phone || '', marks: p.marks || {},
       };
     }))).filter(Boolean);
-    students.forEach(s => { s.due = dueRelances(s, now); });
+    // À supprimer : accès terminé depuis plus de 12 mois (durée annoncée dans la politique de confidentialité).
+    students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
       catalog: CATALOG.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, id: cfg.ids[v.k] || '' })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
@@ -754,6 +766,64 @@ async function admin(req, env, url) {
     await env.DB.prepare('INSERT INTO admin_notes (code, t, who, text) VALUES (?, ?, ?, ?)').bind(c, now, who, text).run();
     await journal(env, who, 'Note de suivi ajoutée', prettyCode(c), JSON.parse(raw).label);
     return reply({ ok: true }, 200, req, env);
+  }
+
+  // Annonces du formateur : liste, publication, retrait.
+  if (url.pathname === '/admin/annonces' && req.method === 'GET') {
+    if (!env.DB) return reply({ annonces: [] }, 200, req, env);
+    const r = await env.DB.prepare('SELECT id, t, who, text, module, until FROM annonces ORDER BY t DESC LIMIT 100').all();
+    return reply({ annonces: r.results }, 200, req, env);
+  }
+  if (url.pathname === '/admin/annonce' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const text = String(b.text || '').trim().slice(0, 400);
+    const module = String(b.module || '');
+    const days = parseInt(b.days, 10) || 0;
+    if (!text) return reply({ error: 'Écrivez le texte de l\'annonce.' }, 400, req, env);
+    if (module && !findModule(module)) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    if (days < 0 || days > 365) return reply({ error: 'Durée invalide.' }, 400, req, env);
+    await env.DB.prepare('INSERT INTO annonces (t, who, text, module, until) VALUES (?, ?, ?, ?, ?)').bind(now, who, text, module, days ? now + days * DAY : 0).run();
+    await journal(env, who, 'Annonce publiée', '', '', (module ? findModule(module).title.split(' : ')[0] : 'toutes les formations') + ' : ' + text.slice(0, 60));
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/annonce-delete' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const row = await env.DB.prepare('SELECT text FROM annonces WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!row) return reply({ error: 'Annonce introuvable.' }, 404, req, env);
+    await env.DB.prepare('DELETE FROM annonces WHERE id = ?').bind(parseInt(b.id, 10)).run();
+    await journal(env, who, 'Annonce retirée', '', '', row.text.slice(0, 60));
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Suppression définitive des données d'un apprenant (droit à l'effacement, fin de la durée de conservation).
+  // Efface : la fiche d'accès (le code ne marche plus), les anciens codes remplacés, la progression, les notes,
+  // le numéro, les relances et les notes de suivi. Le journal garde l'historique des actions, sans le nom.
+  if (url.pathname === '/admin/purge' && req.method === 'POST') {
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    if (b.confirm !== 'SUPPRIMER') return reply({ error: 'Confirmation manquante.' }, 400, req, env);
+    const all = [c];
+    let rec = JSON.parse(raw);
+    while (rec && rec.remplace && !all.includes(rec.remplace) && all.length < 20) {
+      all.push(rec.remplace);
+      const r = await env.ACCESS.get('s:' + rec.remplace);
+      rec = r ? JSON.parse(r) : null;
+    }
+    if (env.DB) {
+      const st = [];
+      for (const x of all) {
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
+      }
+      await env.DB.batch(st);
+    }
+    for (const x of all) await env.ACCESS.delete('s:' + x);
+    await journal(env, who, 'Données de l\'apprenant supprimées', prettyCode(c), '(données supprimées)', all.length > 1 ? all.length + ' codes (avec les anciens codes remplacés)' : '');
+    return reply({ ok: true, codes: all.length }, 200, req, env);
   }
 
   // Trace dans le journal d'une action faite dans la page (ex. export de la liste).
