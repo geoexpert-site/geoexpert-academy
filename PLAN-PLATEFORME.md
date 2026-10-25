@@ -174,8 +174,13 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
   `Downloads\quiz-qgis-chapitre1-corrige.md` et `.json` (hors du dépôt public : les réponses ne doivent pas être publiées)
 - [x] Workers de test déployés ; 50 questions chargées dans `geoexpert-test` (18 leçons, `qgis1-v02` à `qgis1-v19`) ; vérifié sur la page apprenant (3 / 3)
   - tests : tout réussi sauf `test-relances` « Code reçu aujourd'hui » (échoue aussi sans ces changements : test lancé en fin de soirée)
-- [ ] Mise en ligne (accord de l'administrateur requis) : sauvegarde, vérifier que `content` est toujours vide en production,
-  déployer les 2 Workers de production, charger les quiz dans `geoexpert-prod`
+- [x] **Mise en ligne — EN LIGNE le 25/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-25-avant-titres-quiz\` (KV + D1 + code de `main`) ; étiquette `sauvegarde-avant-titres-quiz`
+  - production avant : `content` vide, aucun quiz → rien écrasé
+  - `espace-apprenant-api` → a48b0dc5 (avant : fe27980e) ; `geoexpert-admin` → 55fe9c06 (avant : a1f554e9)
+  - `geoexpert-prod` : 18 quiz, 50 questions (auteur « import quiz chapitre 1 »)
+  - vérifié : faux code refusé (401), « Vérifier un certificat » OK, faux webhook refusé (401), admin renvoyé vers Access, page apprenant 200
+  - retour en arrière : `wrangler rollback` vers les versions « avant » ci-dessus ; quiz : `DELETE FROM quizzes WHERE who = 'import quiz chapitre 1'`
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
