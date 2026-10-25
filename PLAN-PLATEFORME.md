@@ -88,8 +88,12 @@
 - [x] Case « J'ai fait l'exercice » (visible dans la fiche apprenant) — sous chaque exercice disponible ; table `exercises` ; fiche admin « Exercices faits X / Y » ; colonne dans l'export
 - [x] **Preuve pixel phase 2** (`comparer-elements.mjs … cacher phase-2`) : 42/42 blocs identiques à la page en ligne (fin de phase 1) ;
   et 34/34 identiques à la page d'origine des vidéos publicitaires (tous les ajouts masqués) → `geoexpert-captures\preuve-existant-phase-2\`
-- [ ] Mini-quiz modifiables depuis l'admin (onglet « Quiz » sur la page de leçon)
-- [ ] Mode économie de données (à vérifier avec le lecteur Bunny)
+- [x] Mini-quiz modifiables depuis l'admin (onglet « Quiz » sur la page de leçon) — 9/9 admin + 12/12 apprenant, **pas encore en ligne**
+  - onglet admin « ❓ Quiz » (éditeur 1 à 5 questions, statistiques) ; tables `quizzes`, `quiz_results` ; routes `/api/quiz`, `/api/quiz-answer` (correction côté serveur)
+- [x] Mode économie de données (à vérifier avec le lecteur Bunny) — case sous la vidéo, `levelCap=true` (Bunny n'a pas de réglage de qualité imposée) ; auto si connexion lente — 7/7
+- [x] Fin de phase 2 : tous les tests relancés (voir `RAPPORT-PHASE-2.md`), captures `apres-phase-2-apprenant`, guide (§6 à §8),
+  politique de confidentialité, `MISE-EN-LIGNE-PHASE-2.md` (sans étape technique pour l'administrateur)
+- [ ] **Mise en ligne de la phase 2** (attend l'accord de l'administrateur)
 - [x] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité — testé 11/11, **pas encore en ligne**
   - fiche → « Supprimer définitivement ses données » (taper SUPPRIMER) ; efface aussi les anciens codes remplacés ; journal gardé sans le nom · route `/admin/purge`
   - rappel en haut de « Apprenants » + note du tableau de bord quand un accès est fini depuis plus de 12 mois
@@ -163,7 +167,8 @@
 - Sauvegarde avant phase 2 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-2\` (KV + export D1 + code) ; étiquette
   `sauvegarde-avant-phase-2` ; branche `phase-2`.
 - L'administrateur ajoutera les vidéos manquantes, le fichier d'exercice et le numéro WhatsApp **à la fin du codage**.
-- Faits et testés : suppression des données d'un apprenant ; annonces du formateur ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice ».
+- Faits et testés : suppression des données d'un apprenant ; annonces ; objectif, série, badges ; « Mes notes » ; « J'ai fait l'exercice » ; mini-quiz ; économie de données.
+- **Phase 2 terminée et testée (pas encore en ligne).** Prochaine étape : mise en ligne avec l'accord de l'administrateur (), puis validation, puis phase 3.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
 ### (Rappel) Démarrer une phase

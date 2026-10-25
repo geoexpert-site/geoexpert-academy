@@ -6,5 +6,7 @@ exclude:
   - GUIDE-ADMIN.md
   - RAPPORT-PHASE-1.md
   - MISE-EN-LIGNE-PHASE-1.md
+  - RAPPORT-PHASE-2.md
+  - MISE-EN-LIGNE-PHASE-2.md
   - worker/
   - settings.json

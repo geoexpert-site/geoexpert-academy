@@ -81,7 +81,8 @@ Un nouveau code apparaît désormais **tout de suite** dans la liste « Apprenan
 - les dates : code créé, première connexion, fin de l'essai, fin de l'accès, **fin de l'assistance** (3 mois) ;
 - sa dernière visite, ses connexions (et un avertissement si le code est utilisé depuis 4 réseaux ou plus) ;
 - la dernière leçon ouverte ;
-- **leçon par leçon**, ce qu'il a terminé et quand (« date inconnue » = terminé avant la mise à jour).
+- **leçon par leçon**, ce qu'il a terminé et quand (« date inconnue » = terminé avant la mise à jour) ;
+- sous chaque formation, **« Exercices faits : X / Y »** : les exercices que l'apprenant a cochés « J'ai fait l'exercice », avec la date.
 
 **Notes de suivi privées** (en bas de la fiche) :
 1. Écrivez votre note (ex. : « relancé sur WhatsApp », « bloqué sur la leçon 4 »).
@@ -105,6 +106,10 @@ Avant chaque action, une fenêtre explique ce qui va se passer : cliquez **OK** 
 | **Tout débloquer** | Débloquer toutes les leçons avant le 8e jour. | **Tout débloquer** (visible seulement pendant l'essai). Ne peut pas être annulé. |
 | **Remplacer le code** | Code perdu, ou code partagé par erreur. | **Remplacer le code**. Un nouveau code est créé avec la même formation, les mêmes dates et **toute la progression et les notes**. L'ancien code ne marche plus. Le message WhatsApp avec le nouveau code s'affiche : **Copier le message** ou **Ouvrir WhatsApp**. |
 | **Désactiver le code** | Remboursement, abus. | **Désactiver** (bouton rouge). Réversible : **Réactiver**. Un code remplacé, lui, ne peut pas être réactivé. |
+| **Supprimer définitivement ses données** | L'apprenant le demande, ou son accès est terminé depuis plus de 12 mois (engagement de la politique de confidentialité). | **Supprimer les données** (dernier bouton rouge), puis tapez **SUPPRIMER** en majuscules. Son code, sa progression, ses notes, son numéro, vos notes de suivi et ses anciens codes sont effacés. **Irréversible.** Le journal garde l'historique des actions, sans son nom. |
+
+**Rappel automatique :** quand l'accès d'un apprenant est terminé depuis plus de 12 mois, un encadré apparaît en haut
+de l'onglet **Apprenants** avec son nom (bouton pour ouvrir sa fiche), et le tableau de bord le signale.
 
 Les boutons de la liste **Apprenants** demandent eux aussi une confirmation (Couper, +30j, Débloquer).
 Le bouton **+ Module** ouvre la fiche directement sur la liste des formations (plus besoin de taper un identifiant).
@@ -148,20 +153,62 @@ La partie **WhatsApp et relances** propose les 5 messages à tout moment, avec l
 
 ---
 
-## 6. Exporter la liste des apprenants (Excel)
+## 6. Annonces (onglet **📢 Annonces**)
+
+Pour prévenir vos apprenants : nouvelle leçon en ligne, conseil, live à venir…
+1. Écrivez le texte (400 caractères au maximum). L'**aperçu** montre ce que verra l'apprenant.
+2. **Pour qui ?** Tous les apprenants, ou seulement ceux d'une formation.
+3. **Afficher pendant** 7, 14 ou 30 jours, ou jusqu'à ce que vous la retiriez.
+4. **Publier l'annonce**, puis confirmez.
+
+L'annonce apparaît en haut du tableau de bord des apprenants concernés, juste sous « Bonjour… » (3 au maximum, la plus
+récente en premier). Chaque apprenant peut la masquer sur son appareil avec la petite croix **×**.
+Pour l'arrêter plus tôt : **Retirer**, dans la liste « Annonces publiées ».
+
+---
+
+## 7. Mini-quiz (onglet **❓ Quiz**)
+
+2 ou 3 questions à la fin des leçons importantes, pour que l'apprenant vérifie qu'il a compris.
+1. Choisissez la **formation** : toutes ses leçons s'affichent, avec « Pas de quiz » ou « ✓ Quiz de N question(s) ».
+2. **Créer un quiz** (ou **Modifier**) sur la leçon voulue.
+3. Pour chaque question : écrivez la question, 2 à 4 réponses, **cochez la bonne réponse** (rond à gauche), et si vous
+   voulez une **explication** affichée après la réponse.
+4. **+ Ajouter une question** (5 au maximum), puis **Enregistrer le quiz**.
+
+Côté apprenant : un onglet **Quiz** apparaît sous la leçon (pas pendant l'essai si la leçon est encore bloquée).
+Il répond, puis voit son score, la bonne réponse en vert et votre explication. Il peut le refaire autant qu'il veut.
+Dans la liste, vous voyez combien d'apprenants ont répondu et leur **moyenne**.
+**Supprimer le quiz** efface aussi les résultats (après confirmation).
+
+---
+
+## 8. Ce que l'apprenant voit de nouveau (phase 2)
+
+- **Mes progrès** (sous « Vos modules ») : objectif de la semaine qu'il choisit (1 à 7 leçons) avec une jauge,
+  nombre de **semaines actives d'affilée**, et 5 **badges** liés à de vraies étapes (1re leçon, 1er chapitre terminé,
+  1er exercice fait, 4 semaines d'affilée, formation terminée).
+- **Mes notes** (colonne de gauche, sous « Tableau de bord ») : toutes ses notes, leçon par leçon.
+- **J'ai fait l'exercice** : une case sous chaque exercice ; vous le voyez dans sa fiche.
+- **Économie de données** : une case sous la vidéo ; la qualité est limitée à la taille de l'écran (beaucoup moins de
+  données sur téléphone). Elle se coche toute seule si le téléphone signale une connexion lente.
+
+---
+
+## 9. Exporter la liste des apprenants (Excel)
 
 1. Onglet **👥 Apprenants** → bouton **📥 Exporter la liste (Excel / CSV)**.
 2. Un fichier `apprenants-geoexpert-AAAA-MM-JJ.csv` est téléchargé. Ouvrez-le avec Excel (double-clic) : les colonnes et
    les accents s'affichent correctement.
 3. Colonnes : nom, code, numéro WhatsApp, formations, statut, dates (création, 1re connexion, fin d'essai, fin d'accès,
-   fin d'assistance), leçons terminées, total, progression, dernière visite, connexions, relances à faire.
+   fin d'assistance), leçons terminées, total, progression, exercices faits, dernière visite, connexions, relances à faire.
 
 Ce fichier contient des données personnelles : gardez-le pour vous, ne l'envoyez pas, supprimez-le quand vous n'en avez plus besoin.
 Chaque export est inscrit dans le Journal.
 
 ---
 
-## 7. Limite de tentatives
+## 10. Limite de tentatives
 
 Si un mauvais mot de passe administrateur est entré **5 fois en 15 minutes** depuis la même connexion internet,
 l'administration est bloquée **15 minutes** pour cette connexion (même avec le bon mot de passe).
@@ -171,10 +218,10 @@ Chaque mot de passe faux apparaît en rouge dans le **Journal**.
 
 ---
 
-## 8. Journal d'activité
+## 11. Journal d'activité
 
 Onglet **📜 Journal** de l'administration : tout ce qui a été fait, du plus récent au plus ancien
 (300 dernières actions) avec la date, l'action, l'apprenant concerné, le détail et l'adresse e-mail de la personne connectée.
 
 Actions enregistrées : code créé, code désactivé / réactivé, accès prolongé, tout débloqué, module ajouté,
-code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, mot de passe incorrect.
+code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, annonce publiée / retirée, quiz enregistré / supprimé, données d'un apprenant supprimées, mot de passe incorrect.

@@ -109,6 +109,7 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .qzc{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:8px;cursor:pointer}.qzc:hover{background:var(--soft)}.qzc input{margin-top:3px;accent-color:var(--teal)}
 .qzc.bon{background:rgba(10,122,59,.12);font-weight:600}.qzc.faux{background:rgba(192,57,43,.12)}.qze{margin:8px 4px 2px;font-size:13.5px}.qze.bon{color:#0a7a3b}.qze.faux{color:#c0392b}[data-theme=dark] .qze.bon{color:#5fd08f}[data-theme=dark] .qze.faux{color:#ff8a7a}
 .qzr{margin-top:12px;font-weight:600}.qzr.ok{color:#0a7a3b}.qzr.ko{color:#c0392b}[data-theme=dark] .qzr.ok{color:#5fd08f}
+.eco{display:flex;align-items:center;gap:8px;margin:10px 2px 0;font-size:13px;color:var(--dim);cursor:pointer;width:max-content;max-width:100%}.eco input{width:16px;height:16px;accent-color:var(--teal)}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
@@ -472,6 +473,7 @@ function lesson(k){
  var pl=h('div',{class:'pl'});
  var go=h('button',{class:'go','aria-label':'Lancer la vidéo',onclick:function(){play(l,pl)}},ic('play'));
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
+ if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){setDone(k,!P.done[k]);lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
 
 var nx=a[ix+1],pv=a[ix-1];
@@ -555,11 +557,22 @@ async function quiz(k,pn){
  form.appendChild(btn);form.appendChild(res);pn.appendChild(form);
 }
 
+// ===== Économie de données (connexions lentes)
+function ecoOn(){
+ try{var v=localStorage.getItem('geo:eco');if(v!==null)return v==='1'}catch(e){}
+ var c=navigator.connection;return!!(c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||'')));
+}
+function ecoToggle(l,pl){
+ var cb=h('input',{type:'checkbox'});cb.checked=ecoOn();
+ cb.addEventListener('change',function(){try{localStorage.setItem('geo:eco',cb.checked?'1':'0')}catch(e){}
+  if(pl.querySelector('iframe'))play(l,pl)});// relance la vidéo avec le nouveau réglage
+ return h('label',{class:'eco',title:'La qualité de la vidéo est limitée à la taille de votre écran : beaucoup moins de données sur téléphone.'},cb,'Économie de données (connexion lente)');
+}
 async function play(l,pl){
  var b=pl.querySelector('.go');if(b)b.disabled=true;
  try{var r=await post('/api/play',{code:code,k:l.k}),j=await r.json();
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
-  pl.textContent='';var f=h('iframe',{src:j.url,allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
+  pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   pl.appendChild(f);pl.appendChild(wm);
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
