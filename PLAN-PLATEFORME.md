@@ -124,7 +124,7 @@
   - ancienne page + nouveau Worker vérifiée avant publication : 8/8
   - production vérifiée : 6/6 (carte attestation + PDF réel, avis, page « Vérifier un certificat » en ligne) + téléchargement réel
     « Exercice_pratique_1.pdf » avec son vrai nom ; code de test, attestation et avis de test supprimés (production propre)
-  - en attente : validation de la phase 3 par l'administrateur
+  - **Phase 3 VALIDÉE par l'administrateur le 25/10/2026 — le plan des 3 phases est terminé.**
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
@@ -196,7 +196,9 @@
 - Sauvegarde avant phase 3 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-3\` ; étiquette `sauvegarde-avant-phase-3` ; branche `phase-3`.
 - Faits et testés : attestations + page « Vérifier un certificat », avis, gestion du contenu, fichiers par leçon.
 - Preuve pixel phase 3 : `comparer-elements.mjs … cacher phase-3` (référence = fin de phase 2).
-- **Phase 3 en ligne le 25/10/2026** (production vérifiée). Prochaine étape : validation de la phase 3 par l'administrateur. Le plan des 3 phases est alors terminé.
+- **Phase 3 en ligne et validée le 25/10/2026. Les 3 phases du plan sont terminées.**
+- Reste côté administrateur (après le codage) : vidéos Bunny manquantes, fichier de l'exercice 2 ArcGIS 1, numéros WhatsApp.
+- Pour toute nouvelle demande : relire ce fichier, garder la règle n° 1 et la preuve pixel, sauvegarder avant de toucher à la production.
 - Après le codage : l'administrateur ajoutera les vidéos manquantes, le fichier de l'exercice 2 ArcGIS 1 et les numéros WhatsApp.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
