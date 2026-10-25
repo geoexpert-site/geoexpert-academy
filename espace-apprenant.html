@@ -701,18 +701,19 @@ try{if(localStorage.getItem('geo:theme')==='dark')document.documentElement.setAt
 var sc=sessionStorage.getItem('gc');if(sc)login(sc,true);
 
 // Pixel Meta : Purchase au clic sur « Demander mon code d'accès » (1 fois par navigateur et par 24 h).
+// Ajouter ?fbtest à l'adresse pour ignorer cette limite pendant les tests Meta.
 // Jamais lors d'une simple connexion avec un code. Montant repris du dernier « Je m'inscris » (moins de 24 h).
 (function(){
   var a=$('askCode');if(!a)return;
   a.addEventListener('click',function(){
-    var K='geo:fbq-purchase',now=Date.now(),last=0,c=null;
+    var K='geo:fbq-purchase',now=Date.now(),last=0,c=null,test=/[?&]fbtest\b/.test(location.search);
     try{last=parseInt(localStorage.getItem(K),10)||0}catch(e){}
-    if(now-last<86400000)return;
-    try{localStorage.setItem(K,String(now))}catch(e){}
+    if(!test&&now-last<86400000)return;
     try{c=JSON.parse(localStorage.getItem('geo:last-checkout'))}catch(e){}
     var d={currency:'XOF'};
     if(c&&c.v&&now-c.t<86400000){d.value=c.v;d.content_name=c.n}
-    if(typeof fbq==='function')fbq('track','Purchase',d);
+    try{if(typeof fbq==='function')fbq('track','Purchase',d)}catch(e){}
+    try{localStorage.setItem(K,String(now))}catch(e){}
   });
 })();
 
