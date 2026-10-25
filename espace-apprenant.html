@@ -88,6 +88,12 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .pn{padding:16px 0}.pn textarea{width:100%;min-height:150px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:15px Inter;resize:vertical}
 .ex{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.ex span:nth-child(2){flex:1}.note{color:var(--dim);font-size:13px}
 .trial{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-weight:500}.trial .ic{flex:0 0 18px;margin-top:2px;color:var(--mag)}
+/* Message du jour + carte « Essai et assistance » (ajouts : reprennent le style des cartes existantes) */
+.jour{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:14.5px}.jour .ic{flex:0 0 18px;margin-top:2px;color:var(--teal)}.jour b{font-family:Montserrat,sans-serif;font-weight:700}
+.ea{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin-bottom:16px}.ea h3{grid-column:1/-1;font-size:16px}
+.ear{display:flex;flex-direction:column;gap:4px}.ear .eal{color:var(--dim);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.ear b{font:800 18px Montserrat;color:var(--indigo)}[data-theme=dark] .ear b{color:#9d92ee}
+.ear small{color:var(--dim);font-size:13px}.ear .bar{flex:none;height:8px;background:var(--soft);border-radius:9px;overflow:hidden}.ear .bar i{background:var(--teal)}
+@media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
 aside{position:fixed;left:0;top:56px;bottom:0;width:86%;max-width:350px;z-index:20;transform:translateX(-100%);transition:transform .25s;max-height:none}
@@ -284,6 +290,49 @@ function closeS(){document.body.classList.remove('so')}
 
 function ring(p){var c=2*Math.PI*48;return h('div',{class:'ring'},(function(){var d=document.createElement('div');d.innerHTML='<svg width="112" height="112"><circle cx="56" cy="56" r="48" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="10"/><circle cx="56" cy="56" r="48" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+(c*(1-p/100))+'"/></svg>';return d.firstChild})(),h('b',{text:p+'%'}))}
 
+// ===== Message du jour (bande sous le bandeau de bienvenue) : un seul message, choisi selon la vraie situation.
+var DAYMS=86400000;
+var TIPS=['Regardez la vidéo sur votre téléphone, puis refaites chaque étape sur ordinateur juste après : c\'est comme ça qu\'on retient.',
+ 'Dans QGIS comme dans ArcGIS, enregistrez votre projet souvent (Ctrl + S).',
+ 'Rangez les données de chaque projet dans un seul dossier : vous les retrouverez sans chercher.',
+ 'Notez dans « Mes notes » les réglages importants de chaque leçon : vous les retrouverez sur tous vos appareils.',
+ 'Avant une analyse, vérifiez que toutes vos couches ont le même système de coordonnées.',
+ '20 minutes par jour valent mieux que 3 heures une fois par mois.'];
+function dayMessage(p,next,finished){
+ var now=Date.now(),locked=L.length-acc().length,t,b='';
+ var absent=D.prevVisit&&p.n?Math.floor((now-D.prevVisit)/DAYMS):0;
+ var todo=acc().filter(function(l){return!P.done[l.k]})[0]||next;// prochaine leçon pas encore terminée
+ var nx=todo?'« '+todo.t+' » ('+todo.d+')':'';
+ if(finished&&!locked){b='Bravo, vous avez tout terminé !';t='Envoyez votre exercice final au formateur sur WhatsApp pour recevoir votre attestation.'}
+ else if(finished){b='Vous avez terminé toutes les leçons de l\'essai.';t='Les '+locked+' autres leçons se débloquent le '+fdate(D.trialEnd)+'.'}
+ else if(absent>=5){b='Content de vous revoir !';t='Cela faisait '+absent+' jours. Reprenez avec '+nx+' : quelques minutes suffisent pour retrouver le fil.'}
+ else if(!p.n){b='Bienvenue !';t='Commencez par '+nx+'.'+(D.trialEnd?' Pendant l\'essai, vous avez l\'introduction et les 2 premières leçons de chaque module.':'')}
+ else if(D.trialEnd&&D.trialStart){var j=Math.min(7,Math.floor((now-D.trialStart)/DAYMS)+1),r=Math.max(1,Math.ceil((D.trialEnd-now)/DAYMS));b='Jour '+j+' de votre essai.';t='Encore '+r+' jour'+(r>1?'s':'')+' avant le déblocage de toutes les leçons. Prochaine leçon : '+nx+'.'}
+ else if(p.t-p.n<=Math.max(2,Math.ceil(p.t*.2))){var n=p.t-p.n;b='Presque fini !';t='Plus que '+n+' leçon'+(n>1?'s':'')+' avant la fin de votre formation. Prochaine : '+nx+'.'}
+ else{b='Prochaine leçon : '+nx+'.';t='Astuce du jour : '+TIPS[Math.floor(now/DAYMS)%TIPS.length]}
+ return h('div',{class:'jour',role:'status'},ic('right'),h('span',null,h('b',{text:b}),' '+t));
+}
+// ===== Carte « Essai et assistance » (sous les cartes de chiffres) : dates réelles uniquement.
+function trialCard(){
+ var now=Date.now(),rows=[];
+ if(D.trialEnd&&D.trialStart){
+  var j=Math.min(7,Math.floor((now-D.trialStart)/DAYMS)+1),r=Math.max(1,Math.ceil((D.trialEnd-now)/DAYMS));
+  rows.push(h('div',{class:'ear'},h('span',{class:'eal',text:'Période d\'essai'}),h('b',{text:'Jour '+j+' sur 7'}),
+   h('div',{class:'bar'},h('i',{style:'width:'+Math.round(j*100/7)+'%'})),
+   h('small',{text:'Toutes les leçons se débloquent le '+fdate(D.trialEnd)+' (dans '+r+' jour'+(r>1?'s':'')+').'})));
+ }
+ if(D.assistanceEnd){
+  var left=Math.ceil((D.assistanceEnd-now)/DAYMS);
+  rows.push(h('div',{class:'ear'},h('span',{class:'eal',text:'Assistance du formateur'}),
+   h('b',{text:left>0?'Jusqu\'au '+fdate(D.assistanceEnd):'Terminée'}),
+   h('small',{text:left>0?'Encore '+left+' jour'+(left>1?'s':'')+' pour poser vos questions sur WhatsApp.':'Elle s\'est terminée le '+fdate(D.assistanceEnd)+'. Écrivez-nous sur WhatsApp pour la prolonger.'})));
+ }
+ if(!rows.length)return null;
+ var c=h('div',{class:'card ea'},h('h3',{text:'Essai et assistance'}));
+ rows.forEach(function(x){c.appendChild(x)});
+ return c;
+}
+
 function home(){
  cur=null;var p=prog(),m=$('main');m.textContent='';
  var a=acc(),next=P.last&&a.filter(function(l){return l.k===P.last})[0]||a.filter(function(l){return!P.done[l.k]})[0]||a[0];
@@ -292,7 +341,9 @@ function home(){
  if(D.trialEnd)m.appendChild(h('div',{class:'trial',role:'status'},ic('lock'),h('span',{text:'Période d\'essai : votre formateur vous accompagne sur WhatsApp. Toutes les leçons se débloquent le '+fdate(D.trialEnd)+'.'})));
  m.appendChild(h('div',{class:'card hero'},ring(p.p),h('div',null,h('h1',{text:'Bonjour '+D.label}),h('p',{text:finished?'Bravo, vous avez terminé toutes les leçons disponibles.':(p.n?'Vous avez terminé '+p.n+' leçon(s) sur '+p.t+'. Continuez sur votre lancée.':'Prêt à commencer ? Lancez votre première leçon.')}),
   next?h('button',{class:'btn mag',onclick:function(){lesson(next.k)}},ic('play'),(p.n?'Reprendre : ':'Commencer : ')+next.t):null)));
+ m.appendChild(dayMessage(p,next,finished));
  m.appendChild(h('div',{class:'stats'},h('div',{class:'card'},h('b',{text:p.n+' / '+p.t}),h('span',{text:'leçons terminées'})),h('div',{class:'card'},h('b',{text:ftime(left)}),h('span',{text:'de vidéo restant'})),h('div',{class:'card'},h('b',{text:fdate(D.expires)}),h('span',{text:'fin de votre accès'}))));
+ var ea=trialCard();if(ea)m.appendChild(ea);
  m.appendChild(h('h2',{class:'s',text:'Vos modules'}));
  var g=h('div',{class:'grid'});
  D.modules.forEach(function(md){var mp=mprog(md),f=INFO[md.key]||['','',''],first=L.filter(function(l){return l.m===md})[0];

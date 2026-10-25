@@ -1,0 +1,10 @@
+# Réglages GitHub Pages : ces fichiers restent dans le dépôt mais ne sont PAS publiés sur le site.
+# (documents internes, code et réglages du Worker Cloudflare)
+exclude:
+  - README.md
+  - PLAN-PLATEFORME.md
+  - GUIDE-ADMIN.md
+  - RAPPORT-PHASE-1.md
+  - MISE-EN-LIGNE-PHASE-1.md
+  - worker/
+  - settings.json

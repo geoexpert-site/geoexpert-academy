@@ -32,17 +32,44 @@
   - [x] Vérification du jeton Access dans le Worker (signature, audience, émetteur, expiration, e-mail autorisé) — refus testé
   - [x] Limite : 5 mots de passe faux / 15 min → blocage 15 min (table `admin_fails`) — testé
   - [x] Worker apprenant de test en `ROLE = "apprenant"` : plus aucune route admin — testé
-  - [ ] **Attente administrateur :** activer Access sur `geoexpert-admin-test` (GUIDE-ADMIN.md §1) et envoyer POLICY_AUD + team domain, puis test réel e-mail + code
+  - [x] Access activé sur `geoexpert-admin-test` (équipe `gentle-haze-1336.cloudflareaccess.com`) ; sans connexion : renvoi vers la page de connexion Cloudflare (testé 3/3) ; Worker apprenant non touché
+  - [x] Test réel par l'administrateur réussi (e-mail + code + mot de passe) ; son e-mail vérifié apparaît dans le Journal
 - [x] Journal d'activité (créations, déblocages, désactivations, prolongations, modules, vidéos, fichiers, mots de passe faux) — onglet « Journal », testé (9/9 + 3/3)
-- [ ] Tableau de bord admin (actifs, nouveaux, en essai, inactifs > 7 j, progression moyenne, formations les plus suivies)
-- [ ] Fiche de chaque apprenant + notes privées de suivi
-- [ ] Actions en un clic avec confirmation (module par liste, prolonger, désactiver, remplacer un code perdu en gardant la progression)
-- [ ] Relances WhatsApp (J1, J5, inactif 7 j, fin de formation) + liste « À relancer aujourd'hui » + suivi de l'essai (« Suivi fait »)
-- [ ] Apprenant : message du jour sous le bandeau + carte « Essai et assistance » sous les cartes de chiffres
-- [ ] Export CSV des apprenants
-- [ ] Liste admin : plus de limite à 500 apprenants
-- [ ] Nettoyage (décision 4)
-- [ ] Captures avant / après, guide admin, liste des tests, étapes de mise en ligne et de retour en arrière
+- [x] Tableau de bord admin (actifs, nouveaux, en essai, inactifs > 7 j, jamais connectés, progression moyenne, formations les plus suivies) — premier onglet, testé 13/13 en local + non-régression en ligne, **pas encore en ligne**
+  - `/admin/state` renvoie `stats` + pour chaque apprenant `done`, `lessons`, `lastActivity` (servira à la fiche apprenant)
+  - index des codes dans D1 (table `codes`) : nouveaux codes visibles tout de suite ; liste KV complète (plus de limite à 500)
+- [x] Fiche de chaque apprenant + notes privées de suivi — testé 19/19 en local + non-régression, **pas encore en ligne**
+  - bouton « Fiche » dans Apprenants (fenêtre) + champ de recherche · routes `/admin/student`, `/admin/note`, `/admin/note-delete` · table `admin_notes`
+  - « Exercices faits » viendra avec la case « J'ai fait l'exercice » (phase 2)
+- [x] Actions en un clic avec confirmation (module par liste, prolonger 30 j / 3 / 6 / 12 mois, tout débloquer, désactiver / réactiver, remplacer un code perdu en gardant la progression) — testé 16/16 en local + non-régression, **pas encore en ligne**
+  - section « Actions » de la fiche · route `/admin/replace` (déplace progression, notes, suivi ; ancien code désactivé et non réactivable)
+  - confirmations ajoutées aux boutons existants de la liste ; « + Module » ouvre la fiche sur la liste (fin du `prompt`)
+- [x] Relances WhatsApp (bienvenue J1, code pas utilisé, essai J5, inactif 7 j, fin de formation) + liste « À relancer aujourd'hui » + suivi de l'essai (« Suivi fait ») — testé 25/25 en local, **pas encore en ligne**
+  - onglet « 📣 Relances » (2e) avec compteur, bandeau sur le tableau de bord, partie « WhatsApp et relances » dans la fiche
+  - numéro WhatsApp facultatif (Nouvel accès + fiche), table `contacts` ; relances faites : table `relances` ; règles : `dueRelances()` dans le Worker
+  - les numéros et relances suivent l'apprenant en cas de code remplacé
+- [x] Apprenant : message du jour sous le bandeau + carte « Essai et assistance » sous les cartes de chiffres — testé 15/15 (6 situations, téléphone, sombre, ancien Worker), **pas encore en ligne**
+  - message unique selon la situation : terminé / essai fini / absent ≥ 5 j / nouveau / jour X d'essai / presque fini / sinon prochaine leçon + astuce du jour
+  - `/api/login` renvoie en plus `trialStart`, `assistanceEnd` (3 mois après le début), `prevVisit`
+  - **preuve « existant inchangé »** : `GeoExpert-Outils\comparer-elements.mjs` compare la page originale (étiquette git) et la nouvelle,
+    bloc par bloc ; nouveautés masquées → 34/34 blocs identiques au pixel (ordinateur + téléphone, clair + sombre).
+    Résultats : `geoexpert-captures\preuve-existant-phase-1\`
+- [x] Export CSV des apprenants (bouton dans Apprenants ; « ; » + UTF-8 pour Excel ; protection contre les formules ; noté au Journal) — testé 8/8
+- [x] Liste admin : plus de limite à 500 apprenants (et plus d'attente de 60 s pour un nouveau code)
+- [x] Nettoyage (décision 4) : `worker.js` (racine) et `acces-vprhjahnzhi4r961t6y0.html` supprimés ; `admin-b7x…html` remplacée
+  par un renvoi vers https://geoexpert-admin.geographe07.workers.dev ; `.gitignore` pour `.wrangler/`
+- [x] Politique de confidentialité mise à jour (§2.3 espace apprenant, §3 relances, §4 conservation, §5 sécurité ; date 25/10/2026)
+- [x] Configuration de production prête (`worker/wrangler-prod.toml`, `worker/wrangler-admin-prod.toml`, vérifiées à blanc)
+- [x] Livrables : `RAPPORT-PHASE-1.md` (tests, captures), `MISE-EN-LIGNE-PHASE-1.md` (étapes + retour en arrière), `GUIDE-ADMIN.md`
+- [~] **Mise en ligne** — suivre `MISE-EN-LIGNE-PHASE-1.md` (accord donné le 25/10/2026)
+  - [x] 1. Sauvegarde production : `GeoExpert-Sauvegardes\2026-10-25-avant-mise-en-ligne-phase-1\` (3 clés KV + code de `main` 9bbc348)
+  - [x] 2. Base `geoexpert-prod` créée (id 50f98a67-8c17-4936-a4f7-20363bdf981a), 9 tables
+  - [x] 3. Worker `geoexpert-admin` en ligne, verrouillé (403 partout tant qu'Access n'est pas configuré)
+  - [x] 4. 👤 Access activé sur `geoexpert-admin` (POLICY_AUD dans `worker/wrangler-admin-prod.toml`)
+  - [x] 5. 👤 Mot de passe admin installé (présence vérifiée, valeur jamais vue)
+  - [x] 6. `geoexpert-admin` configuré avec Access ; sans e-mail → renvoi vers la connexion Cloudflare ; faux jeton refusé
+  - [ ] 7. 👤 Test de connexion par l'administrateur
+  - [ ] 8 à 10 : voir MISE-EN-LIGNE-PHASE-1.md
 
 ## Phase 2 — Régularité (≈ 14 h)
 
@@ -54,6 +81,7 @@
 - [ ] Case « J'ai fait l'exercice » (visible dans la fiche apprenant)
 - [ ] Mini-quiz modifiables depuis l'admin (onglet « Quiz » sur la page de leçon)
 - [ ] Mode économie de données (à vérifier avec le lecteur Bunny)
+- [ ] Suppression des données d'un apprenant (bouton dans la fiche + liste des accès terminés depuis 12 mois), pour respecter la politique de confidentialité
 
 ## Phase 3 — Fin de parcours et contenu (≈ 16 h)
 
@@ -71,6 +99,10 @@
 - **Outils (hors du site) :** `C:\Users\HP\Documents\GeoExpert-Outils\`
   - `serveur-test.mjs` : sert le site en local en le branchant sur le Worker de test (aucun fichier modifié)
   - `captures.mjs` : captures connexion + tableau de bord (ordinateur / téléphone, clair / sombre)
+  - **Worker local** (le Worker admin de test exige maintenant Access, donc les tests automatiques admin tournent en local) :
+    `node tests-locaux.mjs test-dashboard.mjs` → copie les données de test, démarre `wrangler dev` (config `worker/wrangler-local.toml`,
+    mode admin sans Access, uniquement sur 127.0.0.1), lance le test, arrête tout. Outils : `local.mjs`.
+  - Autres tests en ligne : `test-synchro.mjs`, `test-compat.mjs`, `test-admin.mjs acces`
   - `codes-apprenants-TEST.txt`, `mot-de-passe-admin-TEST.txt` : valeurs de test uniquement
 - **Sauvegarde avant phase 1 :** `C:\Users\HP\Documents\GeoExpert-Sauvegardes\2026-10-24-avant-phase-1\`
   (code en zip + données KV : `cfg`, `f_arc1-e1`, `s_DM6JMZDCVCBU`) · étiquette git `sauvegarde-avant-phase-1`.
@@ -80,16 +112,19 @@
 - **Le dépôt GitHub est public** : l'adresse « cachée » de l'ancienne page admin y est visible par tous, et la version
   actuelle n'a pas de limite de tentatives. → Mettre en ligne la partie sécurité dès qu'Access est validé.
   Tout ce qui est poussé sur `main` est public (aucun secret dans les fichiers : mots de passe et clés restent dans Cloudflare).
-- **Liste admin et KV :** un nouveau code met jusqu'à 60 s à apparaître dans « Apprenants » (comportement de KV, déjà présent
-  avant). À corriger avec le tableau de bord (index des apprenants dans D1).
 - **Déploiement :** le Worker utilise maintenant `admin.html` (importé) → toujours déployer avec wrangler, plus par copier-coller
   dans le tableau de bord Cloudflare.
 
 - **Exercice 2 ArcGIS (arc1-e2)** : marqué « En ligne » dans l'admin, mais le fichier est absent du stockage. À renvoyer depuis l'onglet Fichiers.
 - Clé Bunny de test (`BUNNY_TOKEN_KEY`) à installer par l'administrateur pour lire les vidéos en test.
+- **Conservation des données** : la politique annonce une suppression 12 mois après la fin de l'accès. Il n'y a pas encore
+  de suppression automatique → ajouter en phase 2 un bouton « Supprimer les données de cet apprenant » (+ liste des accès finis depuis 12 mois).
+- La branche `phase-1` est aussi sur GitHub (dépôt public) : aucun secret dedans, seulement du code et des identifiants non secrets.
 
 - Durées du chapitre 2 d'ArcGIS identiques au chapitre 1 (à corriger quand la gestion du contenu existe).
-- Politique de confidentialité : ajouter la sauvegarde de la progression et des notes sur le serveur (à rédiger en fin de phase 1).
+- Politique de confidentialité (à rédiger en fin de phase 1) : sauvegarde de la progression et des notes sur le serveur,
+  notes de suivi de l'administrateur, numéro WhatsApp (relances), journal (dont adresse IP en cas de mot de passe faux),
+  durées de conservation.
 
 ## Journal des sessions
 
@@ -102,4 +137,13 @@
   `espace-apprenant-api` sous le nom `DB`, déployer le Worker, puis publier la page).
 - Sécurité admin et journal : faits et testés en test (Worker admin séparé `geoexpert-admin-test`).
   Ancienne page `admin-b7x…html` gardée jusqu'à la mise en ligne, puis remplacée par un renvoi vers la nouvelle adresse.
-- **Prochaine étape :** finir Access avec l'administrateur, puis tableau de bord admin et fiche apprenant.
+- Access validé par l'administrateur (connexion réelle). Tableau de bord admin fait et testé.
+- Fiche apprenant + notes privées : faites et testées.
+- Actions en un clic : faites et testées.
+- Relances WhatsApp + suivi de l'essai : faits et testés.
+- Côté apprenant (message du jour + carte « Essai et assistance ») : fait, testé, preuve pixel faite.
+- Export CSV, nettoyage, politique de confidentialité, config de production, livrables : faits.
+- Mise en ligne lancée : étapes 1 à 3 faites ; Worker apprenant de production et site non touchés (vérifié).
+  Petite amélioration : l'admin vérifie la connexion e-mail AVANT tout le reste (ne révèle rien sans connexion).
+- **Prochaine étape : mise en ligne, étapes 4 et 5 (administrateur)**, puis 6 à 10 (Claude), en suivant `MISE-EN-LIGNE-PHASE-1.md`.
+  Ensuite : validation de la phase 1 par l'administrateur, puis phase 2.

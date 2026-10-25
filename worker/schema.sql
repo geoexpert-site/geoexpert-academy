@@ -19,6 +19,39 @@ CREATE TABLE IF NOT EXISTS notes (
   PRIMARY KEY (code, k)
 );
 
+-- Index des codes d'accès (le contenu reste dans KV) : affichage immédiat des nouveaux codes dans l'admin.
+CREATE TABLE IF NOT EXISTS codes (
+  code TEXT PRIMARY KEY,
+  created INTEGER
+);
+
+-- Notes privées de suivi écrites par l'administrateur (jamais visibles par l'apprenant).
+CREATE TABLE IF NOT EXISTS admin_notes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT NOT NULL,
+  t INTEGER NOT NULL,
+  who TEXT,
+  text TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS admin_notes_code ON admin_notes (code, t);
+
+-- Numéro WhatsApp de l'apprenant (facultatif), pour les relances. Jamais envoyé à l'espace apprenant.
+CREATE TABLE IF NOT EXISTS contacts (
+  code TEXT PRIMARY KEY,
+  phone TEXT NOT NULL,
+  updated INTEGER
+);
+
+-- Relances faites par l'administrateur (bienvenue, pas commencé, essai, inactif, félicitations).
+CREATE TABLE IF NOT EXISTS relances (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  t INTEGER NOT NULL,
+  who TEXT
+);
+CREATE INDEX IF NOT EXISTS relances_code ON relances (code, kind, t);
+
 -- Journal d'activité de l'administration (qui a fait quoi et quand).
 CREATE TABLE IF NOT EXISTS journal (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

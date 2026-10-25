@@ -1,0 +1,22 @@
+# Exécution LOCALE sur l'ordinateur, pour les tests automatiques uniquement (wrangler dev).
+# Les données sont des copies locales : rien n'est envoyé chez Cloudflare.
+name = "geoexpert-local"
+main = "worker.js"
+compatibility_date = "2026-10-21"
+
+[vars]
+# Mode administration sans Cloudflare Access : possible UNIQUEMENT en local (127.0.0.1), jamais en ligne.
+ROLE = "admin"
+ACCESS_OPTIONAL = "oui"
+ALLOWED_ORIGINS = "http://localhost:5501,http://127.0.0.1:5501"
+LIBRARY_ID = "785941"
+PLAYER_HOST = "iframe.mediadelivery.net"
+
+[[kv_namespaces]]
+binding = "ACCESS"
+id = "local-access"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "geoexpert-local"
+database_id = "local-db"

@@ -73,12 +73,86 @@
   .box { background: var(--bg); border: 1px dashed var(--teal); border-radius: 10px; padding: 16px; margin-top: 20px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: var(--ink); }
   .warn { color: #d35400; font-weight: 600; font-size: 12px; display: inline-block; margin-top: 4px; }
   
+  /* Tableau de bord */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+  .kpi b { display: block; font: 800 30px Montserrat; color: var(--indigo); line-height: 1.1; }
+  .kpi span { display: block; font-weight: 600; font-size: 14px; margin-top: 4px; }
+  .kpi small { display: block; color: var(--dim); font-size: 12.5px; margin-top: 4px; line-height: 1.4; }
+  .kpi.alerte b { color: var(--mag); }
+  .mrow { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .mrow .mbar { grid-column: 1 / -1; height: 8px; background: var(--soft); border-radius: 9px; overflow: hidden; }
+  .mrow .mbar i { display: block; height: 100%; background: var(--teal); border-radius: 9px; }
+  .mrow em { font-style: normal; color: var(--dim); font-size: 13px; text-align: right; white-space: nowrap; }
+
+  /* Fiche apprenant (fenêtre) */
+  .b.sec.fic { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+  .b.sec.fic:hover { filter: brightness(1.1); color: #fff; }
+  .ov { position: fixed; inset: 0; background: rgba(20,18,40,.5); z-index: 50; display: flex; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 30px 16px; }
+  .ov[hidden] { display: none; }
+  .fiche { width: 100%; max-width: 760px; margin: 0; position: relative; }
+  .fiche .x { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: #fff; border-radius: 10px; width: 38px; height: 38px; font-size: 20px; cursor: pointer; color: var(--dim); }
+  .fiche h2 { margin-bottom: 4px; padding-right: 44px; }
+  .fiche .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+  .badge { display: inline-block; font: 700 11px Inter; letter-spacing: .4px; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; background: var(--soft); color: var(--teal); margin-left: 6px; vertical-align: middle; }
+  .badge.off { color: #c0392b; background: #fdf2f2; }
+  .badge.essai { color: var(--mag); }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .facts div { background: var(--bg); border-radius: 10px; padding: 10px 12px; }
+  .facts b { display: block; font-size: 14px; }
+  .facts small { color: var(--dim); font-size: 12px; }
+  .fiche h3 { font-size: 16px; color: var(--indigo); margin: 24px 0 8px; }
+  .fmod { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; }
+  .fmod summary { cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-weight: 600; font-size: 14px; }
+  .fmod summary em { font-style: normal; color: var(--dim); font-weight: 500; }
+  .fmod .mbar { grid-column: 1 / -1; height: 6px; background: var(--soft); border-radius: 9px; overflow: hidden; }
+  .fmod .mbar i { display: block; height: 100%; background: var(--teal); }
+  .fmod ul { list-style: none; margin: 0; padding: 0 14px 10px; font-size: 13.5px; }
+  .fmod li { display: flex; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .fmod li span:first-child { flex: 0 0 18px; color: var(--teal); font-weight: 700; }
+  .fmod li span:nth-child(2) { flex: 1; }
+  .fmod li small { color: var(--dim); white-space: nowrap; }
+  .fnote { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 14px; white-space: pre-wrap; }
+  .fnote small { display: flex; justify-content: space-between; color: var(--dim); font-size: 12px; margin-bottom: 4px; white-space: normal; }
+  .fnote button { border: 0; background: none; color: #c0392b; cursor: pointer; font: 600 12px Inter; }
+  .fiche textarea { width: 100%; box-sizing: border-box; min-height: 80px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font: 14px Inter; background: var(--bg); resize: vertical; }
+  .acts { border: 1px solid var(--line); border-radius: 12px; }
+  .arow { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line); }
+  .arow:first-child { border-top: 0; }
+  .arow b { font-size: 14px; }
+  .arow small { grid-column: 1; color: var(--dim); font-size: 12.5px; }
+  .arow .actl { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; font-size: 13px; color: var(--dim); }
+  .a-card .arow select { width: auto; max-width: 260px; padding: 7px 10px; font-size: 13px; }
+  .acts .warn { margin: 12px 14px; display: block; }
+  .acts > .b { margin: 0 14px 12px; }
+  /* Relances */
+  .cnt { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 99px; background: var(--mag); color: #fff; font-size: 12px; line-height: 18px; text-align: center; margin-left: 4px; }
+  .todo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: var(--r); padding: 14px 18px; margin-bottom: 16px; font-weight: 600; }
+  .todo[hidden] { display: none; }
+  .rrow { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
+  .rrow > div { min-width: 0; flex: 1 1 260px; }
+  .rrow small { display: block; color: var(--dim); font-size: 12.5px; margin-top: 2px; }
+  .lnk { border: 0; background: none; padding: 0; font: 600 15px Inter; color: var(--indigo); cursor: pointer; text-align: left; }
+  .lnk:hover { text-decoration: underline; }
+  .relb { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+  .b.sec.wa { background: #22b455; color: #fff; border-color: #22b455; text-decoration: none; }
+  .b.sec.wa:hover { filter: brightness(.95); color: #fff; }
+  .okt { color: #0a7a3b; font-weight: 600; font-size: 13px; }
+  .a-card .arow input[type=text] { width: auto; max-width: 200px; padding: 7px 10px; font-size: 13px; }
+  @media (max-width: 768px) { .a-card .arow input[type=text] { max-width: none; flex: 1 1 0; } }
+  .fiche, .fiche * { min-width: 0; }
+  .fiche { overflow-wrap: anywhere; }
+  @media (max-width: 768px) { .facts { grid-template-columns: 1fr 1fr; } .arow { grid-template-columns: minmax(0, 1fr); } .arow .actl { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 8px; flex-wrap: nowrap; } .a-card .arow select { max-width: none; width: auto; flex: 1 1 0; min-width: 0; } .ov { padding: 0; } .fiche { border-radius: 0; min-height: 100%; padding: 20px 16px; } }
+
   /* Login */
   #loginCard { max-width: 450px; margin: 60px auto; text-align: center; }
   #loginCard input { margin-bottom: 10px; text-align: center; letter-spacing: 2px; font-size: 18px; }
   
   @media (max-width: 768px) {
     .a-row { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi { padding: 14px; }
+    .kpi b { font-size: 24px; }
     .vid { grid-template-columns: 1fr; }
     .tabs button { flex: 1; text-align: center; }
     .admin-header { flex-direction: column; gap: 10px; text-align: center; }
@@ -108,7 +182,9 @@
 
   <div id="app" hidden>
     <div class="tabs" id="tabs">
-      <button data-t="new" class="on">➕ Nouvel accès</button>
+      <button data-t="dash" class="on">📊 Tableau de bord</button>
+      <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
+      <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
       <button data-t="pdf">📄 Fichiers (PDF/ZIP)</button>
@@ -116,11 +192,40 @@
     </div>
 
     <!-- Onglet Nouvel Accès -->
-    <div class="a-card" data-p="new">
+    <!-- Onglet Tableau de bord -->
+    <div data-p="dash">
+      <div class="todo" id="todo" hidden></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="a-card">
+        <h2>Formations les plus suivies</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 16px;">Nombre d'apprenants inscrits (accès valide), et leçons terminées ces 30 derniers jours.</p>
+        <div id="mods"></div>
+      </div>
+      <p id="dashNote" style="font-size:13px; color:var(--dim); margin:0 4px;"></p>
+    </div>
+
+    <!-- Onglet Relances -->
+    <div data-p="rel" hidden>
+      <div class="a-card">
+        <h2>À relancer aujourd'hui</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Pour chaque apprenant : <b>Ouvrir WhatsApp</b> prépare le message (vous pouvez le modifier avant d'envoyer), puis <b>Fait</b> le retire de la liste.</p>
+        <div id="relList"></div>
+      </div>
+      <div class="a-card">
+        <h2>Suivi de la période d'essai</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants dont l'essai de 7 jours est en cours, avec le jour où ils en sont.</p>
+        <div id="trialList"></div>
+      </div>
+    </div>
+
+    <div class="a-card" data-p="new" hidden>
       <h2>Créer un accès après un paiement</h2>
       <label for="nLabel">Nom ou initiales de l'apprenant (visible sur ses vidéos en filigrane)</label>
       <input type="text" id="nLabel" maxlength="40" placeholder="Ex: Kouadio A. (Pas de numéro de téléphone)">
       
+      <label for="nPhone">Numéro WhatsApp (facultatif, pour les relances ; jamais affiché à l'apprenant)</label>
+      <input type="text" id="nPhone" inputmode="tel" maxlength="24" placeholder="Ex: 07 87 01 50 30" autocomplete="off">
+
       <label for="nProd">Formation achetée</label>
       <select id="nProd"></select>
       <p style="font-size:13px; color:var(--dim); margin:10px 0 0;">Automatique : 7 jours d'essai (introduction + 2 premières leçons de chaque module), puis tout se débloque le 8e jour. Accès de 12 mois (formation seule) ou 24 mois (pack), comptés à partir de la première connexion de l'apprenant.</p>
@@ -137,6 +242,8 @@
     <!-- Onglet Liste -->
     <div class="a-card" data-p="list" hidden>
       <h2>Suivi des apprenants</h2>
+      <button class="b sec" id="export" type="button" style="margin:0 0 12px;">📥 Exporter la liste (Excel / CSV)</button>
+      <input type="text" id="find" placeholder="Rechercher un apprenant (nom ou code)" aria-label="Rechercher un apprenant" style="margin-bottom:6px;">
       <div style="overflow-x:auto;">
         <table>
           <thead>
@@ -161,6 +268,14 @@
       <h2>Fichiers d'exercices (PDF / ZIP)</h2>
       <p style="font-size:14px; color:var(--dim); margin-bottom:20px;">Les fichiers sont protégés : seuls les apprenants connectés peuvent les ouvrir. <strong>Taille maximale : 10 Mo.</strong></p>
       <div id="pdfs"></div>
+    </div>
+
+    <!-- Fiche apprenant (s'ouvre au clic sur « Fiche ») -->
+    <div class="ov" id="ov" hidden>
+      <div class="a-card fiche" role="dialog" aria-modal="true" aria-labelledby="fName">
+        <button class="x" id="fClose" aria-label="Fermer la fiche">×</button>
+        <div id="fBody"></div>
+      </div>
     </div>
 
     <!-- Onglet Journal -->
@@ -202,8 +317,332 @@
     state = await call('/admin/state', 'GET');
     var sel = $('nProd'); sel.textContent = '';
     state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
-    renderList(); renderVids(); renderPdfs();
+    renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
     renderLog((await call('/admin/journal', 'GET')).entries);
+  }
+
+  // ----- Relances WhatsApp
+  var REL = {
+    bienvenue: 'Bienvenue (1er jour)',
+    pascommence: 'Code pas encore utilisé',
+    essai: 'Suivi de l\'essai (5e jour)',
+    inactif: 'Inactif depuis plus de 7 jours',
+    bravo: 'Formation terminée : félicitations',
+  };
+  function dayOf(ms) { return Math.floor((Date.now() - ms) / 86400000); }
+  // Infos utiles aux messages, à partir d'un apprenant de la liste (state) ou d'une fiche.
+  function relCtx(x) {
+    var titles = x.modules.map(function (m) { var c = state.catalog.filter(function (k) { return k.key === (m.key || m.m); })[0]; return c ? c.title.split(' : ')[0] : (m.key || m.m); });
+    var done = x.done !== undefined ? x.done : x.modules.reduce(function (a, m) { return a + m.lessons.filter(function (l) { return l.done; }).length; }, 0);
+    var total = x.lessons !== undefined ? x.lessons : x.modules.reduce(function (a, m) { return a + m.lessons.length; }, 0);
+    return { name: x.label, formation: titles.join(' et '), done: done, total: total, finEssai: x.finEssai, last: x.lastLesson, days: x.lastActivity ? dayOf(x.lastActivity) : 0, code: x.code, phone: x.phone };
+  }
+  function relMessage(kind, c) {
+    var M = {
+      bienvenue: 'Bonjour ' + c.name + ', bienvenue chez GeoExpert Academy !\n\nVotre espace : ' + ESPACE_URL + '\nCommencez par l\'introduction de ' + c.formation + ' : quelques minutes suffisent pour bien démarrer.' + (c.finEssai > Date.now() ? '\n\nPendant 7 jours, vous avez l\'introduction et les 2 premières leçons ; tout se débloque le ' + fdt(c.finEssai) + '.' : '') + '\n\nUne question ? Répondez simplement à ce message.',
+      pascommence: 'Bonjour ' + c.name + ', avez-vous bien reçu votre code d\'accès (' + c.code + ') ?\n\nVotre espace : ' + ESPACE_URL + '\n\nSi vous avez un souci pour vous connecter, répondez-moi ici : je vous aide.',
+      essai: 'Bonjour ' + c.name + ', comment se passent vos premiers jours sur ' + c.formation + ' ?\n\nVous avez terminé ' + c.done + ' leçon(s).' + (c.finEssai > Date.now() ? ' Le ' + fdt(c.finEssai) + ', toutes les leçons se débloquent.' : '') + '\n\nSi quelque chose vous bloque, dites-le-moi ici.',
+      inactif: 'Bonjour ' + c.name + ', cela fait ' + c.days + ' jours que nous ne vous avons pas vu sur ' + c.formation + '.\n\nVous en êtes à ' + c.done + ' leçon(s) sur ' + c.total + '.' + (c.last ? ' Reprenez où vous vous êtes arrêté : « ' + c.last + ' ».' : '') + '\n' + ESPACE_URL + '\n\nBesoin d\'aide pour avancer ? Je suis là.',
+      bravo: 'Bravo ' + c.name + ' ! Vous avez terminé toutes les leçons de ' + c.formation + '.\n\nEnvoyez-moi ici votre exercice final pour recevoir votre attestation.\n\nEt votre avis compte : qu\'avez-vous pensé de la formation ?',
+    };
+    return M[kind];
+  }
+  function waLink(phone, text) { return 'https://wa.me/' + (phone || '') + '?text=' + encodeURIComponent(text); }
+  // Bouton « Ouvrir WhatsApp » + bouton « Fait » ; après « Fait », recharge les listes (et la fiche ouverte).
+  function relButtons(code, kind, ctx, doneLabel) {
+    var box = el('span', 'relb');
+    var w = el('a', 'b sec wa', ctx.phone ? 'Ouvrir WhatsApp' : 'Ouvrir WhatsApp (choisir le contact)');
+    w.href = waLink(ctx.phone, relMessage(kind, ctx)); w.target = '_blank'; w.rel = 'noopener';
+    var ok = el('button', 'b sec', doneLabel || 'Fait ✓'); ok.type = 'button';
+    ok.addEventListener('click', async function () {
+      ok.disabled = true; ok.textContent = '...';
+      try { await call('/admin/relance', 'POST', { code: code, kind: kind }); await load(); if (fCode) await openFiche(fCode); }
+      catch (e) { alert(e.message); ok.disabled = false; ok.textContent = doneLabel || 'Fait ✓'; }
+    });
+    box.appendChild(w); box.appendChild(ok); return box;
+  }
+  function renderRelances() {
+    var list = $('relList'); list.textContent = '';
+    var due = state.students.filter(function (s) { return s.due && s.due.length; });
+    var n = due.reduce(function (a, s) { return a + s.due.length; }, 0);
+    $('relCount').textContent = n; $('relCount').hidden = !n;
+    due.forEach(function (s) {
+      var c = relCtx(s);
+      s.due.forEach(function (kind) {
+        var r = el('div', 'rrow');
+        var who = el('div'); var nm = el('button', 'lnk', s.label); nm.type = 'button'; nm.addEventListener('click', function () { openFiche(s.code); });
+        who.appendChild(nm); who.appendChild(el('small', '', REL[kind] + (kind === 'inactif' ? ' (' + c.days + ' jours)' : '') + (s.phone ? '' : ' · pas de numéro enregistré')));
+        r.appendChild(who); r.appendChild(relButtons(s.code, kind, c)); list.appendChild(r);
+      });
+    });
+    if (!n) list.appendChild(el('p', '', '✅ Personne à relancer aujourd\'hui.'));
+    // Suivi de l'essai
+    var tl = $('trialList'); tl.textContent = '';
+    var now = Date.now(), trial = state.students.filter(function (s) { return s.active && s.finEssai > now; })
+      .sort(function (a, b) { return a.premiereUtilisation - b.premiereUtilisation; });
+    trial.forEach(function (s) {
+      var c = relCtx(s), r = el('div', 'rrow'), who = el('div'), day = Math.min(7, dayOf(s.premiereUtilisation) + 1);
+      var nm = el('button', 'lnk', s.label); nm.type = 'button'; nm.addEventListener('click', function () { openFiche(s.code); });
+      who.appendChild(nm);
+      who.appendChild(el('small', '', 'Jour ' + day + ' sur 7 · tout débloqué le ' + fdt(s.finEssai) + ' · ' + s.done + ' leçon(s) terminée(s) · dernière visite : ' + ago(s.lastActivity)));
+      r.appendChild(who);
+      if (s.marks && s.marks.essai) r.appendChild(el('span', 'okt', '✓ Suivi fait le ' + fdt(s.marks.essai)));
+      else r.appendChild(relButtons(s.code, 'essai', c, 'Suivi fait ✓'));
+      tl.appendChild(r);
+    });
+    if (!trial.length) tl.appendChild(el('p', '', 'Aucun apprenant en période d\'essai.'));
+    // Bandeau du tableau de bord
+    var todo = $('todo'); todo.textContent = ''; todo.hidden = !n;
+    if (n) {
+      todo.appendChild(el('span', '', '📣 ' + due.length + ' apprenant(s) à relancer aujourd\'hui'));
+      var go = el('button', 'b sec fic', 'Voir les relances'); go.type = 'button';
+      go.addEventListener('click', function () { document.querySelector('[data-t=rel]').click(); });
+      todo.appendChild(go);
+    }
+  }
+
+  function renderDash() {
+    var s = state.stats, box = $('kpis'); box.textContent = '';
+    [
+      [s.total, 'Apprenants', 'Codes valides (ni désactivés ni expirés).'],
+      [s.actifs, 'Actifs cette semaine', 'Venus sur la plateforme ces 7 derniers jours.'],
+      [s.nouveaux, 'Nouveaux cette semaine', 'Codes créés ces 7 derniers jours.'],
+      [s.essai, 'En période d\'essai', 'Leur essai de 7 jours est en cours.'],
+      [s.inactifs, 'Inactifs depuis plus de 7 jours', 'Ont déjà commencé, mais ne sont pas revenus depuis 7 jours.', s.inactifs > 0],
+      [s.jamais, 'Jamais connectés', 'Ont reçu un code mais ne l\'ont pas encore utilisé.', s.jamais > 0],
+      [s.progression === null ? '-' : s.progression + ' %', 'Progression moyenne', s.progressionSur ? 'Calculée sur ' + s.progressionSur + ' apprenant(s) dont la progression est sauvegardée.' : 'Pas encore de progression sauvegardée.'],
+    ].forEach(function (k) {
+      var d = el('div', 'kpi' + (k[3] ? ' alerte' : ''));
+      d.appendChild(el('b', '', String(k[0]))); d.appendChild(el('span', '', k[1])); d.appendChild(el('small', '', k[2]));
+      box.appendChild(d);
+    });
+    var mods = $('mods'); mods.textContent = '';
+    var max = Math.max.apply(null, [1].concat(s.modules.map(function (m) { return m.inscrits; })));
+    s.modules.forEach(function (m) {
+      var r = el('div', 'mrow');
+      r.appendChild(el('span', '', m.title));
+      r.appendChild(el('em', '', m.inscrits + ' inscrit(s) · ' + m.lecons30j + ' leçon(s)'));
+      var bar = el('div', 'mbar'), i = el('i'); i.style.width = Math.round(m.inscrits * 100 / max) + '%'; bar.appendChild(i); r.appendChild(bar);
+      mods.appendChild(r);
+    });
+    if (!s.modules.length) mods.appendChild(el('p', '', 'Aucun apprenant inscrit pour le moment.'));
+    var hors = [];
+    if (s.desactives) hors.push(s.desactives + ' code(s) désactivé(s) ou remplacé(s)');
+    if (s.expires) hors.push(s.expires + ' accès expiré(s)');
+    $('dashNote').textContent = (hors.length ? 'Non comptés : ' + hors.join(' et ') + '. ' : '') + 'Chiffres mis à jour à chaque ouverture de l\'administration.';
+  }
+
+  // ----- Export de la liste des apprenants (fichier CSV qui s'ouvre directement dans Excel : « ; » et UTF-8)
+  function csvCell(v) {
+    var s = v === undefined || v === null ? '' : String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // empêche Excel d'interpréter une cellule comme une formule
+    return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function d10(ms) { return ms ? new Date(ms).toLocaleDateString('fr-FR') : ''; }
+  $('export').addEventListener('click', async function () {
+    var now = Date.now(), head = ['Nom', 'Code', 'Numéro WhatsApp', 'Formations', 'Statut', 'Code créé le', 'Première connexion', 'Fin de l\'essai', 'Fin de l\'accès', 'Fin de l\'assistance', 'Leçons terminées', 'Total leçons', 'Progression (%)', 'Dernière visite', 'Connexions', 'À relancer'];
+    var rows = state.students.map(function (s) {
+      var statut = !s.active ? (s.remplace ? 'Remplacé' : 'Désactivé') : (s.expires && s.expires < now) ? 'Expiré' : s.finEssai > now ? 'En essai' : (s.essai && !s.premiereUtilisation) ? 'Pas encore utilisé' : 'Accès complet';
+      var start = s.premiereUtilisation || (s.essai ? 0 : s.created), assist = '';
+      if (start) { var d = new Date(start); d.setUTCMonth(d.getUTCMonth() + 3); assist = d10(d.getTime()); }
+      return [s.label, s.code, s.phone ? '+' + s.phone : '', s.modules.map(function (g) { return LABELS[g.m] || g.m; }).join(', '), statut,
+        d10(s.created), d10(s.premiereUtilisation), d10(s.finEssai), d10(s.expires), assist,
+        s.synced ? s.done : '', s.lessons, s.synced && s.lessons ? Math.round(s.done * 100 / s.lessons) : '', d10(s.lastActivity), s.logins,
+        (s.due || []).map(function (k) { return REL[k]; }).join(', ')];
+    });
+    var csv = '﻿' + [head].concat(rows).map(function (r) { return r.map(csvCell).join(';'); }).join('\r\n');
+    var a = el('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'apprenants-geoexpert-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    try { await call('/admin/log', 'POST', { action: 'Liste des apprenants exportée', detail: rows.length + ' apprenant(s)' }); } catch (e) {}
+  });
+
+  // ----- Recherche dans la liste des apprenants
+  $('find').addEventListener('input', function () {
+    var v = this.value.toLowerCase().replace(/-/g, '');
+    document.querySelectorAll('#rows tr').forEach(function (tr) { tr.hidden = v && tr.textContent.toLowerCase().replace(/-/g, '').indexOf(v) === -1; });
+  });
+
+  // ----- Fiche apprenant
+  var fCode = '';
+  function fdt(ms) { return ms ? new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'; }
+  function ago(ms) {
+    if (!ms) return 'jamais';
+    var d = Math.floor((Date.now() - ms) / 86400000);
+    return d <= 0 ? "aujourd'hui" : d === 1 ? 'hier' : 'il y a ' + d + ' jours';
+  }
+  // focus : élément à montrer à l'ouverture (ex. la liste des formations) · after : message à afficher en haut
+  async function openFiche(code, focus, after) {
+    fCode = code; $('ov').hidden = false; document.body.style.overflow = 'hidden';
+    var body = $('fBody'); body.textContent = 'Chargement...';
+    try {
+      renderFiche(await call('/admin/student?code=' + encodeURIComponent(code), 'GET'));
+      if (after) after(body);
+      var f = focus && $(focus); if (f) { f.scrollIntoView({ block: 'center' }); f.focus(); }
+    } catch (e) { body.textContent = e.message; }
+  }
+  // Action depuis la fiche : confirmation, appel, rechargement de la liste et de la fiche.
+  async function ficheAction(btn, question, path, payload, then) {
+    if (question && !confirm(question)) return;
+    var t = btn.textContent; btn.disabled = true; btn.textContent = '...';
+    try { var j = await call(path, 'POST', payload); await load(); await (then ? then(j) : openFiche(fCode)); }
+    catch (e) { alert(e.message); btn.disabled = false; btn.textContent = t; }
+  }
+  function actRow(title, help) {
+    var d = el('div', 'arow'); d.appendChild(el('b', '', title)); if (help) d.appendChild(el('small', '', help));
+    var c = el('div', 'actl'); d.appendChild(c); return { row: d, ctl: c };
+  }
+  // Fiche : numéro WhatsApp + les 5 messages de relance, et l'historique des relances faites.
+  function renderContact(f, body) {
+    body.appendChild(el('h3', '', 'WhatsApp et relances'));
+    var box = el('div', 'acts');
+    var r = actRow('Numéro WhatsApp', f.phone ? 'Enregistré : +' + f.phone : 'Pas encore de numéro : WhatsApp vous demandera de choisir le contact.');
+    var inp = el('input'); inp.type = 'text'; inp.id = 'fPhone'; inp.inputMode = 'tel'; inp.maxLength = 24; inp.value = f.phone ? '+' + f.phone : ''; inp.placeholder = 'Ex: 07 87 01 50 30'; inp.setAttribute('aria-label', 'Numéro WhatsApp');
+    var sv = el('button', 'b sec', 'Enregistrer'); sv.type = 'button';
+    sv.addEventListener('click', function () { ficheAction(sv, null, '/admin/contact', { code: f.code, phone: inp.value }); });
+    r.ctl.appendChild(inp); r.ctl.appendChild(sv); box.appendChild(r.row);
+    var c = relCtx(f);
+    Object.keys(REL).forEach(function (kind) {
+      var last = f.relances.filter(function (x) { return x.kind === kind; })[0];
+      var rr = actRow(REL[kind], last ? '✓ Fait le ' + fdt(last.t) + (last.who ? ' (' + last.who + ')' : '') : 'Pas encore envoyé.');
+      rr.ctl.appendChild(relButtons(f.code, kind, c));
+      box.appendChild(rr.row);
+    });
+    body.appendChild(box);
+  }
+
+  function renderActions(f, body) {
+    var now = Date.now(), box = el('div', 'acts'), CONF = { label: f.label, active: f.active };
+    body.appendChild(el('h3', '', 'Actions'));
+    if (f.remplacePar) {
+      box.appendChild(el('p', 'warn', 'Ce code a été remplacé par ' + f.remplacePar + ' (code perdu). Toutes les actions se font sur le nouveau code.'));
+      var go = el('button', 'b sec fic', 'Ouvrir la fiche du nouveau code'); go.type = 'button';
+      go.addEventListener('click', function () { openFiche(f.remplacePar); });
+      box.appendChild(go); body.appendChild(box); return;
+    }
+    // Ajouter une formation (liste des formations qu'il n'a pas encore)
+    var owned = f.modules.map(function (m) { return m.key; }), free = state.catalog.filter(function (m) { return owned.indexOf(m.key) < 0; });
+    var r1 = actRow('Ajouter une formation', f.finEssai > now ? 'Ajoutée tout de suite, avec la même période d\'essai que ses autres formations (tout débloqué le ' + fdt(f.finEssai) + ').' : 'Ajoutée et disponible tout de suite.');
+    if (free.length) {
+      var sel = el('select'); sel.id = 'fAddMod'; sel.setAttribute('aria-label', 'Formation à ajouter');
+      free.forEach(function (m) { var o = el('option', '', m.title); o.value = m.key; sel.appendChild(o); });
+      var b1 = el('button', 'b sec', 'Ajouter'); b1.type = 'button';
+      b1.addEventListener('click', function () { ficheAction(b1, 'Ajouter « ' + sel.options[sel.selectedIndex].text + ' » à ' + f.label + ' ?', '/admin/add-module', { code: f.code, module: sel.value }); });
+      r1.ctl.appendChild(sel); r1.ctl.appendChild(b1);
+    } else r1.ctl.appendChild(el('span', '', 'Il a déjà toutes les formations.'));
+    box.appendChild(r1.row);
+    // Prolonger l'accès
+    var r2 = actRow('Prolonger l\'accès', f.expires ? 'Fin actuelle : ' + fdt(f.expires) + '.' : 'Les jours s\'ajouteront à la fin calculée à sa première connexion.');
+    var dur = el('select'); dur.setAttribute('aria-label', 'Durée de prolongation');
+    [[30, '30 jours'], [90, '3 mois (90 jours)'], [182, '6 mois (182 jours)'], [365, '1 an (365 jours)']].forEach(function (x) { var o = el('option', '', x[1]); o.value = x[0]; dur.appendChild(o); });
+    var b2 = el('button', 'b sec', 'Prolonger'); b2.type = 'button';
+    b2.addEventListener('click', function () {
+      var d = +dur.value, base = f.expires ? Math.max(f.expires, now) : 0;
+      ficheAction(b2, CONFIRM.more(CONF, d) + (base ? '\n\nNouvelle fin : ' + fdt(base + d * 86400000) + '.' : ''), '/admin/update', { code: f.code, addDays: d });
+    });
+    r2.ctl.appendChild(dur); r2.ctl.appendChild(b2); box.appendChild(r2.row);
+    // Débloquer avant le 8e jour
+    if (f.finEssai > now || (f.essai && !f.accesComplet && !f.premiereUtilisation)) {
+      var r3 = actRow('Débloquer toutes les leçons maintenant', f.finEssai > now ? 'Sinon, déblocage automatique le ' + fdt(f.finEssai) + '.' : 'Supprime la période d\'essai avant même sa première connexion.');
+      var b3 = el('button', 'b sec', 'Tout débloquer'); b3.type = 'button';
+      b3.addEventListener('click', function () { ficheAction(b3, CONFIRM.unlock(CONF), '/admin/update', { code: f.code, unlockNow: true }); });
+      r3.ctl.appendChild(b3); box.appendChild(r3.row);
+    }
+    // Code perdu
+    if (f.active) {
+      var r4 = actRow('Code perdu ?', 'Crée un nouveau code avec la même formation, les mêmes dates et toute sa progression. L\'ancien code ne marchera plus.');
+      var b4 = el('button', 'b sec', 'Remplacer le code'); b4.type = 'button';
+      b4.addEventListener('click', function () {
+        ficheAction(b4, 'Remplacer le code de ' + f.label + ' ?\n\nL\'ancien code (' + f.code + ') ne fonctionnera plus. Un nouveau code va être créé : vous devrez l\'envoyer à l\'apprenant sur WhatsApp.', '/admin/replace', { code: f.code }, function (j) {
+          return openFiche(j.code, null, function (bd) {
+            var out = el('div'); out.style.marginBottom = '16px';
+            showCodeMessage(out, '✅ Nouveau code pour ' + j.label + ' : ' + j.code + '. Envoyez-le-lui maintenant.',
+              'Bonjour ' + j.label + ', voici votre nouveau code d\'accès (l\'ancien ne fonctionne plus).\n\nVotre espace apprenant : ' + ESPACE_URL + '\nVotre code personnel : ' + j.code + '\n\nVotre progression et vos notes sont conservées. Ce code est strictement personnel : merci de ne pas le partager.');
+            bd.insertBefore(out, bd.children[2]);
+          });
+        });
+      });
+      r4.ctl.appendChild(b4); box.appendChild(r4.row);
+    }
+    // Désactiver / réactiver
+    var r5 = actRow(f.active ? 'Désactiver le code' : 'Réactiver le code', f.active ? 'Par exemple après un remboursement. Réversible.' : 'L\'apprenant pourra de nouveau se connecter.');
+    var b5 = el('button', 'b sec' + (f.active ? ' red' : ''), f.active ? 'Désactiver' : 'Réactiver'); b5.type = 'button';
+    b5.addEventListener('click', function () { ficheAction(b5, CONFIRM.active(CONF), '/admin/update', { code: f.code, active: !f.active }); });
+    r5.ctl.appendChild(b5); box.appendChild(r5.row);
+    body.appendChild(box);
+  }
+  function closeFiche() { $('ov').hidden = true; document.body.style.overflow = ''; fCode = ''; }
+  $('fClose').addEventListener('click', closeFiche);
+  $('ov').addEventListener('click', function (e) { if (e.target === $('ov')) closeFiche(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ov').hidden) closeFiche(); });
+
+  function renderFiche(f) {
+    var now = Date.now(), body = $('fBody'); body.textContent = '';
+    var h = el('h2'); h.id = 'fName'; h.textContent = f.label;
+    var st = !f.active ? ['Désactivé', 'off'] : (f.expires && f.expires < now) ? ['Expiré', 'off'] : f.finEssai > now ? ['En essai', 'essai'] : (f.essai && !f.premiereUtilisation) ? ['Pas encore utilisé', ''] : ['Accès complet', ''];
+    h.appendChild(el('span', 'badge ' + st[1], st[0]));
+    body.appendChild(h);
+    body.appendChild(el('div', 'sub', f.code + (f.product ? ' · ' + (LABELS[f.product] || f.product) : '')));
+
+    var facts = el('div', 'facts');
+    [
+      [fdt(f.created), 'Code créé le'],
+      [f.premiereUtilisation ? fdt(f.premiereUtilisation) : (f.essai ? 'Pas encore' : '-'), 'Première connexion'],
+      [f.finEssai ? fdt(f.finEssai) : (f.essai && !f.accesComplet && !f.premiereUtilisation ? 'Commence à la 1re connexion' : 'Pas d\'essai'), 'Fin de l\'essai'],
+      [f.expires ? fdt(f.expires) : (f.mois ? f.mois + ' mois dès la 1re connexion' : '-'), 'Fin de l\'accès'],
+      [f.finAssistance ? fdt(f.finAssistance) : '3 mois dès la 1re connexion', 'Fin de l\'assistance'],
+      [ago(f.lastActivity), 'Dernière visite'],
+      [f.logins + ' connexion(s) depuis ' + f.networks + ' réseau(x)' + (f.countries.length ? ' (' + f.countries.join(', ') + ')' : ''), 'Connexions'],
+      [f.lastLesson || '-', 'Dernière leçon ouverte'],
+    ].forEach(function (x) { var d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('small', '', x[1])); facts.appendChild(d); });
+    body.appendChild(facts);
+    if (f.networks >= 4) body.appendChild(el('p', 'warn', '⚠️ Code utilisé depuis ' + f.networks + ' connexions internet différentes : partage possible.'));
+    if (f.remplace) body.appendChild(el('p', '', 'Ce code remplace l\'ancien code perdu ' + f.remplace + '.')).style.cssText = 'color:var(--dim);font-size:13px;margin:10px 0 0;';
+    renderContact(f, body);
+    renderActions(f, body);
+
+    body.appendChild(el('h3', '', 'Leçons terminées'));
+    if (!f.synced) body.appendChild(el('p', '', 'Progression pas encore sauvegardée : l\'apprenant ne s\'est pas reconnecté depuis la mise à jour, ou n\'a encore rien commencé.')).style.cssText = 'color:var(--dim);font-size:13px;margin:0 0 8px;';
+    f.modules.forEach(function (m, i) {
+      var n = m.lessons.filter(function (l) { return l.done; }).length, d = el('details', 'fmod');
+      if (i === 0) d.open = true;
+      var s = el('summary'); s.appendChild(el('span', '', m.title)); s.appendChild(el('em', '', n + ' / ' + m.lessons.length));
+      var bar = el('div', 'mbar'), bi = el('i'); bi.style.width = Math.round(n * 100 / (m.lessons.length || 1)) + '%'; bar.appendChild(bi); s.appendChild(bar);
+      d.appendChild(s);
+      var ul = el('ul');
+      m.lessons.forEach(function (l) {
+        var li = el('li'); li.appendChild(el('span', '', l.done ? '✓' : ''));
+        li.appendChild(el('span', '', l.title));
+        li.appendChild(el('small', '', l.done > 1 ? fdt(l.done) : l.done ? 'date inconnue' : ''));
+        ul.appendChild(li);
+      });
+      d.appendChild(ul); body.appendChild(d);
+    });
+
+    body.appendChild(el('h3', '', 'Notes de suivi (privées)'));
+    body.appendChild(el('p', '', 'Visibles seulement dans l\'administration, jamais par l\'apprenant.')).style.cssText = 'color:var(--dim);font-size:13px;margin:0 0 8px;';
+    var ta = el('textarea'); ta.placeholder = 'Ex. : relancé sur WhatsApp, bloqué sur la leçon 4, a demandé une facture...'; ta.maxLength = 2000; ta.setAttribute('aria-label', 'Nouvelle note de suivi');
+    var add = el('button', 'b', 'Ajouter la note'); add.type = 'button'; add.style.marginTop = '10px';
+    var msg = el('div');
+    add.addEventListener('click', async function () {
+      if (!ta.value.trim()) return;
+      add.disabled = true; add.textContent = 'Enregistrement...';
+      try { await call('/admin/note', 'POST', { code: f.code, text: ta.value }); await openFiche(f.code); }
+      catch (e) { msg.className = 'err'; msg.textContent = e.message; add.disabled = false; add.textContent = 'Ajouter la note'; }
+    });
+    body.appendChild(ta); body.appendChild(add); body.appendChild(msg);
+    f.adminNotes.forEach(function (n) {
+      var d = el('div', 'fnote'), meta = el('small');
+      meta.appendChild(el('span', '', new Date(n.t).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + (n.who ? ' · ' + n.who : '')));
+      var del = el('button', '', 'Supprimer'); del.type = 'button';
+      del.addEventListener('click', async function () {
+        if (!confirm('Supprimer définitivement cette note ?')) return;
+        try { await call('/admin/note-delete', 'POST', { id: n.id }); await openFiche(f.code); } catch (e) { alert(e.message); }
+      });
+      meta.appendChild(del); d.appendChild(meta); d.appendChild(document.createTextNode(n.text));
+      body.appendChild(d);
+    });
   }
 
   function renderLog(entries) {
@@ -248,8 +687,9 @@
   $('logoutBtn').addEventListener('click', function() { location.reload(); });
 
   $('tabs').addEventListener('click', function (e) {
-    var t = e.target.getAttribute('data-t'); if (!t) return;
-    document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('on', b === e.target); });
+    var btn = e.target.closest('[data-t]'); if (!btn) return;
+    var t = btn.getAttribute('data-t');
+    document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('on', b === btn); });
     document.querySelectorAll('[data-p]').forEach(function (p) { p.hidden = p.getAttribute('data-p') !== t; });
   });
 
@@ -257,18 +697,11 @@
     var out = $('created'); out.textContent = '';
     var btn = $('create'); btn.textContent = 'Génération...'; btn.disabled = true;
     try {
-      var j = await call('/admin/create', 'POST', { label: $('nLabel').value, product: $('nProd').value, immediate: $('nNow').checked });
-      var msg = 'Bonjour, votre paiement est bien reçu, merci.\n\nVotre espace apprenant : ' + ESPACE_URL + '\nVotre code personnel : ' + j.code + '\n\nCe code est strictement personnel : merci de ne pas le partager. Votre assistance dure 3 mois : écrivez-nous ici dès que vous êtes bloqué (réponse sous 48 heures ouvrables).\n\nBonne formation !';
-      
-      out.appendChild(el('p', 'ok', '✅ Accès créé pour ' + j.label + ' : ' + j.code));
-      out.appendChild(el('div', 'box', msg));
-      
-      var c = el('button', 'b', 'Copier le message'); c.type = 'button';
-      c.addEventListener('click', function () { navigator.clipboard.writeText(msg).then(function () { c.textContent = 'Copié !'; }); });
-      var w = el('a', 'b', 'Ouvrir WhatsApp'); w.href = 'https://wa.me/?text=' + encodeURIComponent(msg); w.target = '_blank'; w.rel = 'noopener'; w.style.display = 'inline-block'; w.style.marginLeft = '8px'; w.style.textDecoration = 'none';
-      
-      out.appendChild(c); out.appendChild(w);
-      $('nLabel').value = ''; 
+      var j = await call('/admin/create', 'POST', { label: $('nLabel').value, phone: $('nPhone').value, product: $('nProd').value, immediate: $('nNow').checked });
+      $('nPhone').value = '';
+      showCodeMessage(out, '✅ Accès créé pour ' + j.label + ' : ' + j.code,
+        'Bonjour, votre paiement est bien reçu, merci.\n\nVotre espace apprenant : ' + ESPACE_URL + '\nVotre code personnel : ' + j.code + '\n\nCe code est strictement personnel : merci de ne pas le partager. Votre assistance dure 3 mois : écrivez-nous ici dès que vous êtes bloqué (réponse sous 48 heures ouvrables).\n\nBonne formation !');
+      $('nLabel').value = '';
       await load();
     } catch (e) { 
       out.appendChild(el('p', 'err', e.message)); 
@@ -276,6 +709,23 @@
       btn.textContent = 'Générer l\'accès apprenant'; btn.disabled = false;
     }
   });
+
+  // Message à envoyer à l'apprenant (nouveau code) : aperçu + « Copier » + « Ouvrir WhatsApp ».
+  function showCodeMessage(out, title, msg) {
+    out.appendChild(el('p', 'ok', title));
+    out.appendChild(el('div', 'box', msg));
+    var c = el('button', 'b', 'Copier le message'); c.type = 'button';
+    c.addEventListener('click', function () { navigator.clipboard.writeText(msg).then(function () { c.textContent = 'Copié !'; }); });
+    var w = el('a', 'b', 'Ouvrir WhatsApp'); w.href = 'https://wa.me/?text=' + encodeURIComponent(msg); w.target = '_blank'; w.rel = 'noopener'; w.style.display = 'inline-block'; w.style.marginLeft = '8px'; w.style.textDecoration = 'none';
+    out.appendChild(c); out.appendChild(w);
+  }
+
+  // Confirmations avant les actions sensibles (texte clair : ce qui va se passer).
+  var CONFIRM = {
+    active: function (s) { return s.active ? 'Désactiver le code de ' + s.label + ' ?\n\nIl ne pourra plus se connecter ni regarder les vidéos (par exemple après un remboursement).\nVous pourrez le réactiver plus tard.' : 'Réactiver le code de ' + s.label + ' ?'; },
+    more: function (s, d) { return 'Prolonger l\'accès de ' + s.label + ' de ' + d + ' jours ?'; },
+    unlock: function (s) { return 'Débloquer toutes les leçons de ' + s.label + ' maintenant, sans attendre la fin de l\'essai ?\n\nCette action ne peut pas être annulée.'; },
+  };
 
   function renderList() {
     var tb = $('rows'); tb.textContent = '';
@@ -291,7 +741,7 @@
       
       var statut = (s.essai && !s.premiereUtilisation ? 'Pas encore utilisé<br><span style="color:var(--dim);font-size:12px;">(' + s.mois + ' mois dès la 1re connexion)</span>' : fd(s.expires))
         + (s.finEssai > now ? ' <br><span style="color:#b9770e;font-weight:600;font-size:12px;">En essai : tout débloqué le ' + fd(s.finEssai) + '</span>' : '')
-        + (s.expires && s.expires < now ?' <br><span style="color:#c0392b;font-weight:600;font-size:12px;">(expiré)</span>' : '') + (s.active ? '' : ' <br><span style="color:#c0392b;font-weight:600;font-size:12px;">(coupé)</span>');
+        + (s.expires && s.expires < now ?' <br><span style="color:#c0392b;font-weight:600;font-size:12px;">(expiré)</span>' : '') + (s.active ? '' : ' <br><span style="color:#c0392b;font-weight:600;font-size:12px;">' + (s.remplace ? '(remplacé)' : '(coupé)') + '</span>');
       var tdStatut = el('td'); tdStatut.innerHTML = statut;
       tr.appendChild(tdStatut);
       
@@ -301,24 +751,14 @@
       
       var a = el('td');
       // Ajout du bouton "+ Module"
-      [['active', s.active ? 'Couper' : 'Réactiver', s.active ? 'red' : ''], ['more', '+30j', ''], ['unlock', 'Débloquer', ''], ['addModule', '+ Module', '']].forEach(function (x) {
+      [['fiche', 'Fiche', 'fic'], ['active', s.active ? 'Couper' : 'Réactiver', s.active ? 'red' : ''], ['more', '+30j', ''], ['unlock', 'Débloquer', ''], ['addModule', '+ Module', '']].forEach(function (x) {
         var b = el('button', 'b sec ' + x[2], x[1]); b.type = 'button';
         b.addEventListener('click', async function () {
+          if (x[0] === 'fiche') { openFiche(s.code); return; }
+          // Ajouter un module : choix dans une liste, dans la fiche de l'apprenant
+          if (x[0] === 'addModule') { openFiche(s.code, 'fAddMod'); return; }
+          if (!confirm(CONFIRM[x[0]](s, 30))) return;
           b.textContent = '...';
-          
-          // Logique pour ajouter un module
-          if (x[0] === 'addModule') {
-            var mod = prompt("Quel module ajouter ?\nEntrez l'identifiant :\n(arc1, arc2, qgis1, qgis2, tele, web, kobo, google)");
-            if (!mod) { b.textContent = x[1]; return; }
-            try {
-              await call('/admin/add-module', 'POST', { code: s.code, module: mod.trim().toLowerCase() });
-              await load();
-            } catch (e) { 
-              alert(e.message); 
-              b.textContent = x[1]; 
-            }
-            return;
-          }
 
           // Logique normale (couper, +30j, débloquer)
           var body = { code: s.code };
@@ -333,6 +773,7 @@
       });
       tr.appendChild(a); tb.appendChild(tr);
     });
+    $('find').dispatchEvent(new Event('input')); // garde la recherche après une action
     if (!state.students.length) { var tr = el('tr'); var td = el('td', '', 'Aucun apprenant pour le moment.'); td.colSpan = 6; td.style.textAlign = 'center'; td.style.padding = '30px'; td.style.color = 'var(--dim)'; tr.appendChild(td); tb.appendChild(tr); }
   }
 

@@ -1,0 +1,23 @@
+# PRODUCTION — Worker de l'espace apprenant (celui de vos apprenants).
+# Ne déployer qu'en suivant MISE-EN-LIGNE-PHASE-1.md. Les secrets (BUNNY_TOKEN_KEY, ADMIN_PASSWORD) restent dans Cloudflare.
+name = "espace-apprenant-api"
+main = "worker.js"
+compatibility_date = "2026-10-21"
+workers_dev = true
+preview_urls = false
+
+[vars]
+# « apprenant » : plus aucune route d'administration ici (elle passe sur geoexpert-admin, protégé par Access).
+ROLE = "apprenant"
+ALLOWED_ORIGINS = "https://geoexpertacademy.ci,https://www.geoexpertacademy.ci"
+LIBRARY_ID = "785941"
+PLAYER_HOST = "iframe.mediadelivery.net"
+
+[[kv_namespaces]]
+binding = "ACCESS"
+id = "a0325892b0844ceca1e20303c962e002"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "geoexpert-prod"
+database_id = "50f98a67-8c17-4936-a4f7-20363bdf981a"

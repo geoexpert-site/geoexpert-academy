@@ -8,11 +8,10 @@ preview_urls = false
 
 [vars]
 ROLE = "admin"
-# Tant que Cloudflare Access n'est pas activé sur ce Worker de test, la page s'ouvre avec le mot de passe seul.
-# Dès que ACCESS_AUD est renseigné, Access devient obligatoire.
-ACCESS_OPTIONAL = "oui"
-ACCESS_TEAM_DOMAIN = ""
-ACCESS_AUD = ""
+# Cloudflare Access est activé : connexion par e-mail + code obligatoire, vérifiée aussi par le Worker.
+# (Ces deux valeurs ne sont pas secrètes.)
+ACCESS_TEAM_DOMAIN = "https://gentle-haze-1336.cloudflareaccess.com"
+ACCESS_AUD = "7cca0e57cec63c97f1010e26edd71deb744d66d029e2c344b4056941b29ee4a3"
 ADMIN_EMAILS = "geographe07@gmail.com"
 ALLOWED_ORIGINS = ""
 LIBRARY_ID = "785941"

@@ -318,12 +318,12 @@ async function loadProgress(env, c) {
     const [d, n, l] = await env.DB.batch([
       env.DB.prepare('SELECT k, done_at FROM progress WHERE code = ?').bind(c),
       env.DB.prepare('SELECT k, text FROM notes WHERE code = ?').bind(c),
-      env.DB.prepare('SELECT last FROM learners WHERE code = ?').bind(c),
+      env.DB.prepare('SELECT last, last_activity FROM learners WHERE code = ?').bind(c),
     ]);
     const done = {}, notes = {};
     for (const r of d.results) done[r.k] = r.done_at;
     for (const r of n.results) notes[r.k] = r.text;
-    return { done, notes, last: (l.results[0] && l.results[0].last) || '' };
+    return { done, notes, last: (l.results[0] && l.results[0].last) || '', act: (l.results[0] && l.results[0].last_activity) || 0 };
   } catch (e) { return null; }
 }
 function entitled(rec, k, now) {
@@ -435,6 +435,7 @@ async function api(req, env, url) {
       };
     }).filter(Boolean);
     const te = trialEnd(rec);
+    const prevLogin = rec.lastLogin || 0; // avant la mise à jour ci-dessous : sert au « message du jour »
     
     const ip = req.headers.get('CF-Connecting-IP') || '';
     const h = (await sha256hex((env.ADMIN_PASSWORD || '') + ip)).slice(0, 10);
@@ -449,7 +450,14 @@ async function api(req, env, url) {
       await env.ACCESS.put('s:' + c, JSON.stringify(rec));
     }
     const progress = await loadProgress(env, c);
-    return reply({ label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods, progress }, 200, req, env);
+    // Dates pour le « message du jour » et la carte « Essai et assistance » (vraies dates uniquement).
+    const startAt = rec.premiereUtilisation || (rec.essai ? 0 : rec.created);
+    return reply({
+      label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods, progress,
+      trialStart: te > now ? rec.premiereUtilisation : 0,
+      assistanceEnd: startAt ? addMonths(startAt, 3) : 0,
+      prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
+    }, 200, req, env);
   }
 
   // Sauvegarde de la progression : la page n'envoie que ce qui a changé.
@@ -535,10 +543,112 @@ async function adminAccessOk(req, env) {
   return !!(await accessEmail(req, env));
 }
 const MAX_FAILS = 5, FAIL_WINDOW = 15 * 60000;
+
+// Tous les codes : liste KV complète (sans limite de 500) + index D1. La liste KV peut mettre jusqu'à 60 s
+// à montrer un nouveau code ; l'index D1, rempli à la création, le montre tout de suite.
+async function listCodes(env) {
+  const set = new Set();
+  let cursor = null;
+  do {
+    const l = await env.ACCESS.list(cursor ? { prefix: 's:', cursor } : { prefix: 's:' });
+    l.keys.forEach(k => set.add(k.name.slice(2)));
+    cursor = l.list_complete ? null : l.cursor;
+  } while (cursor);
+  if (env.DB) {
+    try {
+      const known = new Set((await env.DB.prepare('SELECT code FROM codes').all()).results.map(r => r.code));
+      const missing = [...set].filter(c => !known.has(c));
+      if (missing.length) await env.DB.batch(missing.map(c => env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, 0)').bind(c)));
+      known.forEach(c => set.add(c));
+    } catch (e) { /* sans index, la liste KV suffit */ }
+  }
+  return [...set];
+}
+
+// Progression enregistrée (D1), résumée par apprenant et par formation.
+async function progressSummary(env) {
+  const out = { byCode: {}, recentByModule: {} };
+  if (!env.DB) return out;
+  try {
+    const since = Date.now() - 30 * DAY;
+    const [p, l, r, ct, rl] = await env.DB.batch([
+      env.DB.prepare('SELECT code, COUNT(*) AS n, MAX(done_at) AS lastDone FROM progress GROUP BY code'),
+      env.DB.prepare('SELECT code, last, last_activity FROM learners'),
+      env.DB.prepare("SELECT substr(k, 1, instr(k, '-') - 1) AS m, COUNT(*) AS n FROM progress WHERE done_at > ? GROUP BY m").bind(since),
+      env.DB.prepare('SELECT code, phone FROM contacts'),
+      env.DB.prepare('SELECT code, kind, MAX(t) AS t FROM relances GROUP BY code, kind'),
+    ]);
+    const at = c => out.byCode[c] = out.byCode[c] || {};
+    for (const x of p.results) Object.assign(at(x.code), { n: x.n, lastDone: x.lastDone > 1 ? x.lastDone : 0, seen: true });
+    for (const x of l.results) Object.assign(at(x.code), { act: x.last_activity || 0, last: x.last || '', seen: true });
+    for (const x of r.results) out.recentByModule[x.m] = x.n;
+    for (const x of ct.results) at(x.code).phone = x.phone;
+    for (const x of rl.results) (at(x.code).marks = at(x.code).marks || {})[x.kind] = x.t;
+  } catch (e) { /* tableau de bord sans progression plutôt qu'en erreur */ }
+  return out;
+}
+
+// Relances à faire aujourd'hui pour un apprenant (règles simples, toutes basées sur de vraies dates).
+//   bienvenue   : 1re connexion il y a moins de 2 jours
+//   pascommence : code reçu depuis au moins 1 jour, jamais utilisé
+//   essai       : 5e jour d'essai ou plus, essai pas encore fini
+//   inactif     : a commencé sans finir, aucune visite depuis 7 jours (à refaire au plus une fois par semaine)
+//   bravo       : toutes les leçons terminées
+// Une relance marquée « faite » ne revient pas (sauf « inactif », qui revient 7 jours après si toujours inactif).
+const RELANCES = ['bienvenue', 'pascommence', 'essai', 'inactif', 'bravo'];
+function dueRelances(s, now) {
+  if (!s.active || (s.expires && s.expires < now)) return [];
+  const m = s.marks || {}, used = s.premiereUtilisation || s.logins || s.lastActivity, out = [];
+  const startUse = s.premiereUtilisation || 0;
+  if (startUse && now - startUse < 2 * DAY && !m.bienvenue) out.push('bienvenue');
+  if (!used && now - s.created >= DAY && !m.pascommence) out.push('pascommence');
+  if (s.finEssai > now && startUse && now - startUse >= 4 * DAY && !m.essai) out.push('essai');
+  const fini = s.lessons && s.done >= s.lessons;
+  if (used && !fini && s.lastActivity && now - s.lastActivity >= 7 * DAY && !(m.inactif && m.inactif > Math.max(s.lastActivity, now - 7 * DAY))) out.push('inactif');
+  if (fini && !m.bravo) out.push('bravo');
+  return out;
+}
+
+// Numéro WhatsApp : chiffres seulement ; 10 chiffres ivoiriens → préfixe 225. '' = pas de numéro, null = invalide.
+function normPhone(p) {
+  let d = String(p || '').replace(/[^0-9]/g, '');
+  if (!d) return '';
+  if (d.startsWith('00')) d = d.slice(2);
+  if (d.length === 10 && /^0[157]/.test(d)) d = '225' + d;
+  return d.length >= 8 && d.length <= 15 ? d : null;
+}
+
+// Chiffres du tableau de bord : uniquement de vraies données (aucune estimation).
+function dashboardStats(students, prog, now) {
+  const WEEK = 7 * DAY;
+  const valid = students.filter(s => s.active && !(s.expires && s.expires < now));
+  const used = valid.filter(s => s.premiereUtilisation || s.logins || s.lastActivity);
+  const withProg = used.filter(s => s.synced && s.lessons);
+  const modules = CATALOG.map(m => ({
+    key: m.key, title: m.title,
+    inscrits: valid.filter(s => s.modules.some(g => g.m === m.key)).length,
+    lecons30j: prog.recentByModule[m.key] || 0,
+  })).filter(m => m.inscrits || m.lecons30j).sort((a, b) => b.inscrits - a.inscrits || b.lecons30j - a.lecons30j);
+  return {
+    total: valid.length,
+    actifs: used.filter(s => now - s.lastActivity < WEEK).length,
+    nouveaux: students.filter(s => now - s.created < WEEK).length,
+    essai: valid.filter(s => s.finEssai > now).length,
+    inactifs: used.filter(s => now - s.lastActivity >= WEEK).length,
+    jamais: valid.filter(s => !(s.premiereUtilisation || s.logins || s.lastActivity)).length,
+    progression: withProg.length ? Math.round(withProg.reduce((a, s) => a + Math.min(100, s.done * 100 / s.lessons), 0) / withProg.length) : null,
+    progressionSur: withProg.length,
+    arelancer: students.filter(s => s.due && s.due.length).length,
+    desactives: students.filter(s => !s.active).length,
+    expires: students.filter(s => s.active && s.expires && s.expires < now).length,
+    modules,
+  };
+}
 async function admin(req, env, url) {
-  if (!env.ADMIN_PASSWORD || String(env.ADMIN_PASSWORD).length < 12) return reply({ error: 'Mot de passe administrateur non configuré (12 caractères minimum).' }, 500, req, env);
   const now = Date.now();
+  // D'abord la connexion par e-mail (Access) : sans elle, on ne révèle rien, même pas l'état de la configuration.
   if (!(await adminAccessOk(req, env))) return reply({ error: 'Accès refusé : connectez-vous avec votre adresse e-mail autorisée.' }, 403, req, env);
+  if (!env.ADMIN_PASSWORD || String(env.ADMIN_PASSWORD).length < 12) return reply({ error: 'Mot de passe administrateur non configuré (12 caractères minimum).' }, 500, req, env);
   const who = (await accessEmail(req, env)) || 'administrateur';
   // Limite de tentatives : 5 mots de passe faux en 15 minutes depuis la même connexion = blocage 15 minutes.
   const ip = req.headers.get('CF-Connecting-IP') || '';
@@ -567,22 +677,160 @@ async function admin(req, env, url) {
 
   if (url.pathname === '/admin/state' && req.method === 'GET') {
     const cfg = await getCfg(env);
-    const list = await env.ACCESS.list({ prefix: 's:', limit: 500 });
-    const students = [];
-    for (const k of list.keys) {
-      const rec = JSON.parse(await env.ACCESS.get(k.name));
-      students.push({
-        code: prettyCode(k.name.slice(2)), label: rec.label, created: rec.created, expires: rec.expires, active: rec.active,
+    const codes = await listCodes(env);
+    const prog = await progressSummary(env);
+    const students = (await Promise.all(codes.map(async c => {
+      const raw = await env.ACCESS.get('s:' + c);
+      if (!raw) return null;
+      const rec = JSON.parse(raw), p = prog.byCode[c] || {};
+      return {
+        code: prettyCode(c), label: rec.label, created: rec.created, expires: rec.expires, active: rec.active,
         logins: rec.logins || 0, lastLogin: rec.lastLogin || 0, networks: (rec.seen || []).length, countries: [...new Set((rec.seen || []).map(x => x.c).filter(Boolean))],
         modules: rec.modules.map(g => ({ m: g.m, from: g.from })),
         essai: !!rec.essai, premiereUtilisation: rec.premiereUtilisation || 0, finEssai: trialEnd(rec), accesComplet: !!rec.accesComplet, mois: rec.mois || 0,
-      });
-    }
+        done: p.n || 0, lessons: rec.modules.reduce((s, g) => s + ((findModule(g.m) || { videos: [] }).videos.length), 0),
+        lastActivity: Math.max(rec.lastLogin || 0, p.act || 0, p.lastDone || 0), synced: !!p.seen, remplace: !!rec.remplacePar,
+        lastLesson: p.last ? ((findModule(moduleOf(p.last)) || { videos: [] }).videos.find(v => v.k === p.last) || {}).title || '' : '',
+        phone: p.phone || '', marks: p.marks || {},
+      };
+    }))).filter(Boolean);
+    students.forEach(s => { s.due = dueRelances(s, now); });
     students.sort((a, b) => b.created - a.created);
     return reply({
       catalog: CATALOG.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, id: cfg.ids[v.k] || '' })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
-      products: Object.keys(PRODUCTS), students,
+      products: Object.keys(PRODUCTS), students, stats: dashboardStats(students, prog, now),
     }, 200, req, env);
+  }
+
+  // Fiche d'un apprenant : tout ce qu'on sait de lui, leçon par leçon, et les notes privées de suivi.
+  if (url.pathname === '/admin/student' && req.method === 'GET') {
+    const c = normCode(url.searchParams.get('code'));
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const rec = JSON.parse(raw);
+    const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' };
+    let act = 0, notes = [], phone = '', relances = [];
+    if (env.DB) {
+      const [l, n, ct, rl] = await env.DB.batch([
+        env.DB.prepare('SELECT last_activity FROM learners WHERE code = ?').bind(c),
+        env.DB.prepare('SELECT id, t, who, text FROM admin_notes WHERE code = ? ORDER BY t DESC').bind(c),
+        env.DB.prepare('SELECT phone FROM contacts WHERE code = ?').bind(c),
+        env.DB.prepare('SELECT kind, t, who FROM relances WHERE code = ? ORDER BY t DESC').bind(c),
+      ]);
+      act = (l.results[0] && l.results[0].last_activity) || 0;
+      notes = n.results;
+      phone = (ct.results[0] && ct.results[0].phone) || '';
+      relances = rl.results;
+    }
+    // Début de l'accès : première connexion (nouveaux codes) ou création (anciens codes).
+    const start = rec.premiereUtilisation || (rec.essai ? 0 : rec.created);
+    const lastLesson = progress.last && findModule(moduleOf(progress.last));
+    return reply({
+      code: prettyCode(c), label: rec.label, product: rec.product || '', active: rec.active, created: rec.created,
+      premiereUtilisation: rec.premiereUtilisation || 0, essai: !!rec.essai, accesComplet: !!rec.accesComplet,
+      finEssai: trialEnd(rec), expires: rec.expires || 0, mois: rec.mois || 0,
+      finAssistance: start ? addMonths(start, 3) : 0,
+      logins: rec.logins || 0, lastLogin: rec.lastLogin || 0, lastActivity: Math.max(rec.lastLogin || 0, act),
+      networks: (rec.seen || []).length, countries: [...new Set((rec.seen || []).map(x => x.c).filter(Boolean))],
+      lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
+      modules: rec.modules.map(g => {
+        const m = findModule(g.m); if (!m) return null;
+        return { key: m.key, title: m.title, from: g.from, lessons: m.videos.map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })) };
+      }).filter(Boolean),
+      synced: !!(act || Object.keys(progress.done).length),
+      remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
+      adminNotes: notes, phone, relances,
+    }, 200, req, env);
+  }
+
+  if (url.pathname === '/admin/note' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const text = String(b.text || '').trim().slice(0, 2000);
+    if (!text) return reply({ error: 'La note est vide.' }, 400, req, env);
+    await env.DB.prepare('INSERT INTO admin_notes (code, t, who, text) VALUES (?, ?, ?, ?)').bind(c, now, who, text).run();
+    await journal(env, who, 'Note de suivi ajoutée', prettyCode(c), JSON.parse(raw).label);
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Trace dans le journal d'une action faite dans la page (ex. export de la liste).
+  if (url.pathname === '/admin/log' && req.method === 'POST') {
+    const b = await readJson(req);
+    const allowed = ['Liste des apprenants exportée'];
+    if (!allowed.includes(b.action)) return reply({ error: 'Action inconnue.' }, 400, req, env);
+    await journal(env, who, b.action, '', '', String(b.detail || '').slice(0, 100));
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Numéro WhatsApp d'un apprenant (vide = supprimer).
+  if (url.pathname === '/admin/contact' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const phone = normPhone(b.phone);
+    if (phone === null) return reply({ error: 'Numéro WhatsApp invalide. Exemple : 07 87 01 50 30 ou +225 07 87 01 50 30.' }, 400, req, env);
+    if (phone) await env.DB.prepare('INSERT OR REPLACE INTO contacts (code, phone, updated) VALUES (?, ?, ?)').bind(c, phone, now).run();
+    else await env.DB.prepare('DELETE FROM contacts WHERE code = ?').bind(c).run();
+    await journal(env, who, phone ? 'Numéro WhatsApp enregistré' : 'Numéro WhatsApp supprimé', prettyCode(c), JSON.parse(raw).label);
+    return reply({ ok: true, phone }, 200, req, env);
+  }
+
+  // Relance faite (ou suivi de l'essai fait).
+  if (url.pathname === '/admin/relance' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    if (!RELANCES.includes(b.kind)) return reply({ error: 'Type de relance inconnu.' }, 400, req, env);
+    await env.DB.prepare('INSERT INTO relances (code, kind, t, who) VALUES (?, ?, ?, ?)').bind(c, b.kind, now, who).run();
+    await journal(env, who, 'Relance faite', prettyCode(c), JSON.parse(raw).label, b.kind);
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  if (url.pathname === '/admin/note-delete' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const row = await env.DB.prepare('SELECT code FROM admin_notes WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!row) return reply({ error: 'Note introuvable.' }, 404, req, env);
+    await env.DB.prepare('DELETE FROM admin_notes WHERE id = ?').bind(parseInt(b.id, 10)).run();
+    const raw = await env.ACCESS.get('s:' + row.code);
+    await journal(env, who, 'Note de suivi supprimée', prettyCode(row.code), raw ? JSON.parse(raw).label : '');
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Code perdu : nouveau code avec exactement les mêmes droits et la même progression ; l'ancien code est désactivé.
+  if (url.pathname === '/admin/replace' && req.method === 'POST') {
+    const b = await readJson(req);
+    const old = normCode(b.code);
+    const raw = old && await env.ACCESS.get('s:' + old);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const rec = JSON.parse(raw);
+    if (rec.remplacePar) return reply({ error: 'Ce code a déjà été remplacé par ' + prettyCode(rec.remplacePar) + '.' }, 400, req, env);
+    let code, tries = 0;
+    do { code = randomCode(12); tries++; } while ((await env.ACCESS.get('s:' + code)) && tries < 5);
+    const fresh = Object.assign({}, rec, { active: true, remplace: old });
+    await env.ACCESS.put('s:' + code, JSON.stringify(fresh));
+    if (env.DB) {
+      await env.DB.batch([
+        env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, ?)').bind(code, now),
+        env.DB.prepare('UPDATE progress SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE notes SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE learners SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE admin_notes SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE contacts SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE relances SET code = ? WHERE code = ?').bind(code, old),
+      ]);
+    }
+    rec.active = false; rec.remplacePar = code;
+    await env.ACCESS.put('s:' + old, JSON.stringify(rec));
+    await journal(env, who, 'Code remplacé (perdu)', prettyCode(code), rec.label, 'ancien code ' + prettyCode(old) + ' désactivé');
+    return reply({ code: prettyCode(code), label: rec.label }, 200, req, env);
   }
 
   if (url.pathname === '/admin/create' && req.method === 'POST') {
@@ -591,6 +839,8 @@ async function admin(req, env, url) {
     const prod = PRODUCTS[b.product];
     if (!label) return reply({ error: 'Indiquez un nom ou des initiales.' }, 400, req, env);
     if (!prod) return reply({ error: 'Produit inconnu.' }, 400, req, env);
+    const phone = normPhone(b.phone);
+    if (phone === null) return reply({ error: 'Numéro WhatsApp invalide. Exemple : 07 87 01 50 30 ou +225 07 87 01 50 30.' }, 400, req, env);
     // Nouveaux codes : tous les modules du produit dès le départ, limités par l'essai de 7 jours.
     // La date de fin (12 ou 24 mois) est fixée à la première utilisation du code.
     const modules = prod.now.concat(prod.later).map(m => ({ m, from: now }));
@@ -601,6 +851,8 @@ async function admin(req, env, url) {
       essai: true, mois: b.product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: !!b.immediate,
     };
     await env.ACCESS.put('s:' + code, JSON.stringify(rec));
+    if (env.DB) await env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, ?)').bind(code, now).run();
+    if (env.DB && phone) await env.DB.prepare('INSERT OR REPLACE INTO contacts (code, phone, updated) VALUES (?, ?, ?)').bind(code, phone, now).run();
     await journal(env, who, 'Code créé', prettyCode(code), label, b.product + (b.immediate ? ', sans période d\'essai' : ', avec période d\'essai'));
     return reply({ code: prettyCode(code), label, expires: rec.expires }, 200, req, env);
   }
@@ -611,6 +863,7 @@ async function admin(req, env, url) {
     const raw = c && await env.ACCESS.get('s:' + c);
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw);
+    if (b.active === true && rec.remplacePar) return reply({ error: 'Ce code a été remplacé par ' + prettyCode(rec.remplacePar) + ' : il ne peut pas être réactivé.' }, 400, req, env);
     if (typeof b.active === 'boolean') rec.active = b.active;
     if (b.addDays) {
       const add = Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500);
@@ -634,8 +887,7 @@ async function admin(req, env, url) {
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     
     const mod = String(b.module || '').trim();
-    const validModules = ['arc1', 'arc2', 'qgis1', 'qgis2', 'tele', 'web', 'kobo', 'google'];
-    if (!validModules.includes(mod)) return reply({ error: 'Module inconnu.' }, 400, req, env);
+    if (!findModule(mod)) return reply({ error: 'Module inconnu.' }, 400, req, env);
 
     const rec = JSON.parse(raw);
     if (!rec.modules.find(g => g.m === mod)) {

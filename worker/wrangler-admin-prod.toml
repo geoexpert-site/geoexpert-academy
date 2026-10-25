@@ -1,0 +1,26 @@
+# PRODUCTION — Worker d'administration (même code, ROLE = "admin"), derrière Cloudflare Access.
+# Tant que ACCESS_AUD est vide, il refuse TOUT (aucun accès possible) : c'est voulu.
+# Access activé le 25/10/2026 (valeurs non secrètes).
+name = "geoexpert-admin"
+main = "worker.js"
+compatibility_date = "2026-10-21"
+workers_dev = true
+preview_urls = false
+
+[vars]
+ROLE = "admin"
+ACCESS_TEAM_DOMAIN = "https://gentle-haze-1336.cloudflareaccess.com"
+ACCESS_AUD = "b9fdfe4ce2c6eeeae394615eabf0ae10d0fa4af2b7b2e234c649726d5eff22e8"
+ADMIN_EMAILS = "geographe07@gmail.com"
+ALLOWED_ORIGINS = ""
+LIBRARY_ID = "785941"
+PLAYER_HOST = "iframe.mediadelivery.net"
+
+[[kv_namespaces]]
+binding = "ACCESS"
+id = "a0325892b0844ceca1e20303c962e002"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "geoexpert-prod"
+database_id = "50f98a67-8c17-4936-a4f7-20363bdf981a"
