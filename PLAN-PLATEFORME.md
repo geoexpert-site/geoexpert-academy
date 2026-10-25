@@ -118,7 +118,13 @@
   - fichiers par leçon (`<leçon>-fN`), vrai nom/extension gardés ; catalogue mis en cache 30 s dans le Worker
   - **corrigé au passage (bug déjà en ligne)** : les téléchargements arrivaient tous en « Exercice_GeoExpert.pdf » (en-tête non exposé) → vrai nom + extension
 - [x] Fin de phase 3 : guide (§7 bis, §7 ter, §8), politique de confidentialité, `MISE-EN-LIGNE-PHASE-3.md`, `RAPPORT-PHASE-3.md`
-- [ ] **Mise en ligne de la phase 3** (attend l'accord de l'administrateur)
+- [x] **Mise en ligne de la phase 3 — EN LIGNE le 25/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-25-avant-mise-en-ligne-phase-3\` ; tables `content`, `certificates`, `reviews` ajoutées en production
+  - `geoexpert-admin` → e6713b5d (avant : 26e1e07e) ; `espace-apprenant-api` → 76f93681 (avant : 7a610aab) ; `main` = fd06f46
+  - ancienne page + nouveau Worker vérifiée avant publication : 8/8
+  - production vérifiée : 6/6 (carte attestation + PDF réel, avis, page « Vérifier un certificat » en ligne) + téléchargement réel
+    « Exercice_pratique_1.pdf » avec son vrai nom ; code de test, attestation et avis de test supprimés (production propre)
+  - en attente : validation de la phase 3 par l'administrateur
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
@@ -190,7 +196,7 @@
 - Sauvegarde avant phase 3 : `GeoExpert-Sauvegardes\2026-10-25-avant-phase-3\` ; étiquette `sauvegarde-avant-phase-3` ; branche `phase-3`.
 - Faits et testés : attestations + page « Vérifier un certificat », avis, gestion du contenu, fichiers par leçon.
 - Preuve pixel phase 3 : `comparer-elements.mjs … cacher phase-3` (référence = fin de phase 2).
-- Prochaine étape : mise en ligne de la phase 3 avec l'accord de l'administrateur (voir MISE-EN-LIGNE-PHASE-3.md), puis validation.
+- **Phase 3 en ligne le 25/10/2026** (production vérifiée). Prochaine étape : validation de la phase 3 par l'administrateur. Le plan des 3 phases est alors terminé.
 - Après le codage : l'administrateur ajoutera les vidéos manquantes, le fichier de l'exercice 2 ArcGIS 1 et les numéros WhatsApp.
 - Preuve pixel de la phase 2 : comparer avec la page de `sauvegarde-avant-phase-2` (phase 1 comprise) en masquant les nouveautés de la phase 2.
 
