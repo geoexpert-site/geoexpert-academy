@@ -89,6 +89,25 @@ CREATE TABLE IF NOT EXISTS exercises (
   PRIMARY KEY (code, k)
 );
 
+-- Mini-quiz d'une leçon (contenu écrit dans l'administration). data = JSON
+-- [{ "q": question, "choices": [2 à 4 réponses], "answer": index de la bonne, "explain": explication facultative }]
+CREATE TABLE IF NOT EXISTS quizzes (
+  k TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated INTEGER,
+  who TEXT
+);
+
+-- Dernier résultat de chaque apprenant à chaque quiz.
+CREATE TABLE IF NOT EXISTS quiz_results (
+  code TEXT NOT NULL,
+  k TEXT NOT NULL,
+  score INTEGER NOT NULL,
+  total INTEGER NOT NULL,
+  t INTEGER NOT NULL,
+  PRIMARY KEY (code, k)
+);
+
 -- Préférences de l'apprenant : objectif de la semaine (nombre de leçons, 0 = pas d'objectif).
 CREATE TABLE IF NOT EXISTS prefs (
   code TEXT PRIMARY KEY,

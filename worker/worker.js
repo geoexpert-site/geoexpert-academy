@@ -314,6 +314,28 @@ async function loadAnnonces(env, rec, now) {
     return r.results.filter(a => !a.module || mine.has(a.module)).slice(0, 3).map(a => ({ id: a.id, t: a.t, text: a.text }));
   } catch (e) { return []; }
 }
+// Leçons de l'apprenant qui ont un mini-quiz (seulement les clés : les questions sont envoyées à l'ouverture du quiz).
+async function loadQuizKeys(env, rec) {
+  if (!env.DB) return [];
+  try { return (await env.DB.prepare('SELECT k FROM quizzes').all()).results.map(r => r.k).filter(k => ownsLesson(rec, k)); }
+  catch (e) { return []; }
+}
+// Vérifie et nettoie un quiz écrit dans l'administration. Renvoie { questions } ou { error }.
+function cleanQuiz(qs) {
+  if (!Array.isArray(qs) || qs.length < 1 || qs.length > 5) return { error: 'Un quiz contient de 1 à 5 questions.' };
+  const out = [];
+  for (let i = 0; i < qs.length; i++) {
+    const x = qs[i] || {}, n = i + 1;
+    const q = String(x.q || '').trim().slice(0, 300);
+    const choices = (Array.isArray(x.choices) ? x.choices : []).map(c => String(c || '').trim().slice(0, 150)).filter(Boolean);
+    const answer = parseInt(x.answer, 10);
+    if (!q) return { error: 'Question ' + n + ' : écrivez la question.' };
+    if (choices.length < 2 || choices.length > 4) return { error: 'Question ' + n + ' : il faut de 2 à 4 réponses.' };
+    if (!(answer >= 0 && answer < choices.length)) return { error: 'Question ' + n + ' : choisissez la bonne réponse.' };
+    out.push({ q, choices, answer, explain: String(x.explain || '').trim().slice(0, 300) });
+  }
+  return { questions: out };
+}
 // Leçon (vidéo) d'un module de l'apprenant.
 function ownsLesson(rec, k) {
   const m = findModule(moduleOf(k));
@@ -475,7 +497,32 @@ async function api(req, env, url) {
       assistanceEnd: startAt ? addMonths(startAt, 3) : 0,
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
+      quiz: await loadQuizKeys(env, rec),
     }, 200, req, env);
+  }
+
+  // Mini-quiz : questions sans les bonnes réponses ; la correction se fait ici, sur le serveur.
+  if (url.pathname === '/api/quiz' || url.pathname === '/api/quiz-answer') {
+    if (!env.DB) return reply({ error: 'Quiz indisponible pour le moment.' }, 503, req, env);
+    const k = String(body.k || '');
+    const e = entitled(rec, k, now);
+    if (!ownsLesson(rec, k) || !e.ok) return reply({ error: 'Ce quiz n\'est pas disponible pour vous.' }, 403, req, env);
+    const row = await env.DB.prepare('SELECT data FROM quizzes WHERE k = ?').bind(k).first();
+    if (!row) return reply({ error: 'Pas de quiz pour cette leçon.' }, 404, req, env);
+    const qs = JSON.parse(row.data);
+    if (url.pathname === '/api/quiz') {
+      const last = await env.DB.prepare('SELECT score, total, t FROM quiz_results WHERE code = ? AND k = ?').bind(c, k).first();
+      return reply({ questions: qs.map(x => ({ q: x.q, choices: x.choices })), last: last || null }, 200, req, env);
+    }
+    const ans = Array.isArray(body.answers) ? body.answers : [];
+    if (ans.length !== qs.length) return reply({ error: 'Répondez à toutes les questions.' }, 400, req, env);
+    const ok = qs.map((x, i) => parseInt(ans[i], 10) === x.answer);
+    const score = ok.filter(Boolean).length;
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO quiz_results (code, k, score, total, t) VALUES (?, ?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET score = excluded.score, total = excluded.total, t = excluded.t').bind(c, k, score, qs.length, now),
+      env.DB.prepare('INSERT INTO learners (code, last, last_activity) VALUES (?, NULL, ?) ON CONFLICT (code) DO UPDATE SET last_activity = excluded.last_activity').bind(c, now),
+    ]);
+    return reply({ score, total: qs.length, ok, answers: qs.map(x => x.answer), explain: qs.map(x => x.explain || '') }, 200, req, env);
   }
 
   // Sauvegarde de la progression : la page n'envoie que ce qui a changé.
@@ -794,6 +841,39 @@ async function admin(req, env, url) {
     return reply({ ok: true }, 200, req, env);
   }
 
+  // Mini-quiz : liste (avec statistiques), enregistrement, suppression.
+  if (url.pathname === '/admin/quizzes' && req.method === 'GET') {
+    if (!env.DB) return reply({ quizzes: [] }, 200, req, env);
+    const [q, r] = await env.DB.batch([
+      env.DB.prepare('SELECT k, data, updated, who FROM quizzes'),
+      env.DB.prepare('SELECT k, COUNT(*) AS n, AVG(score * 100.0 / total) AS avg FROM quiz_results GROUP BY k'),
+    ]);
+    const st = {}; r.results.forEach(x => { st[x.k] = { n: x.n, avg: Math.round(x.avg) }; });
+    return reply({ quizzes: q.results.map(x => ({ k: x.k, questions: JSON.parse(x.data), updated: x.updated, who: x.who, stats: st[x.k] || { n: 0, avg: null } })) }, 200, req, env);
+  }
+  if (url.pathname === '/admin/quiz' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const k = String(b.k || ''), m = findModule(moduleOf(k)), v = m && m.videos.find(x => x.k === k);
+    if (!v) return reply({ error: 'Leçon inconnue.' }, 400, req, env);
+    const cq = cleanQuiz(b.questions);
+    if (cq.error) return reply({ error: cq.error }, 400, req, env);
+    await env.DB.prepare('INSERT INTO quizzes (k, data, updated, who) VALUES (?, ?, ?, ?) ON CONFLICT (k) DO UPDATE SET data = excluded.data, updated = excluded.updated, who = excluded.who').bind(k, JSON.stringify(cq.questions), now, who).run();
+    await journal(env, who, 'Quiz enregistré', '', '', m.title.split(' : ')[0] + ' / ' + v.title.slice(0, 50) + ' (' + cq.questions.length + ' question(s))');
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/quiz-delete' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const k = String(b.k || '');
+    const row = await env.DB.prepare('SELECT k FROM quizzes WHERE k = ?').bind(k).first();
+    if (!row) return reply({ error: 'Quiz introuvable.' }, 404, req, env);
+    await env.DB.batch([env.DB.prepare('DELETE FROM quizzes WHERE k = ?').bind(k), env.DB.prepare('DELETE FROM quiz_results WHERE k = ?').bind(k)]);
+    const m = findModule(moduleOf(k)), v = m && m.videos.find(x => x.k === k);
+    await journal(env, who, 'Quiz supprimé', '', '', v ? m.title.split(' : ')[0] + ' / ' + v.title.slice(0, 50) : k);
+    return reply({ ok: true }, 200, req, env);
+  }
+
   // Annonces du formateur : liste, publication, retrait.
   if (url.pathname === '/admin/annonces' && req.method === 'GET') {
     if (!env.DB) return reply({ annonces: [] }, 200, req, env);
@@ -842,7 +922,7 @@ async function admin(req, env, url) {
     if (env.DB) {
       const st = [];
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'codes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
       }
       await env.DB.batch(st);
@@ -923,6 +1003,7 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE relances SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE exercises SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE prefs SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE quiz_results SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;

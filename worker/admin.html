@@ -126,6 +126,15 @@
   .a-card .arow select { width: auto; max-width: 260px; padding: 7px 10px; font-size: 13px; }
   .acts .warn { margin: 12px 14px; display: block; }
   .acts > .b { margin: 0 14px 12px; }
+  /* Quiz */
+  .qq { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 12px; }
+  .qq h4 { margin: 0 0 8px; font: 700 14px Montserrat; color: var(--indigo); display: flex; justify-content: space-between; align-items: center; }
+  .qq textarea, .qq input[type=text] { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; font: 14px Inter; background: var(--bg); }
+  .qq .ch { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qq .ch input[type=radio] { width: 18px; height: 18px; accent-color: #0a7a3b; flex: none; }
+  .qq .ch input[type=text] { flex: 1; }
+  .qq small { color: var(--dim); font-size: 12px; }
+
   /* Annonces */
   .annprev { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: 12px; padding: 12px 16px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
   .annprev b { font-family: Montserrat, sans-serif; }
@@ -191,6 +200,7 @@
       <button data-t="dash" class="on">📊 Tableau de bord</button>
       <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
       <button data-t="ann">📢 Annonces</button>
+      <button data-t="quiz">❓ Quiz</button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
@@ -223,6 +233,18 @@
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants dont l'essai de 7 jours est en cours, avec le jour où ils en sont.</p>
         <div id="trialList"></div>
       </div>
+    </div>
+
+    <!-- Onglet Quiz -->
+    <div data-p="quiz" hidden>
+      <div class="a-card">
+        <h2>Mini-quiz des leçons</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">2 ou 3 questions à la fin des leçons importantes, pour que l'apprenant vérifie qu'il a compris. Il voit un onglet « Quiz » sous la leçon ; la correction et les explications s'affichent après sa réponse.</p>
+        <label for="qMod">Formation</label>
+        <select id="qMod"></select>
+        <div id="qList" style="margin-top:16px;"></div>
+      </div>
+      <div class="a-card" id="qEdit" hidden></div>
     </div>
 
     <!-- Onglet Annonces -->
@@ -350,7 +372,81 @@
     state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
     renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
+    QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
     renderLog((await call('/admin/journal', 'GET')).entries);
+  }
+
+  // ----- Mini-quiz
+  var QZ = [];
+  function quizOf(k) { return QZ.filter(function (q) { return q.k === k; })[0]; }
+  function renderQuizList() {
+    var sel = $('qMod'), v = sel.value; sel.textContent = '';
+    state.catalog.forEach(function (m) { var n = m.videos.filter(function (x) { return quizOf(x.k); }).length; var o = el('option', '', m.title.split(' : ')[0] + (n ? ' (' + n + ' quiz)' : '')); o.value = m.key; sel.appendChild(o); });
+    sel.value = v || state.catalog[0].key;
+    var m = state.catalog.filter(function (c) { return c.key === sel.value; })[0], box = $('qList'); box.textContent = '';
+    var wrap = el('div', 'acts'); box.appendChild(wrap);
+    m.videos.forEach(function (x) {
+      var q = quizOf(x.k);
+      var r = actRow(x.title, q ? '✓ Quiz de ' + q.questions.length + ' question(s) · ' + (q.stats.n ? q.stats.n + ' apprenant(s) ont répondu, moyenne ' + q.stats.avg + ' %' : 'personne n\'a encore répondu') : 'Pas de quiz');
+      var b = el('button', 'b sec' + (q ? ' fic' : ''), q ? 'Modifier' : 'Créer un quiz'); b.type = 'button';
+      b.addEventListener('click', function () { editQuiz(x); });
+      r.ctl.appendChild(b); wrap.appendChild(r.row);
+    });
+  }
+  $('qMod').addEventListener('change', function () { $('qEdit').hidden = true; renderQuizList(); });
+  function editQuiz(lesson) {
+    var q = quizOf(lesson.k), qs = q ? JSON.parse(JSON.stringify(q.questions)) : [{ q: '', choices: ['', '', ''], answer: -1, explain: '' }];
+    var box = $('qEdit'); box.hidden = false;
+    function draw() {
+      box.textContent = '';
+      box.appendChild(el('h2', '', (q ? 'Modifier' : 'Créer') + ' le quiz'));
+      box.appendChild(el('p', '', lesson.title)).style.cssText = 'margin:-12px 0 6px;color:var(--dim);font-size:14px;';
+      qs.forEach(function (x, i) {
+        var d = el('div', 'qq'), h4 = el('h4', '', 'Question ' + (i + 1));
+        if (qs.length > 1) { var rm = el('button', 'b sec red', 'Retirer'); rm.type = 'button'; rm.addEventListener('click', function () { qs.splice(i, 1); draw(); }); h4.appendChild(rm); }
+        d.appendChild(h4);
+        var ta = el('textarea'); ta.rows = 2; ta.maxLength = 300; ta.value = x.q; ta.placeholder = 'Ex : Quel format permet de stocker plusieurs couches dans un seul fichier ?'; ta.setAttribute('aria-label', 'Question ' + (i + 1));
+        ta.addEventListener('input', function () { x.q = ta.value; }); d.appendChild(ta);
+        d.appendChild(el('small', '', 'Réponses (2 à 4) — cochez la bonne :'));
+        for (var c = 0; c < 4; c++) (function (c) {
+          var row = el('div', 'ch'), rd = el('input'); rd.type = 'radio'; rd.name = 'ok' + i; rd.checked = x.answer === c; rd.setAttribute('aria-label', 'Bonne réponse : réponse ' + (c + 1));
+          rd.addEventListener('change', function () { x.answer = c; });
+          var inp = el('input'); inp.type = 'text'; inp.maxLength = 150; inp.value = x.choices[c] || ''; inp.placeholder = 'Réponse ' + (c + 1) + (c > 1 ? ' (facultative)' : '');
+          inp.addEventListener('input', function () { x.choices[c] = inp.value; });
+          row.appendChild(rd); row.appendChild(inp); d.appendChild(row);
+        })(c);
+        var ex = el('input'); ex.type = 'text'; ex.maxLength = 300; ex.value = x.explain || ''; ex.placeholder = 'Explication affichée après la réponse (facultative)'; ex.style.marginTop = '8px';
+        ex.addEventListener('input', function () { x.explain = ex.value; }); d.appendChild(ex);
+        box.appendChild(d);
+      });
+      var bar = el('div'); bar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;';
+      if (qs.length < 5) { var add = el('button', 'b sec', '+ Ajouter une question'); add.type = 'button'; add.addEventListener('click', function () { qs.push({ q: '', choices: ['', '', ''], answer: -1, explain: '' }); draw(); }); bar.appendChild(add); }
+      var save = el('button', 'b', 'Enregistrer le quiz'); save.type = 'button'; save.style.marginTop = '0';
+      var cancel = el('button', 'b sec', 'Annuler'); cancel.type = 'button'; cancel.addEventListener('click', function () { box.hidden = true; });
+      bar.appendChild(save); bar.appendChild(cancel);
+      if (q) {
+        var del = el('button', 'b sec red', 'Supprimer le quiz'); del.type = 'button'; bar.appendChild(del);
+        del.addEventListener('click', async function () {
+          if (!confirm('Supprimer ce quiz et les résultats des apprenants ?\n\n' + lesson.title)) return;
+          try { await call('/admin/quiz-delete', 'POST', { k: lesson.k }); box.hidden = true; await load(); } catch (e) { alert(e.message); }
+        });
+      }
+      var msg = el('div'); box.appendChild(bar); box.appendChild(msg);
+      save.addEventListener('click', async function () {
+        msg.className = ''; msg.textContent = '';
+        // On enlève les réponses vides et on recalcule la position de la bonne réponse.
+        var clean = qs.map(function (x) {
+          var ch = [], ans = -1;
+          x.choices.forEach(function (t, c) { if (String(t || '').trim()) { if (c === x.answer) ans = ch.length; ch.push(t.trim()); } });
+          return { q: x.q, choices: ch, answer: ans, explain: x.explain };
+        });
+        save.disabled = true; save.textContent = 'Enregistrement...';
+        try { await call('/admin/quiz', 'POST', { k: lesson.k, questions: clean }); box.hidden = true; await load(); $('qList').scrollIntoView({ block: 'start' }); }
+        catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+        finally { save.disabled = false; save.textContent = 'Enregistrer le quiz'; }
+      });
+    }
+    draw(); box.scrollIntoView({ block: 'start' });
   }
 
   // ----- Annonces

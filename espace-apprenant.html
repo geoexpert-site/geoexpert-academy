@@ -105,6 +105,10 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .bi{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--dim)}.bi .ic{width:15px;height:15px}.bd.on .bi{background:var(--teal);color:#fff}
 .exd{display:flex;align-items:center;gap:8px;margin:-4px 0 6px 30px;font-size:13.5px;color:var(--dim);cursor:pointer}.exd input{width:17px;height:17px;accent-color:var(--teal)}.exd.on{color:var(--teal);font-weight:600}
 .nt{margin-bottom:12px}.nt h3{font-size:16px;margin:2px 0 8px}.ntx{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;font-size:14.5px}
+.qzq{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px;background:var(--card)}.qzq legend{font-weight:600;padding:0 4px}
+.qzc{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:8px;cursor:pointer}.qzc:hover{background:var(--soft)}.qzc input{margin-top:3px;accent-color:var(--teal)}
+.qzc.bon{background:rgba(10,122,59,.12);font-weight:600}.qzc.faux{background:rgba(192,57,43,.12)}.qze{margin:8px 4px 2px;font-size:13.5px}.qze.bon{color:#0a7a3b}.qze.faux{color:#c0392b}[data-theme=dark] .qze.bon{color:#5fd08f}[data-theme=dark] .qze.faux{color:#ff8a7a}
+.qzr{margin-top:12px;font-weight:600}.qzr.ok{color:#0a7a3b}.qzr.ko{color:#c0392b}[data-theme=dark] .qzr.ok{color:#5fd08f}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
@@ -490,7 +494,8 @@ m.appendChild(h('div',{class:'ctl'},
 ));
 
  var tabs=h('div',{class:'tabs'}),pn=h('div',{class:'pn'});
- [['notes','Mes notes'],['ex','Exercices'],['aide','Aide']].forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
+ var hasQuiz=!l.lock&&(D.quiz||[]).indexOf(k)>-1;if(tab==='quiz'&&!hasQuiz)tab='notes';
+ [['notes','Mes notes'],['ex','Exercices'],['aide','Aide']].concat(hasQuiz?[['quiz','Quiz']]:[]).forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
  if(tab==='notes'){var ta=h('textarea',{placeholder:'Écrivez vos notes pour cette leçon : elles sont enregistrées automatiquement sur votre compte.','aria-label':'Mes notes'});ta.value=P.notes[k]||'';var tm;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){setNote(k,ta.value)},400)});pn.appendChild(ta)}
  
  // --- CORRECTION DES BOUTONS D'EXERCICES ---
@@ -515,7 +520,39 @@ m.appendChild(h('div',{class:'ctl'},
  
  if(tab==='aide'){pn.appendChild(h('p',{text:'Bloqué sur cette leçon ? Écrivez au formateur : votre message contient déjà le titre de la leçon.'}));
   pn.appendChild(h('a',{class:'btn wa',href:wa('Bonjour GeoExpert Academy, j\'ai un blocage sur : '+l.m.title+' / '+l.t),target:'_blank',rel:'noopener'},ic('help'),'Demander de l\'aide'))}
+ if(tab==='quiz')quiz(k,pn);
  m.appendChild(tabs);m.appendChild(pn);side();
+}
+
+// ===== Mini-quiz (onglet « Quiz ») : les questions viennent du serveur, qui corrige et renvoie les explications.
+async function quiz(k,pn){
+ pn.appendChild(h('p',{class:'note',text:'Chargement du quiz...'}));
+ try{var r=await post('/api/quiz',{code:code,k:k}),j=await r.json();if(!r.ok)throw new Error(j.error)}
+ catch(e){pn.textContent='';pn.appendChild(h('p',{class:'note',text:e.message||'Quiz indisponible pour le moment. Vérifiez votre connexion.'}));return}
+ pn.textContent='';
+ var intro=h('p',{class:'note',text:j.last?'Votre dernier résultat : '+j.last.score+' / '+j.last.total+' (le '+fdate(j.last.t)+'). Vous pouvez le refaire autant de fois que vous voulez.':'Quelques questions pour vérifier que vous avez bien compris la leçon.'});
+ pn.appendChild(intro);
+ var form=h('div',{class:'qz'}),sel=[];
+ j.questions.forEach(function(x,i){
+  var box=h('fieldset',{class:'qzq'},h('legend',{text:(i+1)+'. '+x.q}));
+  x.choices.forEach(function(c,ci){var rd=h('input',{type:'radio',name:'qz'+i,value:String(ci)});rd.addEventListener('change',function(){sel[i]=ci});
+   box.appendChild(h('label',{class:'qzc'},rd,h('span',{text:c})))});
+  form.appendChild(box)});
+ var res=h('div',{role:'status'}),btn=h('button',{class:'btn mag'},'Valider mes réponses');
+ btn.addEventListener('click',async function(){
+  if(j.questions.some(function(x,i){return sel[i]===undefined})){res.textContent='Répondez à toutes les questions avant de valider.';res.className='qzr ko';return}
+  btn.disabled=true;
+  try{var r2=await post('/api/quiz-answer',{code:code,k:k,answers:sel}),c=await r2.json();if(!r2.ok)throw new Error(c.error)}
+  catch(e){res.textContent=e.message||'Envoi impossible. Vérifiez votre connexion.';res.className='qzr ko';btn.disabled=false;return}
+  form.querySelectorAll('.qzq').forEach(function(f,i){
+   f.querySelectorAll('input').forEach(function(x){x.disabled=true});
+   f.querySelectorAll('.qzc').forEach(function(lb,ci){if(ci===c.answers[i])lb.classList.add('bon');else if(ci===sel[i])lb.classList.add('faux')});
+   f.appendChild(h('p',{class:'qze '+(c.ok[i]?'bon':'faux'),text:(c.ok[i]?'✓ Bonne réponse.':'✗ La bonne réponse est : « '+j.questions[i].choices[c.answers[i]]+' ».')+(c.explain[i]?' '+c.explain[i]:'')}))});
+  res.className='qzr '+(c.score===c.total?'ok':'');
+  res.textContent=c.score===c.total?'Bravo, '+c.score+' / '+c.total+' : vous avez tout compris !':'Résultat : '+c.score+' / '+c.total+'. Revoyez le passage de la vidéo concerné, puis réessayez.';
+  btn.replaceWith(h('button',{class:'btn alt',onclick:function(){tab='quiz';lesson(k)}},'Refaire le quiz'));
+ });
+ form.appendChild(btn);form.appendChild(res);pn.appendChild(form);
 }
 
 async function play(l,pl){
