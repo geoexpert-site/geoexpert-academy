@@ -156,7 +156,13 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
   - secrets installés par l'administrateur via le panneau Terminal (Claude lance la commande, l'administrateur colle) : méthode à reprendre en production
   - Worker de test : `DP_LIENS_TEST` = `Ez59IkOJHAO1` → google ; versions `espace-apprenant-api-test` ada0776e, `geoexpert-admin-test` c559f972
   - ⚠️ l'admin de test a son propre mot de passe (`GeoExpert-Outils\mot-de-passe-admin-TEST.txt`) : bien le préciser
-- [ ] Mise en ligne (partie B), après accord de l'administrateur — **prochaine étape**
+- [x] **Mise en ligne — EN SERVICE le 25/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes6-10-25-avant-mise-en-ligne-paiements\` ; table `paiements` ajoutée dans `geoexpert-prod`
+  - `geoexpert-admin` → d9240891 (avant : e6713b5d) ; `espace-apprenant-api` → 0c9d319f (avant : 76f93681)
+  - clé DigitalPaye Production « Site GeoExpert » (sans « Retrait »), 3 secrets installés par l'administrateur via le Terminal (vérifiés par nom)
+  - vérifié : connexion apprenant et certificats inchangés, admin protégé par Access, faux webhook refusé (401), « Envoyer un test » de DigitalPaye livré (200)
+  - site publié (politique de confidentialité) : fusion de `paiements` dans `main`
+  - à suivre : premier vrai paiement dans « Paiements reçus » ; réponse du support DigitalPaye (API parfois en 520 depuis Cloudflare)
 - Points à suivre : date de déblocage du message = si le client se connecte le jour même ; un nouveau lien de paiement
   doit être ajouté à `LIENS` (sinon « À vérifier ») ; paiements ignorés sans code : pas encore de suppression automatique.
 
@@ -250,4 +256,5 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 ### 25 octobre 2026 — Session 3 : paiements automatiques DigitalPaye
 - Étape 1 (documentation) validée par l'administrateur ; le lien payé est transmis (`payment_link_token`).
 - Sauvegarde, branche `paiements`, Worker + admin + tests (49/49), Worker de test déployé, documents.
-- Test Sandbox réussi de bout en bout ; mode de secours ajouté (API parfois bloquée, webhook minimal). En attente : accord pour la mise en ligne.
+- Test Sandbox réussi de bout en bout ; mode de secours ajouté (API parfois bloquée, webhook minimal).
+- **Mise en ligne faite le 25/10/2026** : réception des paiements en service en production (test DigitalPaye livré, HTTP 200).
