@@ -140,6 +140,13 @@
   .cl .clf button { border: 0; background: none; color: #c0392b; cursor: pointer; font: 600 12px Inter; }
   .cl .clf label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--teal); font-weight: 600; }
   .cl .clf input[type=file] { font-size: 12px; max-width: 230px; }
+  .cl .clf label.r2l { flex-wrap: wrap; }
+  .cl .clf select { width: auto; max-width: 100%; padding: 4px 8px; font-size: 12px; }
+  .r2t { overflow-x: auto; }
+  .r2use { height: 10px; border-radius: 6px; background: var(--soft); overflow: hidden; margin: 8px 0 4px; }
+  .r2use i { display: block; height: 100%; background: var(--teal); }
+  .r2use.haut i { background: #d35400; }
+  #r2Box table td { overflow-wrap: anywhere; }
   .cbar { position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 12px 0 4px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .cbar .dirty { color: var(--mag); font-weight: 600; font-size: 13px; }
   @media (max-width: 768px) { .cl .clr { grid-template-columns: 28px 1fr 70px; } .cl .clb { grid-column: 1 / -1; justify-content: flex-start; } .cl .clf { margin-left: 0; } }
@@ -285,6 +292,11 @@
         <label for="cMod">Formation</label>
         <select id="cMod"></select>
         <div id="cList" style="margin-top:14px;"></div>
+      </div>
+      <div class="a-card" id="r2Card">
+        <h2>📦 Gros fichiers (stockage R2)</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Pour les fichiers de plus de 10 Mo (cartes, données d'exercices, projets finaux). Déposez-les d'abord dans le stockage R2 (voir le guide), puis rattachez-les à une leçon ci-dessus avec « 📦 Rattacher un gros fichier ». Le stockage n'est jamais public : seuls les apprenants qui ont droit à la leçon peuvent télécharger.</p>
+        <div id="r2Box"></div>
       </div>
     </div>
 
@@ -443,7 +455,8 @@
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
     QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
     renderAttestations(await call('/admin/attestations', 'GET'));
-    renderContent(true);
+    try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
+    renderContent(true); renderR2();
     renderLog((await call('/admin/journal', 'GET')).entries);
   }
 
@@ -485,10 +498,10 @@
       // Fichiers joints à la leçon (gérés tout de suite, sans attendre « Enregistrer »)
       var fz = el('div', 'clf');
       (v.files || []).forEach(function (f) {
-        var line = el('span'); line.appendChild(el('span', '', '📎 ' + f.title + (f.has ? '' : ' (envoi en attente)')));
+        var line = el('span'); line.appendChild(el('span', '', (f.r2 ? '📦 ' : '📎 ') + f.title + (f.r2 ? ' (gros fichier, ' + fsize(f.size) + ')' : f.has ? '' : ' (envoi en attente)')));
         var x = el('button', '', 'Retirer'); x.type = 'button';
         x.addEventListener('click', async function () {
-          if (!confirm('Retirer le fichier « ' + f.title + ' » de cette leçon ?\n\nIl sera supprimé et les apprenants ne pourront plus le télécharger.')) return;
+          if (!confirm('Retirer le fichier « ' + f.title + ' » de cette leçon ?\n\n' + (f.r2 ? 'Les apprenants ne pourront plus le télécharger. Le fichier reste dans le stockage R2 (supprimez-le dans Cloudflare si vous n\'en avez plus besoin).' : 'Il sera supprimé et les apprenants ne pourront plus le télécharger.'))) return;
           try { await call('/admin/lesson-file-delete', 'POST', { k: f.k }); await reloadContent(); } catch (e) { alert(e.message); }
         });
         line.appendChild(x); fz.appendChild(line);
@@ -498,7 +511,7 @@
         var inp = el('input'); inp.type = 'file'; inp.setAttribute('aria-label', 'Joindre un fichier à la leçon ' + (i + 1)); lab.appendChild(inp); fz.appendChild(lab);
         inp.addEventListener('change', async function () {
           var file = inp.files[0]; if (!file) return;
-          if (file.size > 10 * 1024 * 1024) { alert('Fichier trop volumineux (10 Mo au maximum).'); inp.value = ''; return; }
+          if (file.size > 10 * 1024 * 1024) { alert('Fichier trop volumineux (10 Mo au maximum).\n\nPour un gros fichier, déposez-le dans le stockage R2 puis utilisez « 📦 Rattacher un gros fichier » (voir le guide).'); inp.value = ''; return; }
           if (dirty() && !confirm('Vous avez des changements non enregistrés : enregistrez-les d\'abord, sinon ils seront perdus. Continuer quand même ?')) { inp.value = ''; return; }
           var title = prompt('Nom du fichier tel que les apprenants le verront :', file.name.replace(/\.[^.]*$/, ''));
           if (title === null) { inp.value = ''; return; }
@@ -507,6 +520,22 @@
           try { await call('/admin/file?k=' + encodeURIComponent(k) + '&name=' + encodeURIComponent(file.name) + '&title=' + encodeURIComponent(title.trim() || file.name), 'PUT', null, file); await reloadContent(); alert('Fichier joint à la leçon.'); }
           catch (e) { alert(e.message); inp.value = ''; }
         });
+        // Gros fichier déjà déposé dans R2 : on le choisit dans la liste, il n'est pas envoyé par cette page.
+        if (R2 && R2.enabled && R2.objects.length) {
+          var lab2 = el('label', 'r2l'); lab2.appendChild(document.createTextNode('📦 Rattacher un gros fichier :'));
+          var s2 = el('select'); s2.setAttribute('aria-label', 'Rattacher un gros fichier à la leçon ' + (i + 1));
+          var o0 = el('option', '', 'Choisir un fichier déposé…'); o0.value = ''; s2.appendChild(o0);
+          R2.objects.forEach(function (o) { var op = el('option', '', o.key + ' (' + fsize(o.size) + ')'); op.value = o.key; s2.appendChild(op); });
+          lab2.appendChild(s2); fz.appendChild(lab2);
+          s2.addEventListener('change', async function () {
+            var key = s2.value; if (!key) return;
+            if (dirty() && !confirm('Vous avez des changements non enregistrés : enregistrez-les d\'abord, sinon ils seront perdus. Continuer quand même ?')) { s2.value = ''; return; }
+            var title = prompt('Nom du fichier tel que les apprenants le verront :', key.split('/').pop().replace(/\.[^.]*$/, ''));
+            if (title === null) { s2.value = ''; return; }
+            try { await call('/admin/r2-attach', 'POST', { lesson: v.k, key: key, title: title.trim() }); await reloadContent(); alert('Gros fichier rattaché à la leçon.'); }
+            catch (e) { alert(e.message); s2.value = ''; }
+          });
+        }
       } else fz.appendChild(el('span', '', 'Enregistrez d\'abord la nouvelle leçon pour pouvoir y joindre un fichier.'));
       d.appendChild(fz); box.appendChild(d);
     });
@@ -544,6 +573,31 @@
       } catch (e) { msg.className = 'err'; msg.textContent = e.message; save.disabled = false; save.textContent = 'Enregistrer'; }
     });
     mark();
+  }
+  // ----- Gros fichiers (R2)
+  var R2 = null;
+  function fsize(n) { n = n || 0; return n >= 1e9 ? (n / 1e9).toFixed(2).replace('.', ',') + ' Go' : n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' Mo' : Math.max(1, Math.round(n / 1e3)) + ' Ko'; }
+  function renderR2() {
+    var box = $('r2Box'); box.textContent = '';
+    if (!R2 || !R2.enabled) { box.appendChild(el('p', 'warn', 'Le stockage R2 n\'est pas encore relié à cet espace d\'administration.')); return; }
+    var pct = Math.min(100, R2.total / R2.limit * 100);
+    var p = el('p', '', ''); p.id = 'r2Total';
+    p.appendChild(el('b', '', 'Espace utilisé : ' + fsize(R2.total) + ' sur 10 Go gratuits')); p.appendChild(document.createTextNode(' (' + R2.objects.length + ' fichier(s), ' + (pct < 1 && pct > 0 ? '< 1' : Math.round(pct)) + ' %)'));
+    box.appendChild(p);
+    var bar = el('div', 'r2use' + (pct >= 80 ? ' haut' : '')), fill = el('i'); fill.style.width = pct + '%'; bar.appendChild(fill); box.appendChild(bar);
+    if (pct >= 80) box.appendChild(el('p', 'warn', '⚠️ Plus de 8 Go utilisés : supprimez des fichiers inutiles dans Cloudflare avant d\'en déposer d\'autres, pour rester gratuit.'));
+    if (!R2.objects.length) { box.appendChild(el('p', '', 'Aucun fichier déposé pour l\'instant.')); return; }
+    var used = {};
+    state.catalog.forEach(function (m) { m.videos.forEach(function (v) { (v.files || []).forEach(function (f) { if (f.r2) (used[f.r2] = used[f.r2] || []).push(m.title.split(' : ')[0] + ' · ' + v.title); }); }); });
+    var t = el('table'), hr = el('tr');
+    ['Fichier', 'Taille', 'Déposé le', 'Rattaché à'].forEach(function (x) { hr.appendChild(el('th', '', x)); }); t.appendChild(hr);
+    R2.objects.forEach(function (o) {
+      var tr = el('tr');
+      tr.appendChild(el('td', '', o.key)); tr.appendChild(el('td', '', fsize(o.size))); tr.appendChild(el('td', '', fd(o.uploaded)));
+      var u = el('td', used[o.key] ? '' : 'warn', used[o.key] ? used[o.key].join(' ; ') : 'Aucune leçon'); tr.appendChild(u);
+      t.appendChild(tr);
+    });
+    var wrap = el('div', 'r2t'); wrap.appendChild(t); box.appendChild(wrap);
   }
   function mark() { var d = $('cDirty'); if (d) d.textContent = dirty() ? '● Changements non enregistrés' : ''; }
   async function reloadContent() { await load(); renderContent(); }

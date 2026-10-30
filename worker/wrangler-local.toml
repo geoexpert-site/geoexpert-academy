@@ -20,3 +20,8 @@ id = "local-access"
 binding = "DB"
 database_name = "geoexpert-local"
 database_id = "local-db"
+
+# Gros fichiers : stockage R2 simulé sur l'ordinateur (rien chez Cloudflare).
+[[r2_buckets]]
+binding = "FICHIERS"
+bucket_name = "geoexpert-fichiers-local"

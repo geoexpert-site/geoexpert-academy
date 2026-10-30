@@ -182,6 +182,53 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
   - vérifié : faux code refusé (401), « Vérifier un certificat » OK, faux webhook refusé (401), admin renvoyé vers Access, page apprenant 200
   - retour en arrière : `wrangler rollback` vers les versions « avant » ci-dessus ; quiz : `DELETE FROM quizzes WHERE who = 'import quiz chapitre 1'`
 
+## Cours PDF par formation vidéo (demande du 26/10/2026)
+
+- [x] 9 documents rédigés (HTML) et générés en PDF A4 dans `ressources/cours/<clé>/` (qgis1, qgis2, arc1, arc2, tele, web, kobo, google, pack)
+  - style commun : `ressources/cours/commun/` (cours.css, logo du site, fond de couverture en image) ; source : `ressources/Formation_Geomaticien_Operationnel_ (1).pdf`
+  - générer un PDF : `node GeoExpert-Outils\cours-pdf.mjs <cours.html>` (2 passes, numéros du sommaire) ; aperçu : `apercu-pdf.mjs` ; liste des points : `python -I points-a-verifier.py ressources\cours`
+- [ ] Corrections du formateur : 75 points [À VÉRIFIER] listés dans `ressources/cours/POINTS-A-VERIFIER.md`
+- ⚠️ `ressources/` n'est pas suivi par git et ne doit pas aller sur `main` (dépôt public) ; diffusion prévue par l'onglet Fichiers de l'admin
+- « Document réservé à [Prénom Nom] » : texte neutre pour l'instant ; l'ajout du nom au téléchargement est une fonction à développer
+
+## Gros fichiers privés sur Cloudflare R2 (demande du 26/10/2026)
+
+Objectif : les apprenants téléchargent depuis leur espace des fichiers privés et volumineux (ex. vieux plan raster de 200 Mo,
+plus tard données d'exercices et de projets finaux). Google Drive écarté (lien public oublié = fuite).
+Décision de l'administrateur : R2 seulement pour ses propres données ; pas d'images satellites (gratuites à la source) ; rester sous 10 Go.
+
+- [x] R2 activé par l'administrateur (carte demandée = vérification) + **alerte de budget 1 $** par e-mail (26/10/2026)
+- [x] Buckets **privés** `geoexpert-fichiers-test` et `geoexpert-fichiers` (r2.dev désactivé, aucun domaine public — vérifié) ;
+  binding `FICHIERS` dans les 4 configurations + `wrangler-local.toml` (R2 simulé)
+- [x] Choix technique (limites du plan gratuit vérifiées : 10 ms de calcul, durée et taille de réponse non limitées,
+  requêtes entrantes limitées à 100 Mo) : `/api/file` fait les mêmes vérifications qu'avant (code, formation, leçon visible,
+  verrou d'essai) puis renvoie `{ url }` = lien signé HMAC (`DL_SECRET`) valable 30 min vers **le Worker** (`GET /dl/<fichier>/<exp>/<signature>`),
+  qui lit R2 en streaming (reprise `Range` possible). Ni code d'accès dans l'adresse, ni clé S3. La page apprenant n'a pas changé :
+  elle suivait déjà un `{ url }` → téléchargement natif du navigateur (pas de 200 Mo en mémoire sur le téléphone).
+  - fichier R2 = entrée de leçon `{ k: <leçon>-fN, title, r2: <nom dans R2>, size }` dans la table `content` ; titre affiché avec la taille
+  - secret `DL_SECRET` : valeur aléatoire installée par Claude (personne n'a besoin de la connaître) — **test seulement pour l'instant**
+- [x] Admin, onglet 📚 Contenu : « 📦 Rattacher un gros fichier » sous chaque leçon + carte « Gros fichiers » (espace utilisé sur 10 Go,
+  orange dès 8 Go, leçon de chaque fichier, « Aucune leçon » si inutilisé). Routes `/admin/r2`, `/admin/r2-attach` ; « Retirer » détache seulement
+- [x] Dépôt par le tableau de bord Cloudflare ou wrangler (≤ 315 Mo) — guide §7 quater
+- [x] Tests `GeoExpert-Outils\test-gros-fichiers.mjs` : admin local 17/17 ; apprenant en ligne 18/18 (refus sans code / faux code /
+  autre formation, verrou d'essai, signature et date falsifiées refusées, **120 Mo téléchargés et identiques (SHA-256)**, reprise Range,
+  bucket non public : r2.dev désactivé, aucun domaine, accès S3 sans clé refusé, téléchargement réel dans Edge). Ajoutés à `tous-les-tests.mjs`.
+  Non-régression : `test-contenu.mjs admin` 18/18. (Réseau très instable le 26/10 : `local.mjs` réessaie maintenant sans `ping`.)
+  Le fichier de test de 120 Mo reste dans `geoexpert-fichiers-test` (compte dans les 10 Go).
+- [x] **Preuve pixel** (page apprenant non modifiée ; Worker de test avec R2) : 50/50 blocs identiques à la fin de phase 3
+  (`cacher phase-3`) et 34/34 identiques à la page d'origine des vidéos publicitaires (`cacher`) → `geoexpert-captures\preuve-existant-gros-fichiers\` ;
+  capture du fichier sous la leçon : `geoexpert-captures\apprenant-gros-fichier.png`, admin : `admin-gros-fichiers-*.png`
+- [x] Workers de test déployés : `espace-apprenant-api-test` 7a759cc3, `geoexpert-admin-test` 8d4283b4
+- [x] **Mise en ligne — EN LIGNE le 30/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-30-avant-gros-fichiers\` (3 clés KV + D1 prod + code de `main` fbdc9b8)
+  - `DL_SECRET` installé sur `espace-apprenant-api` (valeur aléatoire, autres secrets inchangés)
+  - `geoexpert-admin` → 5730f4aa (avant : 55fe9c06) ; `espace-apprenant-api` → 86229fd8 (avant : a48b0dc5) ; site non republié (page inchangée)
+  - production vérifiée : `GeoExpert-Outils\verif-prod-gros-fichiers.mjs` 14/14 (refus sans code / faux code, verrou d'essai, lien signé,
+    lien falsifié refusé, fichier identique, bucket privé, téléchargement réel depuis geoexpertacademy.ci, admin derrière Access) ;
+    + faux webhook 401, « Vérifier un certificat » OK. Code de test, fichier de test et ligne `content` supprimés (production revenue à 3 clés KV, `content` vide)
+  - retour en arrière : `wrangler rollback` vers les versions « avant » ci-dessus (les gros fichiers rattachés disparaîtraient alors de la page)
+  - code enregistré dans git sur `main` (commit « Gros fichiers privés sur Cloudflare R2 », 30/10/2026)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).

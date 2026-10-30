@@ -251,6 +251,65 @@ function findModule(m) { return CAT.find(x => x.key === m); }
 function vis(m) { return m.videos.filter(v => !v.hidden); }
 // Leçon d'un fichier de leçon (ex. « qgis1-v05-f2 » → « qgis1-v05 »).
 function lessonOfFile(k) { return String(k).replace(/-f\d+$/, ''); }
+// Fichier de leçon (entrée du catalogue), ex. { k, title } (stocké dans KV) ou { k, title, r2, size } (gros fichier R2).
+function lessonFile(k) {
+  const m = findModule(moduleOf(k)), v = m && m.videos.find(x => x.k === lessonOfFile(k));
+  return v ? (v.files || []).find(f => f.k === k) || null : null;
+}
+// Nom de fichier propre pour le navigateur (sans accents ni espaces), ex. « Plan_ancien_1950.tif ».
+function cleanFilename(title, ext) {
+  return (String(title).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '') || 'Fichier') + ext;
+}
+function fmtSize(n) {
+  return n >= 1e9 ? (n / 1e9).toFixed(1).replace('.', ',') + ' Go' : n >= 1e6 ? Math.round(n / 1e6) + ' Mo' : Math.max(1, Math.round(n / 1e3)) + ' Ko';
+}
+
+// ---------------------------------------------------------------- Gros fichiers (Cloudflare R2, binding FICHIERS)
+// Le bucket n'est jamais public. Après les vérifications de /api/file, l'apprenant reçoit un lien signé de courte durée
+// vers CE Worker (/dl/…), qui lit le fichier dans R2 et l'envoie en continu (streaming) : presque aucun temps de calcul,
+// et pas de limite de taille de réponse sur le plan Workers gratuit.
+const DL_MINUTES = 30;   // durée de validité du lien (le téléchargement commencé continue après)
+async function dlSig(env, k, key, exp) { return (await hmacHex(env.DL_SECRET, enc.encode(k + '|' + key + '|' + exp))).slice(0, 40); }
+async function download(req, env, url) {
+  const html = (status, msg) => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Téléchargement</title>'
+    + '<p style="font:16px sans-serif;margin:40px auto;max-width:480px;padding:0 16px">' + msg + '</p>', { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
+  const [, , k, exp, sig] = url.pathname.split('/');
+  const f = /^[a-z0-9]+-v\d{2,3}-f\d+$/.test(k || '') ? lessonFile(k) : null;
+  if (!env.FICHIERS || !env.DL_SECRET || !f || !f.r2 || !/^\d{10}$/.test(exp || '') || !(await safeEqual(sig || '', await dlSig(env, k, f.r2, exp))))
+    return html(403, 'Lien de téléchargement non valable. Retournez dans votre espace apprenant et cliquez à nouveau sur « Télécharger ».');
+  if (Date.now() / 1000 > +exp) return html(403, 'Ce lien de téléchargement a expiré. Retournez dans votre espace apprenant et cliquez à nouveau sur « Télécharger ».');
+  const ext = ((f.r2.match(/\.[a-z0-9]{1,5}$/i) || [''])[0]).toLowerCase();
+  const name = cleanFilename(f.title, ext);
+  const head = req.method === 'HEAD';
+  const range = req.headers.get('Range');
+  const obj = head ? await env.FICHIERS.head(f.r2) : await env.FICHIERS.get(f.r2, range ? { range: req.headers } : {});
+  if (!obj) return html(404, 'Ce fichier sera disponible prochainement.');
+  const h = {
+    'Content-Type': 'application/octet-stream',
+    'Content-Disposition': 'attachment; filename="' + name + '"; filename*=UTF-8\'\'' + encodeURIComponent(name),
+    'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff', 'Accept-Ranges': 'bytes', 'ETag': obj.httpEtag,
+  };
+  // Reprise d'un téléchargement interrompu (en-tête Range) : réponse partielle 206.
+  if (!head && range && obj.range) {
+    const r = obj.range, size = obj.size;
+    const start = r.suffix !== undefined ? Math.max(size - r.suffix, 0) : r.offset || 0;
+    const len = r.suffix !== undefined ? size - start : (r.length !== undefined ? r.length : size - start);
+    h['Content-Range'] = 'bytes ' + start + '-' + (start + len - 1) + '/' + size; h['Content-Length'] = String(len);
+    return new Response(obj.body, { status: 206, headers: h });
+  }
+  h['Content-Length'] = String(obj.size);
+  return new Response(head ? null : obj.body, { status: 200, headers: h });
+}
+// Liste du bucket (administration) : objets + taille totale (offre gratuite R2 : 10 Go).
+async function r2List(env) {
+  const objects = []; let cursor;
+  do {
+    const l = await env.FICHIERS.list({ cursor, limit: 1000 });
+    l.objects.forEach(o => objects.push({ key: o.key, size: o.size, uploaded: o.uploaded ? o.uploaded.getTime() : 0 }));
+    cursor = l.truncated ? l.cursor : null;
+  } while (cursor);
+  return { objects, total: objects.reduce((s, o) => s + o.size, 0) };
+}
 
 function allowedOrigins(env) {
   return String(env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -593,6 +652,8 @@ export default {
       if (role !== 'admin' && url.pathname === '/api/certificat' && req.method === 'GET') return await publicCert(req, env, url);
       // Webhooks DigitalPaye : sur le Worker apprenant (public). Le Worker admin, derrière Access, ne les reçoit qu'en local (tests).
       if (url.pathname === '/webhook/digitalpaye' && (role !== 'admin' || env.ACCESS_OPTIONAL === 'oui')) return await webhookDigitalPaye(req, env);
+      // Gros fichiers : lien signé donné par /api/file (ouvert directement par le navigateur, sans code d'accès dans l'adresse).
+      if (role !== 'admin' && url.pathname.startsWith('/dl/') && (req.method === 'GET' || req.method === 'HEAD')) return await download(req, env, url);
       if (role !== 'admin' && url.pathname.startsWith('/api/')) return await api(req, env, url);
       if (role !== 'apprenant' && url.pathname.startsWith('/admin/')) return await admin(req, env, url);
       if (role === 'admin' && url.pathname === '/' && req.method === 'GET') {
@@ -630,7 +691,7 @@ async function api(req, env, url) {
         videos: vis(m).map(v => {
           const t = trialLock(rec, v.k, now);
           return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k],
-            files: (v.files || []).map(f => ({ k: f.k, title: f.title, ready: !!cfg.files[f.k] })) };
+            files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title + ' (' + fmtSize(f.size || 0) + ')', ready: !!env.FICHIERS } : { k: f.k, title: f.title, ready: !!cfg.files[f.k] }) };
         }),
         exercises: m.exercises.map(e => {
           const t = trialLock(rec, e.k, now);
@@ -771,6 +832,13 @@ async function api(req, env, url) {
     if (e.trial) return reply({ error: 'Cet exercice sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
     if (/-f\d+$/.test(k) && !ownsLesson(rec, lessonOfFile(k))) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
+    // Gros fichier (R2) : mêmes vérifications que ci-dessus, puis un lien signé de courte durée (la page l'ouvre directement).
+    const big = /-f\d+$/.test(k) ? lessonFile(k) : null;
+    if (big && big.r2) {
+      if (!env.FICHIERS || !env.DL_SECRET) return reply({ error: 'Ce fichier sera disponible prochainement.' }, 404, req, env);
+      const exp = String(Math.floor(now / 1000) + DL_MINUTES * 60);
+      return reply({ url: url.origin + '/dl/' + k + '/' + exp + '/' + (await dlSig(env, k, big.r2, exp)), size: big.size || 0 }, 200, req, env);
+    }
 
     // On cherche le nom du fichier pour le navigateur
     const m = findModule(moduleOf(k));
@@ -1007,7 +1075,7 @@ async function admin(req, env, url) {
     students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
-      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => ({ k: f.k, title: f.title, has: !!cfg.files[f.k] })) })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
+      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
       products: Object.keys(PRODUCTS), students, stats: dashboardStats(students, prog, now),
     }, 200, req, env);
   }
@@ -1468,8 +1536,33 @@ async function admin(req, env, url) {
     await saveLessons(env, m.key, m.videos.map(x => x.k === v.k ? Object.assign({}, x, { files: x.files.filter(f => f.k !== k) }) : x), who);
     await env.ACCESS.delete('f:' + k);
     const cfg = await getCfg(env); delete cfg.files[k]; delete cfg.names[k]; await env.ACCESS.put('cfg', JSON.stringify(cfg));
-    await journal(env, who, 'Fichier de leçon retiré', '', '', k);
+    const r2 = (v.files.find(f => f.k === k) || {}).r2;   // gros fichier : seulement détaché, il reste dans R2
+    await journal(env, who, 'Fichier de leçon retiré', '', '', k + (r2 ? ' · ' + r2 + ' (reste dans R2)' : ''));
     return reply({ ok: true }, 200, req, env);
+  }
+
+  // Gros fichiers (R2) : liste du stockage + espace utilisé. Le dépôt se fait par le tableau de bord Cloudflare ou wrangler.
+  if (url.pathname === '/admin/r2' && req.method === 'GET') {
+    if (!env.FICHIERS) return reply({ enabled: false, objects: [], total: 0 }, 200, req, env);
+    return reply(Object.assign({ enabled: true, limit: 10e9 }, await r2List(env)), 200, req, env);
+  }
+  // Rattacher un fichier déposé dans R2 à une leçon (il apparaît chez les apprenants comme les autres fichiers de leçon).
+  if (url.pathname === '/admin/r2-attach' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    if (!env.FICHIERS) return reply({ error: 'Stockage des gros fichiers (R2) non relié à ce Worker.' }, 503, req, env);
+    const b = await readJson(req);
+    const lk = String(b.lesson || ''), m = findModule(moduleOf(lk)), lesson = m && m.videos.find(v => v.k === lk);
+    if (!lesson) return reply({ error: 'Leçon inconnue.' }, 400, req, env);
+    const key = String(b.key || '').slice(0, 1024);
+    const obj = key ? await env.FICHIERS.head(key) : null;
+    if (!obj) return reply({ error: 'Fichier introuvable dans le stockage R2 : vérifiez son nom.' }, 404, req, env);
+    const title = String(b.title || '').trim().replace(/\s+/g, ' ').slice(0, 120) || key.split('/').pop().replace(/\.[^.]*$/, '');
+    const files = lesson.files || [];
+    if (files.some(f => f.r2 === key)) return reply({ error: 'Ce fichier est déjà rattaché à cette leçon.' }, 400, req, env);
+    const k = lk + '-f' + (1 + Math.max(0, ...files.map(f => +f.k.split('-f')[1] || 0)));
+    await saveLessons(env, m.key, m.videos.map(v => v.k === lk ? Object.assign({}, v, { files: files.concat({ k, title, r2: key, size: obj.size }) }) : v), who);
+    await journal(env, who, 'Gros fichier rattaché', '', '', k + ' · ' + key + ' (' + fmtSize(obj.size) + ')');
+    return reply({ ok: true, k }, 200, req, env);
   }
 
   if (url.pathname === '/admin/ids' && req.method === 'PUT') {

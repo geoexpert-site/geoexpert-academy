@@ -266,6 +266,62 @@ en moins d'une minute. **Annuler les changements** efface ce que vous n'avez pas
 ⚠️ Pendant l'essai, ce sont **les 3 premières leçons visibles** qui sont ouvertes : si vous changez l'ordre du début d'une
 formation, les leçons offertes pendant l'essai changent aussi.
 
+## 7 quater. Gros fichiers : cartes, données d'exercices, projets finaux (stockage R2)
+
+Le bouton « 📎 Joindre un fichier » s'arrête à 10 Mo. Pour un fichier plus gros (par exemple un vieux plan raster de 200 Mo),
+on utilise **Cloudflare R2**, un espace de stockage **privé** : personne ne peut y entrer sans passer par l'espace apprenant.
+Le Worker vérifie le code d'accès, la formation et le verrou d'essai (les mêmes règles que les autres fichiers), puis
+donne au navigateur un lien qui ne marche que **30 minutes**. Ce lien ne contient pas le code de l'apprenant.
+
+**Ce qu'on met dans R2 :** seulement vos propres données. Les images satellites gratuites (Landsat, Sentinel) ne sont
+pas stockées : les apprenants les téléchargent à la source.
+
+### Coût : rester gratuit
+
+- Offre gratuite R2 : **10 Go stockés**, 1 million d'envois et 10 millions de lectures par mois. Les téléchargements
+  des apprenants (la bande passante) sont **toujours gratuits**.
+- L'espace utilisé s'affiche dans **📚 Contenu → 📦 Gros fichiers** (« Espace utilisé : … sur 10 Go gratuits »). La barre
+  devient orange après 8 Go : supprimez alors les fichiers inutiles avant d'en déposer d'autres.
+- Une **alerte de budget** vous prévient par e-mail si une dépense apparaît (voir plus bas, à faire une seule fois).
+- Pour information, au-delà de 10 Go : 0,015 $ par Go et par mois (1 Go de trop = moins de 10 FCFA par mois).
+
+### Activer R2 et régler l'alerte (une seule fois)
+
+1. Tableau de bord Cloudflare → menu de gauche **R2 Object Storage** → **Purchase R2 Plan** / **Activer R2**.
+   Cloudflare demande une **carte bancaire ou un compte PayPal** : c'est une vérification. Rien n'est prélevé tant que
+   vous restez dans l'offre gratuite.
+2. **Alerte de budget :** **Manage Account → Billing → Billable Usage** (ou **Notifications → Add → Budget Alert**) →
+   montant **1 $** → votre e-mail. Cloudflare compte la consommation une fois par jour : l'e-mail arrive le lendemain d'un dépassement.
+3. Les deux espaces (« buckets ») ont été créés le 26/10/2026 : `geoexpert-fichiers-test` (test) et `geoexpert-fichiers` (vos apprenants).
+   ✅ R2 et l'alerte à 1 $ sont activés (26/10/2026) : rien à refaire.
+   Ne cliquez **jamais** sur « Public access », « r2.dev » ou « Custom domain » dans les réglages d'un bucket : ils doivent rester privés.
+
+### Déposer un gros fichier
+
+**Par le tableau de bord (le plus simple, jusqu'à environ 300 Mo) :**
+1. **R2 Object Storage** → bucket **`geoexpert-fichiers`** (ou `geoexpert-fichiers-test` pour essayer).
+2. **Upload** → choisissez le fichier. Donnez-lui un nom clair, **sans espaces ni accents**, avec un dossier par formation,
+   par exemple `qgis1/plan-ancien-1950.tif` ou `projets/projet-final-donnees.zip`.
+
+**Par le Terminal (Claude lance la commande pour vous, jusqu'à 315 Mo) :**
+```
+npx wrangler r2 object put "geoexpert-fichiers/qgis1/plan-ancien-1950.tif" --file "C:\chemin\du\fichier.tif" --remote
+```
+Au-delà de 300 Mo, demandez à Claude : il utilise un outil d'envoi en plusieurs morceaux.
+
+### Rattacher le fichier à une leçon
+
+1. Admin → **📚 Contenu** → choisissez la formation.
+2. Sous la leçon : **📦 Rattacher un gros fichier** → choisissez le fichier dans la liste → donnez le **nom que verront les apprenants**
+   (ex. « Plan ancien de 1950 »).
+3. C'est tout : il apparaît dans l'onglet « Exercices » de la leçon chez l'apprenant, avec sa taille
+   (« Plan ancien de 1950 (200 Mo) »), et se télécharge avec le bouton **Télécharger** comme les autres fichiers.
+
+- **Retirer** (à côté du fichier) : les apprenants ne le voient plus, mais il **reste dans R2** (et compte dans les 10 Go).
+  Pour le supprimer vraiment : tableau de bord → R2 → bucket → fichier → **Delete**.
+- Le tableau « Gros fichiers » indique pour chaque fichier la leçon où il est rattaché ; « Aucune leçon » en orange = fichier inutilisé.
+- Un même fichier peut être rattaché à plusieurs leçons sans prendre plus de place.
+
 ---
 
 ## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3)

@@ -25,3 +25,8 @@ id = "955c726a9dd643eb84fed30281261636"
 binding = "DB"
 database_name = "geoexpert-test"
 database_id = "3f7b44aa-686a-40d6-a442-ce09da27c3cf"
+
+# Gros fichiers (Cloudflare R2, bucket PRIVÉ : pas de r2.dev ni de domaine public). Lien signé : secret DL_SECRET.
+[[r2_buckets]]
+binding = "FICHIERS"
+bucket_name = "geoexpert-fichiers-test"
