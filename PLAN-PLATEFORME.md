@@ -238,6 +238,15 @@ Décision de l'administrateur : R2 seulement pour ses propres données ; pas d'i
 - [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → a5038974 (avant : 86229fd8) ; `geoexpert-admin` → e724425c (avant : 5730f4aa) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
 - [ ] Reste à faire sur la plateforme : renommer arc2-v04 en « Leçon 3 : Comment définir les classes d'altitude du relief et la pente » ; masquer qgis1-v10 (leçon 9 en trop)
 
+## Titres et durées des leçons Télédétection (demande du 30/10/2026)
+
+- [x] Nouveau montage : 23 leçons (introduction + leçons 1 à 22, ArcMap, Landsat 2013 et 2025) à la place des 6 longues vidéos ; meta « 23 leçons, 4 h 37 »
+- [x] Clés tele-v01 à tele-v23 : aucune donnée de production n'utilisait les anciennes clés (pas d'identifiant vidéo, pas de progression)
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-30-avant-titres-tele\` ; branche `titres-tele`
+- [x] Test : 23 titres et durées vérifiés par l'API apprenant avec un apprenant Télédétection temporaire (supprimé ensuite)
+- [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → 7099147e (avant : a5038974) ; `geoexpert-admin` → fb841e4c (avant : e724425c) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
+- [ ] Reste à faire : mettre les 23 vidéos sur Bunny et rattacher leurs identifiants dans l'onglet « Contenu » de l'admin
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
