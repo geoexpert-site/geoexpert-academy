@@ -187,7 +187,8 @@ Le parcours du client ne change pas. Détails, test Sandbox, mise en ligne et re
 - [x] 9 documents rédigés (HTML) et générés en PDF A4 dans `ressources/cours/<clé>/` (qgis1, qgis2, arc1, arc2, tele, web, kobo, google, pack)
   - style commun : `ressources/cours/commun/` (cours.css, logo du site, fond de couverture en image) ; source : `ressources/Formation_Geomaticien_Operationnel_ (1).pdf`
   - générer un PDF : `node GeoExpert-Outils\cours-pdf.mjs <cours.html>` (2 passes, numéros du sommaire) ; aperçu : `apercu-pdf.mjs` ; liste des points : `python -I points-a-verifier.py ressources\cours`
-- [ ] Corrections du formateur : 75 points [À VÉRIFIER] listés dans `ressources/cours/POINTS-A-VERIFIER.md`
+- [x] Corrections du formateur : QGIS 1 et 2, ArcGIS 1 et 2, Télédétection et Google Earth terminés (0 point)
+- [ ] En pause (décision du 30/10/2026, campagne centrée sur les modules 1, 2 et Télédétection) : Webmapping (5 points), KoboToolbox (2 points), Projet final du Pack (3 points) — voir `ressources/cours/POINTS-A-VERIFIER.md`
 - ⚠️ `ressources/` n'est pas suivi par git et ne doit pas aller sur `main` (dépôt public) ; diffusion prévue par l'onglet Fichiers de l'admin
 - « Document réservé à [Prénom Nom] » : texte neutre pour l'instant ; l'ajout du nom au téléchargement est une fonction à développer
 
@@ -236,7 +237,7 @@ Décision de l'administrateur : R2 seulement pour ses propres données ; pas d'i
 - [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-30-avant-titres-google\` ; branche `titres-google`
 - [x] Test : titres et durées vérifiés par l'API apprenant (`GeoExpert-Outils\verif-titres.mjs`) ; `test-contenu.mjs` interrompu par des coupures réseau (données de test remises en état à la main)
 - [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → a5038974 (avant : 86229fd8) ; `geoexpert-admin` → e724425c (avant : 5730f4aa) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
-- [ ] Reste à faire sur la plateforme : renommer arc2-v04 en « Leçon 3 : Comment définir les classes d'altitude du relief et la pente » ; masquer qgis1-v10 (leçon 9 en trop)
+- [x] arc2-v04 renommé « Leçon 3 : Comment définir les classes d'altitude du relief et la pente » et qgis1-v10 (leçon 9 en trop) masqué : voir « Finalisation pour la campagne »
 
 ## Titres et durées des leçons Télédétection (demande du 30/10/2026)
 
@@ -246,6 +247,17 @@ Décision de l'administrateur : R2 seulement pour ses propres données ; pas d'i
 - [x] Test : 23 titres et durées vérifiés par l'API apprenant avec un apprenant Télédétection temporaire (supprimé ensuite)
 - [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → 7099147e (avant : a5038974) ; `geoexpert-admin` → fb841e4c (avant : e724425c) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
 - [ ] Reste à faire : mettre les 23 vidéos sur Bunny et rattacher leurs identifiants dans l'onglet « Contenu » de l'admin
+
+## Finalisation pour la campagne (30/10/2026)
+
+Priorité du formateur : modules 1 et 2 (QGIS, ArcGIS) et Télédétection. Webmapping, KoboToolbox et Projet final du Pack sont en pause.
+
+- [x] Plateforme : arc2-v04 renommé ; qgis1-v10 masqué (`"hidden": true` dans le CATALOG ; son quiz reste en base mais n'est plus proposé, aucun résultat enregistré) ; QGIS 1 = « 15 leçons »
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-30-avant-finalisation\` ; test vérifié avec un apprenant temporaire (supprimé)
+- [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → 7047243d (avant : 7099147e) ; `geoexpert-admin` → 0e7276df (avant : fb841e4c) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
+- [ ] **À faire par l'administrateur** : joindre les 6 cours PDF terminés (dossier `ressources/cours/A-DEPOSER-espace-apprenant/`) à la leçon « Introduction » de chaque formation, onglet 📚 Contenu > « 📎 Joindre un fichier » (Google Earth : leçon 1 de la formation Google Earth)
+- ⚠️ Joindre un fichier enregistre la liste des leçons de la formation dans la table `content`, qui remplace ensuite le CATALOG du code pour cette formation : après cela, les titres de ces formations se changent dans l'onglet Contenu, plus dans `worker.js`
+- [ ] Mettre les 23 vidéos Télédétection sur Bunny et coller leurs identifiants dans l'onglet Contenu
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 

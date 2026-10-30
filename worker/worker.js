@@ -55,7 +55,7 @@ const CATALOG = [
       {"k": "arc2-v01", "title": "Introduction : l'analyse spatiale avancée expliquée", "dur": "10:14"},
       {"k": "arc2-v02", "title": "Leçon 1 : Introduction et création d'un nouveau feature dataset", "dur": "10:03"},
       {"k": "arc2-v03", "title": "Leçon 2 : Comment extraire les courbes de niveau à partir d'un MNT", "dur": "14:48"},
-      {"k": "arc2-v04", "title": "Leçon 3 : Comment définir les classes d'altitude du relief sans les courbes de niveau et la pente", "dur": "8:13"},
+      {"k": "arc2-v04", "title": "Leçon 3 : Comment définir les classes d'altitude du relief et la pente", "dur": "8:13"},
       {"k": "arc2-v05", "title": "Leçon 4 : Comment extraire un territoire situé dans une zone de référence", "dur": "13:15"},
       {"k": "arc2-v06", "title": "Leçon 5 : Comment extraire une couche raster à partir d'une donnée vectorielle", "dur": "8:01"},
       {"k": "arc2-v07", "title": "Leçon 6 : Comment extraire des polygones, des lignes et des points avec l'outil Clip", "dur": "16:24"},
@@ -78,7 +78,7 @@ const CATALOG = [
   {
     "key": "qgis1",
     "title": "QGIS - Chapitre 1 : Structuration des données géospatiales",
-    "meta": "16 leçons, 2 astuces, 5 exercices",
+    "meta": "15 leçons, 2 astuces, 5 exercices",
     "videos": [
       {"k": "qgis1-v01", "title": "Introduction", "dur": "4:36"},
       {"k": "qgis1-v02", "title": "Leçon 1 : Comment créer une base de données sur QGIS", "dur": "8:12"},
@@ -89,7 +89,7 @@ const CATALOG = [
       {"k": "qgis1-v07", "title": "Leçon 6 : Comment importer un fichier GPX (format de données GPS) dans QGIS et le sauvegarder dans la base de données", "dur": "3:50"},
       {"k": "qgis1-v08", "title": "Leçon 7 : Comment importer un fichier raster dans QGIS", "dur": "6:05"},
       {"k": "qgis1-v09", "title": "Leçon 8 : Comment créer un mini-projet SIG : vectorisation et gestion de la table attributaire (partie 1)", "dur": "8:52"},
-      {"k": "qgis1-v10", "title": "Leçon 9 : Comment créer un mini-projet SIG : vectorisation et gestion de la table attributaire (partie 2)", "dur": "0:27"},
+      {"k": "qgis1-v10", "title": "Leçon 9 : Comment créer un mini-projet SIG : vectorisation et gestion de la table attributaire (partie 2)", "dur": "0:27", "hidden": true},
       {"k": "qgis1-v11", "title": "Leçon 10 : Google Earth Pro : rechercher une zone, introduction, création d'un projet et d'un polygone, numérisation des zones d'intérêt (partie 1)", "dur": "17:36"},
       {"k": "qgis1-v12", "title": "Leçon 11 : Google Earth Pro : numérisation des zones d'intérêt avec la couche polygone (partie 2)", "dur": "11:43"},
       {"k": "qgis1-v13", "title": "Leçon 12 : Google Earth Pro : création d'une couche ligne (trajet ou route) et numérisation des zones d'intérêt avec la couche ligne", "dur": "10:10"},
