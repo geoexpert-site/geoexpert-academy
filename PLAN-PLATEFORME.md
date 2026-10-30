@@ -229,6 +229,15 @@ Décision de l'administrateur : R2 seulement pour ses propres données ; pas d'i
   - retour en arrière : `wrangler rollback` vers les versions « avant » ci-dessus (les gros fichiers rattachés disparaîtraient alors de la page)
   - code enregistré dans git sur `main` (commit « Gros fichiers privés sur Cloudflare R2 », 30/10/2026)
 
+## Titres et durées des leçons Google Earth (demande du 30/10/2026)
+
+- [x] Formation Google Earth : les 8 titres « VIDÉO 8. ... partie N » remplacés par les titres des leçons Google Earth des chapitres 1 (contenu identique)
+- [x] Vraies durées des leçons Google Earth dans ArcGIS 1 (arc1-v09 à v15) et QGIS 1 (qgis1-v11 à v17)
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-30-avant-titres-google\` ; branche `titres-google`
+- [x] Test : titres et durées vérifiés par l'API apprenant (`GeoExpert-Outils\verif-titres.mjs`) ; `test-contenu.mjs` interrompu par des coupures réseau (données de test remises en état à la main)
+- [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → a5038974 (avant : 86229fd8) ; `geoexpert-admin` → e724425c (avant : 5730f4aa) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
+- [ ] Reste à faire sur la plateforme : renommer arc2-v04 en « Leçon 3 : Comment définir les classes d'altitude du relief et la pente » ; masquer qgis1-v10 (leçon 9 en trop)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
