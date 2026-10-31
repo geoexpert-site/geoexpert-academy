@@ -378,7 +378,8 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [x] Tests : `test-phase-c.mjs` api 49/49, admin 17/17 ; suite complète OK ; preuve pixel 58/58 (page en ligne) et 34/34 (page d'origine) ; capture `geoexpert-captures/apres-phase-c/avant-apres-telephone.png` (tableau de bord identique).
 - [x] Tests réparés au passage : `test-paiements` (17 onglets aujourd'hui, le test en attendait 14) ; `test-relances` (fermeture de fiche trop tôt). Reste 1 échec ancien sans lien : « Code reçu aujourd'hui » (codes de test « Test Journal » trop vieux).
 - [x] Publiés avec la phase C (décision de l'administrateur) : lives sur **Microsoft Teams** (Google Meet toujours accepté), **charte 1.1** (chaque apprenant la réaccepte une fois), 1 paragraphe en plus dans la politique de confidentialité (§2.3, WhatsApp et Teams).
-- Sauvegarde : `GeoExpert-Sauvegardes6-10-31-avant-phase-c\`, étiquette `sauvegarde-avant-phase-c`. Mise en ligne / retour : `MISE-EN-LIGNE-PHASE-C.md`.
+- Sauvegardes : `GeoExpert-Sauvegardes\2026-10-31-avant-phase-c\` et `GeoExpert-Sauvegardes\2026-10-31-avant-mise-en-ligne-phase-c\` (production juste avant), étiquette `sauvegarde-avant-phase-c`. Mise en ligne / retour : `MISE-EN-LIGNE-PHASE-C.md`.
+- [x] **Mise en ligne le 31/10/2026** (accord de l'administrateur) : `espace-apprenant-api` = **5682afa6** (avant 33abc68e) · `geoexpert-admin` = **475ca8c3** (avant 228e930d) · site : fusion de `phase-c` dans `main`.
 - [ ] 👤 Essai de l'administrateur avec « test 1 » : accepter la charte 1.1, ouvrir « Aide », chercher « code », toucher WhatsApp ; dans l'admin, onglet ❔, relire les 7 questions.
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
