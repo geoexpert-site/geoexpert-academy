@@ -3,7 +3,7 @@
 // Même texte publié sur le site : charte-apprenant.html (à mettre à jour en même temps).
 // Nouvelle version (texte modifié) : changer « version » → chaque apprenant devra l'accepter à sa prochaine connexion.
 export const CHARTE = {
-  version: '1.0',
+  version: '1.1', // 1.1 (31/10/2026) : règle de la Communauté WhatsApp et des lives (section 7)
   date: 'octobre 2026',
   titre: 'Charte de l\'apprenant – Formations vidéo GeoExpert Academy',
   intro: 'Bienvenue dans votre espace apprenant. Cette charte résume les règles de votre formation vidéo. Elle reprend les conditions générales de vente (CGV) que vous avez acceptées lors de votre inscription. En cas de différence, les CGV s\'appliquent.',
@@ -39,6 +39,7 @@ export const CHARTE = {
     { t: '7. Votre engagement', items: [
       'Vous vous engagez à suivre vos leçons régulièrement, à refaire les manipulations sur votre ordinateur et à réaliser les exercices.',
       'Vous vous engagez à rester courtois et respectueux dans vos échanges avec le formateur.',
+      'Dans la Communauté WhatsApp et pendant les lives, je respecte les autres membres, je m\'entraide, je ne fais pas de publicité et je ne partage aucun contenu de la formation.',
     ] },
     { t: '8. Le non-respect de la charte', items: [
       'En cas de partage du code, de diffusion des contenus ou de comportement irrespectueux, GeoExpert Academy peut suspendre ou désactiver votre accès, après vous en avoir informé, sans remboursement.',

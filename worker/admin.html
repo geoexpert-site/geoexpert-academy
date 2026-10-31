@@ -273,6 +273,7 @@
       <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
       <button data-t="pf">🗺️ Portfolio <span id="pfCount" class="cnt" hidden></span></button>
       <button data-t="par">🤝 Parrainage <span id="parCount" class="cnt" hidden></span></button>
+      <button data-t="aide">❔ Aide & « Et après ? »</button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="cont">📚 Contenu</button>
@@ -409,6 +410,28 @@
       </div>
     </div>
 
+    <!-- Onglet Aide & « Et après ? » (phase C) -->
+    <div data-p="aide" hidden>
+      <div class="a-card">
+        <h2>❔ Aide : questions fréquentes</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants voient ces questions dans « Aide » (colonne de gauche), avec une recherche et un bouton WhatsApp en bas. Les changements ne sont visibles qu'après <b>Enregistrer l'aide</b>. Pour aller à la ligne dans une réponse, appuyez sur Entrée.</p>
+        <div id="faqList"></div>
+        <button class="b sec" id="faqAdd" type="button" style="margin-top:10px;">➕ Ajouter une question</button>
+        <div><button class="b" id="faqSave" type="button">Enregistrer l'aide</button> <button class="b sec" id="faqReset" type="button">Revenir au contenu de départ</button></div>
+        <div id="faqMsg" role="status"></div>
+      </div>
+      <div class="a-card">
+        <h2>➡️ « Et après ? » : formation recommandée</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Quand un apprenant a terminé une formation, une carte lui propose la suite, avec le prix du site et le lien d'achat habituel. Une formation qu'il possède déjà n'est <b>jamais</b> proposée (ni un pack qui la contient) : on passe alors au choix suivant.</p>
+        <div id="apRegles"></div>
+        <h3 style="margin-top:22px;">Offre spéciale (facultatif)</h3>
+        <p style="font-size:14px; color:var(--dim); margin:0 0 10px;">Par défaut, <b>aucune réduction</b>. Pour en faire une : créez d'abord dans DigitalPaye un lien de paiement au prix réduit, puis remplissez les deux cases. Les paiements faits par ce lien arrivent dans « 💳 Paiements reçus » en <b>« À vérifier »</b> : créez alors le code avec le bouton habituel. Videz les deux cases pour arrêter l'offre.</p>
+        <div id="apOffres"></div>
+        <button class="b" id="apSave" type="button">Enregistrer les recommandations</button>
+        <div id="apMsg" role="status"></div>
+      </div>
+    </div>
+
     <!-- Onglet Quiz -->
     <div data-p="quiz" hidden>
       <div class="a-card" id="qStats">
@@ -457,7 +480,7 @@
     <div data-p="live" hidden>
       <div class="a-card" id="lvForm">
         <h2 id="lvTitle">Programmer un live</h2>
-        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Les apprenants concernés (essai compris) le voient dans « Rendez-vous live » et sur leur tableau de bord la semaine du live. Le lien Meet ne leur est montré que 30 minutes avant le début. Heure d'Abidjan (GMT).</p>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Les apprenants concernés (essai compris) le voient dans « Rendez-vous live » et sur leur tableau de bord la semaine du live. Le lien Teams ne leur est montré que 30 minutes avant le début. Heure d'Abidjan (GMT).</p>
         <label for="lvSujet">Sujet du live</label>
         <input type="text" id="lvSujet" maxlength="150" placeholder="Ex : Questions-réponses QGIS chapitre 1">
         <div class="a-row">
@@ -465,8 +488,8 @@
           <div><label for="lvHeure">Heure (Abidjan)</label><input type="time" id="lvHeure" value="19:00"></div>
           <div><label for="lvDur">Durée</label><select id="lvDur"><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 h</option><option value="90">1 h 30</option><option value="120">2 h</option><option value="180">3 h</option></select></div>
         </div>
-        <label for="lvMeet">Lien Google Meet (vous pouvez l'ajouter plus tard)</label>
-        <input type="url" id="lvMeet" placeholder="https://meet.google.com/abc-defg-hij">
+        <label for="lvMeet">Lien de la réunion Microsoft Teams (vous pouvez l'ajouter plus tard)</label>
+        <input type="url" id="lvMeet" placeholder="https://teams.microsoft.com/l/meetup-join/...">
         <label>Formations concernées</label>
         <div class="lvmods" id="lvMods"></div>
         <small style="color:var(--dim);">Aucune case cochée = tous les apprenants.</small>
@@ -634,6 +657,7 @@ window.preparerPdf = async function (PDFLib, src) {
     try { PF = await call('/admin/portfolio', 'GET'); } catch (e) { PF = { cartes: [] }; }
     renderPortfolio();
     try { renderParrainages(await call('/admin/parrainages', 'GET')); } catch (e) { renderParrainages({ filleuls: [], config: { module: 'google', mois: 1 }, texte: '' }); }
+    if (!AIDE_EDIT) { try { AIDE = await call('/admin/aide', 'GET'); } catch (e) { AIDE = null; } renderAide(); }
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
     renderContent(true); renderR2();
     try { RS = await call('/admin/ressources', 'GET'); } catch (e) { RS = null; }
@@ -941,6 +965,98 @@ window.preparerPdf = async function (PDFLib, src) {
     finally { b.disabled = false; }
   });
 
+  // ----- Aide (FAQ) et « Et après ? » (phase C)
+  // AIDE_EDIT : modifications en cours dans la FAQ, gardées si l'écran est rechargé par une autre action.
+  var AIDE = null, AIDE_EDIT = false, FQ = [];
+  function fcfa(n) { return Number(n).toLocaleString('fr-FR').replace(/ | /g, ' ') + ' FCFA'; }
+  function renderAide() {
+    var w = $('faqList'); w.textContent = '';
+    if (!AIDE) { w.appendChild(el('p', 'err', 'Aide indisponible pour le moment.')); return; }
+    FQ = AIDE.faq.map(function (x) { return { q: x.q, r: x.r }; });
+    renderFaq(); renderApres();
+  }
+  function renderFaq() {
+    var w = $('faqList'); w.textContent = '';
+    if (!FQ.length) w.appendChild(el('p', '', 'Aucune question : les apprenants ne verront que le bouton WhatsApp.'));
+    FQ.forEach(function (x, i) {
+      var box = el('div', 'qq faq'); box.style.cssText = 'border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;';
+      var q = el('input'); q.type = 'text'; q.maxLength = 200; q.value = x.q; q.setAttribute('aria-label', 'Question ' + (i + 1)); q.placeholder = 'Question';
+      var r = el('textarea'); r.rows = 3; r.maxLength = 3000; r.value = x.r; r.setAttribute('aria-label', 'Réponse ' + (i + 1)); r.placeholder = 'Réponse'; r.style.marginTop = '6px';
+      q.addEventListener('input', function () { x.q = q.value; AIDE_EDIT = true; });
+      r.addEventListener('input', function () { x.r = r.value; AIDE_EDIT = true; });
+      var bar = el('div'); bar.style.marginTop = '6px';
+      var up = el('button', 'b sec', '↑'), dn = el('button', 'b sec', '↓'), del = el('button', 'b sec red', 'Supprimer');
+      up.type = dn.type = del.type = 'button'; up.title = 'Monter'; dn.title = 'Descendre';
+      up.disabled = i === 0; dn.disabled = i === FQ.length - 1;
+      up.addEventListener('click', function () { FQ.splice(i - 1, 0, FQ.splice(i, 1)[0]); AIDE_EDIT = true; renderFaq(); });
+      dn.addEventListener('click', function () { FQ.splice(i + 1, 0, FQ.splice(i, 1)[0]); AIDE_EDIT = true; renderFaq(); });
+      del.addEventListener('click', function () { FQ.splice(i, 1); AIDE_EDIT = true; renderFaq(); });
+      bar.appendChild(el('span', '', (i + 1) + '. ')); bar.appendChild(up); bar.appendChild(dn); bar.appendChild(del);
+      box.appendChild(q); box.appendChild(r); box.appendChild(bar); w.appendChild(box);
+    });
+  }
+  $('faqAdd').addEventListener('click', function () { FQ.push({ q: '', r: '' }); AIDE_EDIT = true; renderFaq(); var l = $('faqList').querySelectorAll('.faq input'); if (l.length) l[l.length - 1].focus(); });
+  async function saveFaq(liste, quoi) {
+    var msg = $('faqMsg'); msg.textContent = ''; msg.className = '';
+    var b = $('faqSave'); b.disabled = true;
+    try { var j = await call('/admin/faq', 'POST', { faq: liste }); AIDE_EDIT = false; AIDE.faq = j.faq; renderAide(); msg.className = 'ok'; msg.textContent = '✅ ' + quoi + ' : ' + j.faq.length + ' question(s) visibles par les apprenants.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { b.disabled = false; }
+  }
+  $('faqSave').addEventListener('click', function () {
+    var vide = FQ.filter(function (x) { return !x.q.trim() || !x.r.trim(); }).length;
+    if (vide) { $('faqMsg').className = 'err'; $('faqMsg').textContent = vide + ' question(s) sans texte ou sans réponse : complétez-les ou supprimez-les.'; return; }
+    var avant = AIDE ? AIDE.faq.length : 0, moins = avant - FQ.length;
+    if (!confirm('Enregistrer l\'aide (' + FQ.length + ' question(s)) ?' + (moins > 0 ? '\n\n⚠️ ' + moins + ' question(s) seront retirées pour les apprenants.' : '') + '\n\nLes apprenants verront tout de suite la nouvelle version.')) return;
+    saveFaq(FQ, 'Aide enregistrée');
+  });
+  $('faqReset').addEventListener('click', function () {
+    if (!AIDE) return;
+    if (!confirm('Remplacer toute l\'aide par le contenu de départ (' + AIDE.defaut.faq.length + ' questions) ?\n\n⚠️ Vos questions ajoutées ou modifiées seront perdues.')) return;
+    saveFaq(AIDE.defaut.faq, 'Contenu de départ remis');
+  });
+  function renderApres() {
+    var w = $('apRegles'), o = $('apOffres'); w.textContent = ''; o.textContent = '';
+    var prod = AIDE.produits, nom = {}; prod.forEach(function (p) { nom[p.p] = p.nom + ' — ' + fcfa(p.prix); });
+    var t = el('table'); t.style.cssText = 'width:100%;border-collapse:collapse;font-size:14px;';
+    var hd = el('tr'); ['Formation terminée', '1re proposition', '2e proposition (si la 1re est déjà possédée, ou en plus)'].forEach(function (x) { var th = el('th', '', x); th.style.cssText = 'text-align:left;padding:6px;border-bottom:1px solid var(--line);'; hd.appendChild(th); }); t.appendChild(hd);
+    AIDE.formations.forEach(function (f) {
+      var tr = el('tr'), cur = AIDE.apres.regles[f.key] || [];
+      var td = el('td', '', f.nom); td.style.padding = '6px'; tr.appendChild(td);
+      [0, 1].forEach(function (k) {
+        var s = el('select'); s.className = 'apSel'; s.setAttribute('data-f', f.key); s.setAttribute('aria-label', f.nom + ' : proposition ' + (k + 1));
+        var z = el('option', '', '— aucune —'); z.value = ''; s.appendChild(z);
+        prod.forEach(function (p) { if (p.p === f.key) return; var op = el('option', '', nom[p.p]); op.value = p.p; s.appendChild(op); });
+        s.value = cur[k] || ''; var c = el('td'); c.style.padding = '6px'; c.appendChild(s); tr.appendChild(c);
+      });
+      t.appendChild(tr);
+    });
+    var sc = el('div'); sc.style.overflowX = 'auto'; sc.appendChild(t); w.appendChild(sc);
+    var def = el('button', 'b sec', 'Remettre les recommandations de départ'); def.type = 'button'; def.style.marginTop = '10px';
+    def.addEventListener('click', function () { w.querySelectorAll('.apSel').forEach(function (s) { var l = AIDE.defaut.regles[s.getAttribute('data-f')] || [], k = [].indexOf.call(w.querySelectorAll('.apSel[data-f="' + s.getAttribute('data-f') + '"]'), s); s.value = l[k] || ''; }); $('apMsg').className = ''; $('apMsg').textContent = 'Recommandations de départ remises : cliquez sur « Enregistrer » pour les appliquer.'; });
+    w.appendChild(def);
+    prod.forEach(function (p) {
+      var cur = AIDE.apres.offres[p.p] || {}, row = el('div', 'qq'); row.style.cssText = 'display:grid;grid-template-columns:minmax(150px,1fr) 150px minmax(200px,2fr);gap:8px;align-items:center;margin-bottom:8px;';
+      var px = el('input'); px.type = 'text'; px.inputMode = 'numeric'; px.className = 'apPrix'; px.setAttribute('data-p', p.p); px.placeholder = 'Prix réduit'; px.value = cur.prix || ''; px.setAttribute('aria-label', 'Prix réduit ' + p.nom);
+      var ln = el('input'); ln.type = 'text'; ln.className = 'apLien'; ln.setAttribute('data-p', p.p); ln.placeholder = 'https://checkout.digitalpaye.com/pay/…'; ln.value = cur.lien || ''; ln.setAttribute('aria-label', 'Lien de paiement réduit ' + p.nom);
+      row.appendChild(el('span', '', p.nom + ' (' + fcfa(p.prix) + ')')); row.appendChild(px); row.appendChild(ln); o.appendChild(row);
+    });
+  }
+  $('apSave').addEventListener('click', async function () {
+    var msg = $('apMsg'); msg.textContent = ''; msg.className = '';
+    var regles = {}, offres = {}, txt = [];
+    document.querySelectorAll('#apRegles .apSel').forEach(function (s) { var f = s.getAttribute('data-f'); if (s.value) { (regles[f] = regles[f] || []); if (regles[f].indexOf(s.value) < 0) regles[f].push(s.value); } });
+    document.querySelectorAll('#apOffres .apPrix').forEach(function (px) {
+      var p = px.getAttribute('data-p'), ln = document.querySelector('#apOffres .apLien[data-p="' + p + '"]'), v = px.value.replace(/\s/g, '');
+      if (v || ln.value.trim()) { offres[p] = { prix: v, lien: ln.value.trim() }; txt.push(LABELS[p] + ' à ' + fcfa(+v || 0)); }
+    });
+    if (!confirm('Enregistrer les recommandations ?\n\n' + (txt.length ? 'Offre(s) spéciale(s) : ' + txt.join(', ') : 'Aucune réduction (prix normaux du site).') + '\n\nLes apprenants verront le changement à leur prochaine connexion.')) return;
+    var b = $('apSave'); b.disabled = true;
+    try { var j = await call('/admin/apres', 'POST', { regles: regles, offres: offres }); AIDE.apres = j.apres; renderApres(); msg.className = 'ok'; msg.textContent = '✅ Recommandations enregistrées.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { b.disabled = false; }
+  });
+
   // ----- Mini-quiz
   var QZ = [], QR = [];
   function quizOf(k) { return QZ.filter(function (q) { return q.k === k; })[0]; }
@@ -1124,14 +1240,14 @@ window.preparerPdf = async function (PDFLib, src) {
     var wrap = el('div', 'acts'); list.appendChild(wrap);
     LV.forEach(function (l) {
       var fin = l.t + l.dur * 60000 < now, ann = l.statut === 'annule';
-      var r = actRow(l.sujet, fdh(l.t) + ' · ' + l.dur + ' min · ' + (l.modules ? l.modules.split(',').map(modTitle).join(', ') : 'tous les apprenants') + (ann || fin ? '' : l.meet ? ' · lien Meet prêt' : ' · ⚠️ lien Meet à ajouter'));
+      var r = actRow(l.sujet, fdh(l.t) + ' · ' + l.dur + ' min · ' + (l.modules ? l.modules.split(',').map(modTitle).join(', ') : 'tous les apprenants') + (ann || fin ? '' : l.meet ? ' · lien Teams prêt' : ' · ⚠️ lien Teams à ajouter'));
       r.row.firstChild.appendChild(el('span', 'lvtag' + (ann ? ' red' : ''), ann ? 'Annulé' : fin ? (l.replay ? 'Replay en ligne' : 'Terminé') : 'Prévu'));
       if (fin || ann) r.row.classList.add('fin');
       var bm = el('button', 'b sec', 'Modifier'); bm.type = 'button';
       bm.addEventListener('click', function () { lvForm(l); });
       var bs = el('button', 'b sec' + (ann ? '' : ' red'), ann ? 'Rétablir' : 'Annuler le live'); bs.type = 'button';
       bs.addEventListener('click', async function () {
-        if (!confirm((ann ? 'Rétablir' : 'Annuler') + ' ce live ?\n\n« ' + l.sujet + ' »\n' + fdh(l.t) + '\n\n' + (ann ? 'Il réapparaîtra comme prévu chez les apprenants.' : 'Les apprenants verront « Annulé » et le lien Meet ne sera plus donné. Pensez à les prévenir aussi par une annonce.'))) return;
+        if (!confirm((ann ? 'Rétablir' : 'Annuler') + ' ce live ?\n\n« ' + l.sujet + ' »\n' + fdh(l.t) + '\n\n' + (ann ? 'Il réapparaîtra comme prévu chez les apprenants.' : 'Les apprenants verront « Annulé » et le lien Teams ne sera plus donné. Pensez à les prévenir aussi par une annonce.'))) return;
         bs.disabled = true;
         try { await call('/admin/live-statut', 'POST', { id: l.id, statut: ann ? 'prevu' : 'annule' }); await load(); } catch (e) { alert(e.message); bs.disabled = false; }
       });
@@ -1155,7 +1271,7 @@ window.preparerPdf = async function (PDFLib, src) {
     var mods = [].slice.call($('lvMods').querySelectorAll('input:checked')).map(function (c) { return c.value; });
     if (!sujet || !dt || !hr) { msg.className = 'err'; msg.textContent = 'Indiquez le sujet, la date et l\'heure.'; return; }
     var p = dt.split('-'), q = hr.split(':'), t = Date.UTC(+p[0], +p[1] - 1, +p[2], +q[0], +q[1]);
-    if (!confirm((LVEDIT ? 'Enregistrer les modifications de ce live ?' : 'Programmer ce live ?') + '\n\n« ' + sujet + ' »\n' + fdh(t) + ' (heure d\'Abidjan)\nPour : ' + (mods.length ? mods.map(modTitle).join(', ') : 'tous les apprenants') + '\nLien Meet : ' + ($('lvMeet').value.trim() || 'à ajouter plus tard'))) return;
+    if (!confirm((LVEDIT ? 'Enregistrer les modifications de ce live ?' : 'Programmer ce live ?') + '\n\n« ' + sujet + ' »\n' + fdh(t) + ' (heure d\'Abidjan)\nPour : ' + (mods.length ? mods.map(modTitle).join(', ') : 'tous les apprenants') + '\nLien Teams : ' + ($('lvMeet').value.trim() || 'à ajouter plus tard'))) return;
     var btn = $('lvSave'); btn.disabled = true;
     try { await call('/admin/live', 'POST', { id: LVEDIT, sujet: sujet, t: t, dur: +$('lvDur').value, meet: $('lvMeet').value.trim(), modules: mods }); var edit = LVEDIT; lvForm(null); await load(); msg.className = 'ok'; msg.textContent = edit ? '✅ Live modifié.' : '✅ Live programmé : les apprenants concernés le verront à leur prochaine connexion.'; }
     catch (e) { msg.className = 'err'; msg.textContent = e.message; }
