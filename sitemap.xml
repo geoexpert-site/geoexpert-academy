@@ -126,6 +126,12 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/charte-apprenant.html</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
     <url>
     <loc>https://geoexpertacademy.ci/videos.html</loc>
     <lastmod>2026-10-09</lastmod>

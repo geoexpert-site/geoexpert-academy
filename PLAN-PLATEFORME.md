@@ -255,7 +255,7 @@ Priorité du formateur : modules 1 et 2 (QGIS, ArcGIS) et Télédétection. Webm
 - [x] Plateforme : arc2-v04 renommé ; qgis1-v10 masqué (`"hidden": true` dans le CATALOG ; son quiz reste en base mais n'est plus proposé, aucun résultat enregistré) ; QGIS 1 = « 15 leçons »
 - [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-30-avant-finalisation\` ; test vérifié avec un apprenant temporaire (supprimé)
 - [x] **En ligne le 30/10/2026** : `espace-apprenant-api` → 7047243d (avant : 7099147e) ; `geoexpert-admin` → 0e7276df (avant : fb841e4c) ; contrôles : faux code 401, page apprenant 200, admin renvoyé vers Access
-- [ ] **À faire par l'administrateur** : joindre les 6 cours PDF terminés (dossier `ressources/cours/A-DEPOSER-espace-apprenant/`) à la leçon « Introduction » de chaque formation, onglet 📚 Contenu > « 📎 Joindre un fichier » (Google Earth : leçon 1 de la formation Google Earth)
+- [x] ~~Joindre les 6 cours PDF à la leçon « Introduction »~~ : **remplacé** par la rubrique « Mes ressources » (voir plus bas), les cours y sont mis en place à la mise en ligne
 - ⚠️ Joindre un fichier enregistre la liste des leçons de la formation dans la table `content`, qui remplace ensuite le CATALOG du code pour cette formation : après cela, les titres de ces formations se changent dans l'onglet Contenu, plus dans `worker.js`
 - [ ] Mettre les 23 vidéos Télédétection sur Bunny et coller leurs identifiants dans l'onglet Contenu
 
@@ -270,6 +270,33 @@ Priorité du formateur : modules 1 et 2 (QGIS, ArcGIS) et Télédétection. Webm
   - tests locaux : `GeoExpert-Outils\test-resultats-quiz.mjs` 11/11 ; non-régression quiz 9/9, tableau de bord 13/13, contenu 18/18, purge 15/15
   - ⚠️ `test-fiche` (« Awa essai jour 5 ») et `test-actions` échouent aussi SANS ce changement : données de test périmées (l'essai d'Awa est fini) → à rafraîchir
   - `geoexpert-admin` → 2b141a29 (avant : 0e7276df) ; Worker apprenant pas redéployé (ses routes ne changent pas)
+
+## Mes ressources, livret et guide adaptés, charte de l'apprenant (demande du 31/10/2026)
+
+Détails : `RAPPORT-RESSOURCES-CHARTE.md` (tests, captures) · `MISE-EN-LIGNE-RESSOURCES-CHARTE.md` (étapes, retour en arrière) · `GUIDE-ADMIN.md` §7 quinquies et §7 sexies.
+
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-31-avant-ressources-charte\` (KV + D1 prod + code + dossier `ressources`) ; étiquette `sauvegarde-avant-ressources-charte` ; branche `ressources-charte`
+- [x] Inventaire `ressources/` validé : 6 cours terminés publiés ; Webmapping, KoboToolbox et Projet final (Pack complet seulement) **retenus** tant qu'ils sont en pause
+- [x] Charte comparée aux CGV ; texte corrigé et validé (première connexion, prestataires, « sans remboursement ») → `worker/charte.js`, version **1.0**
+- [x] **Partie 1 — Mes ressources** (validée) : entrée sous « Mes notes » + page de cartes ; règles `immediat` / `j8` (fin d'essai, tout de suite pour les anciens codes) ;
+  `pour` = formation ou `pack-complet` ; tables D1 `ressources`, `chartes` ; fichiers dans R2 (`ressources/<id>/…`, bucket privé)
+  - blocage dans le Worker : `/api/ressource` → lien `/r/<id>/<exp>/<code chiffré AES-GCM>/<signature>` (30 min, `DL_SECRET`), revérifié au téléchargement
+  - nom sur les PDF sans pdf-lib dans le Worker (10 ms de calcul) : le PDF est **préparé** à l'envoi (pdf-lib dans le navigateur de l'admin,
+    script `prep-pdf` de `admin.html`) avec une zone vide de 900 octets en bas de chaque page ; le Worker y écrit le texte (Helvetica, centré)
+  - HTML : `%%RESERVE%%` (texte) et `%%RESERVE_CSS%%` (pied de chaque page imprimée, `@page @bottom-center`)
+  - charte : fenêtre à la 1re connexion / nouvelle version ; `/api/charte-accept` ; `/api/play`, `/api/file`, `/api/quiz*`, `/api/ressource` refusés sans acceptation ;
+    suit le code remplacé, effacée par la purge ; fiche admin « Charte acceptée le … » ; onglet admin **📂 Ressources** (+ carte « Charte »)
+  - outils : `ressources-initiales.mjs local|test|prod`, `ressources-html.mjs`, `test-ressources.mjs api|admin|enligne|documents`, `verif-prod-ressources.mjs`
+- [x] **Partie 2 — livret et guide** (validée) : `ressources/livret-accueil-video.html` (réécrit pour la vidéo) et `ressources/guide-cartographie-video.html`
+  (7e erreur, noms des formations vidéo, étiquette de couverture, nom de l'apprenant) ; Montserrat + Inter ; couverture en image (dégradés mal rendus en PDF) ;
+  **logo du site** (`ressources/logo.png` = logo d'une autre société) ; versions prêtes : `ressources/prets/`
+- [x] **Partie 3 — charte** (validée) : page `charte-apprenant.html` (fabriquée par `GeoExpert-Outils\charte-page.mjs` depuis `worker/charte.js`) ;
+  ligne « En vous inscrivant, vous acceptez… » sous les 11 boutons « Je m'inscris » ; politique de confidentialité (§2.3, §3, §4, 31/10/2026) ; `sitemap.xml`
+- [x] Tests : 61/61 + 12/12 + 8/8 + 20/20 + 14/14 ; non-régression OK (sauf `test-relances` « Code reçu aujourd'hui », déjà connu) ;
+  preuve pixel 50/50 (page en ligne) et 34/34 (vidéos publicitaires) → `geoexpert-captures\preuve-existant-ressources-charte\`
+- [x] Workers de test déployés (`espace-apprenant-api-test` 4370ea6b) ; ressources installées dans `geoexpert-test` / `geoexpert-fichiers-test`
+- [ ] **Mise en ligne** : suivre `MISE-EN-LIGNE-RESSOURCES-CHARTE.md` **après l'accord de l'administrateur** (page du site AVANT le Worker)
+- ⚠️ `ressources/` est maintenant dans `.gitignore` (dépôt public)
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
@@ -291,6 +318,7 @@ Priorité du formateur : modules 1 et 2 (QGIS, ArcGIS) et Télédétection. Webm
 
 ## Points à suivre
 
+- **Charte** : changer son texte = `worker/charte.js` + nouveau numéro de `version` (tous les apprenants la réacceptent) + `node charte-page.mjs`.
 - **Le dépôt GitHub est public** : l'adresse « cachée » de l'ancienne page admin y est visible par tous, et la version
   actuelle n'a pas de limite de tentatives. → Mettre en ligne la partie sécurité dès qu'Access est validé.
   Tout ce qui est poussé sur `main` est public (aucun secret dans les fichiers : mots de passe et clés restent dans Cloudflare).

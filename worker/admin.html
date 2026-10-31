@@ -217,6 +217,9 @@
     .admin-header { flex-direction: column; gap: 10px; text-align: center; }
     .admin-header .title { margin: 0; }
   }
+  /* Onglet Ressources : la description prend 2 colonnes sur ordinateur ; tableau de la charte défilant sur téléphone */
+  @media (min-width: 769px) { .rsd { grid-column: span 2; } }
+  #chBox { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -250,6 +253,7 @@
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="cont">📚 Contenu</button>
+      <button data-t="ress">📂 Ressources</button>
       <button data-t="vid">🎬 Vidéos Bunny</button>
       <button data-t="pdf">📄 Fichiers (PDF/ZIP)</button>
       <button data-t="log">📜 Journal</button>
@@ -305,6 +309,36 @@
         <h2>📦 Gros fichiers (stockage R2)</h2>
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Pour les fichiers de plus de 10 Mo (cartes, données d'exercices, projets finaux). Déposez-les d'abord dans le stockage R2 (voir le guide), puis rattachez-les à une leçon ci-dessus avec « 📦 Rattacher un gros fichier ». Le stockage n'est jamais public : seuls les apprenants qui ont droit à la leçon peuvent télécharger.</p>
         <div id="r2Box"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Ressources (Mes ressources des apprenants) + charte de l'apprenant -->
+    <div data-p="ress" hidden>
+      <div class="a-card">
+        <h2>📂 Ressources des apprenants</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Documents de la rubrique <b>« Mes ressources »</b> de l'espace apprenant. Chaque document téléchargé porte en bas de page le nom et le code de l'apprenant. <b>Dès la première connexion</b> : disponible tout de suite. <b>À partir du 8e jour</b> : comme les leçons (tout de suite pour les anciens codes, sans période d'essai). <b>Retenue</b> : préparée mais invisible pour les apprenants.</p>
+        <div id="rsList"></div>
+      </div>
+      <div class="a-card">
+        <h2>➕ Ajouter une ressource</h2>
+        <div class="a-row">
+          <div><label for="rsTitle">Titre</label><input type="text" id="rsTitle" maxlength="120" placeholder="ex. Fiche des raccourcis QGIS"></div>
+          <div><label for="rsKind">Type de fichier</label><select id="rsKind"><option value="pdf">PDF</option><option value="html">Page HTML (à imprimer en PDF)</option></select></div>
+          <div><label for="rsOrdre">Position dans la liste</label><input type="number" id="rsOrdre" min="0" max="999" value="50"></div>
+        </div>
+        <label for="rsDescr">Description (une phrase, facultatif)</label><input type="text" id="rsDescr" maxlength="300">
+        <div class="a-row">
+          <div><label for="rsRegle">Déblocage</label><select id="rsRegle"></select></div>
+          <div><label for="rsPour">Pour qui ?</label><select id="rsPour"></select></div>
+          <div><label for="rsFile">Fichier</label><input type="file" id="rsFile" accept=".pdf,.html,.htm" style="background:transparent;border:0;padding:8px 0;"></div>
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;font-weight:500;"><input type="checkbox" id="rsVis" checked style="width:auto;"> Visible par les apprenants (décochez pour la préparer sans la montrer)</label>
+        <button class="b" id="rsAdd">Ajouter la ressource</button>
+        <div id="rsAddMsg"></div>
+      </div>
+      <div class="a-card">
+        <h2 style="margin-bottom:12px;">📜 Charte de l'apprenant</h2>
+        <div id="chBox"></div>
       </div>
     </div>
 
@@ -441,6 +475,42 @@
   </div>
 </div>
 
+<!-- Préparation d'un PDF de ressource (dans ce navigateur, avant l'envoi) : une zone vide est réservée en bas de chaque page.
+     Au téléchargement, le Worker y écrit « Document réservé à [nom] – [code] – GeoExpert Academy ». Le fichier d'origine
+     reste sur votre ordinateur, inchangé. Même fonction utilisée par l'outil GeoExpert-Outils\ressources-initiales.mjs. -->
+<script id="prep-pdf">
+window.preparerPdf = async function (PDFLib, src) {
+  var ZONE = 900; // octets par zone : identique à RESS_ZONE dans worker.js
+  var doc = await PDFLib.PDFDocument.load(src, { updateMetadata: false });
+  var font = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+  var ctx = doc.context, zones = {}, n = 0;
+  var q = ctx.register(ctx.stream('q\n')), Q = ctx.register(ctx.stream('\nQ\n'));
+  doc.getPages().forEach(function (page) {
+    var b = page.getCropBox(), key = [b.x, b.y, b.width].map(function (v) { return v.toFixed(2); }).join(',');
+    if (!zones[key]) {
+      var id = 'GXRZONE' + String(n++).padStart(3, '0');
+      zones[key] = { id: id, x: b.x, y: b.y, w: b.width, ref: ctx.register(ctx.stream('%' + id + ' '.repeat(ZONE - id.length - 1))) };
+    }
+    // Le contenu existant est encadré (q … Q) pour que le texte ajouté ne dépende pas de ses réglages.
+    page.node.wrapContentStreams(q, Q);
+    page.node.addContentStream(zones[key].ref);
+    page.node.normalizedEntries().Font.set(PDFLib.PDFName.of('GXR'), font.ref);
+  });
+  var out = await doc.save({ useObjectStreams: false, addDefaultPage: false, updateFieldAppearances: false });
+  var list = Object.keys(zones).map(function (k) { return zones[k]; }).map(function (z) {
+    var m = new TextEncoder().encode('%' + z.id), off = -1;
+    for (var i = 0; i <= out.length - m.length && off < 0; i++) {
+      if (out[i] !== 37) continue;
+      var j = 1; while (j < m.length && out[i + j] === m[j]) j++;
+      if (j === m.length) off = i;
+    }
+    if (off < 0) throw new Error('Zone de marquage introuvable');
+    return { off: off, x: +z.x.toFixed(2), y: +z.y.toFixed(2), w: +z.w.toFixed(2) };
+  });
+  return { bytes: out, zones: list };
+};
+</script>
+
 <script>
 (function () {
   // ===== A REMPLIR =====
@@ -474,6 +544,8 @@
     renderAttestations(await call('/admin/attestations', 'GET'));
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
     renderContent(true); renderR2();
+    try { RS = await call('/admin/ressources', 'GET'); } catch (e) { RS = null; }
+    renderRessources();
     renderLog((await call('/admin/journal', 'GET')).entries);
   }
 
@@ -1240,6 +1312,11 @@
       [f.lastLesson || '-', 'Dernière leçon ouverte'],
     ].forEach(function (x) { var d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('small', '', x[1])); facts.appendChild(d); });
     body.appendChild(facts);
+    var chOk = (f.chartes || []).filter(function (x) { return x.version === f.charteVersion; })[0];
+    var chP = el('p', '', chOk ? '📜 Charte acceptée le ' + fdtm(chOk.t) + ', version ' + chOk.version
+      : '📜 Charte pas encore acceptée (version ' + (f.charteVersion || '?') + ')' + ((f.chartes || [])[0] ? ' · version ' + f.chartes[0].version + ' acceptée le ' + fdtm(f.chartes[0].t) : '') + ' : elle lui sera demandée à sa prochaine connexion.');
+    chP.id = 'fCharte'; chP.style.cssText = 'font-size:13.5px;margin:10px 0 0;font-weight:600;color:' + (chOk ? '#0a7a3b' : '#b9770e') + ';';
+    body.appendChild(chP);
     if (f.networks >= 4) body.appendChild(el('p', 'warn', '⚠️ Code utilisé depuis ' + f.networks + ' connexions internet différentes : partage possible.'));
     if (f.remplace) body.appendChild(el('p', '', 'Ce code remplace l\'ancien code perdu ' + f.remplace + '.')).style.cssText = 'color:var(--dim);font-size:13px;margin:10px 0 0;';
     renderContact(f, body);
@@ -1470,6 +1547,148 @@
     } finally {
       btn.textContent = 'Enregistrer les identifiants'; btn.disabled = false;
     }
+  });
+
+  // ----- Ressources (« Mes ressources » des apprenants) et charte de l'apprenant
+  var RS = null;
+  var REGLES = { immediat: 'Dès la première connexion', j8: 'À partir du 8e jour (comme les leçons)' };
+  var PDFLIB = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+  var PDFLIB_SRI = 'sha384-weMABwrltA6jWR8DDe9Jp5blk+tZQh7ugpCsF3JwSA53WZM9/14PjS5LAJNHNjAI';
+  function fdtm(ms) { return new Date(ms).toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+  function pourLabel(p) { if (!p) return 'Tous les apprenants'; var m = RS && RS.modules.filter(function (x) { return x.key === p; })[0]; return m ? m.title : (LABELS[p] || p); }
+  function fillSelects(regle, pour, value) {
+    regle.textContent = ''; pour.textContent = '';
+    Object.keys(REGLES).forEach(function (k) { var o = el('option', '', REGLES[k]); o.value = k; regle.appendChild(o); });
+    [''].concat(RS.modules.map(function (m) { return m.key; }), ['pack-complet']).forEach(function (k) {
+      var o = el('option', '', k === 'pack-complet' ? 'Pack complet uniquement' : pourLabel(k)); o.value = k; pour.appendChild(o);
+    });
+    if (value) { regle.value = value.regle; pour.value = value.pour; }
+  }
+  function loadPdfLib() {
+    if (window.PDFLib) return Promise.resolve(window.PDFLib);
+    return new Promise(function (ok, ko) {
+      var x = document.createElement('script'); x.src = PDFLIB; x.integrity = PDFLIB_SRI; x.crossOrigin = 'anonymous';
+      x.onload = function () { ok(window.PDFLib); }; x.onerror = function () { ko(new Error('Impossible de charger l\'outil PDF : vérifiez votre connexion.')); };
+      document.head.appendChild(x);
+    });
+  }
+  // Envoie le fichier d'une ressource. PDF : préparé ici (zone du nom sur chaque page), le fichier d'origine n'est pas modifié.
+  async function sendRessFile(r, file, msg) {
+    var isPdf = /\.pdf$/i.test(file.name), isHtml = /\.html?$/i.test(file.name);
+    if (r.kind === 'pdf' && !isPdf) throw new Error('Cette ressource attend un fichier PDF.');
+    if (r.kind === 'html' && !isHtml) throw new Error('Cette ressource attend une page HTML.');
+    if (file.size > 30 * 1024 * 1024) throw new Error('Fichier trop volumineux (30 Mo au maximum).');
+    var body = file, headers = { 'X-Admin-Password': pw };
+    if (isPdf) {
+      msg.textContent = 'Préparation du PDF (ajout de la zone du nom sur chaque page)…';
+      var prep;
+      try { prep = await window.preparerPdf(await loadPdfLib(), new Uint8Array(await file.arrayBuffer())); }
+      catch (e) { throw new Error(/encrypt/i.test(e.message) ? 'Ce PDF est protégé par un mot de passe : enregistrez-en une copie sans protection, puis réessayez.' : 'Ce PDF n\'a pas pu être préparé (' + e.message + ').'); }
+      body = prep.bytes; headers['X-Stamp'] = JSON.stringify(prep.zones);
+    }
+    msg.textContent = 'Envoi…';
+    var res = await fetch(API_URL + '/admin/ressource-fichier?id=' + encodeURIComponent(r.id) + '&name=' + encodeURIComponent(file.name), { method: 'PUT', headers: headers, body: body });
+    var j = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(j.error || 'Erreur');
+  }
+  async function reloadRess() { RS = await call('/admin/ressources', 'GET'); renderRessources(); }
+  function renderRessources() {
+    var box = $('rsList'); if (!box) return; box.textContent = '';
+    if (!RS) { box.appendChild(el('p', 'err', 'Liste des ressources indisponible (base de données ou mise à jour du Worker manquante).')); return; }
+    if (!RS.r2) box.appendChild(el('p', 'err', 'Le stockage R2 n\'est pas relié à ce Worker : les fichiers ne peuvent pas être envoyés.'));
+    if (!RS.items.length) box.appendChild(el('p', '', 'Aucune ressource pour le moment.')).style.color = 'var(--dim)';
+    RS.items.forEach(function (r) {
+      var d = el('details', 'fmod rsr'); d.setAttribute('data-id', r.id);
+      var s = el('summary'), t = el('span', '', r.title);
+      t.appendChild(el('span', 'badge', r.kind === 'html' ? 'Page HTML' : 'PDF'));
+      if (!r.visible) t.appendChild(el('span', 'badge off', 'Retenue'));
+      if (!r.r2) t.appendChild(el('span', 'badge off', 'Pas de fichier'));
+      s.appendChild(t);
+      s.appendChild(el('em', '', (r.regle === 'j8' ? '8e jour' : '1re connexion') + ' · ' + pourLabel(r.pour)));
+      d.appendChild(s);
+      var w = el('div'); w.style.cssText = 'padding:0 14px 14px;font-size:14px;';
+      w.appendChild(el('p', '', r.r2 ? 'Fichier en ligne : ' + fsize(r.size) + ', mis à jour le ' + fdtm(r.updated) + (r.kind === 'pdf' ? ' (nom de l\'apprenant ajouté en bas de chaque page)' : '') : '⚠️ Aucun fichier : la ressource apparaît chez les apprenants avec « Bientôt ».')).style.cssText = 'color:var(--dim);margin:0 0 6px;';
+      var g = el('div', 'a-row');
+      function field(label, input) { var c = el('div'); var l = el('label', '', label); c.appendChild(l); c.appendChild(input); g.appendChild(c); return input; }
+      var ti = field('Titre', el('input')); ti.type = 'text'; ti.maxLength = 120; ti.value = r.title;
+      var rg = field('Déblocage', el('select')), po = field('Pour qui ?', el('select'));
+      fillSelects(rg, po, r);
+      w.appendChild(g);
+      var g2 = el('div', 'a-row');
+      var dl = el('div', 'rsd'); dl.appendChild(el('label', '', 'Description'));
+      var de = el('input'); de.type = 'text'; de.maxLength = 300; de.value = r.descr; dl.appendChild(de); g2.appendChild(dl);
+      var ol = el('div'); ol.appendChild(el('label', '', 'Position')); var or = el('input'); or.type = 'number'; or.min = 0; or.max = 999; or.value = r.ordre; ol.appendChild(or); g2.appendChild(ol);
+      w.appendChild(g2);
+      var vl = el('label'); vl.style.cssText = 'display:flex;gap:8px;align-items:center;font-weight:500;';
+      var vi = el('input'); vi.type = 'checkbox'; vi.checked = !!r.visible; vi.style.width = 'auto'; vl.appendChild(vi); vl.appendChild(document.createTextNode('Visible par les apprenants'));
+      w.appendChild(vl);
+      var msg = el('div'); msg.style.cssText = 'font-size:13.5px;margin-top:8px;';
+      var bar = el('div'); bar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;';
+      var save = el('button', 'b sec fic', 'Enregistrer les réglages'); save.type = 'button';
+      save.addEventListener('click', async function () {
+        save.disabled = true;
+        try { await call('/admin/ressource', 'POST', { id: r.id, title: ti.value, descr: de.value, regle: rg.value, pour: po.value, ordre: or.value, visible: vi.checked }); await reloadRess(); }
+        catch (e) { msg.className = 'err'; msg.textContent = e.message; save.disabled = false; }
+      });
+      var fl = el('label', 'b sec', r.r2 ? '⬆️ Remplacer le fichier' : '⬆️ Envoyer le fichier'); fl.style.cssText = 'margin:2px;cursor:pointer;';
+      var fi = el('input'); fi.type = 'file'; fi.accept = r.kind === 'html' ? '.html,.htm' : '.pdf'; fi.hidden = true; fl.appendChild(fi);
+      fi.addEventListener('change', async function () {
+        if (!fi.files[0]) return;
+        msg.className = ''; msg.textContent = '';
+        try { await sendRessFile(r, fi.files[0], msg); await reloadRess(); }
+        catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+        fi.value = '';
+      });
+      var del = el('button', 'b sec red', 'Retirer'); del.type = 'button';
+      del.addEventListener('click', async function () {
+        if (!confirm('Retirer « ' + r.title + ' » ? Elle disparaîtra de « Mes ressources » pour tous les apprenants, et son fichier sera supprimé du stockage.')) return;
+        try { await call('/admin/ressource-delete', 'POST', { id: r.id }); await reloadRess(); }
+        catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+      });
+      bar.appendChild(save); bar.appendChild(fl); bar.appendChild(del);
+      w.appendChild(bar); w.appendChild(msg);
+      d.appendChild(w); box.appendChild(d);
+    });
+    fillSelects($('rsRegle'), $('rsPour'));
+    renderCharte();
+  }
+  // Charte : qui l'a acceptée (version en cours), et qui ne l'a pas encore fait.
+  function renderCharte() {
+    var box = $('chBox'); if (!box) return; box.textContent = '';
+    var v = RS.charte.version, acc = {};
+    RS.charte.acceptations.forEach(function (a) { if (a.version === v && !acc[a.code]) acc[a.code] = a.t; });
+    var valid = state.students.filter(function (s) { return s.active && !(s.expires && s.expires < Date.now()); });
+    var oui = valid.filter(function (s) { return acc[s.code]; }), non = valid.filter(function (s) { return !acc[s.code]; });
+    var p = el('p', '', 'Version en cours : ' + v + ' (' + RS.charte.date + '). Chaque apprenant doit l\'accepter à sa connexion (et à chaque nouvelle version) avant d\'ouvrir ses leçons et ses ressources. Texte public : geoexpertacademy.ci/charte-apprenant.html');
+    p.style.cssText = 'font-size:14px;color:var(--dim);margin:0 0 12px;'; box.appendChild(p);
+    var k = el('div', 'kpis'); k.style.gridTemplateColumns = 'repeat(2,1fr)';
+    [[oui.length, 'ont accepté la version ' + v], [non.length, 'pas encore (elle leur sera demandée à la prochaine connexion)']].forEach(function (x, i) {
+      var c = el('div', 'kpi' + (i && x[0] ? ' alerte' : '')); c.appendChild(el('b', '', String(x[0]))); c.appendChild(el('span', '', x[1])); k.appendChild(c);
+    });
+    box.appendChild(k);
+    var tb = el('table'), hr = el('tr');
+    ['Apprenant', 'Code', 'Charte', ''].forEach(function (x) { hr.appendChild(el('th', '', x)); }); tb.appendChild(hr);
+    oui.concat(non).forEach(function (s) {
+      var tr = el('tr'); tr.appendChild(el('td', '', s.label)); tr.appendChild(el('td', 'code', s.code));
+      var c = el('td', '', acc[s.code] ? 'Acceptée le ' + fdtm(acc[s.code]) + ', version ' + v : 'Pas encore acceptée'); c.style.color = acc[s.code] ? '#0a7a3b' : '#b9770e'; c.style.fontWeight = '600'; tr.appendChild(c);
+      var bt = el('td'), b = el('button', 'b sec fic', 'Fiche'); b.type = 'button'; b.addEventListener('click', function () { openFiche(s.code); }); bt.appendChild(b); tr.appendChild(bt);
+      tb.appendChild(tr);
+    });
+    if (valid.length) box.appendChild(tb);
+  }
+  $('rsAdd').addEventListener('click', async function () {
+    var out = $('rsAddMsg'), btn = $('rsAdd'), file = $('rsFile').files[0];
+    out.className = ''; out.textContent = ''; btn.disabled = true;
+    try {
+      var kind = $('rsKind').value;
+      if (file && !(kind === 'pdf' ? /\.pdf$/i : /\.html?$/i).test(file.name)) throw new Error(kind === 'pdf' ? 'Choisissez un fichier PDF, ou changez le type.' : 'Choisissez une page HTML, ou changez le type.');
+      var j = await call('/admin/ressource', 'POST', { title: $('rsTitle').value, descr: $('rsDescr').value, kind: kind, regle: $('rsRegle').value, pour: $('rsPour').value, ordre: $('rsOrdre').value, visible: $('rsVis').checked });
+      if (file) await sendRessFile({ id: j.id, kind: kind }, file, out);
+      $('rsTitle').value = ''; $('rsDescr').value = ''; $('rsFile').value = '';
+      await reloadRess();
+      out.className = 'ok'; out.textContent = '✅ Ressource ajoutée' + (file ? '' : ' (pensez à envoyer son fichier)') + '.';
+    } catch (e) { out.className = 'err'; out.textContent = e.message; }
+    btn.disabled = false;
   });
 
   function renderPdfs() {
