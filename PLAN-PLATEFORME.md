@@ -295,7 +295,15 @@ Détails : `RAPPORT-RESSOURCES-CHARTE.md` (tests, captures) · `MISE-EN-LIGNE-RE
 - [x] Tests : 61/61 + 12/12 + 8/8 + 20/20 + 14/14 ; non-régression OK (sauf `test-relances` « Code reçu aujourd'hui », déjà connu) ;
   preuve pixel 50/50 (page en ligne) et 34/34 (vidéos publicitaires) → `geoexpert-captures\preuve-existant-ressources-charte\`
 - [x] Workers de test déployés (`espace-apprenant-api-test` 4370ea6b) ; ressources installées dans `geoexpert-test` / `geoexpert-fichiers-test`
-- [ ] **Mise en ligne** : suivre `MISE-EN-LIGNE-RESSOURCES-CHARTE.md` **après l'accord de l'administrateur** (page du site AVANT le Worker)
+- [x] **Mise en ligne — EN LIGNE le 31/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes6-10-31-avant-mise-en-ligne-ressources\` ; tables `ressources`, `chartes` ajoutées dans `geoexpert-prod`
+  - 12 ressources installées (`ressources-initiales.mjs prod`) ; Webmapping, KoboToolbox, Projet final retenus
+  - site publié d'abord : `main` = 6216699 (fusion de `ressources-charte`) ; puis `geoexpert-admin` → ebbdc3a5 (avant : 2b141a29),
+    `espace-apprenant-api` → 239fbeb4 (avant : 7047243d)
+  - vérifié : `verif-prod-ressources.mjs` 14/14 (codes temporaires supprimés) ; faux webhook 401 ; « Vérifier un certificat » OK ;
+    admin renvoyé vers Access ; production revenue à 3 clés KV, 0 acceptation de charte
+  - retour en arrière : `wrangler rollback 7047243d` / `2b141a29` (voir `MISE-EN-LIGNE-RESSOURCES-CHARTE.md`)
+- [ ] 👤 Essai de l'administrateur avec son code « test 1 » : accepter la charte, ouvrir « Mes ressources »
 - ⚠️ `ressources/` est maintenant dans `.gitignore` (dépôt public)
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
