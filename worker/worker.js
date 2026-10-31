@@ -567,6 +567,32 @@ async function loadAnnonces(env, rec, now) {
     return r.results.filter(a => !a.module || mine.has(a.module)).slice(0, 3).map(a => ({ id: a.id, t: a.t, text: a.text }));
   } catch (e) { return []; }
 }
+// Rendez-vous live : un live est pour l'apprenant s'il vise toutes les formations ou l'une des siennes (essai compris).
+const LIVE_AVANT = 30 * 60000; // le lien Meet est donné 30 minutes avant le début
+const MEET_RE = /^https:\/\/meet\.google\.com\/[a-z0-9-]{3,40}(\?[^\s<>"]*)?$/i;
+const BUNNY_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function liveFor(rec, l) {
+  if (!l.modules) return true;
+  const mine = new Set(rec.modules.map(g => g.m));
+  return l.modules.split(',').some(m => mine.has(m));
+}
+function liveEnd(l) { return l.t + l.dur * 60000; }
+// Lives renvoyés à la connexion : à venir (même annulés, jusqu'à leur date) et passés avec replay. Jamais le lien Meet.
+async function loadLives(env, rec, now) {
+  if (!env.DB) return undefined;
+  try {
+    const r = await env.DB.prepare("SELECT id, t, dur, sujet, modules, statut, meet, replay FROM lives WHERE t > ? OR replay != '' ORDER BY t LIMIT 200").bind(now - DAY).all();
+    return r.results.filter(l => liveFor(rec, l) && (liveEnd(l) > now - DAY || l.replay)).map(l => ({
+      id: l.id, t: l.t, dur: l.dur, sujet: l.sujet, annule: l.statut === 'annule', lien: !!l.meet, replay: !!l.replay,
+      pour: l.modules ? l.modules.split(',').map(m => { const x = findModule(m); return x ? x.title.split(' : ')[0] : m; }).join(', ') : '',
+    }));
+  } catch (e) { return undefined; }
+}
+async function getReglage(env, k) {
+  if (!env.DB) return '';
+  try { const r = await env.DB.prepare('SELECT v FROM reglages WHERE k = ?').bind(k).first(); return r ? r.v : ''; }
+  catch (e) { return ''; }
+}
 // Leçons de l'apprenant qui ont un mini-quiz (seulement les clés : les questions sont envoyées à l'ouverture du quiz).
 async function loadQuizKeys(env, rec) {
   if (!env.DB) return [];
@@ -882,6 +908,8 @@ async function api(req, env, url) {
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
       quiz: await loadQuizKeys(env, rec),
+      lives: await loadLives(env, rec, now),
+      communaute: !!(await getReglage(env, 'communaute')),
       ...(await loginRessources(env, rec, c, now)),
       ...(await (async () => { const x = await loadCertsAndReviews(env, c); return { certificats: x.certs, avisDonnes: x.reviewed }; })()),
     }, 200, req, env);
@@ -904,8 +932,39 @@ async function api(req, env, url) {
   }
 
   // Leçons, exercices, fichiers et quiz : seulement après l'acceptation de la charte.
-  if (['/api/play', '/api/file', '/api/quiz', '/api/quiz-answer'].includes(url.pathname) && !(await charteAcceptee(env, c)))
+  if (['/api/play', '/api/file', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
     return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
+
+  // Rendez-vous live : lien Meet seulement pour un apprenant concerné, de 30 min avant le début jusqu'à la fin.
+  if (url.pathname === '/api/live-link' || url.pathname === '/api/live-replay') {
+    if (!env.DB) return reply({ error: 'Lives indisponibles pour le moment.' }, 503, req, env);
+    const l = await env.DB.prepare('SELECT * FROM lives WHERE id = ?').bind(parseInt(body.id, 10) || 0).first();
+    if (!l || !liveFor(rec, l)) return reply({ error: 'Ce live n\'est pas prévu pour votre formation.' }, 403, req, env);
+    if (url.pathname === '/api/live-replay') {
+      if (!l.replay) return reply({ error: 'Le replay n\'est pas encore disponible.' }, 404, req, env);
+      if (!BUNNY_ID_RE.test(l.replay)) return reply({ url: l.replay, kind: 'lien' }, 200, req, env);
+      if (!env.BUNNY_TOKEN_KEY || !env.LIBRARY_ID) return reply({ error: 'Configuration vidéo incomplète.' }, 500, req, env);
+      const expires = Math.floor(now / 1000) + 4 * 3600;
+      const token = await sha256hex(env.BUNNY_TOKEN_KEY + l.replay + expires);
+      const host = env.PLAYER_HOST || 'iframe.mediadelivery.net';
+      return reply({ url: 'https://' + host + '/embed/' + env.LIBRARY_ID + '/' + l.replay + '?token=' + token + '&expires=' + expires + '&autoplay=false&preload=false', kind: 'bunny', label: rec.label }, 200, req, env);
+    }
+    if (l.statut === 'annule') return reply({ error: 'Ce live a été annulé.' }, 410, req, env);
+    if (now > liveEnd(l)) return reply({ error: 'Ce live est terminé.' + (l.replay ? ' Le replay est disponible.' : ' Le replay sera ajouté prochainement.') }, 410, req, env);
+    if (now < l.t - LIVE_AVANT) {
+      const d = new Date(l.t - LIVE_AVANT);
+      return reply({ error: 'Le lien sera disponible le ' + fmtDate(l.t) + ' à partir de ' + d.getUTCHours() + ' h ' + String(d.getUTCMinutes()).padStart(2, '0') + ' (30 minutes avant le début).' }, 403, req, env);
+    }
+    if (!l.meet) return reply({ error: 'Le lien n\'est pas encore prêt : réessayez dans quelques minutes.' }, 404, req, env);
+    return reply({ url: l.meet }, 200, req, env);
+  }
+
+  // Communauté WhatsApp : le lien d'invitation n'est donné qu'à un apprenant connecté (code valide, charte acceptée).
+  if (url.pathname === '/api/communaute') {
+    const lien = await getReglage(env, 'communaute');
+    if (!lien) return reply({ error: 'Le lien de la Communauté sera ajouté prochainement.' }, 404, req, env);
+    return reply({ url: lien }, 200, req, env);
+  }
 
   // Mini-quiz : questions sans les bonnes réponses ; la correction se fait ici, sur le serveur.
   if (url.pathname === '/api/quiz' || url.pathname === '/api/quiz-answer') {
@@ -1431,6 +1490,65 @@ async function admin(req, env, url) {
     if (!row) return reply({ error: 'Annonce introuvable.' }, 404, req, env);
     await env.DB.prepare('DELETE FROM annonces WHERE id = ?').bind(parseInt(b.id, 10)).run();
     await journal(env, who, 'Annonce retirée', '', '', row.text.slice(0, 60));
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // Rendez-vous live et lien de la Communauté WhatsApp (onglet « 🎥 Lives & communauté »).
+  if (url.pathname === '/admin/lives' && req.method === 'GET') {
+    if (!env.DB) return reply({ lives: [], communaute: '' }, 200, req, env);
+    const r = await env.DB.prepare('SELECT * FROM lives ORDER BY t DESC LIMIT 200').all();
+    return reply({ lives: r.results, communaute: await getReglage(env, 'communaute') }, 200, req, env);
+  }
+  if (url.pathname === '/admin/live' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const id = parseInt(b.id, 10) || 0;
+    const t = parseInt(b.t, 10) || 0, dur = parseInt(b.dur, 10) || 0;
+    const sujet = cleanText(b.sujet, 150), meet = String(b.meet || '').trim();
+    const mods = [...new Set((Array.isArray(b.modules) ? b.modules : []).map(String))];
+    if (!sujet) return reply({ error: 'Écrivez le sujet du live.' }, 400, req, env);
+    if (!t || t < now - 30 * DAY || t > now + 400 * DAY) return reply({ error: 'Date ou heure invalide.' }, 400, req, env);
+    if (!id && t < now) return reply({ error: 'Cette date est déjà passée.' }, 400, req, env);
+    if (dur < 15 || dur > 300) return reply({ error: 'Durée invalide (de 15 minutes à 5 heures).' }, 400, req, env);
+    if (meet && !MEET_RE.test(meet)) return reply({ error: 'Le lien doit être un lien Google Meet (https://meet.google.com/...).' }, 400, req, env);
+    if (mods.some(m => !findModule(m))) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    const label = fmtDate(t) + ' : ' + sujet.slice(0, 60);
+    if (id) {
+      const old = await env.DB.prepare('SELECT id FROM lives WHERE id = ?').bind(id).first();
+      if (!old) return reply({ error: 'Live introuvable.' }, 404, req, env);
+      await env.DB.prepare('UPDATE lives SET t = ?, dur = ?, sujet = ?, meet = ?, modules = ?, updated = ?, who = ? WHERE id = ?').bind(t, dur, sujet, meet, mods.join(','), now, who, id).run();
+      await journal(env, who, 'Live modifié', '', '', label);
+    } else {
+      await env.DB.prepare('INSERT INTO lives (t, dur, sujet, meet, modules, statut, updated, who) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(t, dur, sujet, meet, mods.join(','), 'prevu', now, who).run();
+      await journal(env, who, 'Live programmé', '', '', label);
+    }
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/live-statut' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), statut = b.statut === 'annule' ? 'annule' : 'prevu';
+    const l = await env.DB.prepare('SELECT * FROM lives WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!l) return reply({ error: 'Live introuvable.' }, 404, req, env);
+    await env.DB.prepare('UPDATE lives SET statut = ?, updated = ?, who = ? WHERE id = ?').bind(statut, now, who, l.id).run();
+    await journal(env, who, statut === 'annule' ? 'Live annulé' : 'Live rétabli', '', '', fmtDate(l.t) + ' : ' + l.sujet.slice(0, 60));
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/live-replay' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), replay = String(b.replay || '').trim();
+    const l = await env.DB.prepare('SELECT * FROM lives WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!l) return reply({ error: 'Live introuvable.' }, 404, req, env);
+    if (replay && !BUNNY_ID_RE.test(replay) && !/^https:\/\/[^\s<>"]{4,500}$/.test(replay)) return reply({ error: 'Collez l\'identifiant de la vidéo Bunny (ex. 1a2b3c4d-....) ou un lien qui commence par https://' }, 400, req, env);
+    await env.DB.prepare('UPDATE lives SET replay = ?, updated = ?, who = ? WHERE id = ?').bind(replay, now, who, l.id).run();
+    await journal(env, who, replay ? 'Replay ajouté' : 'Replay retiré', '', '', fmtDate(l.t) + ' : ' + l.sujet.slice(0, 60));
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/communaute' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const lien = String((await readJson(req)).lien || '').trim();
+    if (lien && !/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{10,40}(\?[A-Za-z0-9_=&-]{0,80})?$/.test(lien)) return reply({ error: 'Le lien doit être un lien d\'invitation WhatsApp (https://chat.whatsapp.com/...).' }, 400, req, env);
+    await env.DB.prepare('INSERT INTO reglages (k, v, t, who) VALUES (?, ?, ?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v, t = excluded.t, who = excluded.who').bind('communaute', lien, now, who).run();
+    await journal(env, who, lien ? 'Lien de la Communauté enregistré' : 'Lien de la Communauté retiré', '', '', '');
     return reply({ ok: true }, 200, req, env);
   }
 

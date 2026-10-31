@@ -173,6 +173,15 @@
   .annprev b { font-family: Montserrat, sans-serif; }
   .arow.fin { opacity: .55; }
 
+  /* Lives & communauté */
+  .a-card input[type=date], .a-card input[type=time], .a-card input[type=url] { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font: 15px Inter; background: var(--bg); }
+  .lvmods { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .a-card .lvmods label { display: inline-flex; gap: 6px; align-items: center; margin: 4px 0; font-weight: 500; cursor: pointer; }
+  .lvmods input { width: 17px; height: 17px; accent-color: var(--teal); }
+  .lvtag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: #F0ECF6; color: var(--indigo); margin-left: 6px; }
+  .lvtag.red { background: #fdeded; color: #c0392b; }
+  @media (max-width: 768px) { #lvForm .a-row { grid-template-columns: 1fr; } }
+
   /* Relances */
   .cnt { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 99px; background: var(--mag); color: #fff; font-size: 12px; line-height: 18px; text-align: center; margin-left: 4px; }
   .todo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: var(--r); padding: 14px 18px; margin-bottom: 16px; font-weight: 600; }
@@ -248,6 +257,7 @@
       <button data-t="pay">💳 Paiements reçus <span id="payCount" class="cnt" hidden></span></button>
       <button data-t="rel">📣 Relances <span id="relCount" class="cnt" hidden></span></button>
       <button data-t="ann">📢 Annonces</button>
+      <button data-t="live">🎥 Lives & communauté</button>
       <button data-t="quiz">❓ Quiz</button>
       <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
       <button data-t="new">➕ Nouvel accès</button>
@@ -400,6 +410,41 @@
       </div>
     </div>
 
+    <!-- Onglet Lives & communauté -->
+    <div data-p="live" hidden>
+      <div class="a-card" id="lvForm">
+        <h2 id="lvTitle">Programmer un live</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Les apprenants concernés (essai compris) le voient dans « Rendez-vous live » et sur leur tableau de bord la semaine du live. Le lien Meet ne leur est montré que 30 minutes avant le début. Heure d'Abidjan (GMT).</p>
+        <label for="lvSujet">Sujet du live</label>
+        <input type="text" id="lvSujet" maxlength="150" placeholder="Ex : Questions-réponses QGIS chapitre 1">
+        <div class="a-row">
+          <div><label for="lvDate">Date</label><input type="date" id="lvDate"></div>
+          <div><label for="lvHeure">Heure (Abidjan)</label><input type="time" id="lvHeure" value="19:00"></div>
+          <div><label for="lvDur">Durée</label><select id="lvDur"><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 h</option><option value="90">1 h 30</option><option value="120">2 h</option><option value="180">3 h</option></select></div>
+        </div>
+        <label for="lvMeet">Lien Google Meet (vous pouvez l'ajouter plus tard)</label>
+        <input type="url" id="lvMeet" placeholder="https://meet.google.com/abc-defg-hij">
+        <label>Formations concernées</label>
+        <div class="lvmods" id="lvMods"></div>
+        <small style="color:var(--dim);">Aucune case cochée = tous les apprenants.</small>
+        <button class="b" id="lvSave" type="button" style="width:100%;">Programmer le live</button>
+        <button class="b sec" id="lvCancelEdit" type="button" hidden style="margin-top:8px;">Annuler la modification</button>
+        <div id="lvMsg"></div>
+      </div>
+      <div class="a-card">
+        <h2>Lives programmés</h2>
+        <div id="lvList"></div>
+      </div>
+      <div class="a-card">
+        <h2>Communauté WhatsApp</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">Collez le lien d'invitation de votre Communauté WhatsApp. L'entrée « Communauté » apparaît alors dans l'espace des apprenants ; le lien n'est montré qu'aux apprenants connectés. Laissez vide pour retirer l'entrée.</p>
+        <label for="cmLien">Lien d'invitation</label>
+        <input type="url" id="cmLien" placeholder="https://chat.whatsapp.com/...">
+        <button class="b" id="cmSave" type="button" style="width:100%;">Enregistrer le lien</button>
+        <div id="cmMsg"></div>
+      </div>
+    </div>
+
     <div class="a-card" data-p="new" hidden>
       <h2>Créer un accès après un paiement</h2>
       <label for="nLabel">Nom ou initiales de l'apprenant (visible sur ses vidéos en filigrane)</label>
@@ -540,6 +585,7 @@ window.preparerPdf = async function (PDFLib, src) {
     try { PAY = await call('/admin/paiements', 'GET'); } catch (e) { PAY = null; }
     renderPaiements();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
+    try { renderLives(await call('/admin/lives', 'GET')); } catch (e) { renderLives({ lives: [], communaute: '' }); }
     var qz = await call('/admin/quizzes', 'GET'); QZ = qz.quizzes; QR = qz.results || []; renderQuizList(); renderQuizStats();
     renderAttestations(await call('/admin/attestations', 'GET'));
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
@@ -889,6 +935,82 @@ window.preparerPdf = async function (PDFLib, src) {
     try { await call('/admin/annonce', 'POST', { text: text, module: m.value, days: +d.value }); $('aText').value = ''; $('aPrevT').textContent = '…'; await load(); msg.className = 'ok'; msg.textContent = '✅ Annonce publiée : elle apparaît à la prochaine ouverture du tableau de bord des apprenants.'; }
     catch (e) { msg.className = 'err'; msg.textContent = e.message; }
     finally { btn.disabled = false; btn.textContent = 'Publier l\'annonce'; }
+  });
+
+  // ----- Rendez-vous live et Communauté WhatsApp (heures d'Abidjan = GMT)
+  var LV = [], LVEDIT = 0;
+  function fdh(ms) { var d = new Date(ms); return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) + ' à ' + d.getUTCHours() + ' h ' + String(d.getUTCMinutes()).padStart(2, '0'); }
+  function lvForm(l) {
+    LVEDIT = l ? l.id : 0;
+    var d = l ? new Date(l.t) : null, mods = l && l.modules ? l.modules.split(',') : [];
+    $('lvTitle').textContent = l ? 'Modifier le live' : 'Programmer un live';
+    $('lvSujet').value = l ? l.sujet : '';
+    $('lvDate').value = d ? d.toISOString().slice(0, 10) : '';
+    $('lvHeure').value = d ? d.toISOString().slice(11, 16) : '19:00';
+    $('lvDur').value = String(l ? l.dur : 60);
+    $('lvMeet').value = l ? l.meet : '';
+    $('lvMods').querySelectorAll('input').forEach(function (c) { c.checked = mods.indexOf(c.value) > -1; });
+    $('lvSave').textContent = l ? 'Enregistrer les modifications' : 'Programmer le live';
+    $('lvCancelEdit').hidden = !l;
+    if (l) $('lvForm').scrollIntoView({ block: 'start' });
+  }
+  function renderLives(data) {
+    LV = data.lives || [];
+    var box = $('lvMods');
+    if (!box.children.length) state.catalog.forEach(function (m) {
+      var lb = el('label'), c = document.createElement('input'); c.type = 'checkbox'; c.value = m.key;
+      lb.appendChild(c); lb.appendChild(document.createTextNode(m.title.split(' : ')[0])); box.appendChild(lb);
+    });
+    $('cmLien').value = data.communaute || '';
+    var list = $('lvList'), now = Date.now(); list.textContent = '';
+    if (!LV.length) { list.appendChild(el('p', '', 'Aucun live pour le moment.')); return; }
+    var wrap = el('div', 'acts'); list.appendChild(wrap);
+    LV.forEach(function (l) {
+      var fin = l.t + l.dur * 60000 < now, ann = l.statut === 'annule';
+      var r = actRow(l.sujet, fdh(l.t) + ' · ' + l.dur + ' min · ' + (l.modules ? l.modules.split(',').map(modTitle).join(', ') : 'tous les apprenants') + (ann || fin ? '' : l.meet ? ' · lien Meet prêt' : ' · ⚠️ lien Meet à ajouter'));
+      r.row.firstChild.appendChild(el('span', 'lvtag' + (ann ? ' red' : ''), ann ? 'Annulé' : fin ? (l.replay ? 'Replay en ligne' : 'Terminé') : 'Prévu'));
+      if (fin || ann) r.row.classList.add('fin');
+      var bm = el('button', 'b sec', 'Modifier'); bm.type = 'button';
+      bm.addEventListener('click', function () { lvForm(l); });
+      var bs = el('button', 'b sec' + (ann ? '' : ' red'), ann ? 'Rétablir' : 'Annuler le live'); bs.type = 'button';
+      bs.addEventListener('click', async function () {
+        if (!confirm((ann ? 'Rétablir' : 'Annuler') + ' ce live ?\n\n« ' + l.sujet + ' »\n' + fdh(l.t) + '\n\n' + (ann ? 'Il réapparaîtra comme prévu chez les apprenants.' : 'Les apprenants verront « Annulé » et le lien Meet ne sera plus donné. Pensez à les prévenir aussi par une annonce.'))) return;
+        bs.disabled = true;
+        try { await call('/admin/live-statut', 'POST', { id: l.id, statut: ann ? 'prevu' : 'annule' }); await load(); } catch (e) { alert(e.message); bs.disabled = false; }
+      });
+      var br = el('button', 'b sec fic', l.replay ? 'Changer le replay' : 'Ajouter le replay'); br.type = 'button';
+      br.addEventListener('click', async function () {
+        var v = prompt('Replay de « ' + l.sujet + ' »\n\nCollez l\'identifiant de la vidéo Bunny (conseillé : vidéo protégée, comme les leçons) ou un lien https://\nLaissez vide pour retirer le replay.', l.replay || '');
+        if (v === null) return;
+        br.disabled = true;
+        try { await call('/admin/live-replay', 'POST', { id: l.id, replay: v.trim() }); await load(); } catch (e) { alert(e.message); br.disabled = false; }
+      });
+      if (!fin) r.ctl.appendChild(bm);
+      if (!fin) r.ctl.appendChild(bs);
+      if (fin || l.replay) r.ctl.appendChild(br);
+      wrap.appendChild(r.row);
+    });
+  }
+  $('lvCancelEdit').addEventListener('click', function () { lvForm(null); $('lvMsg').textContent = ''; $('lvMsg').className = ''; });
+  $('lvSave').addEventListener('click', async function () {
+    var msg = $('lvMsg'); msg.textContent = ''; msg.className = '';
+    var sujet = $('lvSujet').value.trim(), dt = $('lvDate').value, hr = $('lvHeure').value;
+    var mods = [].slice.call($('lvMods').querySelectorAll('input:checked')).map(function (c) { return c.value; });
+    if (!sujet || !dt || !hr) { msg.className = 'err'; msg.textContent = 'Indiquez le sujet, la date et l\'heure.'; return; }
+    var p = dt.split('-'), q = hr.split(':'), t = Date.UTC(+p[0], +p[1] - 1, +p[2], +q[0], +q[1]);
+    if (!confirm((LVEDIT ? 'Enregistrer les modifications de ce live ?' : 'Programmer ce live ?') + '\n\n« ' + sujet + ' »\n' + fdh(t) + ' (heure d\'Abidjan)\nPour : ' + (mods.length ? mods.map(modTitle).join(', ') : 'tous les apprenants') + '\nLien Meet : ' + ($('lvMeet').value.trim() || 'à ajouter plus tard'))) return;
+    var btn = $('lvSave'); btn.disabled = true;
+    try { await call('/admin/live', 'POST', { id: LVEDIT, sujet: sujet, t: t, dur: +$('lvDur').value, meet: $('lvMeet').value.trim(), modules: mods }); var edit = LVEDIT; lvForm(null); await load(); msg.className = 'ok'; msg.textContent = edit ? '✅ Live modifié.' : '✅ Live programmé : les apprenants concernés le verront à leur prochaine connexion.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { btn.disabled = false; }
+  });
+  $('cmSave').addEventListener('click', async function () {
+    var msg = $('cmMsg'), v = $('cmLien').value.trim(); msg.textContent = ''; msg.className = '';
+    if (!confirm(v ? 'Enregistrer ce lien ?\n\n' + v + '\n\nL\'entrée « Communauté » apparaîtra chez tous les apprenants connectés.' : 'Retirer le lien ?\n\nL\'entrée « Communauté » disparaîtra de l\'espace des apprenants.')) return;
+    var btn = $('cmSave'); btn.disabled = true;
+    try { await call('/admin/communaute', 'POST', { lien: v }); await load(); msg.className = 'ok'; msg.textContent = v ? '✅ Lien enregistré.' : '✅ Lien retiré.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { btn.disabled = false; }
   });
 
   // ----- Relances WhatsApp

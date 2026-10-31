@@ -378,6 +378,25 @@ ses leçons et ses ressources ne s'ouvrent pas (il garde son accès et sa progre
 - Changer le texte de la charte = demander à Claude : nouveau texte dans `worker/charte.js` + **nouveau numéro de version**
   (tout le monde devra l'accepter à nouveau) + `node charte-page.mjs` pour la page du site.
 
+## 7 septies. Rendez-vous live et Communauté (onglet **🎥 Lives & communauté**)
+
+**Programmer un live** : sujet, date, heure **d'Abidjan**, durée, lien Google Meet (vous pouvez l'ajouter plus tard),
+formations concernées (aucune case = tout le monde) → **Programmer le live** → confirmez.
+- Les apprenants concernés (essai compris) le voient dans « Rendez-vous live » et, la semaine du live, dans une petite bande
+  du tableau de bord. Ils peuvent l'**ajouter à leur agenda** (fichier .ics, rappel 30 min avant).
+- Le **lien Meet** n'est donné qu'aux apprenants concernés et connectés, à partir de **30 minutes avant** le début, jusqu'à la fin.
+- **Modifier** : change l'heure, le sujet, le lien… · **Annuler le live** : les apprenants voient « Annulé » (prévenez-les
+  aussi par une annonce) ; **Rétablir** le remet.
+- **Replay** : après le live, **Ajouter le replay** → collez l'identifiant de la vidéo **Bunny** (conseillé : protégée comme les
+  leçons, avec le filigrane) ou un lien https. Il apparaît dans « Rendez-vous live » et dans « Mes ressources ».
+
+**Communauté WhatsApp** : collez le lien d'invitation (`https://chat.whatsapp.com/…`) → **Enregistrer le lien**. L'entrée
+« Communauté » (présentation, règles, avertissement sur le numéro visible) apparaît alors chez les apprenants connectés.
+Champ vide + Enregistrer = l'entrée disparaît.
+
+**Vitesse de lecture** (rien à régler) : sous chaque vidéo, l'apprenant choisit 0,75x à 2x ; son choix est gardé sur son appareil.
+Si le lecteur ne répond pas, un message l'invite à utiliser la roue dentée ⚙ du lecteur Bunny.
+
 ---
 
 ## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3, ressources et charte)
@@ -394,6 +413,7 @@ ses leçons et ses ressources ne s'ouvrent pas (il garde son accès et sa progre
 - **Fichiers de la leçon** (phase 3) : dans l'onglet « Exercices » de la leçon, avant les exercices du module.
 - **Mes ressources** (colonne de gauche, sous « Mes notes ») : livret, kit, guide, cours PDF à son nom, et la charte.
 - **Charte de l'apprenant** : fenêtre à la 1re connexion et à chaque nouvelle version (voir 7 sexies).
+- **Rendez-vous live**, **Communauté** et **vitesse de lecture** : voir 7 septies.
 
 ---
 
