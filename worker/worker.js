@@ -719,8 +719,9 @@ async function loadAnnonces(env, rec, now) {
   } catch (e) { return []; }
 }
 // Rendez-vous live : un live est pour l'apprenant s'il vise toutes les formations ou l'une des siennes (essai compris).
-const LIVE_AVANT = 30 * 60000; // le lien Meet est donné 30 minutes avant le début
-const MEET_RE = /^https:\/\/meet\.google\.com\/[a-z0-9-]{3,40}(\?[^\s<>"]*)?$/i;
+const LIVE_AVANT = 30 * 60000; // le lien du live est donné 30 minutes avant le début
+// Lien du live : Microsoft Teams (outil du formateur) ; Google Meet reste accepté. La colonne garde son nom « meet ».
+const MEET_RE = /^https:\/\/(teams\.microsoft\.com|teams\.live\.com|meet\.google\.com)\/[^\s<>"]{3,1500}$/i;
 const BUNNY_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function liveFor(rec, l) {
   if (!l.modules) return true;
@@ -728,7 +729,7 @@ function liveFor(rec, l) {
   return l.modules.split(',').some(m => mine.has(m));
 }
 function liveEnd(l) { return l.t + l.dur * 60000; }
-// Lives renvoyés à la connexion : à venir (même annulés, jusqu'à leur date) et passés avec replay. Jamais le lien Meet.
+// Lives renvoyés à la connexion : à venir (même annulés, jusqu'à leur date) et passés avec replay. Jamais le lien du live.
 async function loadLives(env, rec, now) {
   if (!env.DB) return undefined;
   try {
@@ -849,6 +850,70 @@ const LIENS = {
 };
 const PRIX = { arc1: 15000, arc2: 20000, qgis1: 15000, qgis2: 20000, tele: 25000, web: 20000, kobo: 15000, google: 10000, 'pack-qgis': 25000, 'pack-arcgis': 25000, 'pack-complet': 100000 };
 const PAY_OK = ['transaction.successful', 'payment_link.paid', 'order.paid'];
+
+// ---------------------------------------------------------------- Phase C : Aide (FAQ) et « Et après ? »
+// FAQ et recommandations réglables dans l'administration (table reglages, clés « faq » et « apres ») ; sinon contenu de départ ci-dessous.
+const PAY_URL = 'https://checkout.digitalpaye.com/pay/';
+const PAY_URL_RE = /^https:\/\/checkout\.digitalpaye\.com\/pay\/[A-Za-z0-9_-]{6,40}$/;
+const PRODUIT_NOM = { 'pack-qgis': 'Pack QGIS (modules 1 et 2)', 'pack-arcgis': 'Pack ArcGIS (modules 1 et 2)', 'pack-complet': 'Pack Géomaticien opérationnel' };
+function produitNom(p) { return PRODUIT_NOM[p] || modShort(p) || p; }
+function produitLien(p) { const t = Object.keys(LIENS).find(k => LIENS[k] === p); return t ? PAY_URL + t : ''; }
+const FAQ_DEFAUT = [
+  { q: 'Comment installer QGIS sur Windows ?', r: 'Allez sur qgis.org, puis « Télécharger ». Choisissez la version « LTR » (la plus stable) pour Windows.\nLancez le fichier téléchargé et cliquez sur « Suivant » jusqu\'à la fin. QGIS est gratuit.\nPrévoyez environ 1,5 Go d\'espace libre et une bonne connexion pour le téléchargement.' },
+  { q: 'Comment obtenir une licence ArcGIS ?', r: 'Vous n\'avez rien à acheter : le formateur vous accompagne pour installer ArcMap et vous donne la licence.\nÉcrivez-lui avec le bouton WhatsApp en bas de cette page pour convenir de l\'installation.' },
+  { q: 'La vidéo ne se lance pas, que faire ?', r: '1. Vérifiez votre connexion internet.\n2. Rechargez la page.\n3. Essayez un autre navigateur (Chrome ou Edge à jour).\n4. En connexion lente, attendez quelques secondes ou baissez la qualité avec la roue ⚙ du lecteur.\nSi cela ne marche toujours pas, écrivez au formateur avec le bouton WhatsApp en bas de cette page.' },
+  { q: 'J\'ai perdu mon code d\'accès.', r: 'Écrivez au formateur sur WhatsApp en donnant votre nom et la formation achetée. Il vous renverra votre code.\nVotre progression et vos notes sont gardées.' },
+  { q: 'Comment fonctionne la période d\'essai de 7 jours ?', r: 'Pendant les 7 premiers jours, vous avez accès à l\'introduction et aux 2 premières leçons de chaque module.\nLe reste de la formation s\'ouvre automatiquement le 8e jour à 0 h (heure d\'Abidjan).' },
+  { q: 'Comment obtenir mon attestation ?', r: 'Terminez la formation et envoyez votre exercice final. Quand le formateur a validé votre exercice, la carte « 🎓 Mon attestation » apparaît sur votre tableau de bord.\nVous pouvez alors la télécharger en PDF et la partager.' },
+  { q: 'Comment contacter le formateur, et en combien de temps répond-il ?', r: 'Avec le bouton WhatsApp en bas de cette page.\nLe formateur répond sous 48 h ouvrables (du lundi au vendredi, hors jours fériés).' },
+];
+const FAQ_MAX = 60;
+// Formation terminée → produits proposés, dans l'ordre (2 au maximum affichés).
+const APRES_DEFAUT = {
+  qgis1: ['qgis2'], qgis2: ['tele', 'web'], arc1: ['arc2'], arc2: ['tele', 'web'],
+  tele: ['pack-qgis', 'pack-arcgis'], web: ['pack-qgis', 'pack-arcgis'], kobo: ['pack-qgis', 'pack-arcgis'], google: ['pack-qgis', 'pack-arcgis'],
+};
+async function faqListe(env) {
+  try { const v = JSON.parse(await getReglage(env, 'faq') || 'null'); if (Array.isArray(v)) return v; } catch (e) { /* contenu de départ */ }
+  return FAQ_DEFAUT;
+}
+async function apresCfg(env) {
+  try { const v = JSON.parse(await getReglage(env, 'apres') || 'null'); if (v && v.regles) return { regles: v.regles, offres: v.offres || {} }; } catch (e) { /* réglage de départ */ }
+  return { regles: APRES_DEFAUT, offres: {} };
+}
+// Propositions par formation de l'apprenant : prix réel du site et lien d'achat existant, sauf offre réglée par l'administrateur.
+// Jamais un produit dont une formation est déjà possédée (même pas encore débloquée).
+function apresPour(rec, cfg) {
+  const a = new Set(rec.modules.map(g => g.m)), out = {};
+  rec.modules.forEach(g => {
+    const l = (cfg.regles[g.m] || []).filter(p => PRODUCTS[p] && PRIX[p] && produitLien(p) && ![...PRODUCTS[p].now, ...PRODUCTS[p].later].some(m => a.has(m)))
+      .slice(0, 2).map(p => {
+        const o = cfg.offres[p];
+        return o ? { p, nom: produitNom(p), prix: o.prix, avant: PRIX[p], lien: o.lien } : { p, nom: produitNom(p), prix: PRIX[p], lien: produitLien(p) };
+      });
+    if (l.length) out[g.m] = l;
+  });
+  return out;
+}
+function apresValide(b) {
+  const regles = {}, offres = {};
+  for (const m of Object.keys(b.regles || {})) {
+    if (!findModule(m)) return { error: 'Formation inconnue : ' + m };
+    const l = [...new Set((Array.isArray(b.regles[m]) ? b.regles[m] : []).map(String).filter(Boolean))];
+    if (l.length > 2) return { error: '2 propositions au maximum par formation.' };
+    for (const p of l) if (!PRODUCTS[p] || !PRIX[p] || !produitLien(p)) return { error: 'Formation à proposer inconnue : ' + p };
+    if (l.length) regles[m] = l;
+  }
+  for (const p of Object.keys(b.offres || {})) {
+    const o = b.offres[p] || {}, prix = parseInt(o.prix, 10), lien = String(o.lien || '').trim();
+    if (!PRIX[p]) return { error: 'Formation inconnue : ' + p };
+    if (!(prix > 0 && prix < PRIX[p])) return { error: 'Le prix réduit de « ' + produitNom(p) + ' » doit être plus bas que ' + PRIX[p] + ' FCFA.' };
+    if (!PAY_URL_RE.test(lien)) return { error: 'Collez le lien de paiement DigitalPaye de l\'offre « ' + produitNom(p) + ' » (https://checkout.digitalpaye.com/pay/…).' };
+    if (Object.keys(LIENS).some(k => PAY_URL + k === lien)) return { error: 'Le lien de l\'offre « ' + produitNom(p) + ' » est un lien au prix normal : créez un nouveau lien au prix réduit dans DigitalPaye.' };
+    offres[p] = { prix, lien };
+  }
+  return { cfg: { regles, offres } };
+}
 
 // Liens de la Sandbox (environnement de test uniquement, variable DP_LIENS_TEST) : ils ne remplacent jamais les vrais.
 function liensConnus(env) {
@@ -1072,6 +1137,7 @@ async function api(req, env, url) {
       communaute: !!(await getReglage(env, 'communaute')),
       portfolio: !!(env.FICHIERS && env.DL_SECRET),
       parrainage: env.DB ? { saisir: peutSaisirParrain(rec, now) && !(await env.DB.prepare('SELECT code FROM filleuls WHERE code = ?').bind(c).first().catch(() => 1)) } : undefined,
+      apres: apresPour(rec, await apresCfg(env)),
       ...(await loginRessources(env, rec, c, now)),
       ...(await (async () => { const x = await loadCertsAndReviews(env, c); return { certificats: x.certs, avisDonnes: x.reviewed }; })()),
     }, 200, req, env);
@@ -1097,7 +1163,7 @@ async function api(req, env, url) {
   if (['/api/play', '/api/file', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
     return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
 
-  // Rendez-vous live : lien Meet seulement pour un apprenant concerné, de 30 min avant le début jusqu'à la fin.
+  // Rendez-vous live : lien Teams seulement pour un apprenant concerné, de 30 min avant le début jusqu'à la fin.
   if (url.pathname === '/api/live-link' || url.pathname === '/api/live-replay') {
     if (!env.DB) return reply({ error: 'Lives indisponibles pour le moment.' }, 503, req, env);
     const l = await env.DB.prepare('SELECT * FROM lives WHERE id = ?').bind(parseInt(body.id, 10) || 0).first();
@@ -1126,6 +1192,11 @@ async function api(req, env, url) {
     const lien = await getReglage(env, 'communaute');
     if (!lien) return reply({ error: 'Le lien de la Communauté sera ajouté prochainement.' }, 404, req, env);
     return reply({ url: lien }, 200, req, env);
+  }
+
+  // Aide : questions fréquentes (apprenant connecté ; charte non exigée pour pouvoir demander de l'aide).
+  if (url.pathname === '/api/aide') {
+    return reply({ faq: await faqListe(env) }, 200, req, env);
   }
 
   // Mini-quiz : questions sans les bonnes réponses ; la correction se fait ici, sur le serveur.
@@ -1785,6 +1856,36 @@ async function admin(req, env, url) {
     await journal(env, who, 'Récompense de parrainage modifiée', '', '', recompenseTexte(cfg));
     return reply({ ok: true, texte: recompenseTexte(cfg) }, 200, req, env);
   }
+  // ---- Aide (FAQ) et « Et après ? » (phase C)
+  if (url.pathname === '/admin/aide' && req.method === 'GET') {
+    const produits = Object.keys(PRIX).filter(p => PRODUCTS[p] && produitLien(p)).map(p => ({ p, nom: produitNom(p), prix: PRIX[p], lien: produitLien(p) }));
+    return reply({ faq: await faqListe(env), apres: await apresCfg(env), produits, formations: CAT.map(m => ({ key: m.key, nom: modShort(m.key) })),
+      defaut: { faq: FAQ_DEFAUT, regles: APRES_DEFAUT } }, 200, req, env);
+  }
+  if (url.pathname === '/admin/faq' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), l = Array.isArray(b.faq) ? b.faq : null;
+    if (!l) return reply({ error: 'Liste de questions manquante.' }, 400, req, env);
+    if (l.length > FAQ_MAX) return reply({ error: FAQ_MAX + ' questions au maximum.' }, 400, req, env);
+    const faq = [];
+    for (const x of l) {
+      const q = String((x && x.q) || '').trim(), r = String((x && x.r) || '').trim();
+      if (!q || !r) return reply({ error: 'Chaque question doit avoir une réponse.' }, 400, req, env);
+      if (q.length > 200 || r.length > 3000) return reply({ error: 'Question trop longue (200 caractères) ou réponse trop longue (3 000 caractères).' }, 400, req, env);
+      faq.push({ q, r });
+    }
+    await env.DB.prepare('INSERT INTO reglages (k, v, t, who) VALUES (?, ?, ?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v, t = excluded.t, who = excluded.who').bind('faq', JSON.stringify(faq), now, who).run();
+    await journal(env, who, 'Aide (FAQ) modifiée', '', '', faq.length + ' question(s)');
+    return reply({ ok: true, faq }, 200, req, env);
+  }
+  if (url.pathname === '/admin/apres' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const v = apresValide(await readJson(req));
+    if (v.error) return reply({ error: v.error }, 400, req, env);
+    await env.DB.prepare('INSERT INTO reglages (k, v, t, who) VALUES (?, ?, ?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v, t = excluded.t, who = excluded.who').bind('apres', JSON.stringify(v.cfg), now, who).run();
+    await journal(env, who, 'Recommandations « Et après ? » modifiées', '', '', Object.keys(v.cfg.offres).length ? 'offre(s) : ' + Object.keys(v.cfg.offres).map(produitNom).join(', ') : 'sans réduction');
+    return reply({ ok: true, apres: v.cfg }, 200, req, env);
+  }
   if ((url.pathname === '/admin/parrainage-accorder' || url.pathname === '/admin/parrainage-refuser') && req.method === 'POST') {
     if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
     const c = normCode((await readJson(req)).code);
@@ -1861,7 +1962,7 @@ async function admin(req, env, url) {
     if (!t || t < now - 30 * DAY || t > now + 400 * DAY) return reply({ error: 'Date ou heure invalide.' }, 400, req, env);
     if (!id && t < now) return reply({ error: 'Cette date est déjà passée.' }, 400, req, env);
     if (dur < 15 || dur > 300) return reply({ error: 'Durée invalide (de 15 minutes à 5 heures).' }, 400, req, env);
-    if (meet && !MEET_RE.test(meet)) return reply({ error: 'Le lien doit être un lien Google Meet (https://meet.google.com/...).' }, 400, req, env);
+    if (meet && !MEET_RE.test(meet)) return reply({ error: 'Le lien doit être un lien de réunion Microsoft Teams (https://teams.microsoft.com/... ou https://teams.live.com/...).' }, 400, req, env);
     if (mods.some(m => !findModule(m))) return reply({ error: 'Formation inconnue.' }, 400, req, env);
     const label = fmtDate(t) + ' : ' + sujet.slice(0, 60);
     if (id) {

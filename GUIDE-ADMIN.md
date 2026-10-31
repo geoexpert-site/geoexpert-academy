@@ -380,11 +380,11 @@ ses leçons et ses ressources ne s'ouvrent pas (il garde son accès et sa progre
 
 ## 7 septies. Rendez-vous live et Communauté (onglet **🎥 Lives & communauté**)
 
-**Programmer un live** : sujet, date, heure **d'Abidjan**, durée, lien Google Meet (vous pouvez l'ajouter plus tard),
+**Programmer un live** : sujet, date, heure **d'Abidjan**, durée, lien de la réunion Microsoft Teams (vous pouvez l'ajouter plus tard),
 formations concernées (aucune case = tout le monde) → **Programmer le live** → confirmez.
 - Les apprenants concernés (essai compris) le voient dans « Rendez-vous live » et, la semaine du live, dans une petite bande
   du tableau de bord. Ils peuvent l'**ajouter à leur agenda** (fichier .ics, rappel 30 min avant).
-- Le **lien Meet** n'est donné qu'aux apprenants concernés et connectés, à partir de **30 minutes avant** le début, jusqu'à la fin.
+- Le **lien Teams** n'est donné qu'aux apprenants concernés et connectés, à partir de **30 minutes avant** le début, jusqu'à la fin.
 - **Modifier** : change l'heure, le sujet, le lien… · **Annuler le live** : les apprenants voient « Annulé » (prévenez-les
   aussi par une annonce) ; **Rétablir** le remet.
 - **Replay** : après le live, **Ajouter le replay** → collez l'identifiant de la vidéo **Bunny** (conseillé : protégée comme les
@@ -422,6 +422,24 @@ l'accord ; il peut le retirer dans « Mon portfolio » → l'avis disparaît du 
 
 **Attestations** : sous chaque attestation, l'apprenant a maintenant **Partager : LinkedIn, Facebook, WhatsApp, Copier le lien**.
 L'aperçu montre son nom, la formation et la date ; le lien mène à « Vérifier un certificat ». Il n'existe aucune liste des diplômés.
+
+## 7 nonies. Aide et « Et après ? » (onglet **❔ Aide & « Et après ? »**)
+
+**Aide** : les apprenants ont une entrée **« Aide »** en bas de la colonne de gauche. Ils y trouvent les questions fréquentes
+(une recherche en haut, un clic ouvre la réponse) et, en bas, le bouton **« Écrire au formateur sur WhatsApp »**. Le message est déjà
+rempli avec leur nom, leur formation et la page où ils étaient (ex. le titre de la leçon).
+- Modifier une question ou une réponse : changez le texte, puis **Enregistrer l'aide**. Entrée = nouvelle ligne dans la réponse.
+- **➕ Ajouter une question**, **↑ ↓** pour changer l'ordre, **Supprimer**. Rien ne change pour les apprenants avant « Enregistrer ».
+- **Revenir au contenu de départ** remet les 7 questions d'origine (on vous demande de confirmer).
+
+**« Et après ? »** : quand un apprenant a terminé toutes les leçons d'une formation, une carte apparaît sur son tableau de bord.
+Elle propose la suite avec le **prix du site** et le **lien de paiement habituel** (bouton « Je m'inscris »).
+- Tableau : pour chaque formation terminée, choisissez la 1re et la 2e proposition (2 au maximum), puis **Enregistrer les recommandations**.
+- Une formation qu'il possède déjà (ou un pack qui en contient une) n'est **jamais** proposée : la carte passe à la proposition suivante,
+  ou n'apparaît pas.
+- **Offre spéciale** : aucune au départ. Pour faire une réduction, créez d'abord **dans DigitalPaye un lien au prix réduit**, puis tapez
+  le prix et collez ce lien. L'apprenant voit l'ancien prix barré. ⚠️ Ces paiements arrivent dans « 💳 Paiements reçus » en
+  **« À vérifier »** : créez le code avec le bouton habituel. Pour arrêter l'offre, videz les deux cases et enregistrez.
 
 ---
 

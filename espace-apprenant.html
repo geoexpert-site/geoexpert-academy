@@ -148,6 +148,11 @@ body.so aside{transform:none}body.so .back{display:block}.tp{display:none}main{p
 .plink{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}.plink input{flex:1;min-width:200px}
 .pfl{list-style:none;margin:0;padding:0}.pfl li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.pfl li:first-child{border-top:0}.pfl small{color:var(--dim)}
 .cmr.pr li{margin-bottom:4px}
+/* Phase C : Aide et « Et après ? » */
+.fq{border-top:1px solid var(--line)}.fq:first-child{border-top:0}.fq summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.fq summary::-webkit-details-marker{display:none}.fq summary:after{content:'+';color:var(--teal);font:700 20px/1 Inter}.fq[open] summary:after{content:'\2212'}.fq p{margin:0 0 10px;font-size:14.5px}
+.apl{list-style:none;margin:0 0 4px;padding:0}.apl li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}.apl li:first-child{border-top:0}
+.apl b{display:block}.apl s{color:var(--dim);font-size:13px;margin-right:6px}.apl .px{color:var(--indigo);font-weight:700}[data-theme=dark] .apl .px{color:#9d92ee}.apl .btn{padding:8px 13px;font-size:13.5px}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -336,6 +341,7 @@ function side(){
  if(D.communaute)s.appendChild(h('button',{class:'home mesnotes mescom',onclick:function(){comPage();closeS()}},ic('users'),'Communauté'));
  if(D.portfolio)s.appendChild(h('button',{class:'home mesnotes mespf',onclick:function(){pfPage();closeS()}},ic('map'),'Mon portfolio'));
  if(D.parrainage)s.appendChild(h('button',{class:'home mesnotes mespar',onclick:function(){parPage();closeS()}},ic('gift'),'Mes parrainages'));
+ s.appendChild(h('button',{class:'home mesnotes mesaide',onclick:function(){aidePage();closeS()}},ic('help'),'Aide'));
  D.modules.forEach(function(m){
   var mp=mprog(m),d=h('details',{class:'m'});
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
@@ -496,7 +502,7 @@ function charte(must){
  ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';
  if(must)cb.focus();else sc.focus();
 }
-// ===== Rendez-vous live : la liste vient du serveur ; le lien Meet n'est demandé qu'au clic (le serveur ne le donne que 30 min avant).
+// ===== Rendez-vous live : la liste vient du serveur ; le lien Teams n'est demandé qu'au clic (le serveur ne le donne que 30 min avant).
 IC.cal='<path d="M4 6h16v15H4zM4 10h16M8 3v5M16 3v5"/>';IC.users='<path d="M9 11a4 4 0 100-8 4 4 0 000 8zM2 21v-1a6 6 0 0112 0v1M16 3.5a4 4 0 010 7.5M18 14a6 6 0 014 6v1"/>';
 var LIVE_AVANT=30*60000;
 function liveEnd(l){return l.t+l.dur*60000}
@@ -512,12 +518,12 @@ function liveCard(){
 }
 async function joinLive(l,btn){
  var o=btn.textContent,w=window.open('','_blank');btn.disabled=true;btn.textContent='...';
- try{var r=await post('/api/live-link',{code:code,id:l.id}),j=await r.json();if(!r.ok||String(j.url).indexOf('https://meet.google.com/')!==0)throw new Error(j.error||'Lien indisponible.');
+ try{var r=await post('/api/live-link',{code:code,id:l.id}),j=await r.json();if(!r.ok||!/^https:\/\/(teams\.microsoft\.com|teams\.live\.com|meet\.google\.com)\//.test(String(j.url)))throw new Error(j.error||'Lien indisponible.');
   if(w){w.opener=null;w.location.href=j.url}else location.href=j.url}
  catch(e){if(w)w.close();alert(e.message||'Connexion impossible. Vérifiez votre internet.')}
  finally{btn.disabled=false;btn.textContent=o}
 }
-// Fichier agenda (.ics) fabriqué sur le téléphone : sans le lien Meet (il reste dans l'espace apprenant), rappel 30 min avant.
+// Fichier agenda (.ics) fabriqué sur le téléphone : sans le lien Teams (il reste dans l'espace apprenant), rappel 30 min avant.
 function icsLive(l){
  var z=function(ms){return new Date(ms).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')},esc=function(s){return String(s).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')};
  var txt=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//GeoExpert Academy//Rendez-vous live//FR','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
@@ -620,7 +626,38 @@ function endCards(row){
    h('div',{class:'certb'},b,h('a',{class:'btn alt',href:VERIF+c.id,target:'_blank',rel:'noopener'},'Lien de vérification')),shareRow(c)));
  });
  D.modules.forEach(function(m){if(modDone(m)&&(D.avisDonnes||[]).indexOf(m.key)<0)row.appendChild(avisCard(m))});
+ D.modules.forEach(function(m){if(modDone(m)&&D.apres&&D.apres[m.key])row.appendChild(apresCard(m,D.apres[m.key]))});
  if(D.parrainage&&D.parrainage.saisir)row.appendChild(parrainCard());
+}
+// ===== Phase C : « Et après ? » (formation terminée → suite logique, choisie par le serveur) et page « Aide ».
+function fcfa(n){return Number(n).toLocaleString('fr-FR').replace(/ | /g,' ')+' FCFA'}
+function apresCard(m,l){
+ var ul=h('ul',{class:'apl'});
+ l.forEach(function(x){ul.appendChild(h('li',null,h('span',null,h('b',{text:x.nom}),x.avant?h('s',{text:fcfa(x.avant)}):null,h('span',{class:'px',text:fcfa(x.prix)})),
+  h('a',{class:'btn',href:x.lien,target:'_blank',rel:'noopener'},'Je m\'inscris')))});
+ return h('div',{class:'card apres'},h('h3',{text:'➡️ Et après ?',style:'font-size:16px;margin-bottom:6px'}),
+  h('p',{class:'note',text:'Bravo, vous avez terminé « '+m.title.split(' : ')[0]+' » ! Pour continuer :'}),ul);
+}
+function sansAccent(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
+async function aidePage(){
+ // Où était l'apprenant avant d'ouvrir l'aide : repris dans le message WhatsApp.
+ var was=cur,on=$('side').querySelector('.home.on'),page=was?was.t:on?on.textContent.replace(/\d+$/,'').trim():'Tableau de bord';
+ var form=was?was.m.title.split(' : ')[0]:D.modules.map(function(x){return x.title.split(' : ')[0]}).join(', ');
+ var m=pageHead('Aide','Les réponses aux questions les plus fréquentes. Vous ne trouvez pas ? Écrivez au formateur en bas de la page.');
+ sideOn('mesaide');
+ var q=h('input',{class:'srch',type:'search',placeholder:'Rechercher dans l\'aide (ex. : code, vidéo, attestation)','aria-label':'Rechercher dans l\'aide',style:'margin-bottom:12px'});
+ var c=h('div',{class:'card'},h('p',{class:'note',text:'Chargement…'})),vide=h('p',{class:'note',hidden:'',text:'Aucune question ne correspond à votre recherche. Écrivez au formateur avec le bouton ci-dessous.'});
+ var t='Bonjour, je suis '+D.label+', apprenant(e) de la formation « '+form+' ». J\'ai une question (page : '+page+') : ';
+ var wa=h('a',{class:'btn wa',href:'https://wa.me/'+WA+'?text='+encodeURIComponent(t),target:'_blank',rel:'noopener'},ic('help'),'Écrire au formateur sur WhatsApp');
+ m.appendChild(q);m.appendChild(c);m.appendChild(vide);
+ m.appendChild(h('div',{class:'card',style:'margin-top:16px'},h('h3',{text:'Besoin d\'aide personnalisée ?',style:'font-size:16px;margin-bottom:6px'}),
+  h('p',{class:'note',text:'Le formateur répond sous 48 h ouvrables (du lundi au vendredi). Votre message est déjà prérempli avec votre formation et la page où vous étiez.'}),wa));
+ var d;try{var r=await post('/api/aide',{code:code});d=await r.json();if(!r.ok)throw new Error(d.error)}catch(e){c.textContent='';c.appendChild(h('p',{class:'note',style:'margin:0',text:e.message||'Connexion impossible. Vérifiez votre internet.'}));return}
+ if(!document.body.contains(c))return;c.textContent='';
+ var items=d.faq.map(function(x){var de=h('details',{class:'fq'},h('summary',{text:x.q}));String(x.r).split('\n').forEach(function(p){if(p.trim())de.appendChild(h('p',{text:p}))});c.appendChild(de);return{el:de,txt:sansAccent(x.q+' '+x.r)}});
+ if(!items.length)c.appendChild(h('p',{class:'note',style:'margin:0',text:'Aucune question pour le moment : écrivez au formateur avec le bouton ci-dessous.'}));
+ q.addEventListener('input',function(){var v=sansAccent(q.value).trim(),n=0;items.forEach(function(it){var ok=!v||v.split(/\s+/).every(function(w){return it.txt.indexOf(w)>-1});it.el.hidden=!ok;if(ok)n++;it.el.open=!!v&&ok});
+  c.hidden=!n&&items.length>0;vide.hidden=!!n||!items.length});
 }
 // ===== Phase B : partage de l'attestation, Mon portfolio, Mes parrainages.
 IC.map='<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/>';IC.gift='<path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-6-4-6-1s6 1 6 1zM12 7c2-4 6-4 6-1s-6 1-6 1z"/>';IC.share='<path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>';

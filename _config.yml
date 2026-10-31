@@ -15,6 +15,8 @@ exclude:
   - RAPPORT-RESSOURCES-CHARTE.md
   - MISE-EN-LIGNE-LIVE-COMMUNAUTE.md
   - MISE-EN-LIGNE-PHASE-B.md
+  - MISE-EN-LIGNE-PHASE-C.md
+  - PROJET-PHASE-C.md
   - REGLES-PLATEFORME.md
   - worker/
   - settings.json

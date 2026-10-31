@@ -369,6 +369,18 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [ ] 👤 Essai de l'administrateur avec « test 1 » : déposer une carte, la valider (onglet 🗺️), voir « Réalisations des apprenants », retirer l'accord, supprimer la carte ; ouvrir « Mes parrainages »
 - ⚠️ Constaté au passage, non corrigé : les 13 pages du site annoncent `images/og-image.jpg`, qui n'existe pas (aperçus des liens sans image)
 
+## Phase C : Aide (FAQ) et « Et après ? » (demande du 31/10/2026)
+
+- Existant vérifié : aucune page « Aide » dans l'espace apprenant (seule la FAQ publique `faq.html`) ; aucune recommandation → créées.
+- [x] **Aide** (colonne de gauche) : questions en accordéon, recherche (sans accents), bouton WhatsApp prérempli (nom, formation, page). 7 questions de départ (QGIS, licence ArcMap donnée par le formateur, vidéo, code perdu, essai 7 jours, attestation, 48 h ouvrables). Route `/api/aide`.
+- [x] **« Et après ? »** : carte en fin de formation (toutes les leçons cochées), 1 à 2 propositions calculées par le Worker (`apres` dans `/api/login`), vrai prix, lien d'achat existant, jamais un produit déjà possédé. Départ : QGIS M1 → M2, ArcGIS M1 → M2, M2 → Télédétection / Webmapping, formation seule → packs.
+- [x] Admin : onglet **❔ Aide & « Et après ? »** (ajouter, modifier, monter/descendre, supprimer, remettre le contenu de départ ; 2 propositions par formation ; offre spéciale facultative = prix plus bas + nouveau lien DigitalPaye). Réglages `faq` et `apres` dans la table `reglages` (aucune nouvelle table).
+- [x] Tests : `test-phase-c.mjs` api 49/49, admin 17/17 ; suite complète OK ; preuve pixel 58/58 (page en ligne) et 34/34 (page d'origine) ; capture `geoexpert-captures/apres-phase-c/avant-apres-telephone.png` (tableau de bord identique).
+- [x] Tests réparés au passage : `test-paiements` (17 onglets aujourd'hui, le test en attendait 14) ; `test-relances` (fermeture de fiche trop tôt). Reste 1 échec ancien sans lien : « Code reçu aujourd'hui » (codes de test « Test Journal » trop vieux).
+- [x] Publiés avec la phase C (décision de l'administrateur) : lives sur **Microsoft Teams** (Google Meet toujours accepté), **charte 1.1** (chaque apprenant la réaccepte une fois), 1 paragraphe en plus dans la politique de confidentialité (§2.3, WhatsApp et Teams).
+- Sauvegarde : `GeoExpert-Sauvegardes6-10-31-avant-phase-c\`, étiquette `sauvegarde-avant-phase-c`. Mise en ligne / retour : `MISE-EN-LIGNE-PHASE-C.md`.
+- [ ] 👤 Essai de l'administrateur avec « test 1 » : accepter la charte 1.1, ouvrir « Aide », chercher « code », toucher WhatsApp ; dans l'admin, onglet ❔, relire les 7 questions.
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
