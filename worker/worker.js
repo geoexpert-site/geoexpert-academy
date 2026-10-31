@@ -1105,17 +1105,20 @@ async function admin(req, env, url) {
     const rec = JSON.parse(raw);
     const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' };
     let act = 0, notes = [], phone = '', relances = [];
+    const quiz = {};
     if (env.DB) {
-      const [l, n, ct, rl] = await env.DB.batch([
+      const [l, n, ct, rl, qr] = await env.DB.batch([
         env.DB.prepare('SELECT last_activity FROM learners WHERE code = ?').bind(c),
         env.DB.prepare('SELECT id, t, who, text FROM admin_notes WHERE code = ? ORDER BY t DESC').bind(c),
         env.DB.prepare('SELECT phone FROM contacts WHERE code = ?').bind(c),
         env.DB.prepare('SELECT kind, t, who FROM relances WHERE code = ? ORDER BY t DESC').bind(c),
+        env.DB.prepare('SELECT k, score, total, t FROM quiz_results WHERE code = ?').bind(c),
       ]);
       act = (l.results[0] && l.results[0].last_activity) || 0;
       notes = n.results;
       phone = (ct.results[0] && ct.results[0].phone) || '';
       relances = rl.results;
+      qr.results.forEach(x => { quiz[x.k] = { score: x.score, total: x.total, t: x.t }; });
     }
     // Début de l'accès : première connexion (nouveaux codes) ou création (anciens codes).
     const start = rec.premiereUtilisation || (rec.essai ? 0 : rec.created);
@@ -1130,7 +1133,7 @@ async function admin(req, env, url) {
       lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
       modules: rec.modules.map(g => {
         const m = findModule(g.m); if (!m) return null;
-        return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0 })),
+        return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0, quiz: quiz[v.k] || null })),
           exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0 })) };
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
@@ -1155,12 +1158,15 @@ async function admin(req, env, url) {
   // Mini-quiz : liste (avec statistiques), enregistrement, suppression.
   if (url.pathname === '/admin/quizzes' && req.method === 'GET') {
     if (!env.DB) return reply({ quizzes: [] }, 200, req, env);
-    const [q, r] = await env.DB.batch([
+    const [q, r, all] = await env.DB.batch([
       env.DB.prepare('SELECT k, data, updated, who FROM quizzes'),
       env.DB.prepare('SELECT k, COUNT(*) AS n, AVG(score * 100.0 / total) AS avg FROM quiz_results GROUP BY k'),
+      env.DB.prepare('SELECT code, k, score, total, t FROM quiz_results ORDER BY t DESC LIMIT 500'),
     ]);
     const st = {}; r.results.forEach(x => { st[x.k] = { n: x.n, avg: Math.round(x.avg) }; });
-    return reply({ quizzes: q.results.map(x => ({ k: x.k, questions: JSON.parse(x.data), updated: x.updated, who: x.who, stats: st[x.k] || { n: 0, avg: null } })) }, 200, req, env);
+    // Résultats un par un (tableau « Résultats des quiz ») : le nom de l'apprenant est retrouvé par la page avec son code.
+    const results = all.results.map(x => ({ code: prettyCode(x.code), k: x.k, score: x.score, total: x.total, t: x.t }));
+    return reply({ quizzes: q.results.map(x => ({ k: x.k, questions: JSON.parse(x.data), updated: x.updated, who: x.who, stats: st[x.k] || { n: 0, avg: null } })), results }, 200, req, env);
   }
   if (url.pathname === '/admin/quiz' && req.method === 'POST') {
     if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);

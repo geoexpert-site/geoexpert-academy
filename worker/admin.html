@@ -113,6 +113,14 @@
   .fmod li span:nth-child(2) { flex: 1; }
   .fmod li small { color: var(--dim); white-space: nowrap; }
   .fmod li.exh { font-weight: 700; color: var(--indigo); padding-top: 12px; }
+  /* Résultats des quiz : sur petit écran, chaque ligne du tableau devient une petite fiche */
+  #qStats td:last-child { white-space: nowrap; }
+  @media (max-width: 700px) {
+    #qStats tr:first-child { display: none; }
+    #qStats tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    #qStats td { display: block; border: 0; padding: 3px 0; white-space: normal; }
+    #qStats td::before { content: attr(data-l) " : "; font-weight: 700; color: var(--indigo); font-size: 12.5px; }
+  }
   .fnote { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 14px; white-space: pre-wrap; }
   .fnote small { display: flex; justify-content: space-between; color: var(--dim); font-size: 12px; margin-bottom: 4px; white-space: normal; }
   .fnote button { border: 0; background: none; color: #c0392b; cursor: pointer; font: 600 12px Inter; }
@@ -316,6 +324,15 @@
 
     <!-- Onglet Quiz -->
     <div data-p="quiz" hidden>
+      <div class="a-card" id="qStats">
+        <h2>📊 Résultats des quiz</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Toutes formations confondues. Quand un apprenant refait un quiz, seul son dernier score compte.</p>
+        <div class="kpis" id="qKpis"></div>
+        <h3>Par leçon <small style="font-weight:400; color:var(--dim);">(les moins réussies en premier)</small></h3>
+        <div id="qByLesson" style="overflow-x:auto;"></div>
+        <h3 style="margin-top:22px;">Dernières réponses</h3>
+        <div id="qLast" style="overflow-x:auto;"></div>
+      </div>
       <div class="a-card">
         <h2>Mini-quiz des leçons</h2>
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 4px;">2 ou 3 questions à la fin des leçons importantes, pour que l'apprenant vérifie qu'il a compris. Il voit un onglet « Quiz » sous la leçon ; la correction et les explications s'affichent après sa réponse.</p>
@@ -453,7 +470,7 @@
     try { PAY = await call('/admin/paiements', 'GET'); } catch (e) { PAY = null; }
     renderPaiements();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
-    QZ = (await call('/admin/quizzes', 'GET')).quizzes; renderQuizList();
+    var qz = await call('/admin/quizzes', 'GET'); QZ = qz.quizzes; QR = qz.results || []; renderQuizList(); renderQuizStats();
     renderAttestations(await call('/admin/attestations', 'GET'));
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
     renderContent(true); renderR2();
@@ -650,8 +667,54 @@
   }
 
   // ----- Mini-quiz
-  var QZ = [];
+  var QZ = [], QR = [];
   function quizOf(k) { return QZ.filter(function (q) { return q.k === k; })[0]; }
+  // Tableau « Résultats des quiz » : chiffres d'ensemble, moyenne par leçon, dernières réponses.
+  function renderQuizStats() {
+    var pct = function (x) { return Math.round(x.score * 100 / (x.total || 1)); };
+    var lessonOf = function (k) {
+      for (var i = 0; i < state.catalog.length; i++) {
+        var m = state.catalog[i], v = m.videos.filter(function (x) { return x.k === k; })[0];
+        if (v) return { mod: m.title.split(' : ')[0], title: v.title };
+      }
+      return { mod: '', title: k };
+    };
+    var who = function (code) { var s = state.students.filter(function (x) { return x.code === code; })[0]; return s ? s.label || code : code; };
+    var codes = {}; QR.forEach(function (x) { codes[x.code] = 1; });
+    var avg = QR.length ? Math.round(QR.reduce(function (a, x) { return a + pct(x); }, 0) / QR.length) : null;
+    var box = $('qKpis'); box.textContent = '';
+    [
+      [QR.length, 'Quiz faits', 'Nombre de quiz validés par les apprenants (un par leçon et par apprenant).'],
+      [Object.keys(codes).length, 'Apprenants qui ont répondu', 'Ont validé au moins un quiz.'],
+      [avg === null ? '-' : avg + ' %', 'Moyenne générale', 'Part de bonnes réponses, tous quiz confondus.', avg !== null && avg < 50],
+    ].forEach(function (k) {
+      var d = el('div', 'kpi' + (k[3] ? ' alerte' : ''));
+      d.appendChild(el('b', '', String(k[0]))); d.appendChild(el('span', '', k[1])); d.appendChild(el('small', '', k[2]));
+      box.appendChild(d);
+    });
+    var table = function (head, rows) {
+      var t = el('table'), tr = el('tr'); head.forEach(function (h) { tr.appendChild(el('th', '', h)); }); t.appendChild(tr);
+      rows.forEach(function (r) {
+        var tr = el('tr');
+        r.forEach(function (c, i) { var td = el('td'); td.setAttribute('data-l', head[i]); if (typeof c === 'string') td.textContent = c; else td.appendChild(c); tr.appendChild(td); });
+        t.appendChild(tr);
+      });
+      return t;
+    };
+    var by = $('qByLesson'); by.textContent = '';
+    var withStats = QZ.filter(function (q) { return q.stats.n; }).sort(function (a, b) { return a.stats.avg - b.stats.avg; });
+    if (!withStats.length) by.appendChild(el('p', '', 'Aucun apprenant n\'a encore validé de quiz.')).style.cssText = 'color:var(--dim);font-size:14px;';
+    else by.appendChild(table(['Formation', 'Leçon', 'Réponses', 'Moyenne'], withStats.map(function (q) {
+      var l = lessonOf(q.k); return [l.mod, l.title, String(q.stats.n), q.stats.avg + ' %' + (q.stats.avg < 50 ? ' ⚠️' : '')];
+    })));
+    var last = $('qLast'); last.textContent = '';
+    if (!QR.length) last.appendChild(el('p', '', 'Les réponses des apprenants apparaîtront ici.')).style.cssText = 'color:var(--dim);font-size:14px;';
+    else last.appendChild(table(['Date', 'Apprenant', 'Leçon', 'Score'], QR.slice(0, 20).map(function (x) {
+      var l = lessonOf(x.k), b = el('button', 'b sec', who(x.code)); b.type = 'button'; b.title = 'Ouvrir la fiche';
+      b.addEventListener('click', function () { openFiche(x.code); });
+      return [fdt(x.t), b, l.mod + ' · ' + l.title, x.score + ' / ' + x.total + ' (' + pct(x) + ' %)'];
+    })));
+  }
   function renderQuizList() {
     var sel = $('qMod'), v = sel.value; sel.textContent = '';
     state.catalog.forEach(function (m) { var n = m.videos.filter(function (x) { return quizOf(x.k); }).length; var o = el('option', '', m.title.split(' : ')[0] + (n ? ' (' + n + ' quiz)' : '')); o.value = m.key; sel.appendChild(o); });
@@ -1195,8 +1258,11 @@
         var li = el('li'); li.appendChild(el('span', '', l.done ? '✓' : ''));
         li.appendChild(el('span', '', l.title));
         li.appendChild(el('small', '', l.done > 1 ? fdt(l.done) : l.done ? 'date inconnue' : ''));
+        if (l.quiz) li.appendChild(el('small', '', 'Quiz : ' + l.quiz.score + ' / ' + l.quiz.total));
         ul.appendChild(li);
       });
+      var qd = m.lessons.filter(function (l) { return l.quiz; });
+      if (qd.length) ul.appendChild(el('li', 'exh', 'Quiz faits : ' + qd.length + ' · moyenne ' + Math.round(qd.reduce(function (a, l) { return a + l.quiz.score * 100 / (l.quiz.total || 1); }, 0) / qd.length) + ' %'));
       if (m.exercises && m.exercises.length) {
         var ne = m.exercises.filter(function (x) { return x.done; }).length;
         ul.appendChild(el('li', 'exh', 'Exercices faits : ' + ne + ' / ' + m.exercises.length));

@@ -259,6 +259,18 @@ Priorité du formateur : modules 1 et 2 (QGIS, ArcGIS) et Télédétection. Webm
 - ⚠️ Joindre un fichier enregistre la liste des leçons de la formation dans la table `content`, qui remplace ensuite le CATALOG du code pour cette formation : après cela, les titres de ces formations se changent dans l'onglet Contenu, plus dans `worker.js`
 - [ ] Mettre les 23 vidéos Télédétection sur Bunny et coller leurs identifiants dans l'onglet Contenu
 
+## Tableau « Résultats des quiz » dans l'admin (demande du 31/10/2026)
+
+- [x] Onglet « ❓ Quiz » : nouvelle carte « 📊 Résultats des quiz » en haut (quiz faits, apprenants qui ont répondu, moyenne générale ;
+  tableau par leçon, les moins réussies en premier ; 20 dernières réponses avec bouton vers la fiche). Sur téléphone, les lignes deviennent des fiches.
+  Fiche apprenant : « Quiz : X / Y » à côté de chaque leçon + « Quiz faits : N · moyenne M % » par formation.
+  - serveur : `/admin/quizzes` renvoie aussi `results` (500 dernières réponses) ; `/admin/student` ajoute `quiz` à chaque leçon. Espace apprenant non touché.
+- [x] **Mis en ligne directement le 31/10/2026, sans passer par la plateforme de test (choix de l'administrateur)**
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-31-avant-resultats-quiz\` ; étiquette `sauvegarde-avant-resultats-quiz` ; branche `resultats-quiz`
+  - tests locaux : `GeoExpert-Outils\test-resultats-quiz.mjs` 11/11 ; non-régression quiz 9/9, tableau de bord 13/13, contenu 18/18, purge 15/15
+  - ⚠️ `test-fiche` (« Awa essai jour 5 ») et `test-actions` échouent aussi SANS ce changement : données de test périmées (l'essai d'Awa est fini) → à rafraîchir
+  - `geoexpert-admin` → 2b141a29 (avant : 0e7276df) ; Worker apprenant pas redéployé (ses routes ne changent pas)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
