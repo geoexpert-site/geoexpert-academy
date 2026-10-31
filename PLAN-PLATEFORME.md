@@ -359,7 +359,14 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
   33/34 à chaque passage, le bloc différent étant la photo de fond du diaporama de connexion (ordinateur au 1er passage, téléphone au 2e :
   moment de capture, code de connexion non modifié) → `geoexpert-captures\preuve-existant-phase-b\` ; avant/après téléphone :
   `geoexpert-capturespres-phase-b	ableau-de-bord-telephone-avant-apres.png` (seul ajout visible : carte « Vous avez été parrainé ? » en bas)
-- [ ] **Mise en ligne** (accord de l'administrateur nécessaire) — `MISE-EN-LIGNE-PHASE-B.md`
+- [x] **Mise en ligne — EN LIGNE le 31/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-31-avant-mise-en-ligne-phase-b\` ; tables `avis_info`, `portfolio`, `parrains`, `filleuls` ajoutées dans `geoexpert-prod`
+  - site publié d'abord : `main` = 3f7aec0 (fusion de `phase-b`) ; puis `geoexpert-admin` → 228e930d (avant : b669dc8d),
+    `espace-apprenant-api` → 33abc68e (avant : 1315f264)
+  - vérifié : `GeoExpert-Outils\verif-prod-phase-b.mjs` 8/8 (code temporaire, carte envoyée dans R2 puis effacée, production revenue à 3 clés KV) ;
+    faux code 401, faux webhook 401, envoi falsifié 403, « Vérifier un certificat » OK, admin renvoyé vers Access, pages du site 200, document interne non publié
+  - retour en arrière : `wrangler rollback 1315f264` / `b669dc8d` + `git revert` de la fusion (voir `MISE-EN-LIGNE-PHASE-B.md`)
+- [ ] 👤 Essai de l'administrateur avec « test 1 » : déposer une carte, la valider (onglet 🗺️), voir « Réalisations des apprenants », retirer l'accord, supprimer la carte ; ouvrir « Mes parrainages »
 - ⚠️ Constaté au passage, non corrigé : les 13 pages du site annoncent `images/og-image.jpg`, qui n'existe pas (aperçus des liens sans image)
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
