@@ -306,6 +306,23 @@ Détails : `RAPPORT-RESSOURCES-CHARTE.md` (tests, captures) · `MISE-EN-LIGNE-RE
 - [ ] 👤 Essai de l'administrateur avec son code « test 1 » : accepter la charte, ouvrir « Mes ressources »
 - ⚠️ `ressources/` est maintenant dans `.gitignore` (dépôt public)
 
+## Rendez-vous live, Communauté, vitesse de lecture (demande du 31/10/2026, « phase A »)
+
+Mise en ligne et retour en arrière : `MISE-EN-LIGNE-LIVE-COMMUNAUTE.md` · guide : `GUIDE-ADMIN.md` §7 septies.
+
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-31-avant-live-communaute\` (KV + D1 prod + code) ; étiquette `sauvegarde-avant-live-communaute` ; branche `live-communaute`
+- [x] **Rendez-vous live** : table `lives` ; onglet admin « 🎥 Lives & communauté » (programmer, modifier, annuler/rétablir, replay Bunny ou lien) ;
+  entrée « Rendez-vous live » + bande « Prochain live » sous le message du jour (live dans les 7 jours) ; fichier .ics fait sur le téléphone (sans lien Meet, rappel 30 min)
+  - `/api/login` → `lives` (jamais le lien Meet) ; `/api/live-link` : apprenant concerné (essai compris), charte acceptée, de 30 min avant à la fin ; `/api/live-replay` (Bunny signé + filigrane)
+  - replays aussi dans « Mes ressources »
+- [x] **Communauté** : table `reglages` (`communaute`) ; entrée visible seulement quand le lien est saisi ; lien donné par `/api/communaute` (connecté + charte) ; règles + avertissement sur le numéro
+- [x] **Vitesse de lecture** 0,75x à 2x (`geo:vitesse` sur l'appareil), commandes « player.js » du lecteur Bunny (`setPlaybackRate`, réappliquée à chaque lecture) ; si le lecteur ne répond pas : message vers la roue ⚙ ; bouton « Reprendre » inchangé
+  - ⚠️ testé avec un lecteur simulé : à vérifier sur une vraie vidéo Bunny en production (étape 7 de la mise en ligne)
+- [x] Tests : `test-live.mjs` 64/64, `test-live-admin.mjs` 26/26 (ajoutés à `tous-les-tests.mjs`) ; preuve pixel `comparer-elements.mjs … cacher live` 54/54 + `cacher` 34/34 → `geoexpert-captures\preuve-existant-live-communaute\`
+- [x] Workers de test déployés : `espace-apprenant-api-test` 9f194327, `geoexpert-admin-test` f7683f98 ; tables dans `geoexpert-test`
+- [ ] 👤 Ajouter les phrases proposées à la charte (nouvelle version) et à la politique de confidentialité
+- [ ] **Mise en ligne** (accord de l'administrateur à demander)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).

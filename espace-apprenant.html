@@ -122,6 +122,13 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .chsc h3{font-size:15px;margin:14px 0 4px}.chsc ul{margin:0;padding-left:20px}.chsc li{margin:3px 0}
 .chk{display:flex;gap:10px;align-items:flex-start;font-weight:600;cursor:pointer}.chk input{flex:none;width:18px;height:18px;margin-top:2px;accent-color:var(--teal)}
 .chbt{display:flex;gap:10px;flex-wrap:wrap}.chbox .msg{margin:0;min-height:0}
+/* Rendez-vous live, Communauté, vitesse de lecture (ajouts : reprennent le style des cartes existantes) */
+.jour.lv{border-left-color:var(--indigo);align-items:center;flex-wrap:wrap}.jour.lv>.ic{color:var(--indigo)}.jour.lv>span:not(.ic){flex:1;min-width:200px}.jour.lv .btn{padding:7px 14px;font-size:13.5px}
+[data-theme=dark] .jour.lv>.ic{color:#9d92ee}
+.lvc .tag.an{color:#c0392b}.lvc.an h3{color:var(--dim);text-decoration:line-through}.lvb{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.lvb .btn{padding:9px 14px;font-size:14px}
+.cmr{margin:6px 0 14px;padding-left:20px}.cmr li{margin:4px 0}
+.cmw{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px 16px;margin:0 0 16px;font-weight:500}.cmw .ic{flex:0 0 18px;margin-top:2px;color:var(--mag)}
+.vit{display:flex;align-items:center;gap:8px;margin:8px 2px 0;font-size:13px;color:var(--dim);flex-wrap:wrap}.vit select{padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:13px Inter}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
@@ -312,6 +319,8 @@ function side(){
  var nn=Object.keys(P.notes).filter(function(k){return P.notes[k]&&L.some(function(l){return l.k===k})}).length;
  s.appendChild(h('button',{class:'home mesnotes',onclick:function(){notesPage();closeS()}},ic('note'),'Mes notes',nn?h('span',{class:'nb',text:String(nn)}):null));
  if(D.ressources)s.appendChild(h('button',{class:'home mesnotes mesress',onclick:function(){ressPage();closeS()}},ic('folder'),'Mes ressources'));
+ if(D.lives){var nl=D.lives.filter(function(l){return!l.annule&&liveEnd(l)>Date.now()}).length;s.appendChild(h('button',{class:'home mesnotes meslive',onclick:function(){livePage();closeS()}},ic('cal'),'Rendez-vous live',nl?h('span',{class:'nb',text:String(nl)}):null))}
+ if(D.communaute)s.appendChild(h('button',{class:'home mesnotes mescom',onclick:function(){comPage();closeS()}},ic('users'),'Communauté'));
  D.modules.forEach(function(m){
   var mp=mprog(m),d=h('details',{class:'m'});
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
@@ -428,6 +437,10 @@ function ressPage(){
   if(r.locked||!r.ready)b.disabled=true;
   g.appendChild(h('div',{class:'card mc rs'+(r.locked?' lk':'')},h('span',{class:'tag',text:r.kind==='html'?'Document':'PDF'}),h('h3',{text:r.title}),r.descr?h('p',{text:r.descr}):null,b));
  });
+ (D.lives||[]).filter(function(l){return l.replay}).forEach(function(l){
+  g.appendChild(h('div',{class:'card mc rs'},h('span',{class:'tag',text:'Replay du live'}),h('h3',{text:l.sujet}),h('p',{text:'Live du '+fdate(l.t)+'.'}),
+   h('button',{class:'btn alt',onclick:function(){livePage(l.id)}},ic('play'),'Regarder le replay')));
+ });
  var c=D.charte;
  if(c)g.appendChild(h('div',{class:'card mc rs'},h('span',{class:'tag',text:'Charte'}),h('h3',{text:'Charte de l\'apprenant'}),h('p',{text:'Version '+c.version+(c.accepted?', acceptée le '+fdate(c.accepted)+'.':'.')}),
   h('button',{class:'btn alt',onclick:function(){charte(false)}},ic('note'),'Lire la charte')));
@@ -467,6 +480,118 @@ function charte(must){
  }else box.appendChild(h('div',{class:'chbt'},h('button',{class:'btn',onclick:close},'Fermer')));
  ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';
  if(must)cb.focus();else sc.focus();
+}
+// ===== Rendez-vous live : la liste vient du serveur ; le lien Meet n'est demandé qu'au clic (le serveur ne le donne que 30 min avant).
+IC.cal='<path d="M4 6h16v15H4zM4 10h16M8 3v5M16 3v5"/>';IC.users='<path d="M9 11a4 4 0 100-8 4 4 0 000 8zM2 21v-1a6 6 0 0112 0v1M16 3.5a4 4 0 010 7.5M18 14a6 6 0 014 6v1"/>';
+var LIVE_AVANT=30*60000;
+function liveEnd(l){return l.t+l.dur*60000}
+function fhm(ms){var d=new Date(ms);return d.getUTCHours()+' h '+(d.getUTCMinutes()<10?'0':'')+d.getUTCMinutes()}
+function fjour(ms){return new Date(ms).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})}
+function nextLive(){var now=Date.now();return(D.lives||[]).filter(function(l){return!l.annule&&liveEnd(l)>now}).sort(function(a,b){return a.t-b.t})[0]}
+// Carte discrète du tableau de bord : seulement quand un live a lieu dans les 7 prochains jours.
+function liveCard(){
+ var l=nextLive(),now=Date.now();if(!l||l.t-now>7*DAYMS)return null;
+ var open=now>=l.t-LIVE_AVANT;
+ return h('div',{class:'jour lv',role:'status'},ic('cal'),h('span',null,h('b',{text:open?(now>=l.t?'Le live a commencé : ':'Le live commence bientôt : '):'Prochain live : '}),'« '+l.sujet+' », '+fjour(l.t)+' à '+fhm(l.t)+' (heure d\'Abidjan).'),
+  open?h('button',{class:'btn mag',onclick:function(e){joinLive(l,e.currentTarget)}},'Rejoindre'):h('button',{class:'btn alt',onclick:function(){livePage()}},'Voir'));
+}
+async function joinLive(l,btn){
+ var o=btn.textContent,w=window.open('','_blank');btn.disabled=true;btn.textContent='...';
+ try{var r=await post('/api/live-link',{code:code,id:l.id}),j=await r.json();if(!r.ok||String(j.url).indexOf('https://meet.google.com/')!==0)throw new Error(j.error||'Lien indisponible.');
+  if(w){w.opener=null;w.location.href=j.url}else location.href=j.url}
+ catch(e){if(w)w.close();alert(e.message||'Connexion impossible. Vérifiez votre internet.')}
+ finally{btn.disabled=false;btn.textContent=o}
+}
+// Fichier agenda (.ics) fabriqué sur le téléphone : sans le lien Meet (il reste dans l'espace apprenant), rappel 30 min avant.
+function icsLive(l){
+ var z=function(ms){return new Date(ms).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')},esc=function(s){return String(s).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')};
+ var txt=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//GeoExpert Academy//Rendez-vous live//FR','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+  'UID:live-'+l.id+'@geoexpertacademy.ci','DTSTAMP:'+z(Date.now()),'DTSTART:'+z(l.t),'DTEND:'+z(liveEnd(l)),
+  'SUMMARY:'+esc('Live GeoExpert : '+l.sujet),
+  'DESCRIPTION:'+esc('Le lien du live apparaît dans votre espace apprenant (rubrique « Rendez-vous live ») 30 minutes avant le début.'),
+  'URL:https://geoexpertacademy.ci/espace-apprenant.html',
+  'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc('Live GeoExpert dans 30 minutes'),'TRIGGER:-PT30M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+ var u=URL.createObjectURL(new Blob([txt],{type:'text/calendar;charset=utf-8'})),a=h('a',{href:u,download:'live-geoexpert-'+new Date(l.t).toISOString().slice(0,10)+'.ics',style:'display:none'});
+ document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},2000);
+}
+function livePage(replayId){
+ cur=null;var m=$('main');m.textContent='';window.scrollTo(0,0);
+ m.appendChild(h('div',{class:'crumb',text:'Espace apprenant'}));
+ m.appendChild(h('h1',{class:'lt',text:'Rendez-vous live'}));
+ m.appendChild(h('p',{class:'note',style:'margin:-6px 0 16px',text:'Des séances en direct avec le formateur pour poser vos questions. Le bouton « Rejoindre » s\'active 30 minutes avant le début. Heures d\'Abidjan (GMT).'}));
+ var pl=h('div',{class:'pl',style:'display:none;margin-bottom:8px'});m.appendChild(pl);
+ var box=h('div');m.appendChild(box);
+ var draw=function(){
+  if(!document.body.contains(box))return false;
+  box.textContent='';var now=Date.now(),ls=D.lives||[];
+  var up=ls.filter(function(l){return liveEnd(l)>now}).sort(function(a,b){return a.t-b.t}),rp=ls.filter(function(l){return l.replay&&liveEnd(l)<=now}).sort(function(a,b){return b.t-a.t});
+  box.appendChild(h('h2',{class:'s',text:'À venir'}));
+  if(!up.length)box.appendChild(h('div',{class:'card'},h('p',{class:'note',text:'Aucun live n\'est prévu pour le moment. Les prochains apparaîtront ici et sur votre tableau de bord.'})));
+  var g=h('div',{class:'grid'});
+  up.forEach(function(l){
+   var open=now>=l.t-LIVE_AVANT,bt=h('div',{class:'lvb'});
+   if(!l.annule){
+    var jb=h('button',{class:'btn mag',onclick:function(e){joinLive(l,e.currentTarget)}},ic('play'),open?'Rejoindre le live':'Lien disponible à '+fhm(l.t-LIVE_AVANT));
+    if(!open)jb.disabled=true;bt.appendChild(jb);
+    bt.appendChild(h('button',{class:'btn alt',onclick:function(){icsLive(l)}},ic('cal'),'Ajouter à mon agenda'));
+   }
+   g.appendChild(h('div',{class:'card mc rs lvc'+(l.annule?' an':'')},h('span',{class:'tag'+(l.annule?' an':''),text:l.annule?'Annulé':open?'En cours':'Prévu'}),h('h3',{text:l.sujet}),
+    h('p',{text:fjour(l.t)+', de '+fhm(l.t)+' à '+fhm(liveEnd(l))+(l.pour?' · Pour : '+l.pour:'')+(l.annule?' · Ce live n\'aura pas lieu.':'')}),bt));
+  });
+  box.appendChild(g);
+  if(rp.length){
+   box.appendChild(h('h2',{class:'s',text:'Replays'}));
+   var g2=h('div',{class:'grid'});
+   rp.forEach(function(l){g2.appendChild(h('div',{class:'card mc rs'},h('span',{class:'tag',text:'Replay'}),h('h3',{text:l.sujet}),h('p',{text:'Live du '+fdate(l.t)+'.'}),
+    h('button',{class:'btn alt',onclick:function(e){replay(l,pl,e.currentTarget)}},ic('play'),'Regarder le replay')))});
+   box.appendChild(g2);
+  }
+  return true;
+ };
+ draw();
+ var t=setInterval(function(){if(!draw())clearInterval(t)},30000);// le bouton « Rejoindre » s'active tout seul
+ side();
+ var sb=$('side').querySelector('.meslive');if(sb)sb.classList.add('on');
+ var r=replayId&&(D.lives||[]).filter(function(l){return l.id===replayId})[0];if(r)replay(r,pl,null);
+}
+async function replay(l,pl,btn){
+ var w=btn?window.open('','_blank'):null;if(btn)btn.disabled=true;
+ try{var r=await post('/api/live-replay',{code:code,id:l.id}),j=await r.json();if(!r.ok||String(j.url).indexOf('https://')!==0)throw new Error(j.error||'Replay indisponible.');
+  if(j.kind!=='bunny'){if(w){w.opener=null;w.location.href=j.url}else location.href=j.url;return}
+  if(w)w.close();pl.style.display='';pl.textContent='';
+  var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:'Replay : '+l.sujet}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
+  vitesse(f);pl.appendChild(f);pl.appendChild(wm);if(!pl.nextSibling||!pl.nextSibling.classList.contains('vit'))pl.after(vitCtl());
+  var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
+  var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
+  window.scrollTo({top:0,behavior:'smooth'});
+ }catch(e){if(w)w.close();alert(e.message||'Replay indisponible. Vérifiez votre connexion.')}
+ finally{if(btn)btn.disabled=false}
+}
+// ===== Communauté WhatsApp : le lien d'invitation est demandé au serveur au clic (apprenants connectés seulement).
+function comPage(){
+ cur=null;var m=$('main');m.textContent='';window.scrollTo(0,0);
+ m.appendChild(h('div',{class:'crumb',text:'Espace apprenant'}));
+ m.appendChild(h('h1',{class:'lt',text:'Communauté'}));
+ var c=h('div',{class:'card'});
+ c.appendChild(h('p',{style:'margin-top:0',text:'La Communauté GeoExpert réunit les apprenants sur WhatsApp : annonces du formateur, entraide entre apprenants et conseils pour avancer dans votre formation.'}));
+ c.appendChild(h('h3',{text:'Les règles',style:'font-size:16px'}));
+ var ul=h('ul',{class:'cmr'});
+ ['Respect : on reste courtois avec tout le monde, même en cas de désaccord.','Entraide : on pose ses questions et on aide les autres quand on peut.','Pas de publicité, de vente ni de messages sans rapport avec la géomatique.','Pas de partage des contenus de la formation (vidéos, documents, codes d\'accès) : ils sont personnels.'].forEach(function(t){ul.appendChild(h('li',{text:t}))});
+ c.appendChild(ul);
+ c.appendChild(h('div',{class:'cmw',role:'note'},ic('help'),h('span',{text:'Dans les groupes WhatsApp, les autres membres peuvent voir votre numéro.'})));
+ var b=h('button',{class:'btn wa'},ic('users'),'Rejoindre la Communauté WhatsApp');
+ b.addEventListener('click',async function(){
+  var w=window.open('','_blank');b.disabled=true;
+  try{var r=await post('/api/communaute',{code:code}),j=await r.json();if(!r.ok||String(j.url).indexOf('https://chat.whatsapp.com/')!==0)throw new Error(j.error||'Lien indisponible.');
+   if(w){w.opener=null;w.location.href=j.url}else location.href=j.url}
+  catch(e){if(w)w.close();alert(e.message||'Connexion impossible. Vérifiez votre internet.')}
+  finally{b.disabled=false}
+ });
+ c.appendChild(b);
+ c.appendChild(h('p',{class:'note',style:'margin-top:12px;margin-bottom:0',text:'En rejoignant la Communauté, vous acceptez ces règles. Le formateur peut retirer un membre qui ne les respecte pas.'}));
+ m.appendChild(c);
+ side();
+ var sb=$('side').querySelector('.mescom');if(sb)sb.classList.add('on');
 }
 // ===== Fin de formation : « Mon attestation » (une carte par attestation) et « Votre avis » (formation terminée).
 var VERIF='https://geoexpertacademy.ci/verifier-certificat.html?code=';
@@ -568,6 +693,7 @@ function home(){
   next?h('button',{class:'btn mag',onclick:function(){lesson(next.k)}},ic('play'),(p.n?'Reprendre : ':'Commencer : ')+next.t):null)));
  annonces().forEach(function(a){m.appendChild(a)});
  m.appendChild(dayMessage(p,next,finished));
+ var lc=liveCard();if(lc)m.appendChild(lc);
  m.appendChild(h('div',{class:'stats'},h('div',{class:'card'},h('b',{text:p.n+' / '+p.t}),h('span',{text:'leçons terminées'})),h('div',{class:'card'},h('b',{text:ftime(left)}),h('span',{text:'de vidéo restant'})),h('div',{class:'card'},h('b',{text:fdate(D.expires)}),h('span',{text:'fin de votre accès'}))));
  var ea=trialCard();if(ea)m.appendChild(ea);
  m.appendChild(h('h2',{class:'s',text:'Vos modules'}));
@@ -603,6 +729,7 @@ function lesson(k){
  var go=h('button',{class:'go','aria-label':'Lancer la vidéo',onclick:function(){play(l,pl)}},ic('play'));
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
+ if(l.ready&&!l.lock)m.appendChild(vitCtl());
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){setDone(k,!P.done[k]);lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
 
 var nx=a[ix+1],pv=a[ix-1];
@@ -700,12 +827,42 @@ function ecoToggle(l,pl){
   if(pl.querySelector('iframe'))play(l,pl)});// relance la vidéo avec le nouveau réglage
  return h('label',{class:'eco',title:'La qualité de la vidéo est limitée à la taille de votre écran : beaucoup moins de données sur téléphone.'},cb,'Économie de données (connexion lente)');
 }
+// ===== Vitesse de lecture (0,75x à 2x), mémorisée sur l'appareil. Le lecteur Bunny est piloté par messages « player.js » ;
+// s'il ne répond pas, on le dit et on renvoie vers son propre réglage (roue dentée) : la vidéo continue normalement.
+var VIT=[0.75,1,1.25,1.5,1.75,2],PJ=null,VUI=null;
+function vitGet(){try{var v=parseFloat(localStorage.getItem('geo:vitesse'));if(VIT.indexOf(v)>-1)return v}catch(e){}return 1}
+function vitSet(v){try{localStorage.setItem('geo:vitesse',String(v))}catch(e){}}
+function vitTxt(v){return String(v).replace('.',',')+'x'+(v===1?' (normale)':'')}
+function pjSend(method,value,listener){
+ if(!PJ||!PJ.f.contentWindow)return;var x={context:'player.js',version:'0.0.11',method:method};if(value!==undefined)x.value=value;if(listener)x.listener=listener;
+ try{PJ.f.contentWindow.postMessage(JSON.stringify(x),PJ.origin)}catch(e){}
+}
+function vitNote(t){if(VUI&&document.body.contains(VUI.n))VUI.n.textContent=t}
+function vitApply(v){if(!PJ)return;pjSend('setPlaybackRate',v);clearTimeout(PJ.chk);
+ PJ.chk=setTimeout(function(){if(PJ&&!PJ.ready)vitNote('Réglage non pris en compte par le lecteur : utilisez la roue dentée ⚙ de la vidéo.')},4000)}
+addEventListener('message',function(e){
+ if(!PJ||e.source!==PJ.f.contentWindow)return;var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
+ if(!d||d.context!=='player.js')return;
+ if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
+ else if(d.event==='play'){if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}// certains lecteurs remettent 1x au démarrage
+ else if(d.event==='playbackratechange'){var r=+(d.value&&typeof d.value==='object'?d.value.playbackRate:d.value);
+  if(VIT.indexOf(r)>-1){PJ.rate=r;vitSet(r);if(VUI&&document.body.contains(VUI.s))VUI.s.value=String(r);vitNote('')}}
+});
+function vitesse(f){PJ={f:f,origin:new URL(f.src).origin,ready:false,rate:0};
+ setTimeout(function(){if(PJ&&PJ.f===f&&!PJ.ready&&document.body.contains(f))vitNote('Pour changer la vitesse, utilisez la roue dentée ⚙ de la vidéo.')},15000)}
+function vitCtl(){
+ var s=h('select',{'aria-label':'Vitesse de lecture'}),n=h('span',{role:'status'});
+ VIT.forEach(function(v){var o=h('option',{value:String(v)},vitTxt(v));if(v===vitGet())o.selected=true;s.appendChild(o)});
+ s.addEventListener('change',function(){var v=+s.value;vitSet(v);vitNote('');if(PJ&&document.body.contains(PJ.f)){PJ.rate=0;vitApply(v)}});
+ VUI={s:s,n:n};
+ return h('div',{class:'vit'},h('label',null,'Vitesse de lecture ',s),n);
+}
 async function play(l,pl){
  var b=pl.querySelector('.go');if(b)b.disabled=true;
  try{var r=await post('/api/play',{code:code,k:l.k}),j=await r.json();
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
   pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
-  pl.appendChild(f);pl.appendChild(wm);
+  vitesse(f);pl.appendChild(f);pl.appendChild(wm);
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
  }catch(e){pl.textContent='';pl.appendChild(h('div',{class:'er',text:'Lecture impossible pour le moment. Réessayez.'}))}

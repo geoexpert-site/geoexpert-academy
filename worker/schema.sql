@@ -217,3 +217,28 @@ CREATE TABLE IF NOT EXISTS chartes (
   t INTEGER NOT NULL,
   PRIMARY KEY (code, version)
 );
+
+-- Rendez-vous live (onglet « 🎥 Lives » de l'administration). t : début (ms, heure d'Abidjan = UTC) · dur : minutes
+-- modules : '' (toutes les formations) ou clés séparées par des virgules (qgis1,arc1…) · statut : prevu | annule
+-- meet : lien Google Meet (jamais envoyé à la connexion : seulement par /api/live-link, 30 min avant, aux apprenants concernés)
+-- replay : identifiant de vidéo Bunny ou lien https, ajouté après le live
+CREATE TABLE IF NOT EXISTS lives (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  t INTEGER NOT NULL,
+  dur INTEGER NOT NULL DEFAULT 60,
+  sujet TEXT NOT NULL,
+  meet TEXT NOT NULL DEFAULT '',
+  modules TEXT NOT NULL DEFAULT '',
+  statut TEXT NOT NULL DEFAULT 'prevu',
+  replay TEXT NOT NULL DEFAULT '',
+  updated INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT ''
+);
+
+-- Réglages simples de l'administration (ex. « communaute » = lien d'invitation à la Communauté WhatsApp).
+CREATE TABLE IF NOT EXISTS reglages (
+  k TEXT PRIMARY KEY,
+  v TEXT NOT NULL DEFAULT '',
+  t INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT ''
+);
