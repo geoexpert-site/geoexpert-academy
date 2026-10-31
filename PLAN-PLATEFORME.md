@@ -328,6 +328,40 @@ Mise en ligne et retour en arrière : `MISE-EN-LIGNE-LIVE-COMMUNAUTE.md` · guid
     faux code 401, faux webhook 401, « Vérifier un certificat » OK, admin renvoyé vers Access
 - [ ] 👤 Coller le lien de la Communauté WhatsApp (onglet 🎥) ; essayer la vitesse sur une vraie vidéo Bunny avec « test 1 »
 
+## Phase B : partage d'attestation, portfolio, parrainage, avis publiés (demande du 31/10/2026)
+
+Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrière : `MISE-EN-LIGNE-PHASE-B.md` · guide : `GUIDE-ADMIN.md` §7 octies.
+
+- Existant vérifié avant de coder : attestation PDF + lien + page « Vérifier un certificat » (phase 3) **déjà là** ; avis (étoiles, texte,
+  accord, tri admin) **déjà là** mais jamais affiché sur le site ; portfolio et parrainage **absents**.
+- [x] Sauvegarde `GeoExpert-Sauvegardes\2026-10-31-avant-phase-b\` (KV + D1 prod + code) ; étiquette `sauvegarde-avant-phase-b` ; branche `phase-b`
+- [x] **Attestation partageable** : sous chaque attestation, LinkedIn / Facebook / WhatsApp / Copier le lien (ajout sous les boutons existants) ;
+  lien partagé = page du Worker `/a/ATT-…` (Open Graph : nom, formation, date ; `noindex` ; renvoi vers « Vérifier un certificat ») ;
+  Open Graph général ajouté à `verifier-certificat.html`. Aucune liste publique.
+- [x] **Mon portfolio** : entrée « Mon portfolio » ; JPG/PNG/PDF ≤ 5 Mo, type vérifié par le contenu dans le Worker ; grosses photos réduites
+  sur le téléphone, miniature 480 px ; 20 cartes max. ; R2 privé `portfolio/<id>/…` ; envoi et lecture par liens signés (`DL_SECRET`) ;
+  onglet admin 🗺️ (voir, commenter, valider, à revoir, supprimer) ; publiée si **validée ET autorisée** → `realisations-apprenants.html`
+  (lien depuis la page des formations vidéo, `sitemap.xml`) ; retrait à tout moment (accord ou suppression)
+- [x] **Parrainage** : code de 6 caractères + lien `?parrain=CODE` + message WhatsApp prérempli ; DigitalPaye ne transmet pas le code
+  (webhook minimal) → saisie pendant les **7 premiers jours** (carte en bas du tableau de bord, code déjà rempli si arrivé par le lien) ;
+  refus : propre code, ancien code, même nom, même WhatsApp, parrainage croisé, parrain inscrit après ; récompense réglable
+  (`reglages.parrainage`, départ : Google Earth, sinon +1 mois d'assistance = `rec.assistMois`) ; « Accorder » seulement après les 7 jours
+  d'essai et si l'accès du filleul est actif (désactivé = remboursé → refus) ; onglet admin 🤝 ; page apprenant « Mes parrainages »
+- [x] **Avis** : champ profession + nouvelle case d'accord (prénom, initiale, profession ; table `avis_info`) ; admin « Publier sur le site » ;
+  affichage sous les témoignages de la page des formations vidéo, **texte jamais modifié** ; retrait par l'apprenant dans « Mon portfolio »
+- [x] Suppression des données et remplacement de code : portfolio (+ fichiers R2), parrainage, avis_info suivis
+- [x] Politique de confidentialité (§2.3, §3, §4) ; `_config.yml` : documents internes non publiés
+- [x] Tests : `GeoExpert-Outils\test-phase-b.mjs api` **116/116** (serveur + pages dans Edge, téléphone et ordinateur) ;
+  `test-phase-b.mjs admin` **13/13** (écrans admin) ; non-régression : attestations 16/16 + 16/16, purge 15/15, actions 16/16,
+  ressources 61/61, lives 64/64, tableau de bord 13/13 (`test-attestations.mjs` mis à jour : bouton renommé « Publier sur le site ») ; ajoutés à `tous-les-tests.mjs` ; captures `geoexpert-captures\apres-phase-b\`
+- [x] Workers de test déployés : `espace-apprenant-api-test` bbb37561, `geoexpert-admin-test` 6cffb48e ; tables dans `geoexpert-test`
+- [x] Preuve pixel `comparer-elements.mjs … cacher phase-b` : **58/58** blocs identiques à la page en ligne ; vs page des vidéos publicitaires
+  33/34 à chaque passage, le bloc différent étant la photo de fond du diaporama de connexion (ordinateur au 1er passage, téléphone au 2e :
+  moment de capture, code de connexion non modifié) → `geoexpert-captures\preuve-existant-phase-b\` ; avant/après téléphone :
+  `geoexpert-capturespres-phase-b	ableau-de-bord-telephone-avant-apres.png` (seul ajout visible : carte « Vous avez été parrainé ? » en bas)
+- [ ] **Mise en ligne** (accord de l'administrateur nécessaire) — `MISE-EN-LIGNE-PHASE-B.md`
+- ⚠️ Constaté au passage, non corrigé : les 13 pages du site annoncent `images/og-image.jpg`, qui n'existe pas (aperçus des liens sans image)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).

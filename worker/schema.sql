@@ -242,3 +242,50 @@ CREATE TABLE IF NOT EXISTS reglages (
   t INTEGER NOT NULL DEFAULT 0,
   who TEXT NOT NULL DEFAULT ''
 );
+
+-- Phase B (31/10/2026) -------------------------------------------------------------------------
+-- Avis : informations ajoutées avec la nouvelle case d'accord (prénom, initiale du nom, profession).
+-- Une ligne ici = l'apprenant a accepté la nouvelle formulation ; sans ligne, seul le prénom peut être affiché.
+CREATE TABLE IF NOT EXISTS avis_info (
+  id INTEGER PRIMARY KEY,
+  profession TEXT NOT NULL DEFAULT ''
+);
+
+-- Mon portfolio : cartes déposées par les apprenants (fichier dans R2 : portfolio/<id>/carte.<ext> et mini.jpg).
+-- statut : envoi (fichier pas encore reçu) / a_voir / valide / a_revoir. Publiée sur le site si valide ET consent = 1.
+CREATE TABLE IF NOT EXISTS portfolio (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  module TEXT NOT NULL DEFAULT '',
+  titre TEXT NOT NULL,
+  descr TEXT NOT NULL DEFAULT '',
+  kind TEXT NOT NULL,
+  size INTEGER NOT NULL DEFAULT 0,
+  mini INTEGER NOT NULL DEFAULT 0,
+  consent INTEGER NOT NULL DEFAULT 0,
+  statut TEXT NOT NULL DEFAULT 'envoi',
+  commentaire TEXT NOT NULL DEFAULT '',
+  t INTEGER NOT NULL,
+  tv INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS portfolio_code ON portfolio (code);
+
+-- Parrainage : code personnel de chaque parrain, et filleul → parrain (un seul parrain par filleul).
+-- statut du filleul : attente / accorde / refuse.
+CREATE TABLE IF NOT EXISTS parrains (
+  code TEXT PRIMARY KEY,
+  pcode TEXT NOT NULL UNIQUE,
+  t INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS filleuls (
+  code TEXT PRIMARY KEY,
+  parrain TEXT NOT NULL,
+  t INTEGER NOT NULL,
+  statut TEXT NOT NULL DEFAULT 'attente',
+  recompense TEXT NOT NULL DEFAULT '',
+  ta INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS filleuls_parrain ON filleuls (parrain);

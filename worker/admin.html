@@ -172,6 +172,17 @@
   .annprev { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mag); border-radius: 12px; padding: 12px 16px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
   .annprev b { font-family: Montserrat, sans-serif; }
   .arow.fin { opacity: .55; }
+  /* Portfolio et parrainage (phase B) */
+  .pfflt { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .pfflt button.on { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+  .pfc { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px; border-top: 1px solid var(--line); }
+  .pfc:first-child { border-top: 0; }
+  .pfc .th { width: 120px; height: 90px; border-radius: 8px; background: var(--soft); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--dim); font: 700 13px Inter; }
+  .pfc .th img { width: 100%; height: 100%; object-fit: cover; }
+  .pfc b { font-size: 14.5px; } .pfc small { display: block; color: var(--dim); font-size: 12.5px; margin-top: 2px; }
+  .pfc .ds { font-size: 13.5px; margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .pfc .actl { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  @media (max-width: 768px) { .pfc { grid-template-columns: 1fr; } .pfc .th { width: 100%; height: 160px; } }
 
   /* Lives & communauté */
   .a-card input[type=date], .a-card input[type=time], .a-card input[type=url] { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font: 15px Inter; background: var(--bg); }
@@ -260,6 +271,8 @@
       <button data-t="live">🎥 Lives & communauté</button>
       <button data-t="quiz">❓ Quiz</button>
       <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
+      <button data-t="pf">🗺️ Portfolio <span id="pfCount" class="cnt" hidden></span></button>
+      <button data-t="par">🤝 Parrainage <span id="parCount" class="cnt" hidden></span></button>
       <button data-t="new">➕ Nouvel accès</button>
       <button data-t="list">👥 Apprenants</button>
       <button data-t="cont">📚 Contenu</button>
@@ -356,13 +369,43 @@
     <div data-p="att" hidden>
       <div class="a-card">
         <h2>Avis des apprenants</h2>
-        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Donnés à la fin d'une formation. Un avis ne peut être marqué « publiable » que si l'apprenant l'a accepté. « Copier » vous donne le texte prêt à mettre sur le site ou les réseaux.</p>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Donnés à la fin d'une formation. « Publier sur le site » l'affiche sur la page des formations vidéo (près des témoignages), avec le prénom, l'initiale du nom et la profession, <b>sans changer un mot du texte</b>. Possible seulement si l'apprenant l'a accepté ; s'il retire son accord, l'avis disparaît du site (en quelques minutes). « Copier » donne le texte pour les réseaux.</p>
         <div id="avList"></div>
       </div>
       <div class="a-card">
         <h2>Attestations délivrées</h2>
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Pour délivrer une attestation : ouvrez la <b>fiche</b> de l'apprenant → « Actions » → « Attestation ». Chacune est vérifiable par tous sur <b>geoexpertacademy.ci/verifier-certificat.html</b>.</p>
         <div id="attList"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Portfolio (phase B) -->
+    <div data-p="pf" hidden>
+      <div class="a-card">
+        <h2>🗺️ Cartes des apprenants</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants déposent leurs cartes (JPG, PNG ou PDF, 5 Mo au maximum) dans « Mon portfolio ». Regardez-les, laissez un commentaire (l'apprenant le voit), puis <b>Validez</b>. Une carte validée apparaît sur la page publique <b>Réalisations des apprenants</b> seulement si l'apprenant a coché l'accord de publication ; il peut le retirer à tout moment.</p>
+        <div class="pfflt" id="pfFlt"></div>
+        <div id="pfList"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Parrainage (phase B) -->
+    <div data-p="par" hidden>
+      <div class="a-card">
+        <h2>🤝 Parrainages</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Chaque apprenant a un code et un lien personnels (« Mes parrainages »). Son filleul saisit le code pendant ses 7 premiers jours. La récompense ne peut être accordée qu'<b>après les 7 jours d'essai du filleul</b>, si son accès est toujours actif. Vérifiez qu'il n'y a pas eu de remboursement avant de cliquer : si vous avez désactivé l'accès du filleul, la récompense est refusée automatiquement.</p>
+        <div id="parList"></div>
+      </div>
+      <div class="a-card">
+        <h2>Récompense du parrain</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Accordée pour chaque filleul validé. Si le parrain a déjà la formation offerte, il reçoit à la place les mois d'assistance du formateur en plus.</p>
+        <div class="a-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div><label for="parMod">Formation offerte</label><select id="parMod"></select></div>
+          <div><label for="parMois">Sinon (ou en plus si aucune formation) : mois d'assistance</label><select id="parMois"><option value="0">0 mois</option><option value="1">1 mois</option><option value="2">2 mois</option><option value="3">3 mois</option><option value="6">6 mois</option></select></div>
+        </div>
+        <p id="parTexte" style="font-size:14px; margin:10px 0;"></p>
+        <button class="b" id="parSave" type="button">Enregistrer la récompense</button>
+        <div id="parMsg" role="status"></div>
       </div>
     </div>
 
@@ -588,6 +631,9 @@ window.preparerPdf = async function (PDFLib, src) {
     try { renderLives(await call('/admin/lives', 'GET')); } catch (e) { renderLives({ lives: [], communaute: '' }); }
     var qz = await call('/admin/quizzes', 'GET'); QZ = qz.quizzes; QR = qz.results || []; renderQuizList(); renderQuizStats();
     renderAttestations(await call('/admin/attestations', 'GET'));
+    try { PF = await call('/admin/portfolio', 'GET'); } catch (e) { PF = { cartes: [] }; }
+    renderPortfolio();
+    try { renderParrainages(await call('/admin/parrainages', 'GET')); } catch (e) { renderParrainages({ filleuls: [], config: { module: 'google', mois: 1 }, texte: '' }); }
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
     renderContent(true); renderR2();
     try { RS = await call('/admin/ressources', 'GET'); } catch (e) { RS = null; }
@@ -749,14 +795,15 @@ window.preparerPdf = async function (PDFLib, src) {
     var w1 = el('div', 'acts'); if (d.avis.length) av.appendChild(w1);
     d.avis.forEach(function (a) {
       var r = actRow(stars(a.stars) + '  ' + (a.text || '(sans commentaire)'),
-        a.name + ' · ' + modTitle(a.module) + ' · ' + fdt(a.t) + ' · ' + (a.consent ? 'publication acceptée' : 'publication NON acceptée') + ' · ' + ({ nouveau: 'nouveau', publiable: '✓ publiable', masque: 'masqué' })[a.status]);
+        a.name + ' · ' + modTitle(a.module) + ' · ' + fdt(a.t) + ' · ' + (a.consent ? 'publication acceptée (affiché : ' + a.nomPublic + (a.profession ? ', ' + a.profession : '') + ')' : 'publication NON acceptée') + ' · ' + ({ nouveau: 'nouveau', publiable: '✓ publié sur le site', masque: 'masqué' })[a.status]);
       if (a.status === 'masque') r.row.classList.add('fin');
       function act(label, status, cls) {
         var b = el('button', 'b sec ' + (cls || ''), label); b.type = 'button';
         b.addEventListener('click', async function () { b.disabled = true; try { await call('/admin/avis-statut', 'POST', { id: a.id, status: status }); await load(); } catch (e) { alert(e.message); b.disabled = false; } });
         r.ctl.appendChild(b);
       }
-      if (a.consent && a.status !== 'publiable') act('Marquer publiable', 'publiable', 'fic');
+      if (a.consent && a.status !== 'publiable') act('Publier sur le site', 'publiable', 'fic');
+      if (a.status === 'publiable') act('Retirer du site', 'nouveau');
       if (a.status === 'publiable') {
         var cp = el('button', 'b sec', 'Copier'); cp.type = 'button';
         cp.addEventListener('click', function () { navigator.clipboard.writeText('« ' + (a.text || '') + ' » — ' + a.name + ', ' + modTitle(a.module) + ' (' + a.stars + '/5)').then(function () { cp.textContent = 'Copié !'; }); });
@@ -783,6 +830,116 @@ window.preparerPdf = async function (PDFLib, src) {
       w2.appendChild(r.row);
     });
   }
+
+  // ----- Portfolio des apprenants (phase B)
+  var PF = { cartes: [] }, PFF = 'a_voir';
+  var PFS = { a_voir: 'À voir', valide: 'Validée', a_revoir: 'À revoir' };
+  function renderPortfolio() {
+    var cs = PF.cartes || [], nv = cs.filter(function (c) { return c.statut === 'a_voir'; }).length;
+    $('pfCount').textContent = nv; $('pfCount').hidden = !nv;
+    var flt = $('pfFlt'); flt.textContent = '';
+    [['a_voir', 'À voir'], ['valide', 'Validées'], ['a_revoir', 'À revoir'], ['', 'Toutes']].forEach(function (f) {
+      var n = f[0] ? cs.filter(function (c) { return c.statut === f[0]; }).length : cs.length;
+      var b = el('button', 'b sec' + (PFF === f[0] ? ' on' : ''), f[1] + ' (' + n + ')'); b.type = 'button';
+      b.addEventListener('click', function () { PFF = f[0]; renderPortfolio(); });
+      flt.appendChild(b);
+    });
+    var list = $('pfList'); list.textContent = '';
+    if (PF.pret === false) list.appendChild(el('p', 'warn', 'Stockage des fichiers non configuré sur ce Worker.'));
+    var sel = cs.filter(function (c) { return !PFF || c.statut === PFF; });
+    if (!sel.length) { list.appendChild(el('p', '', cs.length ? 'Aucune carte dans cette catégorie.' : 'Aucune carte déposée pour le moment.')); return; }
+    var wrap = el('div', 'acts'); list.appendChild(wrap);
+    sel.forEach(function (c) {
+      var row = el('div', 'pfc'), th = el('a', 'th'); th.href = c.voir; th.target = '_blank'; th.rel = 'noopener';
+      if (c.kind === 'pdf') th.textContent = 'PDF'; else { var im = el('img'); im.src = c.mini; im.alt = c.titre; im.loading = 'lazy'; th.appendChild(im); }
+      row.appendChild(th);
+      var d = el('div'); row.appendChild(d);
+      d.appendChild(el('b', '', c.titre));
+      var pub = c.statut === 'valide' && c.consent;
+      d.appendChild(el('small', '', c.name + ' (' + c.code + ') · ' + (c.formation || 'formation non précisée') + ' · ' + fdt(c.t) + ' · ' + c.kind.toUpperCase() + ' ' + Math.max(1, Math.round(c.size / 1024)) + ' Ko'));
+      d.appendChild(el('small', '', PFS[c.statut] + ' · ' + (c.consent ? 'publication acceptée (affiché : ' + c.nomPublic + ')' : 'publication NON acceptée') + (pub ? ' · ✓ visible sur le site' : '')));
+      if (c.descr) d.appendChild(el('p', 'ds', c.descr));
+      if (c.commentaire) d.appendChild(el('p', 'fnote', 'Votre commentaire : ' + c.commentaire));
+      var ctl = el('div', 'actl'); d.appendChild(ctl);
+      var v = el('a', 'b sec', 'Voir en grand'); v.href = c.voir; v.target = '_blank'; v.rel = 'noopener'; ctl.appendChild(v);
+      function go(label, statut, cls, ask, withCom) {
+        var b = el('button', 'b sec ' + (cls || ''), label); b.type = 'button';
+        b.addEventListener('click', async function () {
+          var com;
+          if (withCom) { com = prompt('Commentaire pour ' + c.name + ' (il le verra dans « Mon portfolio ») :', c.commentaire || ''); if (com === null) return; }
+          if (ask && !confirm(ask)) return;
+          b.disabled = true;
+          try { await call('/admin/portfolio-statut', 'POST', { id: c.id, statut: statut || c.statut, commentaire: com }); await load(); }
+          catch (e) { alert(e.message); b.disabled = false; }
+        });
+        ctl.appendChild(b);
+      }
+      go('Commenter', '', '', '', true);
+      if (c.statut !== 'valide') go('Valider', 'valide', 'fic', 'Valider « ' + c.titre + ' » ?\n\n' + (c.consent ? 'Elle apparaîtra sur la page publique « Réalisations des apprenants » avec « ' + c.nomPublic + ' » (en quelques minutes).' : 'L\'apprenant n\'a pas accepté la publication : elle ne sera PAS affichée sur le site.'));
+      if (c.statut !== 'a_revoir') go('À revoir', 'a_revoir', '', '', true);
+      var del = el('button', 'b sec red', 'Supprimer'); del.type = 'button';
+      del.addEventListener('click', async function () {
+        if (!confirm('Supprimer définitivement « ' + c.titre + ' » de ' + c.name + ' ?\n\nLe fichier sera effacé et la carte disparaîtra de son portfolio et du site. Cette action ne peut pas être annulée.')) return;
+        del.disabled = true;
+        try { await call('/admin/portfolio-supprimer', 'POST', { id: c.id }); await load(); } catch (e) { alert(e.message); del.disabled = false; }
+      });
+      ctl.appendChild(del);
+      wrap.appendChild(row);
+    });
+  }
+
+  // ----- Parrainage (phase B)
+  var PAR_ETAT = { essai: '⏳ en essai', pret: '✅ prêt à récompenser', accorde: '🎁 récompense accordée', refuse: 'refusé', desactive: '⛔ accès du filleul désactivé', absent: 'filleul supprimé' };
+  function renderParrainages(d) {
+    var fs = d.filleuls || [], pr = fs.filter(function (f) { return f.etat === 'pret'; }).length;
+    $('parCount').textContent = pr; $('parCount').hidden = !pr;
+    var ms = $('parMod');
+    if (!ms.children.length) {
+      var o0 = el('option', '', 'Aucune formation offerte'); o0.value = ''; ms.appendChild(o0);
+      state.catalog.forEach(function (m) { var o = el('option', '', m.title.split(' : ')[0]); o.value = m.key; ms.appendChild(o); });
+    }
+    ms.value = d.config.module || ''; $('parMois').value = String(d.config.mois);
+    $('parTexte').textContent = 'Réglage actuel : ' + (d.texte || '');
+    var list = $('parList'); list.textContent = '';
+    if (!fs.length) { list.appendChild(el('p', '', 'Aucun parrainage pour le moment.')); return; }
+    var wrap = el('div', 'acts'); list.appendChild(wrap);
+    fs.forEach(function (f) {
+      var r = actRow(f.label + ' (filleul) ← parrainé par ' + f.parrainLabel,
+        'Filleul ' + f.code + ' · ' + (LABELS[f.product] || f.product || '') + ' · code saisi le ' + fdt(f.t) + ' · Parrain ' + f.parrain + ' (code ' + f.pcode + ')' + (f.parrainActif ? '' : ' · ⚠️ accès du parrain inactif') + ' · ' + f.texte);
+      r.row.firstChild.appendChild(el('span', 'lvtag' + (f.etat === 'desactive' ? ' red' : ''), PAR_ETAT[f.etat]));
+      if (f.etat === 'accorde' || f.etat === 'refuse' || f.etat === 'absent') r.row.classList.add('fin');
+      if (f.statut === 'attente') {
+        var g = el('button', 'b sec fic', 'Accorder la récompense'); g.type = 'button';
+        g.disabled = f.etat !== 'pret' || !f.parrainActif;
+        if (f.etat !== 'pret') g.title = f.texte;
+        g.addEventListener('click', async function () {
+          var quoi = d.config.module && !f.dejaModule ? 'la formation « ' + modTitle(d.config.module) + ' » offerte' : d.config.mois + ' mois d\'assistance en plus' + (d.config.module ? ' (il a déjà « ' + modTitle(d.config.module) + ' »)' : '');
+          if (!confirm('Accorder la récompense à ' + f.parrainLabel + ' ?\n\nRécompense : ' + quoi + '\nPour le filleul : ' + f.label + '\n\nVérifiez d\'abord que le filleul n\'a pas été remboursé. Cette action ne peut pas être annulée.')) return;
+          g.disabled = true;
+          try { var j = await call('/admin/parrainage-accorder', 'POST', { code: f.code }); alert('✅ Récompense accordée : ' + j.texte + '.\nPensez à prévenir ' + f.parrainLabel + ' sur WhatsApp.'); await load(); }
+          catch (e) { alert(e.message); g.disabled = false; }
+        });
+        r.ctl.appendChild(g);
+        var x = el('button', 'b sec red', 'Refuser'); x.type = 'button';
+        x.addEventListener('click', async function () {
+          if (!confirm('Refuser ce parrainage (ex. auto-parrainage, remboursement) ?\n\nFilleul : ' + f.label + '\nParrain : ' + f.parrainLabel + '\n\nAucune récompense ne sera donnée. Cette action ne peut pas être annulée.')) return;
+          x.disabled = true;
+          try { await call('/admin/parrainage-refuser', 'POST', { code: f.code }); await load(); } catch (e) { alert(e.message); x.disabled = false; }
+        });
+        r.ctl.appendChild(x);
+      }
+      wrap.appendChild(r.row);
+    });
+  }
+  $('parSave').addEventListener('click', async function () {
+    var msg = $('parMsg'); msg.textContent = ''; msg.className = '';
+    var m = $('parMod').value, mo = +$('parMois').value;
+    if (!confirm('Enregistrer la récompense ?\n\nFormation offerte : ' + (m ? modTitle(m) : 'aucune') + '\nMois d\'assistance : ' + mo + '\n\nElle s\'appliquera aux prochaines récompenses accordées.')) return;
+    var b = $('parSave'); b.disabled = true;
+    try { var j = await call('/admin/parrainage-config', 'POST', { module: m, mois: mo }); await load(); msg.className = 'ok'; msg.textContent = '✅ Enregistré : ' + j.texte + '.'; }
+    catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+    finally { b.disabled = false; }
+  });
 
   // ----- Mini-quiz
   var QZ = [], QR = [];

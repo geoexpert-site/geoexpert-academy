@@ -533,6 +533,157 @@ async function publicCert(req, env, url) {
   if (row.revoked) return reply({ valid: false, revoked: true, id: row.id }, 200, req, env);
   return reply({ valid: true, id: row.id, name: row.name, title: row.title, hours: row.hours, t: row.t }, 200, req, env, { 'Cache-Control': 'public, max-age=300' });
 }
+// ---------------------------------------------------------------- Phase B : partage, portfolio, parrainage, avis publics
+const SITE = 'https://geoexpertacademy.ci';
+const escHtml = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Nom affiché publiquement : prénom + initiale du nom (« Aminata K. »). Un premier mot en MAJUSCULES suivi
+// d'un mot qui ne l'est pas est pris pour le nom de famille (« KONÉ Aminata » → « Aminata K. »).
+function pubName(label) {
+  const w = String(label || '').trim().split(/\s+/).filter(Boolean);
+  if (!w.length) return '';
+  const up = x => x.length > 1 && x === x.toUpperCase() && x !== x.toLowerCase();
+  let prenom = w[0], nom = w.length > 1 ? w[w.length - 1] : '';
+  if (w.length > 1 && up(w[0]) && !up(w[1])) { prenom = w[1]; nom = w[0]; }
+  return capitalize(prenom) + (nom ? ' ' + nom[0].toUpperCase() + '.' : '');
+}
+function prenomOf(label) { return pubName(label).replace(/ \S\.$/, ''); }
+function modShort(k) { const m = findModule(k); return m ? m.title.split(' : ')[0] : ''; }
+
+// Page de partage d'une attestation (/a/ATT-XXXX-XXXX) : balises Open Graph lues par LinkedIn, Facebook et WhatsApp,
+// puis la personne est envoyée sur « Vérifier un certificat ». Jamais de liste : une page par numéro, non indexée.
+async function sharePage(env, url) {
+  const id = decodeURIComponent(url.pathname.slice(3)).toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20);
+  const ok = /^ATT-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/.test(id);
+  const row = ok && env.DB ? await env.DB.prepare('SELECT id, name, title, t, revoked FROM certificates WHERE id = ?').bind(id).first() : null;
+  const dest = SITE + '/verifier-certificat.html' + (ok ? '?code=' + id : '');
+  const valid = row && !row.revoked;
+  const title = valid ? 'Attestation GeoExpert Academy : ' + row.name + ' — ' + row.title.split(' : ')[0] : 'Vérifier une attestation GeoExpert Academy';
+  const descr = valid ? 'Attestation de fin de formation « ' + row.title + ' », délivrée le ' + fmtDate(row.t) + '. N° ' + row.id + ' : vérifiez son authenticité sur geoexpertacademy.ci.'
+    : 'Chaque attestation GeoExpert Academy porte un numéro unique vérifiable en ligne.';
+  const html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>' + escHtml(title) + '</title><meta name="robots" content="noindex, nofollow">'
+    + '<meta name="description" content="' + escHtml(descr) + '">'
+    + '<meta property="og:type" content="website"><meta property="og:site_name" content="GeoExpert Academy">'
+    + '<meta property="og:title" content="' + escHtml(title) + '"><meta property="og:description" content="' + escHtml(descr) + '">'
+    + '<meta property="og:url" content="' + escHtml(url.origin + '/a/' + (ok ? id : '')) + '"><meta property="og:image" content="' + SITE + '/images/formation-certificat-1.jpg">'
+    + '<meta property="og:image:width" content="1000"><meta property="og:image:height" content="707"><meta name="twitter:card" content="summary_large_image">'
+    + '<link rel="canonical" href="' + escHtml(dest) + '"></head><body style="font:16px sans-serif;margin:40px auto;max-width:480px;padding:0 16px">'
+    + '<p><a href="' + escHtml(dest) + '">Vérifier cette attestation sur geoexpertacademy.ci</a></p>'
+    + '<script>location.replace(' + JSON.stringify(dest).replace(/</g, '\\u003c') + ')</script></body></html>';
+  return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300', 'X-Content-Type-Options': 'nosniff', 'X-Robots-Tag': 'noindex, nofollow' } });
+}
+
+// Avis publiés sur la page des formations vidéo : accord de l'apprenant ET choix de l'administrateur. Texte jamais modifié.
+async function publicAvis(req, env) {
+  if (!env.DB) return reply({ avis: [] }, 200, req, env);
+  const r = await env.DB.prepare("SELECT r.module, r.name, r.stars, r.text, r.t, i.id AS v2, i.profession FROM reviews r LEFT JOIN avis_info i ON i.id = r.id WHERE r.status = 'publiable' AND r.consent = 1 ORDER BY r.t DESC LIMIT 30").all();
+  const avis = r.results.map(a => ({ nom: a.v2 ? pubName(a.name) : prenomOf(a.name), profession: a.v2 ? a.profession : '', stars: a.stars, text: a.text, formation: modShort(a.module), t: a.t }));
+  return reply({ avis }, 200, req, env, { 'Cache-Control': 'public, max-age=300' });
+}
+
+// Portfolio : fichiers vérifiés par leur contenu (pas seulement l'extension).
+const PF_MAX = 5 * 1024 * 1024, PF_MINI_MAX = 400 * 1024, PF_PAR_APPRENANT = 20;
+const PF_TYPES = { jpg: 'image/jpeg', png: 'image/png', pdf: 'application/pdf' };
+function pfKind(b) {
+  if (b.length > 3 && b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'jpg';
+  if (b.length > 8 && [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A].every((x, i) => b[i] === x)) return 'png';
+  if (b.length > 5 && [0x25, 0x50, 0x44, 0x46, 0x2D].every((x, i) => b[i] === x)) return 'pdf';
+  return '';
+}
+const pfKey = (id, part, kind) => 'portfolio/' + id + '/' + (part === 'mini' ? 'mini.jpg' : 'carte.' + kind);
+async function pfSig(env, mode, id, part, exp) { return (await hmacHex(env.DL_SECRET, enc.encode('pf|' + mode + '|' + id + '|' + part + '|' + exp))).slice(0, 40); }
+// Lien signé (30 min à 2 h) pour voir une carte non publiée : donné seulement à son auteur et à l'administrateur.
+async function pfLink(env, base, mode, id, part, secs) {
+  const exp = Math.floor(Date.now() / 1000) + secs;
+  return base + '/' + (mode === 'u' ? 'pfu' : 'pfv') + '/' + id + '/' + part + '/' + exp + '/' + await pfSig(env, mode, id, part, exp);
+}
+function pfRow(x) { return { id: x.id, titre: x.titre, module: x.module, formation: modShort(x.module), descr: x.descr, kind: x.kind, size: x.size, consent: !!x.consent, statut: x.statut, commentaire: x.commentaire, t: x.t, tv: x.tv }; }
+async function pfDelete(env, rows) {
+  for (const x of rows) if (env.FICHIERS) { try { await env.FICHIERS.delete([pfKey(x.id, 'full', x.kind), pfKey(x.id, 'mini')]); } catch (e) { /* fichier déjà absent */ } }
+}
+// Envoi du fichier (PUT /pfu/<id>/<full|mini>/<exp>/<sig>) : lien donné par /api/portfolio-ajout, valable 30 minutes.
+async function pfUpload(req, env, url) {
+  const [, , id, part, exp, sig] = url.pathname.split('/');
+  if (!env.DL_SECRET || !env.FICHIERS || !env.DB || !/^\d{1,10}$/.test(id || '') || !['full', 'mini'].includes(part) || !/^\d{10}$/.test(exp || '')
+    || !(await safeEqual(sig || '', await pfSig(env, 'u', id, part, exp)))) return reply({ error: 'Lien d\'envoi non valable.' }, 403, req, env);
+  if (Date.now() / 1000 > +exp) return reply({ error: 'Le délai d\'envoi est dépassé : recommencez.' }, 403, req, env);
+  const row = await env.DB.prepare('SELECT id, kind, statut FROM portfolio WHERE id = ?').bind(+id).first();
+  if (!row || !['envoi', 'a_voir', 'a_revoir'].includes(row.statut)) return reply({ error: 'Carte introuvable.' }, 404, req, env);
+  const max = part === 'mini' ? PF_MINI_MAX : PF_MAX;
+  if (+(req.headers.get('Content-Length') || 0) > max) return reply({ error: 'Fichier trop lourd (5 Mo au maximum).' }, 413, req, env);
+  const buf = new Uint8Array(await req.arrayBuffer());
+  if (!buf.length || buf.length > max) return reply({ error: 'Fichier trop lourd (5 Mo au maximum).' }, 413, req, env);
+  const kind = pfKind(buf);
+  if (part === 'mini' ? kind !== 'jpg' : kind !== row.kind) return reply({ error: 'Ce fichier n\'est pas une vraie image JPG / PNG ou un vrai PDF.' }, 415, req, env);
+  await env.FICHIERS.put(pfKey(row.id, part, row.kind), buf, { httpMetadata: { contentType: PF_TYPES[kind] } });
+  if (part === 'full') await env.DB.prepare("UPDATE portfolio SET size = ?, statut = CASE WHEN statut = 'envoi' THEN 'a_voir' ELSE statut END WHERE id = ?").bind(buf.length, row.id).run();
+  else await env.DB.prepare('UPDATE portfolio SET mini = 1 WHERE id = ?').bind(row.id).run();
+  return reply({ ok: true }, 200, req, env);
+}
+// Lecture d'une carte : /pfv/… (lien signé : auteur ou administrateur) ou /pub/<id>/<full|mini> (publique : validée ET autorisée).
+async function pfServe(req, env, url) {
+  const [, kindOfRoute, id, part, exp, sig] = url.pathname.split('/');
+  const pub = kindOfRoute === 'pub';
+  const no = (s, t) => new Response(t, { status: s, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
+  if (!env.DB || !env.FICHIERS || !/^\d{1,10}$/.test(id || '') || !['full', 'mini'].includes(part)) return no(404, 'Introuvable.');
+  if (!pub && (!env.DL_SECRET || !/^\d{10}$/.test(exp || '') || Date.now() / 1000 > +exp || !(await safeEqual(sig || '', await pfSig(env, 'v', id, part, exp))))) return no(403, 'Lien expiré : rouvrez la page.');
+  const row = await env.DB.prepare('SELECT id, kind, mini, statut, consent, titre FROM portfolio WHERE id = ?').bind(+id).first();
+  if (!row || (pub && !(row.statut === 'valide' && row.consent))) return no(404, 'Cette carte n\'est pas (ou plus) publiée.');
+  const obj = await env.FICHIERS.get(pfKey(row.id, part === 'mini' && row.mini ? 'mini' : 'full', row.kind));
+  if (!obj) return no(404, 'Fichier introuvable.');
+  const kind = part === 'mini' && row.mini ? 'jpg' : row.kind;
+  return new Response(obj.body, { status: 200, headers: {
+    'Content-Type': PF_TYPES[kind], 'X-Content-Type-Options': 'nosniff', 'Content-Disposition': 'inline',
+    'Cache-Control': pub ? 'public, max-age=300' : 'private, max-age=600', 'Cross-Origin-Resource-Policy': 'cross-origin',
+  } });
+}
+// Réalisations publiées (page realisations-apprenants.html) : cartes validées ET autorisées, prénom + initiale seulement.
+async function publicRealisations(req, env, url) {
+  if (!env.DB) return reply({ cartes: [] }, 200, req, env);
+  const r = await env.DB.prepare("SELECT id, name, module, titre, descr, kind, tv, t FROM portfolio WHERE statut = 'valide' AND consent = 1 ORDER BY tv DESC, id DESC LIMIT 200").all();
+  const cartes = r.results.map(x => ({ id: x.id, titre: x.titre, descr: x.descr, formation: modShort(x.module), nom: pubName(x.name), kind: x.kind,
+    mini: url.origin + '/pub/' + x.id + '/mini', full: url.origin + '/pub/' + x.id + '/full', t: x.tv || x.t }));
+  return reply({ cartes }, 200, req, env, { 'Cache-Control': 'public, max-age=300' });
+}
+
+// Parrainage : récompense réglable dans l'administration (par défaut : Google Earth Pro offerte, sinon 1 mois d'assistance).
+const PARRAIN_DEFAUT = { module: 'google', mois: 1 };
+async function parrainCfg(env) {
+  try { const v = JSON.parse(await getReglage(env, 'parrainage') || '{}'); return { module: v.module === '' ? '' : (v.module && findModule(v.module) ? v.module : PARRAIN_DEFAUT.module), mois: Number.isInteger(v.mois) ? v.mois : PARRAIN_DEFAUT.mois }; }
+  catch (e) { return Object.assign({}, PARRAIN_DEFAUT); }
+}
+function recompenseTexte(cfg) {
+  const a = cfg.module ? 'la formation « ' + modShort(cfg.module) + ' » offerte' : '', b = cfg.mois ? cfg.mois + ' mois d\'assistance du formateur en plus' : '';
+  return a && b ? a + ' (si vous l\'avez déjà : ' + b + ')' : a || b || 'aucune récompense pour le moment';
+}
+// Début de l'accès et fin des 7 jours d'essai d'un filleul (la récompense n'est possible qu'après).
+function accesDebut(rec) { return rec.premiereUtilisation || (rec.essai ? 0 : rec.created); }
+function finEssaiFilleul(rec) { const d = accesDebut(rec); return d ? (trialEnd(rec) || d + TRIAL_DAYS * DAY) : 0; }
+// Le filleul peut saisir un code pendant ses 7 premiers jours (première connexion comprise).
+function peutSaisirParrain(rec, now) { const d = accesDebut(rec); return !!d && now < d + TRIAL_DAYS * DAY; }
+async function codeParrain(env, c) {
+  const row = await env.DB.prepare('SELECT pcode FROM parrains WHERE code = ?').bind(c).first();
+  if (row) return row.pcode;
+  for (let i = 0; i < 5; i++) {
+    const p = randomCode(6);
+    const r = await env.DB.prepare('INSERT OR IGNORE INTO parrains (code, pcode, t) VALUES (?, ?, ?)').bind(c, p, Date.now()).run();
+    if (r.meta && r.meta.changes) return p;
+    const again = await env.DB.prepare('SELECT pcode FROM parrains WHERE code = ?').bind(c).first();
+    if (again) return again.pcode;
+  }
+  throw new Error('code parrain');
+}
+// État d'un filleul pour l'administration et pour la page « Mes parrainages » du parrain.
+function etatFilleul(f, rec, now) {
+  if (f.statut === 'accorde') return { etat: 'accorde', texte: 'Récompense accordée' + (f.recompense ? ' : ' + f.recompense : '') };
+  if (f.statut === 'refuse') return { etat: 'refuse', texte: 'Parrainage non retenu' };
+  if (!rec) return { etat: 'absent', texte: 'Accès supprimé' };
+  if (!rec.active) return { etat: 'desactive', texte: 'Accès désactivé (remboursé ou arrêté) : pas de récompense' };
+  const fin = finEssaiFilleul(rec);
+  if (!fin || now < fin) return { etat: 'essai', texte: fin ? 'En essai jusqu\'au ' + fmtDate(fin) : 'Code pas encore utilisé', fin };
+  return { etat: 'pret', texte: 'Essai terminé : récompense en cours de validation par le formateur', fin };
+}
+
 function fmtDate(ms) {
   return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
@@ -822,6 +973,15 @@ export default {
       const sameOrigin = role === 'admin' && origin === url.origin;
       if (origin && !sameOrigin && !allowedOrigins(env).includes(origin)) return reply({ error: 'Origine non autorisée.' }, 403, req, env);
       if (role !== 'admin' && url.pathname === '/api/certificat' && req.method === 'GET') return await publicCert(req, env, url);
+      // Phase B : pages et listes publiques (aucun code d'accès), envoi et lecture des cartes du portfolio.
+      if (role !== 'admin' && req.method === 'GET') {
+        if (url.pathname.startsWith('/a/')) return await sharePage(env, url);
+        if (url.pathname === '/api/avis-publics') return await publicAvis(req, env);
+        if (url.pathname === '/api/realisations') return await publicRealisations(req, env, url);
+        if (url.pathname.startsWith('/pub/')) return await pfServe(req, env, url);
+      }
+      if (role !== 'admin' && url.pathname.startsWith('/pfu/') && req.method === 'PUT') return await pfUpload(req, env, url);
+      if (url.pathname.startsWith('/pfv/') && req.method === 'GET' && (role !== 'admin' || await adminAccessOk(req, env))) return await pfServe(req, env, url);
       // Webhooks DigitalPaye : sur le Worker apprenant (public). Le Worker admin, derrière Access, ne les reçoit qu'en local (tests).
       if (url.pathname === '/webhook/digitalpaye' && (role !== 'admin' || env.ACCESS_OPTIONAL === 'oui')) return await webhookDigitalPaye(req, env);
       // Gros fichiers : lien signé donné par /api/file (ouvert directement par le navigateur, sans code d'accès dans l'adresse).
@@ -904,12 +1064,14 @@ async function api(req, env, url) {
     return reply({
       label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods, progress,
       trialStart: te > now ? rec.premiereUtilisation : 0,
-      assistanceEnd: startAt ? addMonths(startAt, 3) : 0,
+      assistanceEnd: startAt ? addMonths(startAt, 3 + (rec.assistMois || 0)) : 0,
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
       quiz: await loadQuizKeys(env, rec),
       lives: await loadLives(env, rec, now),
       communaute: !!(await getReglage(env, 'communaute')),
+      portfolio: !!(env.FICHIERS && env.DL_SECRET),
+      parrainage: env.DB ? { saisir: peutSaisirParrain(rec, now) && !(await env.DB.prepare('SELECT code FROM filleuls WHERE code = ?').bind(c).first().catch(() => 1)) } : undefined,
       ...(await loginRessources(env, rec, c, now)),
       ...(await (async () => { const x = await loadCertsAndReviews(env, c); return { certificats: x.certs, avisDonnes: x.reviewed }; })()),
     }, 200, req, env);
@@ -999,10 +1161,108 @@ async function api(req, env, url) {
     if (!(stars >= 1 && stars <= 5)) return reply({ error: 'Choisissez une note de 1 à 5 étoiles.' }, 400, req, env);
     const text = String(body.text || '').trim().slice(0, 1000), consent = body.consent ? 1 : 0;
     await env.DB.batch([
+      env.DB.prepare('DELETE FROM avis_info WHERE id IN (SELECT id FROM reviews WHERE code = ? AND module = ?)').bind(c, module),
       env.DB.prepare('DELETE FROM reviews WHERE code = ? AND module = ?').bind(c, module),
       env.DB.prepare("INSERT INTO reviews (code, module, name, stars, text, consent, t, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'nouveau')").bind(c, module, rec.label, stars, text, consent, now),
     ]);
+    // Nouvelle case d'accord (prénom, initiale du nom, profession) : envoyée par la nouvelle page seulement.
+    if (body.accord === 2) {
+      const row = await env.DB.prepare('SELECT id FROM reviews WHERE code = ? AND module = ?').bind(c, module).first();
+      if (row) await env.DB.prepare('INSERT OR REPLACE INTO avis_info (id, profession) VALUES (?, ?)').bind(row.id, cleanText(body.profession, 60)).run();
+    }
     return reply({ ok: true }, 200, req, env);
+  }
+  // L'apprenant retire (ou redonne) son accord de publication d'un avis : retiré du site tout de suite.
+  if (url.pathname === '/api/avis-accord') {
+    if (!env.DB) return reply({ error: 'Indisponible pour le moment.' }, 503, req, env);
+    const r = await env.DB.prepare('UPDATE reviews SET consent = ?, status = CASE WHEN ? = 0 AND status = \'publiable\' THEN \'nouveau\' ELSE status END WHERE id = ? AND code = ?')
+      .bind(body.consent ? 1 : 0, body.consent ? 1 : 0, parseInt(body.id, 10) || 0, c).run();
+    if (!(r.meta && r.meta.changes)) return reply({ error: 'Avis introuvable.' }, 404, req, env);
+    if (body.consent) await env.DB.prepare('INSERT OR IGNORE INTO avis_info (id, profession) VALUES (?, \'\')').bind(parseInt(body.id, 10)).run();
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // ---- Mon portfolio : liste, ajout (puis envoi du fichier par lien signé), accord de publication, suppression.
+  if (url.pathname.startsWith('/api/portfolio')) {
+    if (!env.DB || !env.FICHIERS || !env.DL_SECRET) return reply({ error: 'Le portfolio sera disponible prochainement.' }, 503, req, env);
+    if (url.pathname === '/api/portfolio') {
+      await env.DB.prepare("DELETE FROM portfolio WHERE code = ? AND statut = 'envoi' AND t < ?").bind(c, now - 3600000).run();
+      const [p, a] = await env.DB.batch([
+        env.DB.prepare('SELECT * FROM portfolio WHERE code = ? ORDER BY t DESC').bind(c),
+        env.DB.prepare('SELECT r.id, r.module, r.stars, r.consent, r.status, i.id AS v2 FROM reviews r LEFT JOIN avis_info i ON i.id = r.id WHERE r.code = ? ORDER BY r.t DESC').bind(c),
+      ]);
+      const cartes = await Promise.all(p.results.filter(x => x.statut !== 'envoi').map(async x => Object.assign(pfRow(x), {
+        voir: await pfLink(env, url.origin, 'v', x.id, 'full', 1800), mini: await pfLink(env, url.origin, 'v', x.id, 'mini', 1800), publie: x.statut === 'valide' && !!x.consent })));
+      const avis = a.results.map(x => ({ id: x.id, formation: modShort(x.module), stars: x.stars, consent: !!x.consent, publie: x.status === 'publiable' && !!x.consent }));
+      return reply({ cartes, avis, nom: pubName(rec.label), max: PF_PAR_APPRENANT }, 200, req, env);
+    }
+    if (url.pathname === '/api/portfolio-ajout') {
+      if (!(await charteAcceptee(env, c))) return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
+      const titre = cleanText(body.titre, 100), descr = String(body.descr || '').replace(/[\u0000-\u0009\u000b-\u001f<>]/g, ' ').trim().slice(0, 600);
+      const kind = String(body.kind || ''), module = String(body.module || ''), size = parseInt(body.size, 10) || 0;
+      if (titre.length < 3) return reply({ error: 'Donnez un titre à votre carte (3 caractères au moins).' }, 400, req, env);
+      if (!PF_TYPES[kind]) return reply({ error: 'Formats acceptés : JPG, PNG ou PDF.' }, 400, req, env);
+      if (!(size > 0 && size <= PF_MAX)) return reply({ error: 'Fichier trop lourd : 5 Mo au maximum.' }, 400, req, env);
+      if (module && !rec.modules.some(g => g.m === module)) return reply({ error: 'Choisissez une de vos formations.' }, 400, req, env);
+      const n = await env.DB.prepare("SELECT COUNT(*) AS n FROM portfolio WHERE code = ? AND statut != 'envoi'").bind(c).first();
+      if (n && n.n >= PF_PAR_APPRENANT) return reply({ error: 'Vous avez déjà ' + PF_PAR_APPRENANT + ' cartes : supprimez-en une pour en ajouter une autre.' }, 400, req, env);
+      const r = await env.DB.prepare('INSERT INTO portfolio (code, name, module, titre, descr, kind, size, consent, t) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .bind(c, rec.label, module, titre, descr, kind, size, body.consent ? 1 : 0, now).run();
+      const id = r.meta.last_row_id;
+      return reply({ id, envoi: await pfLink(env, url.origin, 'u', id, 'full', 1800), envoiMini: await pfLink(env, url.origin, 'u', id, 'mini', 1800) }, 200, req, env);
+    }
+    const row = await env.DB.prepare('SELECT * FROM portfolio WHERE id = ? AND code = ?').bind(parseInt(body.id, 10) || 0, c).first();
+    if (!row) return reply({ error: 'Carte introuvable.' }, 404, req, env);
+    if (url.pathname === '/api/portfolio-accord') {
+      await env.DB.prepare('UPDATE portfolio SET consent = ? WHERE id = ?').bind(body.consent ? 1 : 0, row.id).run();
+      return reply({ ok: true }, 200, req, env);
+    }
+    if (url.pathname === '/api/portfolio-supprimer') {
+      await env.DB.prepare('DELETE FROM portfolio WHERE id = ?').bind(row.id).run();
+      await pfDelete(env, [row]);
+      return reply({ ok: true }, 200, req, env);
+    }
+    return reply({ error: 'Introuvable.' }, 404, req, env);
+  }
+
+  // ---- Parrainage : code et lien personnels, filleuls, saisie du code d'un parrain (7 premiers jours).
+  if (url.pathname === '/api/parrainage' || url.pathname === '/api/parrain-saisir') {
+    if (!env.DB) return reply({ error: 'Le parrainage sera disponible prochainement.' }, 503, req, env);
+    if (url.pathname === '/api/parrain-saisir') {
+      const p = String(body.pcode || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!/^[2-9A-HJ-NP-Z]{6}$/.test(p)) return reply({ error: 'Le code de parrainage a 6 caractères (lettres et chiffres).' }, 400, req, env);
+      if (await env.DB.prepare('SELECT code FROM filleuls WHERE code = ?').bind(c).first()) return reply({ error: 'Vous avez déjà indiqué un parrain.' }, 400, req, env);
+      if (!peutSaisirParrain(rec, now)) return reply({ error: 'Le code de parrainage se saisit pendant les 7 premiers jours de votre accès.' }, 400, req, env);
+      const pr = await env.DB.prepare('SELECT code, t FROM parrains WHERE pcode = ?').bind(p).first();
+      if (!pr) return reply({ error: 'Code de parrainage introuvable. Vérifiez-le auprès de votre parrain.' }, 404, req, env);
+      // Pas d'auto-parrainage : même code, ancien code de la même personne, même numéro WhatsApp, même nom, ou parrainage croisé.
+      const praw = await env.ACCESS.get('s:' + pr.code), prec = praw ? JSON.parse(praw) : null;
+      const [ph1, ph2, croise] = await Promise.all([
+        env.DB.prepare('SELECT phone FROM contacts WHERE code = ?').bind(c).first(),
+        env.DB.prepare('SELECT phone FROM contacts WHERE code = ?').bind(pr.code).first(),
+        env.DB.prepare('SELECT code FROM filleuls WHERE code = ? AND parrain = ?').bind(pr.code, c).first(),
+      ]);
+      const same = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (pr.code === c || !prec || rec.remplace === pr.code || prec.remplace === c || croise
+        || (ph1 && ph2 && ph1.phone && ph1.phone === ph2.phone) || (same(prec.label) && same(prec.label) === same(rec.label)))
+        return reply({ error: 'Ce code de parrainage ne peut pas être utilisé pour votre accès.' }, 400, req, env);
+      if ((prec.created || 0) > (rec.created || 0)) return reply({ error: 'Votre parrain doit être inscrit avant vous.' }, 400, req, env);
+      await env.DB.prepare('INSERT OR IGNORE INTO filleuls (code, parrain, t) VALUES (?, ?, ?)').bind(c, pr.code, now).run();
+      await journal(env, 'apprenant', 'Parrainage saisi', prettyCode(c), rec.label, 'parrain ' + prettyCode(pr.code) + ' (' + prec.label + ')');
+      return reply({ ok: true }, 200, req, env);
+    }
+    const [pcode, cfg, f, moi] = await Promise.all([
+      codeParrain(env, c), parrainCfg(env),
+      env.DB.prepare('SELECT * FROM filleuls WHERE parrain = ? ORDER BY t DESC LIMIT 100').bind(c).all(),
+      env.DB.prepare('SELECT t FROM filleuls WHERE code = ?').bind(c).first(),
+    ]);
+    const filleuls = await Promise.all(f.results.map(async x => {
+      const raw = await env.ACCESS.get('s:' + x.code), fr = raw ? JSON.parse(raw) : null;
+      const e = etatFilleul(x, fr, now);
+      return { prenom: fr ? prenomOf(fr.label) : '—', t: x.t, etat: e.etat, texte: e.texte };
+    }));
+    return reply({ pcode, lien: SITE + '/formations-video-geoexpert.html?parrain=' + pcode, recompense: recompenseTexte(cfg), filleuls,
+      parraine: !!moi, peutSaisir: !moi && peutSaisirParrain(rec, now) }, 200, req, env);
   }
 
   // Sauvegarde de la progression : la page n'envoie que ce qui a changé.
@@ -1350,7 +1610,7 @@ async function admin(req, env, url) {
       code: prettyCode(c), label: rec.label, product: rec.product || '', active: rec.active, created: rec.created,
       premiereUtilisation: rec.premiereUtilisation || 0, essai: !!rec.essai, accesComplet: !!rec.accesComplet,
       finEssai: trialEnd(rec), expires: rec.expires || 0, mois: rec.mois || 0,
-      finAssistance: start ? addMonths(start, 3) : 0,
+      finAssistance: start ? addMonths(start, 3 + (rec.assistMois || 0)) : 0, assistMois: rec.assistMois || 0,
       logins: rec.logins || 0, lastLogin: rec.lastLogin || 0, lastActivity: Math.max(rec.lastLogin || 0, act),
       networks: (rec.seen || []).length, countries: [...new Set((rec.seen || []).map(x => x.c).filter(Boolean))],
       lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
@@ -1420,10 +1680,11 @@ async function admin(req, env, url) {
     if (!env.DB) return reply({ certificats: [], avis: [] }, 200, req, env);
     const [a, r] = await env.DB.batch([
       env.DB.prepare('SELECT id, code, module, name, title, hours, t, who, revoked FROM certificates ORDER BY t DESC LIMIT 500'),
-      env.DB.prepare('SELECT id, code, module, name, stars, text, consent, t, status FROM reviews ORDER BY t DESC LIMIT 500'),
+      env.DB.prepare('SELECT r.id, r.code, r.module, r.name, r.stars, r.text, r.consent, r.t, r.status, i.id AS v2, i.profession FROM reviews r LEFT JOIN avis_info i ON i.id = r.id ORDER BY r.t DESC LIMIT 500'),
     ]);
     const pc = x => ({ ...x, code: prettyCode(x.code) });
-    return reply({ certificats: a.results.map(pc), avis: r.results.map(pc) }, 200, req, env);
+    // Nom tel qu'il sera affiché sur le site : prénom + initiale (nouvel accord), sinon prénom seul (ancien accord).
+    return reply({ certificats: a.results.map(pc), avis: r.results.map(x => ({ ...pc(x), v2: !!x.v2, profession: x.profession || '', nomPublic: x.v2 ? pubName(x.name) : prenomOf(x.name) })) }, 200, req, env);
   }
   if (url.pathname === '/admin/certificat' && req.method === 'POST') {
     if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
@@ -1460,8 +1721,98 @@ async function admin(req, env, url) {
     if (!['nouveau', 'publiable', 'masque'].includes(b.status)) return reply({ error: 'Statut inconnu.' }, 400, req, env);
     if (b.status === 'publiable' && !row.consent) return reply({ error: 'L\'apprenant n\'a pas accepté que cet avis soit publié.' }, 400, req, env);
     await env.DB.prepare('UPDATE reviews SET status = ? WHERE id = ?').bind(b.status, row.id).run();
-    await journal(env, who, b.status === 'publiable' ? 'Avis marqué publiable' : b.status === 'masque' ? 'Avis masqué' : 'Avis remis en « nouveau »', '', row.name, '');
+    await journal(env, who, b.status === 'publiable' ? 'Avis publié sur le site' : b.status === 'masque' ? 'Avis masqué' : 'Avis remis en « nouveau »', '', row.name, '');
     return reply({ ok: true }, 200, req, env);
+  }
+
+  // ---- Portfolio des apprenants : liste (avec liens de lecture signés), commentaire, validation, suppression.
+  if (url.pathname === '/admin/portfolio' && req.method === 'GET') {
+    if (!env.DB) return reply({ cartes: [] }, 200, req, env);
+    const r = await env.DB.prepare("SELECT * FROM portfolio WHERE statut != 'envoi' ORDER BY t DESC LIMIT 500").all();
+    const ok = env.DL_SECRET && env.FICHIERS;
+    const cartes = await Promise.all(r.results.map(async x => Object.assign(pfRow(x), {
+      code: prettyCode(x.code), name: x.name, nomPublic: pubName(x.name), who: x.who,
+      voir: ok ? await pfLink(env, '', 'v', x.id, 'full', 7200) : '', mini: ok ? await pfLink(env, '', 'v', x.id, 'mini', 7200) : '' })));
+    return reply({ cartes, pret: !!ok }, 200, req, env);
+  }
+  if (url.pathname === '/admin/portfolio-statut' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const row = await env.DB.prepare('SELECT * FROM portfolio WHERE id = ?').bind(parseInt(b.id, 10) || 0).first();
+    if (!row || row.statut === 'envoi') return reply({ error: 'Carte introuvable.' }, 404, req, env);
+    if (!['a_voir', 'valide', 'a_revoir'].includes(b.statut)) return reply({ error: 'Statut inconnu.' }, 400, req, env);
+    const com = typeof b.commentaire === 'string' ? String(b.commentaire).replace(/[\u0000-\u0009\u000b-\u001f<>]/g, ' ').trim().slice(0, 600) : row.commentaire;
+    await env.DB.prepare('UPDATE portfolio SET statut = ?, commentaire = ?, tv = ?, who = ? WHERE id = ?').bind(b.statut, com, b.statut === 'valide' ? (row.tv || now) : 0, who, row.id).run();
+    await journal(env, who, b.statut === 'valide' ? 'Carte du portfolio validée' : b.statut === 'a_revoir' ? 'Carte du portfolio à revoir' : 'Carte du portfolio commentée', prettyCode(row.code), row.name, row.titre);
+    return reply({ ok: true }, 200, req, env);
+  }
+  if (url.pathname === '/admin/portfolio-supprimer' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const row = await env.DB.prepare('SELECT * FROM portfolio WHERE id = ?').bind(parseInt((await readJson(req)).id, 10) || 0).first();
+    if (!row) return reply({ error: 'Carte introuvable.' }, 404, req, env);
+    await env.DB.prepare('DELETE FROM portfolio WHERE id = ?').bind(row.id).run();
+    await pfDelete(env, [row]);
+    await journal(env, who, 'Carte du portfolio supprimée', prettyCode(row.code), row.name, row.titre);
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // ---- Parrainage : liste des filleuls, réglage de la récompense, accorder / refuser.
+  if (url.pathname === '/admin/parrainages' && req.method === 'GET') {
+    if (!env.DB) return reply({ filleuls: [], config: PARRAIN_DEFAUT }, 200, req, env);
+    const [f, p] = await env.DB.batch([
+      env.DB.prepare('SELECT * FROM filleuls ORDER BY t DESC LIMIT 500'),
+      env.DB.prepare('SELECT code, pcode FROM parrains'),
+    ]);
+    const pc = {}; p.results.forEach(x => { pc[x.code] = x.pcode; });
+    const cfg = await parrainCfg(env);
+    const filleuls = await Promise.all(f.results.map(async x => {
+      const [a, b] = await Promise.all([env.ACCESS.get('s:' + x.code), env.ACCESS.get('s:' + x.parrain)]);
+      const fr = a ? JSON.parse(a) : null, pr = b ? JSON.parse(b) : null, e = etatFilleul(x, fr, now);
+      return { code: prettyCode(x.code), label: fr ? fr.label : '(supprimé)', product: fr ? fr.product || '' : '', parrain: prettyCode(x.parrain), parrainLabel: pr ? pr.label : '(supprimé)',
+        pcode: pc[x.parrain] || '', parrainActif: !!(pr && studentStatus(pr, now) === 'ok'), t: x.t, statut: x.statut, recompense: x.recompense, ta: x.ta, who: x.who, etat: e.etat, texte: e.texte, fin: e.fin || 0,
+        dejaModule: !!(pr && cfg.module && pr.modules.some(g => g.m === cfg.module)) };
+    }));
+    return reply({ filleuls, config: cfg, texte: recompenseTexte(cfg) }, 200, req, env);
+  }
+  if (url.pathname === '/admin/parrainage-config' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const module = String(b.module || ''), mois = parseInt(b.mois, 10);
+    if (module && !findModule(module)) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    if (!(mois >= 0 && mois <= 6)) return reply({ error: 'Nombre de mois : de 0 à 6.' }, 400, req, env);
+    const cfg = { module, mois };
+    await env.DB.prepare('INSERT INTO reglages (k, v, t, who) VALUES (?, ?, ?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v, t = excluded.t, who = excluded.who').bind('parrainage', JSON.stringify(cfg), now, who).run();
+    await journal(env, who, 'Récompense de parrainage modifiée', '', '', recompenseTexte(cfg));
+    return reply({ ok: true, texte: recompenseTexte(cfg) }, 200, req, env);
+  }
+  if ((url.pathname === '/admin/parrainage-accorder' || url.pathname === '/admin/parrainage-refuser') && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const c = normCode((await readJson(req)).code);
+    const f = c && await env.DB.prepare('SELECT * FROM filleuls WHERE code = ?').bind(c).first();
+    if (!f) return reply({ error: 'Parrainage introuvable.' }, 404, req, env);
+    if (f.statut !== 'attente') return reply({ error: 'Ce parrainage a déjà été traité.' }, 400, req, env);
+    const [a, b] = await Promise.all([env.ACCESS.get('s:' + c), env.ACCESS.get('s:' + f.parrain)]);
+    const fr = a ? JSON.parse(a) : null, pr = b ? JSON.parse(b) : null;
+    if (url.pathname === '/admin/parrainage-refuser') {
+      await env.DB.prepare("UPDATE filleuls SET statut = 'refuse', ta = ?, who = ? WHERE code = ? AND statut = 'attente'").bind(now, who, c).run();
+      await journal(env, who, 'Parrainage refusé', prettyCode(c), fr ? fr.label : '', 'parrain ' + prettyCode(f.parrain));
+      return reply({ ok: true }, 200, req, env);
+    }
+    // Vérifications dans le Worker : 7 jours d'essai du filleul terminés, filleul actif (pas remboursé), parrain actif.
+    const e = etatFilleul(f, fr, now);
+    if (e.etat !== 'pret') return reply({ error: 'Pas encore possible : ' + e.texte + '.' }, 400, req, env);
+    if (!pr || studentStatus(pr, now) !== 'ok') return reply({ error: 'L\'accès du parrain est désactivé ou terminé.' }, 400, req, env);
+    const cfg = await parrainCfg(env);
+    let texte = '';
+    if (cfg.module && !pr.modules.some(g => g.m === cfg.module)) { pr.modules.push({ m: cfg.module, from: now }); texte = 'formation « ' + modShort(cfg.module) + ' » offerte'; }
+    else if (cfg.mois) { pr.assistMois = (pr.assistMois || 0) + cfg.mois; texte = '+' + cfg.mois + ' mois d\'assistance'; }
+    else return reply({ error: 'Aucune récompense possible avec le réglage actuel (le parrain a déjà la formation offerte et 0 mois d\'assistance est prévu).' }, 400, req, env);
+    // D'abord la ligne (une seule fois, même en double clic), ensuite la fiche du parrain.
+    const u = await env.DB.prepare("UPDATE filleuls SET statut = 'accorde', recompense = ?, ta = ?, who = ? WHERE code = ? AND statut = 'attente'").bind(texte, now, who, c).run();
+    if (!(u.meta && u.meta.changes)) return reply({ error: 'Ce parrainage a déjà été traité.' }, 400, req, env);
+    await env.ACCESS.put('s:' + f.parrain, JSON.stringify(pr));
+    await journal(env, who, 'Récompense de parrainage accordée', prettyCode(f.parrain), pr.label, texte + ' · filleul ' + prettyCode(c) + (fr ? ' (' + fr.label + ')' : ''));
+    return reply({ ok: true, texte }, 200, req, env);
   }
 
   // Annonces du formateur : liste, publication, retrait.
@@ -1570,8 +1921,12 @@ async function admin(req, env, url) {
     }
     if (env.DB) {
       const st = [];
+      // Fichiers du portfolio (R2) d'abord : la liste disparaît avec les lignes.
+      for (const x of all) await pfDelete(env, (await env.DB.prepare('SELECT id, kind FROM portfolio WHERE code = ?').bind(x).all()).results);
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        st.push(env.DB.prepare('DELETE FROM avis_info WHERE id IN (SELECT id FROM reviews WHERE code = ?)').bind(x));
+        st.push(env.DB.prepare('DELETE FROM filleuls WHERE parrain = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes', 'portfolio', 'parrains', 'filleuls']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
         st.push(env.DB.prepare('INSERT OR IGNORE INTO codes_supprimes (code, t) VALUES (?, ?)').bind(x, now));
       }
@@ -1658,6 +2013,10 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE reviews SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE paiements SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE chartes SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE portfolio SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE parrains SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE filleuls SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE filleuls SET parrain = ? WHERE parrain = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;
