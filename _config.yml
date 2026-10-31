@@ -11,5 +11,7 @@ exclude:
   - RAPPORT-PHASE-3.md
   - MISE-EN-LIGNE-PHASE-3.md
   - MISE-EN-LIGNE-PAIEMENTS.md
+  - MISE-EN-LIGNE-RESSOURCES-CHARTE.md
+  - RAPPORT-RESSOURCES-CHARTE.md
   - worker/
   - settings.json

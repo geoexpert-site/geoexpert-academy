@@ -188,3 +188,32 @@ CREATE TABLE IF NOT EXISTS codes_supprimes (
   code TEXT PRIMARY KEY,
   t INTEGER NOT NULL
 );
+
+-- Mes ressources (livret d'accueil, kit, guide, cours PDF…) : réglées dans l'onglet « 📂 Ressources » de l'administration.
+-- kind : pdf | html · r2 : fichier dans R2 (« ressources/<id>/… », bucket privé) · stamp : zones de marquage du nom (PDF)
+-- regle : immediat (dès la 1re connexion) | j8 (comme les leçons : 8e jour d'essai, tout de suite pour les anciens codes)
+-- pour : '' (tous) | formation (qgis1…) | produit (pack-complet) · visible : 0 = retenue (invisible pour les apprenants)
+CREATE TABLE IF NOT EXISTS ressources (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  descr TEXT NOT NULL DEFAULT '',
+  kind TEXT NOT NULL,
+  r2 TEXT NOT NULL DEFAULT '',
+  size INTEGER NOT NULL DEFAULT 0,
+  stamp TEXT NOT NULL DEFAULT '',
+  regle TEXT NOT NULL,
+  pour TEXT NOT NULL DEFAULT '',
+  ordre INTEGER NOT NULL DEFAULT 0,
+  visible INTEGER NOT NULL DEFAULT 1,
+  updated INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT ''
+);
+
+-- Acceptation de la charte de l'apprenant : code, version, date et heure. Une ligne par version acceptée.
+-- Suit l'apprenant si son code est remplacé ; supprimée avec ses données.
+CREATE TABLE IF NOT EXISTS chartes (
+  code TEXT NOT NULL,
+  version TEXT NOT NULL,
+  t INTEGER NOT NULL,
+  PRIMARY KEY (code, version)
+);

@@ -324,7 +324,63 @@ Au-delà de 300 Mo, demandez à Claude : il utilise un outil d'envoi en plusieur
 
 ---
 
-## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3)
+## 7 quinquies. Mes ressources (onglet **📂 Ressources**)
+
+Les documents de la rubrique **« Mes ressources »** de l'espace apprenant : livret d'accueil, kit de démarrage SIG,
+guide pratique, cours PDF de chaque formation. Chaque document téléchargé porte en bas de page
+« Document réservé à [Prénom Nom] – [code] – GeoExpert Academy » : vous n'avez rien à faire, c'est automatique.
+
+### Ajouter une ressource
+
+1. Admin → **📂 Ressources** → carte **➕ Ajouter une ressource**.
+2. **Titre** (ce que verra l'apprenant), **type** (PDF, ou page HTML pour un document à imprimer), **position** dans la liste
+   (plus le nombre est petit, plus elle est haut), **description** en une phrase.
+3. **Déblocage** :
+   - *Dès la première connexion* : disponible tout de suite ;
+   - *À partir du 8e jour* : comme les leçons (et tout de suite pour les anciens codes, qui n'ont pas de période d'essai).
+4. **Pour qui ?** : *Tous les apprenants*, une formation (seuls ceux qui l'ont achetée la voient), ou *Pack complet uniquement*.
+5. **Fichier** : choisissez le PDF sur votre ordinateur. Laissez **Visible par les apprenants** coché (décochez pour la préparer sans la montrer).
+6. **Ajouter la ressource**. Le PDF est préparé dans votre navigateur (quelques secondes) puis envoyé.
+   Votre fichier d'origine n'est pas modifié.
+
+- Un PDF protégé par un mot de passe est refusé : enregistrez-en une copie sans protection.
+- Une page HTML doit contenir `%%RESERVE%%` à l'endroit du nom (c'est déjà le cas du livret et du guide, dans
+  `ressources/livret-accueil-video.html` et `ressources/guide-cartographie-video.html` ; après une modification, préparez-les avec
+  `node ressources-html.mjs <fichier> <sortie>` dans GeoExpert-Outils pour intégrer les images, puis envoyez la sortie).
+
+### Remplacer, modifier ou retirer
+
+Cliquez sur la ressource dans la liste :
+- **⬆️ Remplacer le fichier** : nouvelle version (l'ancienne est supprimée du stockage) ;
+- changez le titre, la description, le déblocage, « pour qui » ou **Visible par les apprenants**, puis **Enregistrer les réglages** ;
+- **Retirer** : elle disparaît pour tous les apprenants et son fichier est supprimé (confirmation demandée).
+
+Badges : **Retenue** = invisible pour les apprenants ; **Pas de fichier** = l'apprenant voit « Bientôt ».
+Actuellement retenues : Webmapping, KoboToolbox et Projet final (formations en pause). Pour les publier : remplacez le fichier
+par la version finale, cochez **Visible par les apprenants**, puis **Enregistrer les réglages**.
+
+Ce que voit l'apprenant : une carte par ressource, avec **Télécharger le PDF** (ou **Ouvrir le document** pour le livret et le guide,
+qui s'ouvrent dans un nouvel onglet avec un bouton « Imprimer / Enregistrer en PDF »). Une ressource pas encore débloquée affiche
+un cadenas et « Disponible à partir du [date] ». Le blocage est fait par le serveur : même avec l'adresse d'un fichier, un apprenant
+ne peut pas télécharger une ressource bloquée ou d'une formation qu'il n'a pas achetée.
+
+## 7 sexies. Charte de l'apprenant : qui l'a acceptée ?
+
+À sa première connexion (et à chaque nouvelle version), l'apprenant lit la charte dans une fenêtre, coche
+« J'ai lu la charte de l'apprenant et je l'accepte » puis clique sur **Accéder à ma formation**. Tant qu'il ne l'a pas fait,
+ses leçons et ses ressources ne s'ouvrent pas (il garde son accès et sa progression).
+
+- **Tous les apprenants d'un coup** : Admin → **📂 Ressources** → carte **📜 Charte de l'apprenant** : combien l'ont acceptée,
+  combien pas encore, et la liste (nom, code, « Acceptée le … à …, version 1.0 » ou « Pas encore acceptée ») avec un bouton **Fiche**.
+- **Un apprenant** : sa fiche (bouton **Fiche**) affiche juste sous les dates « 📜 Charte acceptée le [date et heure], version [x] »,
+  ou « Charte pas encore acceptée ».
+- Texte public : geoexpertacademy.ci/charte-apprenant.html ; l'apprenant la relit aussi dans « Mes ressources ».
+- Changer le texte de la charte = demander à Claude : nouveau texte dans `worker/charte.js` + **nouveau numéro de version**
+  (tout le monde devra l'accepter à nouveau) + `node charte-page.mjs` pour la page du site.
+
+---
+
+## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3, ressources et charte)
 
 - **Mes progrès** (sous « Vos modules ») : objectif de la semaine qu'il choisit (1 à 7 leçons) avec une jauge,
   nombre de **semaines actives d'affilée**, et 5 **badges** liés à de vraies étapes (1re leçon, 1er chapitre terminé,
@@ -336,6 +392,8 @@ Au-delà de 300 Mo, demandez à Claude : il utilise un outil d'envoi en plusieur
 - **Mon attestation** (phase 3) : carte dans « Attestation et assistance », après les deux cartes habituelles ; PDF + lien de vérification.
 - **Votre avis** (phase 3) : carte au même endroit, quand une formation est terminée.
 - **Fichiers de la leçon** (phase 3) : dans l'onglet « Exercices » de la leçon, avant les exercices du module.
+- **Mes ressources** (colonne de gauche, sous « Mes notes ») : livret, kit, guide, cours PDF à son nom, et la charte.
+- **Charte de l'apprenant** : fenêtre à la 1re connexion et à chaque nouvelle version (voir 7 sexies).
 
 ---
 

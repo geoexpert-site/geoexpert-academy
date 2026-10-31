@@ -113,6 +113,15 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .stars{display:flex;gap:4px;margin:6px 0 8px}.stars button{border:0;background:none;font-size:28px;line-height:1;color:var(--line);padding:0 2px}.stars button.on{color:#f0a500}
 .avis textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:14px Inter;resize:vertical}.consent{margin:8px 0 10px;align-items:flex-start}.consent input{margin-top:2px;flex:none}
 .eco{display:flex;align-items:center;gap:8px;margin:10px 2px 0;font-size:13px;color:var(--dim);cursor:pointer;width:max-content;max-width:100%}.eco input{width:16px;height:16px;accent-color:var(--teal)}
+/* Mes ressources + charte de l'apprenant (ajouts : reprennent le style des cartes existantes) */
+.rs{display:flex;flex-direction:column}.rs .tag{align-self:flex-start}.rs .btn{margin-top:auto;align-self:flex-start}.rs.lk h3{color:var(--dim)}
+.chov{position:fixed;inset:0;z-index:60;background:rgba(20,18,40,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.chbox{width:100%;max-width:720px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;gap:12px}
+.chbox h2{font-size:20px;color:var(--indigo)}[data-theme=dark] .chbox h2{color:#9d92ee}.chbox .note{margin:-6px 0 0}
+.chsc{flex:1;min-height:120px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:4px 16px 12px;background:var(--bg);font-size:14px}
+.chsc h3{font-size:15px;margin:14px 0 4px}.chsc ul{margin:0;padding-left:20px}.chsc li{margin:3px 0}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:600;cursor:pointer}.chk input{flex:none;width:18px;height:18px;margin-top:2px;accent-color:var(--teal)}
+.chbt{display:flex;gap:10px;flex-wrap:wrap}.chbox .msg{margin:0;min-height:0}
 @media(max-width:900px){.ea{grid-template-columns:1fr}}
 .back{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.45);z-index:19;display:none}
 @media(max-width:900px){.login{grid-template-columns:1fr;align-content:start}.lp{display:flex;min-height:300px;padding:30px 24px;justify-content:center}.lp h1{font-size:clamp(25px,6vw,34px)}.lp p{font-size:14px}.lp ul{margin-top:16px;gap:8px}.fp{padding:30px 22px}.lay{grid-template-columns:1fr}#burger{display:grid}
@@ -287,6 +296,7 @@ function start(){
  $('login').style.display = 'none'; 
  $('app').hidden=false;$('who').textContent=D.label;
  side();home();
+ if(D.charte&&!D.charte.accepted)charte(true);
 }
 function acc(){return L.filter(function(l){return!l.lock})}
 function prog(){var a=acc(),n=a.filter(function(l){return P.done[l.k]}).length;return{n:n,t:a.length,p:a.length?Math.round(n*100/a.length):0}}
@@ -301,6 +311,7 @@ function side(){
  s.appendChild(h('button',{class:'home',onclick:function(){home();closeS()}},ic('home'),'Tableau de bord'));
  var nn=Object.keys(P.notes).filter(function(k){return P.notes[k]&&L.some(function(l){return l.k===k})}).length;
  s.appendChild(h('button',{class:'home mesnotes',onclick:function(){notesPage();closeS()}},ic('note'),'Mes notes',nn?h('span',{class:'nb',text:String(nn)}):null));
+ if(D.ressources)s.appendChild(h('button',{class:'home mesnotes mesress',onclick:function(){ressPage();closeS()}},ic('folder'),'Mes ressources'));
  D.modules.forEach(function(m){
   var mp=mprog(m),d=h('details',{class:'m'});
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
@@ -402,6 +413,60 @@ function notesPage(){
  });
  side();
  var b=$('side').querySelector('.mesnotes');if(b)b.classList.add('on');
+}
+// ===== Page « Mes ressources » (entrée de la colonne de gauche) : livret, kit, guide, cours PDF, charte.
+// Les règles (formation achetée, 8e jour) sont appliquées par le serveur : la page n'affiche que ce qu'il renvoie.
+IC.folder='<path d="M3 6h6l2 2h10v11H3z"/>';
+function ressPage(){
+ cur=null;var m=$('main');m.textContent='';window.scrollTo(0,0);
+ m.appendChild(h('div',{class:'crumb',text:'Espace apprenant'}));
+ m.appendChild(h('h1',{class:'lt',text:'Mes ressources'}));
+ m.appendChild(h('p',{class:'note',style:'margin:-6px 0 16px',text:'Les documents de votre formation. Chacun porte votre nom : il vous est strictement réservé.'}));
+ var g=h('div',{class:'grid'});
+ (D.ressources||[]).forEach(function(r){
+  var b=h('button',{class:'btn alt',onclick:function(e){openRess(r,e.currentTarget)}},ic(r.locked?'lock':'pdf'),r.locked?'Disponible à partir du '+fdate(r.unlockAt):!r.ready?'Bientôt':r.kind==='html'?'Ouvrir le document':'Télécharger le PDF');
+  if(r.locked||!r.ready)b.disabled=true;
+  g.appendChild(h('div',{class:'card mc rs'+(r.locked?' lk':'')},h('span',{class:'tag',text:r.kind==='html'?'Document':'PDF'}),h('h3',{text:r.title}),r.descr?h('p',{text:r.descr}):null,b));
+ });
+ var c=D.charte;
+ if(c)g.appendChild(h('div',{class:'card mc rs'},h('span',{class:'tag',text:'Charte'}),h('h3',{text:'Charte de l\'apprenant'}),h('p',{text:'Version '+c.version+(c.accepted?', acceptée le '+fdate(c.accepted)+'.':'.')}),
+  h('button',{class:'btn alt',onclick:function(){charte(false)}},ic('note'),'Lire la charte')));
+ m.appendChild(g);
+ side();
+ var sb=$('side').querySelector('.mesress');if(sb)sb.classList.add('on');
+}
+// Le serveur vérifie les droits puis donne un lien de 30 minutes : PDF → téléchargement ; page HTML → nouvel onglet (à imprimer en PDF).
+async function openRess(r,btn){
+ var kids=[].slice.call(btn.childNodes),w=r.kind==='html'?window.open('','_blank'):null;
+ btn.disabled=true;btn.textContent='...';
+ try{var x=await post('/api/ressource',{code:code,id:r.id}),j=await x.json();
+  if(!x.ok||String(j.url).indexOf('https://')!==0&&String(j.url).indexOf('http://127.0.0.1')!==0)throw new Error(j.error||'Document indisponible.');
+  if(w){w.opener=null;w.location.href=j.url}else location.href=j.url}
+ catch(e){if(w)w.close();alert(e.message||'Ouverture impossible. Vérifiez votre connexion.')}
+ finally{btn.textContent='';kids.forEach(function(k){btn.appendChild(k)});btn.disabled=false}
+}
+// ===== Charte de l'apprenant : obligatoire à la première connexion et à chaque nouvelle version ; consultable dans « Mes ressources ».
+function charte(must){
+ var c=D.charte,t=c.texte,ov=h('div',{class:'chov',role:'dialog','aria-modal':'true','aria-labelledby':'chT'}),box=h('div',{class:'card chbox'});
+ var close=function(){ov.remove();document.body.style.overflow=''};
+ box.appendChild(h('h2',{id:'chT',text:t.titre}));
+ box.appendChild(h('p',{class:'note',text:'Version '+t.version+' – '+t.date+(must?'. Lisez-la, puis cochez la case pour accéder à votre formation.':'')}));
+ var sc=h('div',{class:'chsc',tabindex:'0'});
+ sc.appendChild(h('p',{text:t.intro}));
+ t.sections.forEach(function(s){var ul=h('ul');s.items.forEach(function(i){ul.appendChild(h('li',{text:i}))});sc.appendChild(h('h3',{text:s.t}));sc.appendChild(ul)});
+ box.appendChild(sc);
+ if(must){
+  var cb=h('input',{type:'checkbox',id:'chOk'}),go=h('button',{class:'btn mag',disabled:''},'Accéder à ma formation'),er=h('div',{class:'msg',role:'alert'});
+  cb.addEventListener('change',function(){go.disabled=!cb.checked});
+  go.addEventListener('click',async function(){go.disabled=true;er.textContent='';
+   try{var r=await post('/api/charte-accept',{code:code,version:t.version}),j=await r.json();if(!r.ok)throw new Error(j.error);c.accepted=j.accepted||Date.now();close()}
+   catch(e){er.textContent=e.message||'Enregistrement impossible. Vérifiez votre connexion et réessayez.';go.disabled=!cb.checked}});
+  box.appendChild(h('label',{class:'chk',for:'chOk'},cb,t.case));
+  box.appendChild(h('div',{class:'chbt'},go,h('button',{class:'btn alt',onclick:function(){sessionStorage.removeItem('gc');location.reload()}},'Se déconnecter')));
+  box.appendChild(er);
+ }else box.appendChild(h('div',{class:'chbt'},h('button',{class:'btn',onclick:close},'Fermer')));
+ ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';
+ if(must)cb.focus();else sc.focus();
 }
 // ===== Fin de formation : « Mon attestation » (une carte par attestation) et « Votre avis » (formation terminée).
 var VERIF='https://geoexpertacademy.ci/verifier-certificat.html?code=';

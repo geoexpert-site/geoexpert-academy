@@ -6,6 +6,7 @@
 //   ROLE absent        : les deux, comme avant (le temps de la transition)
 // =====================================================================
 import ADMIN_HTML from './admin.html';
+import { CHARTE } from './charte.js';
 
 const CATALOG = [
   {
@@ -326,6 +327,134 @@ async function r2List(env) {
     cursor = l.truncated ? l.cursor : null;
   } while (cursor);
   return { objects, total: objects.reduce((s, o) => s + o.size, 0) };
+}
+
+// ---------------------------------------------------------------- Mes ressources (livret, kit, guide, cours PDF)
+// Liste dans la table D1 « ressources » ; fichiers dans R2 (bucket privé), sous « ressources/<id>/ ».
+// Règle : « immediat » (dès la 1re connexion) ou « j8 » (comme les leçons : fin de l'essai ; tout de suite pour les anciens codes).
+// « pour » : '' = tous les apprenants ; une formation (qgis1…) ; ou un produit (pack-complet).
+// Chaque document téléchargé porte « Document réservé à [nom] – [code] – GeoExpert Academy » :
+//   HTML : le texte remplace %%RESERVE%% ; PDF : le fichier a été préparé dans l'administration (pdf-lib, dans le navigateur)
+//   avec une zone vide réservée sur chaque page ; ici on écrit seulement le texte dans cette zone (même taille d'octets,
+//   la structure du PDF ne change pas), ce qui reste très rapide (limite de 10 ms de calcul du plan gratuit).
+const RESS_REGLES = ['immediat', 'j8'];
+const RESS_MAX = 30 * 1024 * 1024;
+const RESS_ZONE = 900;   // octets réservés par zone de marquage (doit être identique dans admin.html)
+// Largeurs Helvetica (1/1000 de point) des octets WinAnsi 32 à 255.
+const HELV = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,0,556,0,222,556,333,1000,556,556,333,1000,667,333,1000,0,611,0,0,222,222,333,333,350,556,1000,333,1000,500,333,944,0,500,500,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+const WINANSI_80 = '€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ';
+function winAnsi(s) {
+  const out = [];
+  for (const ch of String(s)) {
+    const u = ch.codePointAt(0), i = WINANSI_80.indexOf(ch);
+    if (u >= 32 && u < 127 || u >= 160 && u <= 255) out.push(u);
+    else if (i >= 0 && HELV[i + 96]) out.push(0x80 + i);
+    else { const a = ch.normalize('NFD').replace(/[̀-ͯ]/g, ''); out.push(a.length === 1 && a.charCodeAt(0) >= 32 && a.charCodeAt(0) < 127 ? a.charCodeAt(0) : 63); }
+  }
+  return out;
+}
+function reserveText(rec, c) { return 'Document réservé à ' + String(rec.label || '').trim().slice(0, 60) + ' – ' + prettyCode(c) + ' – GeoExpert Academy'; }
+// Contenu d'une zone de marquage : texte gris centré tout en bas de la page (sous les pieds de page existants), complété par des espaces jusqu'à RESS_ZONE octets.
+function stampBytes(z, text) {
+  const b = winAnsi(text), w = b.reduce((a, x) => a + (HELV[x - 32] || 556), 0) / 1000;
+  const size = Math.min(7.5, (z.w - 40) / w), x = z.x + (z.w - w * size) / 2, y = z.y + 9;
+  const hex = b.map(x => x.toString(16).padStart(2, '0')).join('');
+  const s = 'q BT /GXR ' + size.toFixed(2) + ' Tf 0.541 0.608 0.710 rg 1 0 0 1 ' + x.toFixed(2) + ' ' + y.toFixed(2) + ' Tm <' + hex + '> Tj ET Q';
+  return s.length <= RESS_ZONE ? enc.encode(s.padEnd(RESS_ZONE, ' ')) : null;
+}
+// Possède la ressource ? Renvoie la date de déblocage (0 = tout de suite), ou null si elle n'est pas pour cet apprenant.
+function ressUnlock(rec, r, now) {
+  let from = 0;
+  if (r.pour) {
+    const g = rec.modules.find(x => x.m === r.pour);
+    if (!g && rec.product !== r.pour) return null;
+    if (g && g.from > now) from = g.from;
+  }
+  if (r.regle === 'j8') { const te = trialEnd(rec); if (te > now) from = Math.max(from, te); }
+  return from;
+}
+async function loadRessources(env, all) {
+  if (!env.DB) return [];
+  try { return (await env.DB.prepare('SELECT * FROM ressources' + (all ? '' : ' WHERE visible = 1') + ' ORDER BY ordre, title').all()).results; }
+  catch (e) { return []; }
+}
+function ressFilename(r) { return cleanFilename(r.title, r.kind === 'html' ? '.html' : '.pdf'); }
+// Charte acceptée (version en cours) : date d'acceptation, ou 0. Sans base de données : on ne bloque rien (comme avant).
+async function charteAcceptee(env, c) {
+  if (!env.DB) return Date.now();
+  try { const r = await env.DB.prepare('SELECT t FROM chartes WHERE code = ? AND version = ?').bind(c, CHARTE.version).first(); return r ? r.t : 0; }
+  catch (e) { return Date.now(); }
+}
+// Lien de téléchargement d'une ressource : /r/<id>/<expiration>/<code chiffré>/<signature>, valable DL_MINUTES.
+// Le code d'accès n'apparaît jamais en clair dans l'adresse (chiffré en AES-GCM avec une clé tirée de DL_SECRET).
+async function ressKey(env) {
+  return crypto.subtle.importKey('raw', await crypto.subtle.digest('SHA-256', enc.encode('ressources|' + env.DL_SECRET)), 'AES-GCM', false, ['encrypt', 'decrypt']);
+}
+function b64uEnc(u8) { return btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+async function ressLink(env, origin, id, c, now) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await ressKey(env), enc.encode(c)));
+  const tok = b64uEnc(new Uint8Array([...iv, ...ct])), exp = String(Math.floor(now / 1000) + DL_MINUTES * 60);
+  const sig = (await hmacHex(env.DL_SECRET, enc.encode('r|' + id + '|' + exp + '|' + tok))).slice(0, 40);
+  return origin + '/r/' + id + '/' + exp + '/' + tok + '/' + sig;
+}
+// Vérifications communes (POST /api/ressource et GET /r/…) : renvoie { r } ou { error, status }.
+async function ressCheck(env, rec, c, id, now) {
+  const r = env.DB && /^[a-z0-9-]{1,40}$/.test(id) ? await env.DB.prepare('SELECT * FROM ressources WHERE id = ? AND visible = 1').bind(id).first() : null;
+  const from = r ? ressUnlock(rec, r, now) : null;
+  if (!r || from === null) return { status: 403, error: 'Cette ressource ne fait pas partie de votre formation.' };
+  if (from > now) return { status: 403, error: 'Cette ressource sera disponible à partir du ' + fmtDate(from) + '.' };
+  if (!(await charteAcceptee(env, c))) return { status: 403, error: 'Acceptez d\'abord la charte de l\'apprenant (rechargez la page).' };
+  if (!r.r2 || !env.FICHIERS) return { status: 404, error: 'Cette ressource sera disponible prochainement.' };
+  return { r };
+}
+async function ressDownload(req, env, url) {
+  const html = (status, msg) => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Ressource</title>'
+    + '<p style="font:16px sans-serif;margin:40px auto;max-width:480px;padding:0 16px">' + msg + '</p>', { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
+  const [, , id, exp, tok, sig] = url.pathname.split('/');
+  const bad = 'Lien non valable. Retournez dans votre espace apprenant, rubrique « Mes ressources ».';
+  if (!env.DL_SECRET || !/^[a-z0-9-]{1,40}$/.test(id || '') || !/^\d{10}$/.test(exp || '') || !/^[A-Za-z0-9_-]{20,120}$/.test(tok || '')
+    || !(await safeEqual(sig || '', (await hmacHex(env.DL_SECRET, enc.encode('r|' + id + '|' + exp + '|' + tok))).slice(0, 40)))) return html(403, bad);
+  if (Date.now() / 1000 > +exp) return html(403, 'Ce lien a expiré. Retournez dans votre espace apprenant, rubrique « Mes ressources ».');
+  let c;
+  try {
+    const raw = Uint8Array.from(atob(tok.replace(/-/g, '+').replace(/_/g, '/')), x => x.charCodeAt(0));
+    c = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, await ressKey(env), raw.slice(12)));
+  } catch (e) { return html(403, bad); }
+  // L'accès est revérifié au moment du téléchargement (code désactivé, expiré, ressource retirée…).
+  const found = await findStudent(env, c), now = Date.now();
+  if (!found || studentStatus(found.rec, now) !== 'ok') return html(403, 'Accès désactivé ou expiré. Écrivez-nous sur WhatsApp.');
+  const chk = await ressCheck(env, found.rec, found.c, id, now);
+  if (chk.error) return html(chk.status, chk.error);
+  const r = chk.r, obj = await env.FICHIERS.get(r.r2);
+  if (!obj) return html(404, 'Cette ressource sera disponible prochainement.');
+  const text = reserveText(found.rec, found.c), name = ressFilename(r);
+  const h = { 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer' };
+  if (r.kind === 'html') {
+    const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // %%RESERVE_CSS%% : même texte dans une feuille de style (pied de chaque page imprimée, @page { @bottom-center }).
+    const css = text.replace(/[\\"]/g, '\\$&').replace(/[\r\n<>]/g, ' ');
+    return new Response((await obj.text()).split('%%RESERVE_CSS%%').join(css).split('%%RESERVE%%').join(esc), { status: 200, headers: Object.assign(h, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Disposition': 'inline; filename="' + name + '"',
+      'Content-Security-Policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    }) });
+  }
+  const buf = new Uint8Array(await obj.arrayBuffer());
+  let zones = [];
+  try { zones = JSON.parse(r.stamp || '[]'); } catch (e) { zones = []; }
+  const marker = enc.encode('%GXRZONE');
+  for (const z of zones) {
+    const b = stampBytes(z, text);
+    // Sécurité : on n'écrit que si la zone réservée est bien à cet endroit (sinon le PDF serait abîmé).
+    if (!b || !(z.off >= 0 && z.off + RESS_ZONE <= buf.length) || !marker.every((x, i) => buf[z.off + i] === x)) return html(500, 'Document momentanément indisponible. Prévenez le formateur sur WhatsApp.');
+    buf.set(b, z.off);
+  }
+  return new Response(buf, { status: 200, headers: Object.assign(h, {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': 'attachment; filename="' + name + '"; filename*=UTF-8\'\'' + encodeURIComponent(name),
+    'Content-Length': String(buf.length),
+  }) });
 }
 
 function allowedOrigins(env) {
@@ -652,7 +781,7 @@ const ADMIN_PAGE_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'no-referrer',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://geoexpertacademy.ci; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://geoexpertacademy.ci; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
 };
 
 export default {
@@ -671,6 +800,8 @@ export default {
       if (url.pathname === '/webhook/digitalpaye' && (role !== 'admin' || env.ACCESS_OPTIONAL === 'oui')) return await webhookDigitalPaye(req, env);
       // Gros fichiers : lien signé donné par /api/file (ouvert directement par le navigateur, sans code d'accès dans l'adresse).
       if (role !== 'admin' && url.pathname.startsWith('/dl/') && (req.method === 'GET' || req.method === 'HEAD')) return await download(req, env, url);
+      // Ressources (Mes ressources) : lien signé donné par /api/ressource ; le nom de l'apprenant est ajouté au document.
+      if (role !== 'admin' && url.pathname.startsWith('/r/') && req.method === 'GET') return await ressDownload(req, env, url);
       if (role !== 'admin' && url.pathname.startsWith('/api/')) return await api(req, env, url);
       if (role !== 'apprenant' && url.pathname.startsWith('/admin/')) return await admin(req, env, url);
       if (role === 'admin' && url.pathname === '/' && req.method === 'GET') {
@@ -683,6 +814,16 @@ export default {
     }
   },
 };
+
+// Ressources et charte renvoyées à la connexion (liste seulement : les fichiers passent par /api/ressource).
+async function loginRessources(env, rec, c, now) {
+  if (!env.DB) return {};
+  const list = (await loadRessources(env)).map(r => {
+    const from = ressUnlock(rec, r, now);
+    return from === null ? null : { id: r.id, title: r.title, descr: r.descr, kind: r.kind, ready: !!(r.r2 && env.FICHIERS && env.DL_SECRET), locked: from > now, unlockAt: from };
+  }).filter(Boolean);
+  return { ressources: list, charte: { version: CHARTE.version, accepted: await charteAcceptee(env, c), texte: CHARTE } };
+}
 
 // ---------------------------------------------------------------- API apprenant
 async function api(req, env, url) {
@@ -741,9 +882,30 @@ async function api(req, env, url) {
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
       quiz: await loadQuizKeys(env, rec),
+      ...(await loginRessources(env, rec, c, now)),
       ...(await (async () => { const x = await loadCertsAndReviews(env, c); return { certificats: x.certs, avisDonnes: x.reviewed }; })()),
     }, 200, req, env);
   }
+
+  // Acceptation de la charte de l'apprenant (version en cours) : code, date et heure, version.
+  if (url.pathname === '/api/charte-accept') {
+    if (!env.DB) return reply({ error: 'Enregistrement indisponible pour le moment.' }, 503, req, env);
+    if (String(body.version || '') !== CHARTE.version) return reply({ error: 'La charte a changé : rechargez la page pour lire la nouvelle version.' }, 409, req, env);
+    await env.DB.prepare('INSERT OR IGNORE INTO chartes (code, version, t) VALUES (?, ?, ?)').bind(c, CHARTE.version, now).run();
+    return reply({ ok: true, version: CHARTE.version, accepted: await charteAcceptee(env, c) }, 200, req, env);
+  }
+
+  // Ressources : vérifie le droit (formation, date de déblocage, charte) puis donne un lien de 30 minutes.
+  if (url.pathname === '/api/ressource') {
+    if (!env.DL_SECRET) return reply({ error: 'Cette ressource sera disponible prochainement.' }, 404, req, env);
+    const chk = await ressCheck(env, rec, c, String(body.id || ''), now);
+    if (chk.error) return reply({ error: chk.error }, chk.status, req, env);
+    return reply({ url: await ressLink(env, url.origin, chk.r.id, c, now), kind: chk.r.kind }, 200, req, env);
+  }
+
+  // Leçons, exercices, fichiers et quiz : seulement après l'acceptation de la charte.
+  if (['/api/play', '/api/file', '/api/quiz', '/api/quiz-answer'].includes(url.pathname) && !(await charteAcceptee(env, c)))
+    return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
 
   // Mini-quiz : questions sans les bonnes réponses ; la correction se fait ici, sur le serveur.
   if (url.pathname === '/api/quiz' || url.pathname === '/api/quiz-answer') {
@@ -1104,16 +1266,18 @@ async function admin(req, env, url) {
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw);
     const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' };
-    let act = 0, notes = [], phone = '', relances = [];
+    let act = 0, notes = [], phone = '', relances = [], chartes = [];
     const quiz = {};
     if (env.DB) {
-      const [l, n, ct, rl, qr] = await env.DB.batch([
+      const [l, n, ct, rl, qr, ch] = await env.DB.batch([
         env.DB.prepare('SELECT last_activity FROM learners WHERE code = ?').bind(c),
         env.DB.prepare('SELECT id, t, who, text FROM admin_notes WHERE code = ? ORDER BY t DESC').bind(c),
         env.DB.prepare('SELECT phone FROM contacts WHERE code = ?').bind(c),
         env.DB.prepare('SELECT kind, t, who FROM relances WHERE code = ? ORDER BY t DESC').bind(c),
         env.DB.prepare('SELECT k, score, total, t FROM quiz_results WHERE code = ?').bind(c),
+        env.DB.prepare('SELECT version, t FROM chartes WHERE code = ? ORDER BY t DESC').bind(c),
       ]);
+      chartes = ch.results;
       act = (l.results[0] && l.results[0].last_activity) || 0;
       notes = n.results;
       phone = (ct.results[0] && ct.results[0].phone) || '';
@@ -1139,6 +1303,7 @@ async function admin(req, env, url) {
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
       adminNotes: notes, phone, relances, certificats: (await loadCertsAndReviews(env, c)).certs,
+      chartes, charteVersion: CHARTE.version,
     }, 200, req, env);
   }
 
@@ -1288,7 +1453,7 @@ async function admin(req, env, url) {
     if (env.DB) {
       const st = [];
       for (const x of all) {
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
         st.push(env.DB.prepare('INSERT OR IGNORE INTO codes_supprimes (code, t) VALUES (?, ?)').bind(x, now));
       }
@@ -1374,6 +1539,7 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE certificates SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE reviews SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE paiements SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE chartes SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;
@@ -1565,9 +1731,91 @@ async function admin(req, env, url) {
   }
 
   // Gros fichiers (R2) : liste du stockage + espace utilisé. Le dépôt se fait par le tableau de bord Cloudflare ou wrangler.
+  // ---- Mes ressources : liste, réglages, fichier, retrait ; acceptations de la charte.
+  if (url.pathname === '/admin/ressources' && req.method === 'GET') {
+    const items = await loadRessources(env, true);
+    let chartes = [];
+    if (env.DB) chartes = (await env.DB.prepare('SELECT code, version, t FROM chartes ORDER BY t DESC').all()).results.map(x => Object.assign(x, { code: prettyCode(x.code) }));
+    return reply({
+      items: items.map(r => { let n = 0; try { n = JSON.parse(r.stamp || '[]').length; } catch (e) { n = 0; } const o = Object.assign({}, r, { zones: n }); delete o.stamp; return o; }),
+      r2: !!env.FICHIERS, modules: CATALOG.map(m => ({ key: m.key, title: m.title })),
+      charte: { version: CHARTE.version, date: CHARTE.date, acceptations: chartes },
+    }, 200, req, env);
+  }
+  if (url.pathname === '/admin/ressource' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const title = String(b.title || '').trim().replace(/\s+/g, ' ').slice(0, 120);
+    const descr = String(b.descr || '').trim().replace(/\s+/g, ' ').slice(0, 300);
+    const regle = RESS_REGLES.includes(b.regle) ? b.regle : null;
+    const pour = String(b.pour || '');
+    if (!title) return reply({ error: 'Donnez un titre à la ressource.' }, 400, req, env);
+    if (!regle) return reply({ error: 'Choisissez la règle de déblocage.' }, 400, req, env);
+    if (pour && !findModule(pour) && !PRODUCTS[pour]) return reply({ error: 'Formation inconnue.' }, 400, req, env);
+    const visible = b.visible === false || b.visible === 0 ? 0 : 1, ordre = Math.max(0, Math.min(999, parseInt(b.ordre, 10) || 0));
+    let id = String(b.id || '');
+    if (id) {
+      const old = await env.DB.prepare('SELECT id FROM ressources WHERE id = ?').bind(id).first();
+      if (!old) return reply({ error: 'Ressource introuvable.' }, 404, req, env);
+      await env.DB.prepare('UPDATE ressources SET title = ?, descr = ?, regle = ?, pour = ?, visible = ?, ordre = ?, updated = ?, who = ? WHERE id = ?')
+        .bind(title, descr, regle, pour, visible, ordre, now, who, id).run();
+    } else {
+      const kind = b.kind === 'html' ? 'html' : 'pdf';
+      const base = (String(b.newId || title).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'ressource').slice(0, 30);
+      id = base;
+      for (let i = 2; await env.DB.prepare('SELECT id FROM ressources WHERE id = ?').bind(id).first(); i++) id = base + '-' + i;
+      await env.DB.prepare("INSERT INTO ressources (id, title, descr, kind, r2, size, stamp, regle, pour, ordre, visible, updated, who) VALUES (?, ?, ?, ?, '', 0, '', ?, ?, ?, ?, ?, ?)")
+        .bind(id, title, descr, kind, regle, pour, ordre, visible, now, who).run();
+    }
+    await journal(env, who, b.id ? 'Ressource modifiée' : 'Ressource ajoutée', '', '', id + ' · ' + title + ' · ' + regle + (pour ? ' · ' + pour : '') + (visible ? '' : ' · retenue'));
+    return reply({ ok: true, id }, 200, req, env);
+  }
+  // Fichier d'une ressource. PDF : déjà préparé dans la page d'administration (zones de marquage, en-tête X-Stamp).
+  if (url.pathname === '/admin/ressource-fichier' && req.method === 'PUT') {
+    if (!env.DB || !env.FICHIERS) return reply({ error: 'Stockage indisponible (base ou R2).' }, 503, req, env);
+    const id = String(url.searchParams.get('id') || '');
+    const r = /^[a-z0-9-]{1,40}$/.test(id) ? await env.DB.prepare('SELECT * FROM ressources WHERE id = ?').bind(id).first() : null;
+    if (!r) return reply({ error: 'Ressource introuvable.' }, 404, req, env);
+    const buf = new Uint8Array(await req.arrayBuffer());
+    if (buf.length < 100 || buf.length > RESS_MAX) return reply({ error: 'Fichier vide ou supérieur à 30 Mo.' }, 400, req, env);
+    let stamp = '';
+    if (r.kind === 'pdf') {
+      let zones = [];
+      try { zones = JSON.parse(req.headers.get('X-Stamp') || '[]'); } catch (e) { zones = []; }
+      const marker = enc.encode('%GXRZONE');
+      const ok = Array.isArray(zones) && zones.length && zones.length <= 50 && zones.every(z => z && [z.off, z.x, z.y, z.w].every(Number.isFinite) && z.w > 50
+        && z.off >= 0 && z.off + RESS_ZONE <= buf.length && marker.every((x, i) => buf[z.off + i] === x));
+      if (String.fromCharCode(...buf.slice(0, 5)) !== '%PDF-' || !ok) return reply({ error: 'Ce PDF n\'a pas pu être préparé pour le marquage du nom. Réessayez ; s\'il est protégé par un mot de passe, enregistrez-en une copie sans protection.' }, 400, req, env);
+      stamp = JSON.stringify(zones.map(z => ({ off: z.off, x: z.x, y: z.y, w: z.w })));
+    } else {
+      const text = new TextDecoder().decode(buf);
+      if (!/<html[\s>]/i.test(text)) return reply({ error: 'Ce fichier n\'est pas une page HTML.' }, 400, req, env);
+      if (!text.includes('%%RESERVE%%')) return reply({ error: 'La page HTML doit contenir %%RESERVE%% à l\'endroit où le nom de l\'apprenant doit apparaître (voir le guide).' }, 400, req, env);
+    }
+    const key = 'ressources/' + id + '/' + now + (r.kind === 'html' ? '.html' : '.pdf');
+    await env.FICHIERS.put(key, buf, { httpMetadata: { contentType: r.kind === 'html' ? 'text/html; charset=utf-8' : 'application/pdf' } });
+    await env.DB.prepare('UPDATE ressources SET r2 = ?, size = ?, stamp = ?, updated = ?, who = ? WHERE id = ?').bind(key, buf.length, stamp, now, who, id).run();
+    if (r.r2 && r.r2 !== key) await env.FICHIERS.delete(r.r2);
+    const fname = String(url.searchParams.get('name') || '').replace(/[^\w.\- ]/g, '').slice(-80);
+    await journal(env, who, r.r2 ? 'Fichier de ressource remplacé' : 'Fichier de ressource envoyé', '', '', id + (fname ? ' · ' + fname : '') + ' (' + fmtSize(buf.length) + ')');
+    return reply({ ok: true, size: buf.length }, 200, req, env);
+  }
+  if (url.pathname === '/admin/ressource-delete' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), id = String(b.id || '');
+    const r = /^[a-z0-9-]{1,40}$/.test(id) ? await env.DB.prepare('SELECT * FROM ressources WHERE id = ?').bind(id).first() : null;
+    if (!r) return reply({ error: 'Ressource introuvable.' }, 404, req, env);
+    await env.DB.prepare('DELETE FROM ressources WHERE id = ?').bind(id).run();
+    if (r.r2 && env.FICHIERS) await env.FICHIERS.delete(r.r2);
+    await journal(env, who, 'Ressource retirée', '', '', id + ' · ' + r.title);
+    return reply({ ok: true }, 200, req, env);
+  }
+
   if (url.pathname === '/admin/r2' && req.method === 'GET') {
     if (!env.FICHIERS) return reply({ enabled: false, objects: [], total: 0 }, 200, req, env);
-    return reply(Object.assign({ enabled: true, limit: 10e9 }, await r2List(env)), 200, req, env);
+    // Les fichiers de « Mes ressources » comptent dans l'espace utilisé, mais ne sont pas proposés pour les leçons.
+    const l = await r2List(env);
+    return reply({ enabled: true, limit: 10e9, total: l.total, objects: l.objects.filter(o => !o.key.startsWith('ressources/')) }, 200, req, env);
   }
   // Rattacher un fichier déposé dans R2 à une leçon (il apparaît chez les apprenants comme les autres fichiers de leçon).
   if (url.pathname === '/admin/r2-attach' && req.method === 'POST') {

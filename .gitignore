@@ -1,3 +1,5 @@
 # Fichiers temporaires de l'outil Cloudflare (wrangler)
 .wrangler/
 worker/.wrangler/
+# Documents de travail (cours, livret, kit…) : jamais dans le dépôt public. Les apprenants les reçoivent par « Mes ressources ».
+ressources/
