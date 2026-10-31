@@ -321,7 +321,12 @@ Mise en ligne et retour en arrière : `MISE-EN-LIGNE-LIVE-COMMUNAUTE.md` · guid
 - [x] Tests : `test-live.mjs` 64/64, `test-live-admin.mjs` 26/26 (ajoutés à `tous-les-tests.mjs`) ; preuve pixel `comparer-elements.mjs … cacher live` 54/54 + `cacher` 34/34 → `geoexpert-captures\preuve-existant-live-communaute\`
 - [x] Workers de test déployés : `espace-apprenant-api-test` 9f194327, `geoexpert-admin-test` f7683f98 ; tables dans `geoexpert-test`
 - [ ] 👤 Ajouter les phrases proposées à la charte (nouvelle version) et à la politique de confidentialité
-- [ ] **Mise en ligne** (accord de l'administrateur à demander)
+- [x] **Mise en ligne — EN LIGNE le 31/10/2026** (accord de l'administrateur donné)
+  - sauvegarde : `GeoExpert-Sauvegardes\2026-10-31-avant-mise-en-ligne-live\` ; tables `lives`, `reglages` ajoutées dans `geoexpert-prod`
+  - site publié : `main` = 7833b8a ; `geoexpert-admin` → b669dc8d (avant : ebbdc3a5) ; `espace-apprenant-api` → 1315f264 (avant : 239fbeb4)
+  - vérifié : `GeoExpert-Outils\verif-prod-live.mjs` 10/10 (code et live temporaires supprimés, production revenue à 3 clés KV, 0 live) ;
+    faux code 401, faux webhook 401, « Vérifier un certificat » OK, admin renvoyé vers Access
+- [ ] 👤 Coller le lien de la Communauté WhatsApp (onglet 🎥) ; essayer la vitesse sur une vraie vidéo Bunny avec « test 1 »
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
