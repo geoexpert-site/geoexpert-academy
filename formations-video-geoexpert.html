@@ -750,8 +750,53 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
       </div>
 
     </div>
+
+    <!-- AVIS DES APPRENANTS DES FORMATIONS VIDÉO (publiés avec leur accord, texte jamais modifié) -->
+    <div id="avisVideo" hidden style="max-width: 1080px; margin: 44px auto 0;">
+      <h3 style="text-align: center; font-size: 22px; margin-bottom: 20px;">Avis de nos apprenants en vidéo</h3>
+      <div id="avisVideoGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;"></div>
+    </div>
+    <p style="text-align: center; margin-top: 32px; font-size: 15px;">
+      <a href="realisations-apprenants.html" style="color: var(--teal); font-weight: 600;">Voir les cartes réalisées par nos apprenants →</a>
+    </p>
   </div>
 </section>
+<script>
+(function () {
+  var API = 'https://espace-apprenant-api.geographe07.workers.dev';
+  // Lien de parrainage (?parrain=CODE) : le code est gardé sur cet appareil et proposé à la première connexion.
+  try {
+    var p = (new URLSearchParams(location.search).get('parrain') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (/^[2-9A-HJ-NP-Z]{6}$/.test(p)) {
+      localStorage.setItem('geo:parrain', JSON.stringify({ c: p, t: Date.now() }));
+      var bar = document.createElement('div');
+      bar.setAttribute('role', 'status');
+      bar.style.cssText = 'background:#F6F3FA;border-bottom:1px solid #e5e0ee;color:#4B3F92;font:600 14px Inter,sans-serif;text-align:center;padding:10px 16px;line-height:1.5';
+      bar.textContent = 'Vous venez de la part d\'un apprenant GeoExpert : à votre première connexion, indiquez son code de parrainage ' + p + '.';
+      document.addEventListener('DOMContentLoaded', function () { var m = document.querySelector('main') || document.body; m.insertBefore(bar, m.firstChild); });
+    }
+  } catch (e) {}
+  // Avis publiés depuis l'espace administrateur.
+  fetch(API + '/api/avis-publics').then(function (r) { return r.json(); }).then(function (j) {
+    var av = (j && j.avis) || [];
+    if (!av.length) return;
+    var g = document.getElementById('avisVideoGrid'), cols = ['var(--teal)', 'var(--indigo)', 'var(--magenta)'];
+    function el(t, css, x) { var e = document.createElement(t); if (css) e.style.cssText = css; if (x !== undefined) e.textContent = x; return e; }
+    av.forEach(function (a, i) {
+      var c = el('div', 'background: var(--bg-soft); padding: 26px; border-radius: var(--radius); border: 1px solid var(--line); display: flex; flex-direction: column;');
+      c.appendChild(el('div', 'color: #F5B041; font-size: 20px; margin-bottom: 10px;', '★★★★★'.slice(0, a.stars) + '☆☆☆☆☆'.slice(0, 5 - a.stars)));
+      if (a.text) c.appendChild(el('p', 'font-size: 15px; font-style: italic; color: var(--ink-dim); margin-bottom: 20px; flex: 1; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;', '« ' + a.text + ' »'));
+      var who = el('div', 'display: flex; align-items: center; gap: 12px; margin-top: auto;');
+      var ini = a.nom.split(' ').map(function (x) { return x.charAt(0); }).join('').slice(0, 2).toUpperCase();
+      who.appendChild(el('div', 'width: 40px; height: 40px; flex: none; border-radius: 50%; background: ' + cols[i % 3] + '; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: var(--font-display);', ini));
+      var t = el('div'); t.appendChild(el('strong', 'display: block; font-size: 14.5px; color: var(--ink);', a.nom));
+      t.appendChild(el('span', 'font-size: 12px; color: var(--ink-faint);', [a.profession, a.formation ? 'Formation ' + a.formation : ''].filter(Boolean).join(' · ')));
+      who.appendChild(t); c.appendChild(who); g.appendChild(c);
+    });
+    document.getElementById('avisVideo').hidden = false;
+  }).catch(function () {});
+})();
+</script>
 <!-- GUIDE / KIT GRATUIT -->
 <section style="padding: 60px 0;">
   <div class="container">

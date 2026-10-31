@@ -399,6 +399,32 @@ Si le lecteur ne répond pas, un message l'invite à utiliser la roue dentée �
 
 ---
 
+## 7 octies. Portfolio, parrainage, avis publiés, partage des attestations
+
+**🗺️ Portfolio** (le chiffre rose = cartes à voir) : les apprenants déposent leurs cartes (JPG, PNG ou PDF, 5 Mo maximum)
+dans « Mon portfolio ». Pour chaque carte : **Voir en grand**, **Commenter** (l'apprenant lit votre commentaire),
+**Valider**, **À revoir**, **Supprimer** (définitif). Une carte **validée ET autorisée** par l'apprenant apparaît sur la page
+publique **Réalisations des apprenants** (geoexpertacademy.ci/realisations-apprenants.html) avec son prénom et l'initiale
+de son nom. S'il décoche l'accord ou supprime la carte, elle disparaît du site en quelques minutes.
+
+**🤝 Parrainage** (le chiffre rose = récompenses prêtes) : chaque apprenant a un code et un lien dans « Mes parrainages ».
+Le filleul indique le code pendant ses **7 premiers jours** (le serveur refuse son propre code, le même nom, le même numéro
+WhatsApp, un parrain inscrit après lui, le parrainage croisé).
+- **Accorder la récompense** ne s'active qu'**après les 7 jours d'essai** du filleul et si son accès est actif.
+  Avant de cliquer, vérifiez qu'il n'a pas été **remboursé** (si vous avez désactivé son accès, c'est refusé automatiquement).
+- Récompense (réglable en bas de l'onglet) : au départ, **Google Earth Pro offerte** ; si le parrain l'a déjà,
+  **1 mois d'assistance** en plus (sa date de fin d'assistance recule d'un mois). Prévenez-le ensuite sur WhatsApp.
+- **Refuser** : en cas d'abus (même personne, remboursement…).
+
+**Avis** (onglet 🎓 Attestations & avis) : **Publier sur le site** affiche l'avis sous les témoignages de la page des formations
+vidéo, avec le prénom, l'initiale du nom et la profession, **sans changer un mot**. Possible seulement si l'apprenant a coché
+l'accord ; il peut le retirer dans « Mon portfolio » → l'avis disparaît du site. **Retirer du site** le retire aussi.
+
+**Attestations** : sous chaque attestation, l'apprenant a maintenant **Partager : LinkedIn, Facebook, WhatsApp, Copier le lien**.
+L'aperçu montre son nom, la formation et la date ; le lien mène à « Vérifier un certificat ». Il n'existe aucune liste des diplômés.
+
+---
+
 ## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3, ressources et charte)
 
 - **Mes progrès** (sous « Vos modules ») : objectif de la semaine qu'il choisit (1 à 7 leçons) avec une jauge,

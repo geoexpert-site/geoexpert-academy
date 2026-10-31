@@ -135,6 +135,19 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 aside{position:fixed;left:0;top:56px;bottom:0;width:86%;max-width:350px;z-index:20;transform:translateX(-100%);transition:transform .25s;max-height:none}
 body.so aside{transform:none}body.so .back{display:block}.tp{display:none}main{padding:16px}.stats{grid-template-columns:1fr}.hero{padding:18px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Phase B : partage de l'attestation, portfolio, parrainage */
+.certs{align-items:center}.certs .note{margin-right:2px}.certs .btn{padding:7px 12px;font-size:13.5px}.btn.li{background:#0a66c2}.btn.fb{background:#1877f2}
+.pff{display:grid;gap:10px}.pff label.l{font-weight:600;font-size:14px;margin-bottom:-4px}
+.pff input[type=text],.pff select,.pff textarea,.parin{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:14px Inter}
+.pff input[type=file]{font:14px Inter;color:var(--ink);max-width:100%}.pff textarea{resize:vertical}
+.pfm{display:flex;flex-direction:column}.pfm .th{display:flex;align-items:center;justify-content:center;height:150px;margin:-22px -22px 14px;border-radius:var(--r) var(--r) 0 0;background:var(--soft);overflow:hidden;color:var(--dim);font:800 22px Montserrat}
+.pfm .th img{width:100%;height:100%;object-fit:cover}.pfm .tag.ok{color:var(--teal)}.pfm .tag.rv{color:#c0392b}
+.pfm .com{background:var(--soft);border-left:3px solid var(--indigo);border-radius:8px;padding:8px 10px;font-size:13.5px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.pfm .exd{margin:8px 0}.pfb{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.pfb .btn{padding:8px 13px;font-size:13.5px}
+.pcode{font:800 26px Montserrat;letter-spacing:3px;color:var(--indigo)}[data-theme=dark] .pcode{color:#9d92ee}
+.plink{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}.plink input{flex:1;min-width:200px}
+.pfl{list-style:none;margin:0;padding:0}.pfl li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.pfl li:first-child{border-top:0}.pfl small{color:var(--dim)}
+.cmr.pr li{margin-bottom:4px}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -321,6 +334,8 @@ function side(){
  if(D.ressources)s.appendChild(h('button',{class:'home mesnotes mesress',onclick:function(){ressPage();closeS()}},ic('folder'),'Mes ressources'));
  if(D.lives){var nl=D.lives.filter(function(l){return!l.annule&&liveEnd(l)>Date.now()}).length;s.appendChild(h('button',{class:'home mesnotes meslive',onclick:function(){livePage();closeS()}},ic('cal'),'Rendez-vous live',nl?h('span',{class:'nb',text:String(nl)}):null))}
  if(D.communaute)s.appendChild(h('button',{class:'home mesnotes mescom',onclick:function(){comPage();closeS()}},ic('users'),'Communauté'));
+ if(D.portfolio)s.appendChild(h('button',{class:'home mesnotes mespf',onclick:function(){pfPage();closeS()}},ic('map'),'Mon portfolio'));
+ if(D.parrainage)s.appendChild(h('button',{class:'home mesnotes mespar',onclick:function(){parPage();closeS()}},ic('gift'),'Mes parrainages'));
  D.modules.forEach(function(m){
   var mp=mprog(m),d=h('details',{class:'m'});
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
@@ -602,27 +617,170 @@ function endCards(row){
   b.addEventListener('click',function(){certPdf(c,b)});
   row.appendChild(h('div',{class:'card cert'},h('h3',{text:'🎓 Mon attestation',style:'font-size:16px;margin-bottom:6px'}),
    h('p',{class:'note',text:c.title.split(' : ')[0]+' · délivrée le '+fdate(c.t)+' · N° '+c.id}),
-   h('div',{class:'certb'},b,h('a',{class:'btn alt',href:VERIF+c.id,target:'_blank',rel:'noopener'},'Lien de vérification'))));
+   h('div',{class:'certb'},b,h('a',{class:'btn alt',href:VERIF+c.id,target:'_blank',rel:'noopener'},'Lien de vérification')),shareRow(c)));
  });
  D.modules.forEach(function(m){if(modDone(m)&&(D.avisDonnes||[]).indexOf(m.key)<0)row.appendChild(avisCard(m))});
+ if(D.parrainage&&D.parrainage.saisir)row.appendChild(parrainCard());
+}
+// ===== Phase B : partage de l'attestation, Mon portfolio, Mes parrainages.
+IC.map='<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/>';IC.gift='<path d="M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-6-4-6-1s6 1 6 1zM12 7c2-4 6-4 6-1s-6 1-6 1z"/>';IC.share='<path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>';
+// Prénom + initiale du nom, comme sur le site (même règle que le serveur).
+function pubName(l){var w=String(l||'').trim().split(/\s+/).filter(Boolean);if(!w.length)return'';var up=function(x){return x.length>1&&x===x.toUpperCase()&&x!==x.toLowerCase()},p=w[0],n=w.length>1?w[w.length-1]:'';if(w.length>1&&up(w[0])&&!up(w[1])){p=w[1];n=w[0]}
+ p=p.toLowerCase().replace(/(^|[\s'-])(\S)/g,function(a,b,c){return b+c.toUpperCase()});return p+(n?' '+n[0].toUpperCase()+'.':'')}
+function shareRow(c){
+ var u=API+'/a/'+encodeURIComponent(c.id),f=c.title.split(' : ')[0],t='J\'ai obtenu mon attestation « '+f+' » chez GeoExpert Academy ! Vous pouvez la vérifier ici : ';
+ var cp=h('button',{class:'btn alt',type:'button'},'Copier le lien');
+ cp.addEventListener('click',function(){var done=function(){cp.textContent='Lien copié !'};if(navigator.clipboard)navigator.clipboard.writeText(u).then(done,function(){prompt('Copiez ce lien :',u)});else prompt('Copiez ce lien :',u)});
+ return h('div',{class:'certb certs'},h('span',{class:'note',text:'Partager :'}),
+  h('a',{class:'btn li',href:'https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(u),target:'_blank',rel:'noopener'},'LinkedIn'),
+  h('a',{class:'btn fb',href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(u),target:'_blank',rel:'noopener'},'Facebook'),
+  h('a',{class:'btn wa',href:'https://wa.me/?text='+encodeURIComponent(t+u),target:'_blank',rel:'noopener'},'WhatsApp'),cp);
+}
+function pageHead(t,n){cur=null;var m=$('main');m.textContent='';window.scrollTo(0,0);m.appendChild(h('div',{class:'crumb',text:'Espace apprenant'}));m.appendChild(h('h1',{class:'lt',text:t}));if(n)m.appendChild(h('p',{class:'note',style:'margin:-6px 0 16px',text:n}));return m}
+function sideOn(c){side();var sb=$('side').querySelector('.'+c);if(sb)sb.classList.add('on')}
+// Image réduite sur le téléphone (miniature, et grosses photos ramenées sous 5 Mo).
+function pfImg(file,max,q){return new Promise(function(ok,ko){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){var r=Math.min(1,max/Math.max(i.naturalWidth,i.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(i.naturalWidth*r));cv.height=Math.max(1,Math.round(i.naturalHeight*r));var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(i,0,0,cv.width,cv.height);URL.revokeObjectURL(u);cv.toBlob(function(b){b?ok(b):ko(new Error('Image illisible.'))},'image/jpeg',q)};i.onerror=function(){URL.revokeObjectURL(u);ko(new Error('Image illisible : choisissez un fichier JPG ou PNG.'))};i.src=u})}
+var PF_MAX=5*1024*1024;
+async function pfSend(f,meta,msg){
+ var n=(f.name||'').toLowerCase(),kind=f.type==='application/pdf'||/\.pdf$/.test(n)?'pdf':f.type==='image/png'||/\.png$/.test(n)?'png':f.type==='image/jpeg'||/\.jpe?g$/.test(n)?'jpg':'';
+ if(!kind)throw new Error('Formats acceptés : JPG, PNG ou PDF.');
+ var full=f,mini=null;
+ if(kind!=='pdf'){
+  msg.textContent='Préparation de l\'image…';
+  if(f.size>4.5*1024*1024){full=await pfImg(f,2400,.85);kind='jpg'}
+  mini=await pfImg(f,480,.75);if(mini.size>380*1024)mini=await pfImg(f,360,.5);
+ }
+ if(full.size>PF_MAX)throw new Error(kind==='pdf'?'PDF trop lourd : 5 Mo au maximum. Exportez-le en qualité « écran » ou envoyez une image JPG.':'Image trop lourde : 5 Mo au maximum.');
+ msg.textContent='Envoi en cours… ne fermez pas la page.';
+ var r=await post('/api/portfolio-ajout',Object.assign({code:code,kind:kind,size:full.size},meta)),j=await r.json();if(!r.ok)throw new Error(j.error);
+ var put=async function(u,b){var x=await fetch(u,{method:'PUT',headers:{'Content-Type':b.type||'application/octet-stream'},body:b}),y=await x.json().catch(function(){return{}});if(!x.ok)throw new Error(y.error||'Envoi impossible.')};
+ await put(j.envoi,full);if(mini)await put(j.envoiMini,mini);
+}
+var PFST={a_voir:['En attente de relecture',''],valide:['✓ Validée par le formateur','ok'],a_revoir:['À revoir','rv']};
+async function pfPage(){
+ var m=pageHead('Mon portfolio','Déposez vos cartes : le formateur les regarde et vous laisse un commentaire. Si vous le souhaitez, une carte validée peut être publiée sur notre site.');
+ sideOn('mespf');
+ var box=h('div',null,h('p',{class:'note',text:'Chargement…'}));m.appendChild(box);
+ var d;try{var r=await post('/api/portfolio',{code:code});d=await r.json();if(!r.ok)throw new Error(d.error)}catch(e){box.textContent='';box.appendChild(h('p',{class:'note',text:e.message||'Connexion impossible. Vérifiez votre internet.'}));return}
+ if(!document.body.contains(box))return;box.textContent='';
+ // Formulaire d'ajout
+ var fc=h('div',{class:'card',style:'margin-bottom:16px'}),fm=h('div',{class:'pff'});
+ var fi=h('input',{type:'file',accept:'.jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf','aria-label':'Fichier de la carte'});
+ var ti=h('input',{type:'text',maxlength:'100',placeholder:'Ex. : Carte d\'occupation du sol de Bouaké','aria-label':'Titre de la carte'});
+ var mo=h('select',{'aria-label':'Formation'});mo.appendChild(h('option',{value:''},'Choisir la formation'));D.modules.forEach(function(x){mo.appendChild(h('option',{value:x.key},x.title.split(' : ')[0]))});
+ var de=h('textarea',{rows:'3',maxlength:'600',placeholder:'Données utilisées, logiciel, ce que montre la carte… (facultatif)','aria-label':'Description'});
+ var ok=h('input',{type:'checkbox'}),msg=h('p',{class:'note',role:'status'}),go=h('button',{class:'btn',type:'button'},ic('map'),'Envoyer ma carte');
+ fm.appendChild(h('h3',{text:'Ajouter une carte',style:'font-size:16px;margin:0'}));
+ fm.appendChild(h('label',{class:'l',text:'Fichier : JPG, PNG ou PDF (5 Mo au maximum)'}));fm.appendChild(fi);
+ fm.appendChild(h('label',{class:'l',text:'Titre'}));fm.appendChild(ti);
+ fm.appendChild(h('label',{class:'l',text:'Formation'}));fm.appendChild(mo);
+ fm.appendChild(h('label',{class:'l',text:'Description'}));fm.appendChild(de);
+ fm.appendChild(h('label',{class:'exd consent',style:'margin:0'},ok,'J\'accepte que GeoExpert publie cette carte avec mon prénom et l\'initiale de mon nom ('+(d.nom||pubName(D.label))+'). Je peux retirer cet accord à tout moment.'));
+ fm.appendChild(h('div',null,go));fm.appendChild(msg);fc.appendChild(fm);
+ go.addEventListener('click',async function(){
+  msg.textContent='';var f=fi.files&&fi.files[0];
+  if(!f){msg.textContent='Choisissez d\'abord le fichier de votre carte.';return}
+  if(ti.value.trim().length<3){msg.textContent='Donnez un titre à votre carte.';return}
+  go.disabled=true;
+  try{await pfSend(f,{titre:ti.value,module:mo.value,descr:de.value,consent:ok.checked},msg);pfPage()}
+  catch(e){msg.textContent=e.message||'Envoi impossible. Vérifiez votre connexion.';go.disabled=false}
+ });
+ if(d.cartes.length>=d.max)fc=h('div',{class:'card',style:'margin-bottom:16px'},h('p',{class:'note',style:'margin:0',text:'Vous avez déposé '+d.max+' cartes, le maximum : supprimez-en une pour en ajouter une nouvelle.'}));
+ box.appendChild(fc);
+ // Mes cartes
+ box.appendChild(h('h2',{class:'s',text:'Mes cartes'}));
+ if(!d.cartes.length)box.appendChild(h('p',{class:'note',text:'Vous n\'avez pas encore déposé de carte.'}));
+ var g=h('div',{class:'grid'});
+ d.cartes.forEach(function(c){
+  var st=PFST[c.statut]||['',''],th=h('a',{class:'th',href:c.voir,target:'_blank',rel:'noopener','aria-label':'Voir la carte en grand'});
+  if(c.kind==='pdf')th.textContent='PDF';else th.appendChild(h('img',{src:c.mini,alt:c.titre,loading:'lazy'}));
+  var cb=h('input',{type:'checkbox'});cb.checked=c.consent;
+  var lab=h('label',{class:'exd'},cb,c.publie?'Publiée sur le site (décochez pour la retirer)':'Accord de publication sur le site');
+  cb.addEventListener('change',async function(){cb.disabled=true;try{var r=await post('/api/portfolio-accord',{code:code,id:c.id,consent:cb.checked}),j=await r.json();if(!r.ok)throw new Error(j.error);pfPage()}catch(e){cb.checked=!cb.checked;cb.disabled=false;alert(e.message||'Connexion impossible.')}});
+  var del=h('button',{class:'btn alt',type:'button'},'Supprimer');
+  del.addEventListener('click',async function(){if(!confirm('Supprimer définitivement « '+c.titre+' » ?'+(c.publie?'\n\nElle sera aussi retirée du site.':'')))return;del.disabled=true;try{var r=await post('/api/portfolio-supprimer',{code:code,id:c.id}),j=await r.json();if(!r.ok)throw new Error(j.error);pfPage()}catch(e){del.disabled=false;alert(e.message||'Connexion impossible.')}});
+  g.appendChild(h('div',{class:'card pfm'},th,h('span',{class:'tag '+st[1],text:st[0]}),h('h3',{text:c.titre,style:'font-size:16px;margin:6px 0 2px'}),
+   h('p',{class:'note',style:'margin:0',text:(c.formation?c.formation+' · ':'')+'déposée le '+fdate(c.t)}),c.descr?h('p',{style:'font-size:14px;margin:8px 0 0',text:c.descr}):null,
+   c.commentaire?h('div',{class:'com'},h('b',{text:'Le formateur : '}),c.commentaire):null,lab,
+   h('div',{class:'pfb'},h('a',{class:'btn alt',href:c.voir,target:'_blank',rel:'noopener'},'Voir'),del)));
+ });
+ box.appendChild(g);
+ // Mes avis : retirer ou redonner l'accord de publication
+ if(d.avis&&d.avis.length){
+  box.appendChild(h('h2',{class:'s',text:'Mes avis'}));
+  var ac=h('div',{class:'card'});
+  d.avis.forEach(function(a){
+   var cb=h('input',{type:'checkbox'});cb.checked=a.consent;
+   cb.addEventListener('change',async function(){cb.disabled=true;try{var r=await post('/api/avis-accord',{code:code,id:a.id,consent:cb.checked}),j=await r.json();if(!r.ok)throw new Error(j.error);pfPage()}catch(e){cb.checked=!cb.checked;cb.disabled=false;alert(e.message||'Connexion impossible.')}});
+   ac.appendChild(h('div',{style:'padding:6px 0'},h('b',{text:a.formation+' · '+'★★★★★'.slice(0,a.stars)}),h('label',{class:'exd',style:'margin:4px 0 0'},cb,a.publie?'Publié sur le site (décochez pour le retirer)':'J\'accepte que mon avis soit publié (prénom, initiale du nom, profession)')));
+  });
+  box.appendChild(ac);
+ }
+}
+// Code de parrainage gardé par le site (lien ?parrain=…) : proposé dans le champ.
+function parrainDuSite(){try{var x=JSON.parse(localStorage.getItem('geo:parrain')||'null');return x&&x.c&&Date.now()-x.t<60*86400000?x.c:''}catch(e){return''}}
+function parrainForm(after){
+ var inp=h('input',{type:'text',class:'parin',maxlength:'8',placeholder:'Code à 6 caractères','aria-label':'Code de parrainage',style:'max-width:220px;text-transform:uppercase'});inp.value=parrainDuSite();
+ var b=h('button',{class:'btn',type:'button'},'Valider'),msg=h('p',{class:'note',role:'status'});
+ b.addEventListener('click',async function(){msg.textContent='';if(!inp.value.trim()){msg.textContent='Entrez le code de votre parrain.';return}b.disabled=true;
+  try{var r=await post('/api/parrain-saisir',{code:code,pcode:inp.value}),j=await r.json();if(!r.ok)throw new Error(j.error);D.parrainage.saisir=false;try{localStorage.removeItem('geo:parrain')}catch(e){}after()}
+  catch(e){msg.textContent=e.message||'Connexion impossible.';b.disabled=false}});
+ return h('div',null,h('div',{class:'plink'},inp,b),msg);
+}
+function parrainCard(){
+ var c=h('div',{class:'card parr'});
+ c.appendChild(h('h3',{text:'Vous avez été parrainé ?',style:'font-size:16px;margin-bottom:6px'}));
+ c.appendChild(h('p',{class:'note',text:'Entrez le code de la personne qui vous a recommandé GeoExpert Academy (possible pendant vos 7 premiers jours).'}));
+ c.appendChild(parrainForm(function(){c.textContent='';c.appendChild(h('h3',{text:'Merci ! Votre parrain est bien enregistré.',style:'font-size:16px'}))}));
+ return c;
+}
+var PARST={essai:'',pret:'',accorde:'ok',refuse:'rv',desactive:'rv',absent:'rv'};
+async function parPage(){
+ var m=pageHead('Mes parrainages','Recommandez GeoExpert Academy à vos collègues et amis.');
+ sideOn('mespar');
+ var box=h('div',null,h('p',{class:'note',text:'Chargement…'}));m.appendChild(box);
+ var d;try{var r=await post('/api/parrainage',{code:code});d=await r.json();if(!r.ok)throw new Error(d.error)}catch(e){box.textContent='';box.appendChild(h('p',{class:'note',text:e.message||'Connexion impossible. Vérifiez votre internet.'}));return}
+ if(!document.body.contains(box))return;box.textContent='';
+ var t='Je me forme au SIG en vidéo avec GeoExpert Academy (QGIS, ArcGIS, télédétection…), avec l\'assistance du formateur. Découvre les formations avec mon lien : '+d.lien+' — à ta première connexion, indique mon code de parrainage : '+d.pcode;
+ var li=h('input',{type:'text',class:'parin',readonly:'','aria-label':'Votre lien de parrainage'});li.value=d.lien;
+ var cp=h('button',{class:'btn alt',type:'button'},'Copier le lien');
+ cp.addEventListener('click',function(){var ok=function(){cp.textContent='Lien copié !'};if(navigator.clipboard)navigator.clipboard.writeText(d.lien).then(ok,function(){li.select()});else li.select()});
+ var c=h('div',{class:'card',style:'margin-bottom:16px'});
+ c.appendChild(h('p',{class:'note',style:'margin:0',text:'Votre code de parrainage'}));
+ c.appendChild(h('div',{class:'pcode',text:d.pcode}));
+ c.appendChild(h('div',{class:'plink'},li,cp));
+ c.appendChild(h('a',{class:'btn wa',href:'https://wa.me/?text='+encodeURIComponent(t),target:'_blank',rel:'noopener'},ic('share'),'Inviter sur WhatsApp'));
+ c.appendChild(h('h3',{text:'Votre récompense',style:'font-size:16px;margin:18px 0 6px'}));
+ c.appendChild(h('p',{style:'margin:0 0 8px',text:'Pour chaque filleul validé : '+d.recompense+'.'}));
+ var ul=h('ul',{class:'cmr pr'});
+ ['Votre filleul s\'inscrit, puis indique votre code à sa première connexion (pendant ses 7 premiers jours).','La récompense est accordée par le formateur après les 7 jours d\'essai de votre filleul, si sa formation n\'a pas été remboursée.','Vous ne pouvez pas être votre propre parrain (même personne, même numéro).'].forEach(function(x){ul.appendChild(h('li',{class:'note',text:x}))});
+ c.appendChild(ul);box.appendChild(c);
+ box.appendChild(h('h2',{class:'s',text:'Mes filleuls'}));
+ var fc=h('div',{class:'card',style:'margin-bottom:16px'});
+ if(!d.filleuls.length)fc.appendChild(h('p',{class:'note',style:'margin:0',text:'Pas encore de filleul. Partagez votre lien !'}));
+ else{var l=h('ul',{class:'pfl'});d.filleuls.forEach(function(f){l.appendChild(h('li',null,h('span',null,h('b',{text:f.prenom}),h('small',{text:' · depuis le '+fdate(f.t)})),h('span',{class:'tag '+(PARST[f.etat]||''),text:f.texte})))});fc.appendChild(l)}
+ box.appendChild(fc);
+ if(d.peutSaisir){var pc=parrainCard();box.appendChild(pc)}
+ else if(d.parraine)box.appendChild(h('p',{class:'note',text:'Votre parrain est bien enregistré. Merci !'}));
 }
 function avisCard(m){
  var st=0,c=h('div',{class:'card avis'}),stars=h('div',{class:'stars',role:'radiogroup','aria-label':'Votre note'});
  for(var i=1;i<=5;i++)(function(i){stars.appendChild(h('button',{type:'button',role:'radio','aria-label':i+' étoile'+(i>1?'s':''),onclick:function(){st=i;stars.querySelectorAll('button').forEach(function(x,j){x.classList.toggle('on',j<i);x.setAttribute('aria-checked',j===i-1)})}},'★'))})(i);
  var ta=h('textarea',{maxlength:'1000',rows:'3',placeholder:'Qu\'avez-vous pensé de la formation ? Qu\'est-ce qui vous a servi ?','aria-label':'Votre commentaire'});
  var ok=h('input',{type:'checkbox'}),msg=h('p',{class:'note',role:'status'});
+ var pro=h('input',{type:'text',class:'parin',maxlength:'60',placeholder:'Votre profession (facultatif), ex. : Technicien urbaniste','aria-label':'Votre profession',style:'margin-top:8px'});
  var send=h('button',{class:'btn'},'Envoyer mon avis');
  send.addEventListener('click',async function(){
   if(!st){msg.textContent='Choisissez d\'abord une note (de 1 à 5 étoiles).';return}
   send.disabled=true;
-  try{var r=await post('/api/avis',{code:code,module:m.key,stars:st,text:ta.value,consent:ok.checked}),j=await r.json();if(!r.ok)throw new Error(j.error)
+  try{var r=await post('/api/avis',{code:code,module:m.key,stars:st,text:ta.value,consent:ok.checked,profession:pro.value,accord:2}),j=await r.json();if(!r.ok)throw new Error(j.error)
    D.avisDonnes=(D.avisDonnes||[]).concat(m.key);c.textContent='';c.appendChild(h('h3',{text:'Merci pour votre avis !',style:'font-size:16px;margin-bottom:6px'}));c.appendChild(h('p',{class:'note',text:'Il nous aide à améliorer nos formations.'}))}
   catch(e){msg.textContent=e.message||'Envoi impossible. Vérifiez votre connexion.';send.disabled=false}
  });
  c.appendChild(h('h3',{text:'Votre avis sur '+m.title.split(' : ')[0],style:'font-size:16px;margin-bottom:6px'}));
  c.appendChild(h('p',{class:'note',text:'Bravo, vous avez terminé cette formation ! Votre avis nous aide beaucoup.'}));
- c.appendChild(stars);c.appendChild(ta);
- c.appendChild(h('label',{class:'exd consent'},ok,'J\'accepte que mon prénom et mon avis soient publiés par GeoExpert Academy.'));
+ c.appendChild(stars);c.appendChild(ta);c.appendChild(pro);
+ c.appendChild(h('label',{class:'exd consent'},ok,'J\'accepte que GeoExpert Academy publie mon avis avec mon prénom, l\'initiale de mon nom ('+pubName(D.label)+') et ma profession. Je peux retirer cet accord à tout moment dans « Mon portfolio ».'));
  c.appendChild(send);c.appendChild(msg);
  return c;
 }
