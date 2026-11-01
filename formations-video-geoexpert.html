@@ -178,6 +178,27 @@
     .compare th, .compare td { padding:10px 12px; font-size:13.5px; }
   }
 
+
+  /* --- Cartes compactes, bandeau commun et filtres --- */
+  .includes-band { max-width: 1080px; margin: 0 auto 18px; background: var(--teal-soft); border: 1px solid var(--teal); border-radius: var(--radius); padding: 12px 18px; font-size: 14px; line-height: 1.55; color: var(--ink-dim); }
+  .includes-band strong { color: var(--ink); }
+  .filter-tabs { max-width: 1080px; margin: 0 auto 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-tabs button { appearance: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-dim); background: #fff; border: 1px solid var(--line); border-radius: 99px; padding: 8px 16px; min-height: 40px; cursor: pointer; }
+  .filter-tabs button.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .course-card .key-points { flex: 0 0 auto; margin: 10px 0 12px; }
+  .course-more { margin: 0 0 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .course-more summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--teal); min-height: 28px; }
+  .course-more[open] summary { margin-bottom: 10px; }
+  .course-more .course-sub { display: block; font-size: 12px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .course-more ul { margin-bottom: 0; }
+  .cards[hidden], .course-card[hidden], .packs-section[hidden] { display: none; }
+  @media (max-width: 600px) {
+    .course-card { padding: 18px; }
+    .course-card h3 { margin: 12px 0 4px; }
+    .filter-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .filter-tabs button { flex: 0 0 auto; }
+  }
+
   @media (max-width: 768px) {
     /* Sur mobile, on donne une hauteur fixe à l'iframe pour que l'animation soit lisible */
     #apercu .container > div {
@@ -427,106 +448,90 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   <div class="container">
     <div class="section-head">
       <h2>Choisissez votre formation e-learning</h2>
-      <p>Chaque formation s'apprend pas à pas, par la pratique. Le niveau et la durée sont indiqués sur chaque carte.</p>
+      <p>Chaque formation s'apprend pas à pas, par la pratique. Le niveau est indiqué sur chaque carte ; dépliez « Voir le programme » pour le détail et la durée.</p>
     </div>
     <div class="guide-box">
       <strong>Vous débutez ? Commencez par un Module 1.</strong>
       Choisissez QGIS si vous voulez un logiciel gratuit, ou ArcGIS si c'est le logiciel utilisé dans votre entreprise ou votre école. Passez ensuite au Module 2 pour apprendre à analyser un territoire.
       Un doute ? <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20d%C3%A9bute%20en%20SIG%2C%20quelle%20formation%20vid%C3%A9o%20me%20conseillez-vous%20%3F" target="_blank" rel="noopener">Demandez conseil sur WhatsApp</a>.
     </div>
+    <div class="includes-band"><strong>Chaque formation comprend :</strong> l'assistance du formateur pendant 3 mois · l'attestation de fin de formation · la garantie 7 jours (remboursement intégral si elle ne vous convient pas) · l'accès aux vidéos pendant 12 mois.</div>
+    <div class="filter-tabs" role="group" aria-label="Filtrer les formations">
+      <button type="button" class="active" data-filter="all" aria-pressed="true">Tout</button>
+      <button type="button" data-filter="debutant" aria-pressed="false">Débutant</button>
+      <button type="button" data-filter="qgis" aria-pressed="false">QGIS</button>
+      <button type="button" data-filter="arcgis" aria-pressed="false">ArcGIS</button>
+      <button type="button" data-filter="packs" aria-pressed="false">Packs</button>
+    </div>
     <div class="cards">
-      <article class="course-card">
-        <span class="course-tag">ArcGIS · Module 1</span>
+      <article class="course-card" data-cat="debutant arcgis">
+        <span class="course-tag">Débutant</span>
         <h3>Votre premier projet SIG avec ArcGIS</h3>
-        <p>Rangez vos points GPS, vos plans et vos données de terrain dans un projet propre, même sans aucune expérience.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Créer un projet SIG bien organisé dès le départ</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP, le format SIG le plus courant</li><li>Transformer un vieux plan papier en carte numérique (vectorisation)</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces ArcMap</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Créer un projet SIG bien organisé dès le départ</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP, le format SIG le plus courant</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">ArcGIS · Module 1</span><p>Rangez vos points GPS, vos plans et vos données de terrain dans un projet propre, même sans aucune expérience.</p><div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span></div><ul><li>Créer un projet SIG bien organisé dès le départ</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP, le format SIG le plus courant</li><li>Transformer un vieux plan papier en carte numérique (vectorisation)</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces ArcMap</li></ul></details>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/l0sNNklrbHcH" data-product="ArcGIS — Module 1 : bases et gestion des données" data-price="15 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">ArcGIS · Module 2</span>
+      <article class="course-card" data-cat="arcgis">
+        <span class="course-tag">Intermédiaire</span>
         <h3>Analyser un territoire avec ArcGIS</h3>
-        <p>Répondez à des questions concrètes avec une carte : quelles zones sont proches d'une route, quelle est la pente d'un terrain.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (outil Clip)</li><li>Croiser des couches et mesurer des distances (Intersect, Buffer, Near)</li><li>Télécharger gratuitement des données spatiales (Raster et données vectorielles)</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (outil Clip)</li><li>Croiser des couches et mesurer des distances (Intersect, Buffer, Near)</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">ArcGIS · Module 2</span><p>Répondez à des questions concrètes avec une carte : quelles zones sont proches d'une route, quelle est la pente d'un terrain.</p><div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span></div><ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (outil Clip)</li><li>Croiser des couches et mesurer des distances (Intersect, Buffer, Near)</li><li>Télécharger gratuitement des données spatiales (Raster et données vectorielles)</li></ul></details>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/qKk96zGepbQ0" data-product="ArcGIS — Module 2 : analyse spatiale avancée" data-price="20 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">QGIS · Module 1</span>
+      <article class="course-card" data-cat="debutant qgis">
+        <span class="course-tag">Débutant</span>
         <h3>Votre premier projet SIG avec QGIS, 100 % gratuit</h3>
-        <p>Le logiciel libre pour démarrer : organisez vos données et transformez un vieux plan en carte numérique.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Créer une base de données GeoPackage et vos couches</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP ou GeoPackage</li><li>Transformer un ancien plan en base de données parcellaire</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces QGIS</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Créer une base de données GeoPackage et vos couches</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP ou GeoPackage</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">QGIS · Module 1</span><p>Le logiciel libre pour démarrer : organisez vos données et transformez un vieux plan en carte numérique.</p><div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> à votre rythme, 5 exercices</span></div><ul><li>Créer une base de données GeoPackage et vos couches</li><li>Importer vos données : tableaux Excel ou CSV, points GPS, plans DXF (dessinés sur ordinateur), images et fichiers KML</li><li>Les convertir au format SHP ou GeoPackage</li><li>Transformer un ancien plan en base de données parcellaire</li><li>Suivre l'évolution d'un phénomène, cartographié des parcelles</li><li>Gagner du temps grâce aux astuces QGIS</li></ul></details>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/EVli5Yhhk9QD" data-product="QGIS — Module 1 : données et bases de données" data-price="15 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">QGIS · Module 2</span>
+      <article class="course-card" data-cat="qgis">
+        <span class="course-tag">Intermédiaire</span>
         <h3>Analyser un territoire avec QGIS</h3>
-        <p>Découpez, croisez et mesurez vos données pour produire des résultats utiles à un vrai projet.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (Clip, extraction par masque)</li><li>Croiser des couches et créer des zones tampons (Intersect, Buffer)</li><li>Mesurer des distances entre objets (proximité)</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (Clip, extraction par masque)</li><li>Croiser des couches et créer des zones tampons (Intersect, Buffer)</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">QGIS · Module 2</span><p>Découpez, croisez et mesurez vos données pour produire des résultats utiles à un vrai projet.</p><div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire, à suivre après le Module 1</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span></div><ul><li>Représenter le relief : courbes de niveau et pente</li><li>Découper vos données sur votre zone d'étude (Clip, extraction par masque)</li><li>Croiser des couches et créer des zones tampons (Intersect, Buffer)</li><li>Mesurer des distances entre objets (proximité)</li></ul></details>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/cK0Q6QrMdEBB" data-product="QGIS — Module 2 : analyse spatiale" data-price="20 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">Télédétection</span>
+      <article class="course-card" data-cat="debutant">
+        <span class="course-tag">Débutant</span>
         <h3>Lire la Terre vue du ciel</h3>
-        <p>Repérez la végétation, l'eau et les zones construites sur des images satellites, puis présentez vos cartes.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant en télédétection</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Afficher et interpréter une image satellite (compositions colorées)</li><li>Suivre l'état de la végétation avec l'indice NDVI</li><li>Repérer l'eau et les zones bâties (NDWI, MNDWI, NDBI)</li><li>Suivre l'évolution des feux de brousse</li><li>Classer une image automatiquement, occupation du sol et réaliser une carte professionnelle</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Afficher et interpréter une image satellite (compositions colorées)</li><li>Suivre l'état de la végétation avec l'indice NDVI</li><li>Repérer l'eau et les zones bâties (NDWI, MNDWI, NDBI)</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">Télédétection</span><p>Repérez la végétation, l'eau et les zones construites sur des images satellites, puis présentez vos cartes.</p><div class="course-meta"><span><strong>Niveau :</strong> Débutant en télédétection</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span></div><ul><li>Afficher et interpréter une image satellite (compositions colorées)</li><li>Suivre l'état de la végétation avec l'indice NDVI</li><li>Repérer l'eau et les zones bâties (NDWI, MNDWI, NDBI)</li><li>Suivre l'évolution des feux de brousse</li><li>Classer une image automatiquement, occupation du sol et réaliser une carte professionnelle</li></ul></details>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/amqThnoWczd8" data-product="Télédétection — module vidéo complet" data-price="25 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">Webmapping</span>
+      <article class="course-card" data-cat="arcgis">
+        <span class="course-tag">Intermédiaire</span>
         <h3>Publier votre carte interactive sur internet</h3>
-        <p>Créez une carte en ligne consultable sur téléphone, tablette ou site web.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Préparer, nettoyer, organiser les données</li><li>Créer une application cartographique avec ArcGIS Online</li><li>La rendre utilisable sur smartphone et tablette</li><li>La publier sur votre site web</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Préparer, nettoyer, organiser les données</li><li>Créer une application cartographique avec ArcGIS Online</li><li>La rendre utilisable sur smartphone et tablette</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">Webmapping</span><p>Créez une carte en ligne consultable sur téléphone, tablette ou site web.</p><div class="course-meta"><span><strong>Niveau :</strong> Intermédiaire</span><span><strong>Durée :</strong> à votre rythme, 4 exercices</span></div><ul><li>Préparer, nettoyer, organiser les données</li><li>Créer une application cartographique avec ArcGIS Online</li><li>La rendre utilisable sur smartphone et tablette</li><li>La publier sur votre site web</li></ul></details>
         <div class="price-row"><span class="price">20 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/DBeEmN5qdD0F" data-product="Webmapping — création et déploiement d&#x27;application" data-price="20 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">Collecte mobile</span>
+      <article class="course-card" data-cat="debutant">
+        <span class="course-tag">Débutant</span>
         <h3>Collecter des données de terrain avec votre téléphone</h3>
-        <p>Remplacez les fiches papier par un questionnaire sur smartphone, puis transformez les réponses en carte.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Créer votre compte et configurer KoboToolbox</li><li>Mettre en place un formulaire d'enquête</li><li>Collecter des données sur le terrain avec votre mobile</li><li>Importer les réponses dans un SIG et les cartographier pour un rapport</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Créer votre compte et configurer KoboToolbox</li><li>Mettre en place un formulaire d'enquête</li><li>Collecter des données sur le terrain avec votre mobile</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">Collecte mobile</span><p>Remplacez les fiches papier par un questionnaire sur smartphone, puis transformez les réponses en carte.</p><div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span></div><ul><li>Créer votre compte et configurer KoboToolbox</li><li>Mettre en place un formulaire d'enquête</li><li>Collecter des données sur le terrain avec votre mobile</li><li>Importer les réponses dans un SIG et les cartographier pour un rapport</li></ul></details>
         <div class="price-row"><span class="price">15 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/t1orZESwHB7C" data-product="KoboToolbox — collecte mobile et intégration SIG" data-price="15 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card">
-        <span class="course-tag">Outils complémentaires</span>
+      <article class="course-card" data-cat="debutant">
+        <span class="course-tag">Débutant</span>
         <h3>Gagner du temps avec Google Earth</h3>
-        <p>Utilisez Google Earth en complément de votre logiciel SIG pour préparer et vérifier vos cartes.</p>
-        <div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span><span><strong>Inclus :</strong> assistance du formateur pendant 3 mois</span><span><strong>Inclus :</strong> accès aux vidéos pendant 12 mois</span></div>
-        <ul><li>Comprendre les fonctionnalités de Google Earth</li><li>Utiliser Google Earth à côté de votre logiciel SIG</li><li>Créer des polygones, des points et des lignes</li><li>Numériser des cultures, forêts, bâtiments, réseaux routiers, des lieux sur Google Earth</li><li>Suivre l'évolution d'un phénomène entre deux dates</li><li>Importer un fichier KML (vos tracés Google Earth) dans ArcGIS</li></ul>
-        <div class="benefit"><span class="check">✓</span><div><strong>Attestation de fin de formation</strong><small>Un document professionnel délivré pour valoriser votre CV.</small></div></div>
-        <div class="benefit"><span class="check">✓</span><div><strong>Garantie 7 jours</strong><small>7 jours d'essai accompagné, remboursement intégral si la formation ne vous convient pas.</small></div></div>
+        <ul class="key-points"><li>Comprendre les fonctionnalités de Google Earth</li><li>Utiliser Google Earth à côté de votre logiciel SIG</li><li>Créer des polygones, des points et des lignes</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><span class="course-sub">Outils complémentaires</span><p>Utilisez Google Earth en complément de votre logiciel SIG pour préparer et vérifier vos cartes.</p><div class="course-meta"><span><strong>Niveau :</strong> Débutant, aucun prérequis</span><span><strong>Durée :</strong> A votre rythme, 4 exercices</span></div><ul><li>Comprendre les fonctionnalités de Google Earth</li><li>Utiliser Google Earth à côté de votre logiciel SIG</li><li>Créer des polygones, des points et des lignes</li><li>Numériser des cultures, forêts, bâtiments, réseaux routiers, des lieux sur Google Earth</li><li>Suivre l'évolution d'un phénomène entre deux dates</li><li>Importer un fichier KML (vos tracés Google Earth) dans ArcGIS</li></ul></details>
         <div class="price-row"><span class="price">10 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/guwsyvzssOco" data-product="Google Earth et outils complémentaires aux SIG" data-price="10 000 FCFA">Je m'inscris</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
@@ -563,34 +568,34 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
       <h2>Économisez avec nos packs</h2>
       <p>Regroupez plusieurs modules pour construire un parcours plus complet à un tarif avantageux.</p>
     </div>
+    <div class="includes-band"><strong>Chaque pack comprend :</strong> l'assistance du formateur pendant 3 mois · l'accès aux vidéos pendant 24 mois.</div>
     <div class="cards">
-      <article class="course-card pack-card featured">
+      <article class="course-card pack-card featured" data-cat="packs qgis">
         <span class="popular">Pack recommandé</span>
         <span class="course-tag">2 modules + astuces</span>
         <h3>Pack QGIS</h3>
-        <p>Des bases de données à l'analyse spatiale, pour développer votre autonomie sur QGIS.</p>
-        <ul><li>QGIS module 1</li><li>QGIS module 2</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul>
+        <ul class="key-points"><li>QGIS module 1</li><li>QGIS module 2</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><p>Des bases de données à l'analyse spatiale, pour développer votre autonomie sur QGIS.</p><ul><li>QGIS module 1</li><li>QGIS module 2</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul></details>
         <div class="price-old">Au lieu de 30 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-primary order-btn" data-link="https://checkout.digitalpaye.com/pay/iuiqjHbR5b7a" data-product="Pack QGIS — modules 1 et 2" data-price="25 000 FCFA">Choisir le pack QGIS</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card pack-card">
+      <article class="course-card pack-card" data-cat="packs arcgis">
         <span class="course-tag">2 modules + astuces</span>
         <h3>Pack ArcGIS</h3>
-        <p>Un parcours sur ArcMap, de la gestion des données aux outils d'analyse spatiale.</p>
-        <ul><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul>
+        <ul class="key-points"><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><p>Un parcours sur ArcMap, de la gestion des données aux outils d'analyse spatiale.</p><ul><li>ArcGIS module 1 et astuces associées</li><li>ArcGIS module 2 et astuces associées</li><li>Assistance du formateur pendant 3 mois</li><li>Accès aux vidéos pendant 24 mois</li></ul></details>
         <div class="price-old">Au lieu de 30 000 FCFA</div><span class="save-tag">Vous économisez 5 000 FCFA</span>
         <div class="price-row"><span class="price">25 000</span><span class="currency">FCFA</span></div>
-        <!-- ⚠️ ATTENTION : LIEN DUPLIQUÉ ICI ! C'est le même que le Pack QGIS. Il faut le remplacer. DEJA FAIT -->
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/y1udN30HlczI" data-product="Pack ArcGIS — modules 1 et 2 avec astuces" data-price="25 000 FCFA">Choisir le pack ArcGIS</button>
         <p class="accept-line">En vous inscrivant, vous acceptez nos <a href="cgv.html">conditions générales de vente</a> et la <a href="charte-apprenant.html">charte de l'apprenant</a>.</p>
       </article>
-      <article class="course-card pack-card">
+      <article class="course-card pack-card" data-cat="packs">
         <span class="course-tag">Parcours complet</span>
         <h3>Pack Géomaticien opérationnel</h3>
-        <p>Une sélection de formations complémentaires pour développer vos compétences en géomatique.</p>
-        <ul><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li><li>Plus de 100 h de vidéos</li><li>Accès aux vidéos pendant 24 mois</li></ul>
+        <ul class="key-points"><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li></ul>
+        <details class="course-more"><summary>Voir le programme</summary><p>Une sélection de formations complémentaires pour développer vos compétences en géomatique.</p><ul><li>QGIS et ArcGIS : modules 1 et 2</li><li>Télédétection, Webmapping et KoboToolbox</li><li>Google Earth et outils complémentaires</li><li>Plus de 100 h de vidéos</li><li>Accès aux vidéos pendant 24 mois</li></ul></details>
         <div class="price-old">Au lieu de 140 000 FCFA</div><span class="save-tag">Vous économisez 40 000 FCFA</span>
         <div class="price-row"><span class="price">100 000</span><span class="currency">FCFA</span></div>
         <button class="btn btn-outline order-btn" data-link="https://checkout.digitalpaye.com/pay/Al3BVi8KpMq9" data-product="Pack Géomaticien opérationnel - toutes les formations listées" data-price="100 000 FCFA">Choisir le pack complet</button>
@@ -1016,6 +1021,24 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
         clearTimeout(rotateTimer);
       });
     }
+
+
+    // ==========================================
+    // 6. FILTRES DES FORMATIONS (aucun lien de paiement ni événement n'est touché)
+    // ==========================================
+    const filtres = document.querySelectorAll('.filter-tabs button');
+    const cartes = document.querySelectorAll('.course-card[data-cat]');
+    const sectionPacks = document.getElementById('packs');
+    filtres.forEach(f => f.addEventListener('click', () => {
+      const cle = f.getAttribute('data-filter');
+      filtres.forEach(x => { const on = x === f; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      cartes.forEach(c => { c.hidden = !(cle === 'all' || c.getAttribute('data-cat').split(' ').indexOf(cle) !== -1); });
+      document.querySelectorAll('.cards').forEach(g => { g.hidden = !g.querySelector('.course-card:not([hidden])'); });
+      if (sectionPacks) {
+        sectionPacks.hidden = !sectionPacks.querySelector('.course-card:not([hidden])');
+        if (cle === 'packs') sectionPacks.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }));
 
     // ==========================================
     // 5. BARRE D'ACTION FIXE SUR MOBILE
