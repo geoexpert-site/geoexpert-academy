@@ -21,11 +21,6 @@ body { display: grid; place-items: center; }
   overflow: hidden; isolation: isolate; color: var(--ink); background: var(--bg);
 }
 
-.blob-1, .blob-2 {
-  position: absolute; width: 60vw; height: 60vw; border-radius: 50%; filter: blur(100px); opacity: 0.15; z-index: 0; pointer-events: none;
-}
-.blob-1 { top: -20%; right: -10%; background: var(--teal); }
-.blob-2 { bottom: -20%; left: -10%; background: var(--indigo); }
 
 .header { position: absolute; z-index: 8; top: 5%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: space-between; }
 .brand { display: flex; align-items: center; gap: 10px; }
@@ -40,7 +35,7 @@ body { display: grid; place-items: center; }
 .scene.active { opacity: 1; visibility: visible; transform: scale(1); z-index: 3; }
 
 h1, h2 { margin: 0; font-size: clamp(32px, 5vw, 55px); line-height: 1.1; font-weight: 900; letter-spacing: -.03em; color: var(--ink); }
-.gradient { background: linear-gradient(100deg, var(--teal) 0%, var(--indigo) 50%, var(--magenta) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.gradient {color: var(--teal);}
 .sub { max-width: 600px; margin-top: 15px; color: var(--muted); font-size: clamp(14px, 1.8vw, 18px); line-height: 1.6; font-weight: 500; }
 
 /* --- SCENE 1 : LOGIN MOCKUP --- */
@@ -151,7 +146,7 @@ h1, h2 { margin: 0; font-size: clamp(32px, 5vw, 55px); line-height: 1.1; font-we
 .replay-overlay.show { opacity: 1; pointer-events: auto; }
 .replay-overlay button {
   width: 80px; height: 80px; border-radius: 50%; background: var(--teal); border: none; color: white; cursor: pointer;
-  display: grid; place-items: center; box-shadow: 0 0 40px rgba(0, 146, 166, 0.6); transition: transform 0.2s, background 0.2s;
+  display: grid; place-items: center; transition: transform 0.2s, background 0.2s;
 }
 .replay-overlay button:hover { transform: scale(1.1); background: var(--indigo); }
 .replay-overlay svg { width: 36px; height: 36px; margin-left: 5px; fill: white; }
@@ -188,8 +183,6 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 </head>
 <body>
 <div class="stage" id="stage">
-  <div class="blob-1"></div>
-  <div class="blob-2"></div>
 
   <header class="header">
     <div class="brand">
