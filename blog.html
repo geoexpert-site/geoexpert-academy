@@ -37,76 +37,63 @@
     font-size:17px;
     color:var(--ink-dim);
   }
-  .blog-grid{
-    padding:70px 0;
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
-    gap:28px;
+  /* --- Page blog : commencer ici, bandeau plateforme, filtres, cartes compactes --- */
+  .bl-section{ padding:48px 0 0; }
+  .bl-section h2{ font-size:clamp(24px,3.4vw,30px); margin-bottom:6px; }
+  .bl-lead{ font-size:16px; color:var(--ink-dim); margin-bottom:22px; }
+  .bl-meta{ display:block; font-size:16px; line-height:1.4; color:var(--ink-dim); margin-bottom:6px; }
+
+  .bl-start-list{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .bl-start-card{ display:flex; flex-direction:column; height:100%; padding:24px 22px 20px; background:var(--bg); border:1px solid var(--line); border-top:4px solid #0092A6; border-radius:var(--radius); color:inherit; transition:border-color .2s, box-shadow .2s, transform .15s; }
+  .bl-start-card:hover{ border-color:var(--teal); box-shadow:0 14px 30px rgba(0,146,166,0.12); transform:translateY(-3px); }
+  .bl-start-title{ font-size:20px; line-height:1.3; font-weight:700; margin:0 0 16px; flex:1; }
+  .bl-start-go{ font-size:16px; font-weight:600; color:#4B3F92; }
+
+  .bl-platform{ margin-top:48px; }
+  .bl-platform-inner{ display:flex; align-items:center; justify-content:space-between; gap:20px 32px; flex-wrap:wrap; padding:28px 32px; border-radius:var(--radius); background:linear-gradient(100deg,#4B3F92 0%,#A83C93 100%); color:#fff; }
+  .bl-platform h2{ margin:0 0 6px; font-size:clamp(22px,3vw,28px); color:#fff; }
+  .bl-platform p{ margin:0; font-size:17px; font-weight:500; color:#fff; }
+  .bl-platform .btn{ background:#fff; color:#4B3F92; min-height:48px; font-size:16px; flex-shrink:0; }
+  .bl-platform .btn:hover{ box-shadow:0 8px 22px rgba(0,0,0,0.25); }
+
+  .bl-tools{ display:none; margin-bottom:18px; }
+  .js .bl-tools{ display:block; }
+  .bl-search{ display:block; width:100%; max-width:520px; min-height:48px; padding:10px 14px; font:inherit; font-size:16px; color:var(--ink); background:#fff; border:1px solid var(--line-strong); border-radius:10px; margin-bottom:14px; }
+  .bl-search:focus{ outline:2px solid #4B3F92; outline-offset:1px; }
+  .bl-filters{ display:flex; flex-wrap:wrap; gap:8px; }
+  .bl-filter{ min-height:44px; padding:8px 16px; font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--ink); background:#fff; border:1px solid var(--line-strong); border-radius:999px; cursor:pointer; }
+  .bl-filter:hover{ border-color:#4B3F92; }
+  .bl-filter[aria-pressed="true"]{ background:#4B3F92; border-color:#4B3F92; color:#fff; }
+  .bl-filter:focus-visible, .bl-more:focus-visible, .bl-card:focus-visible, .bl-start-card:focus-visible{ outline:3px solid #A83C93; outline-offset:2px; }
+  .bl-count{ display:none; margin:14px 0 0; font-size:16px; color:var(--ink-dim); }
+  .js .bl-count{ display:block; }
+
+  .bl-list{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2,1fr); gap:14px 20px; }
+  .bl-item[hidden]{ display:none; }
+  .bl-card{ display:block; height:100%; padding:16px 18px; background:var(--bg); border:1px solid var(--line); border-left:4px solid #0092A6; border-radius:12px; color:inherit; transition:border-color .2s, box-shadow .2s; }
+  .bl-card.bl-choisir{ border-left-color:#4B3F92; }
+  .bl-card.bl-metiers{ border-left-color:#A83C93; }
+  .bl-card:hover{ border-color:var(--teal); box-shadow:0 10px 24px rgba(0,146,166,0.12); }
+  .bl-title{ margin:0; font-size:18px; line-height:1.35; font-weight:600; }
+  .bl-empty{ margin:18px 0 0; font-size:16px; color:var(--ink-dim); }
+  .bl-more-wrap{ text-align:center; margin-top:24px; }
+  .bl-more{ min-height:48px; padding:12px 28px; font-family:var(--font-display); font-size:16px; font-weight:600; color:#4B3F92; background:#fff; border:2px solid #4B3F92; border-radius:10px; cursor:pointer; }
+  .bl-more:hover{ background:#F6F3FA; }
+  .bl-all{ padding-bottom:64px; }
+
+  @media (max-width:900px){
+    .bl-start-list{ grid-template-columns:1fr; gap:12px; }
+    .bl-start-card{ height:auto; padding:18px 18px 16px; }
+    .bl-start-title{ margin-bottom:10px; }
   }
-  .blog-card{
-    background:var(--bg);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    transition:border-color .2s, box-shadow .2s, transform .15s;
-  }
-  .blog-card:hover{
-    border-color:var(--teal);
-    box-shadow:0 14px 30px rgba(0,146,166,0.12);
-    transform:translateY(-3px);
-  }
-  .blog-card-image{
-    aspect-ratio:16/9;
-    background:var(--gradient-brand);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-family:var(--font-display);
-    font-size:40px;
-    font-weight:800;
-  }
-  .blog-card-content{
-    padding:24px;
-    display:flex;
-    flex-direction:column;
-    flex:1;
-  }
-  .blog-card-tag{
-    align-self:flex-start;
-    font-size:11px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--teal);
-    background:var(--teal-soft);
-    padding:5px 10px;
-    border-radius:6px;
-    margin-bottom:14px;
-    font-weight:600;
-  }
-  .blog-card h2{
-    font-size:20px;
-    margin-bottom:10px;
-    font-weight:600;
-    line-height:1.3;
-  }
-  .blog-card p{
-    font-size:14.5px;
-    color:var(--ink-dim);
-    margin-bottom:20px;
-    flex:1;
-  }
-  .blog-card-meta{
-    font-size:12.5px;
-    color:var(--ink-faint);
-    margin-bottom:16px;
-  }
-  .blog-card .btn{
-    align-self:flex-start;
-    padding:10px 20px;
-    font-size:14px;
+  @media (max-width:700px){
+    .blog-hero{ padding:56px 0 36px; }
+    .bl-section{ padding-top:36px; }
+    .bl-list{ grid-template-columns:1fr; gap:8px; }
+    .bl-card{ padding:12px 14px; }
+    .bl-platform-inner{ padding:22px 20px; }
+    .bl-platform .btn{ width:100%; }
+    .bl-more{ width:100%; }
   }
 </style>
 <!-- Meta Pixel Code -->
@@ -133,6 +120,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 <!-- End Meta Pixel Code -->
 </head>
 <body>
+<script>document.documentElement.className += " js";</script>
 
 <!-- HEADER -->
 <header class="site-header" id="header">
@@ -239,158 +227,204 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- LISTE DES ARTICLES -->
-<section>
+<!-- COMMENT AJOUTER UN ARTICLE (3 étapes) :
+     1. Copiez un bloc <li class="bl-item" ...> de la liste ci-dessous, au bon endroit (les plus récents en haut).
+     2. Changez 4 choses : data-themes (debuter, choisir, metiers, outils ; un ou deux, le 1er est affiché), le lien href, le titre, la ligne « Thème · N min de lecture ».
+     3. Ajoutez l'adresse dans sitemap.xml. Le filtre, la recherche et « Voir plus » lisent la liste tout seuls : rien d'autre à modifier. -->
+
+<!-- COMMENCER ICI -->
+<section class="bl-section" aria-labelledby="bl-start-h">
   <div class="container">
-    <div class="blog-grid">
+    <h2 id="bl-start-h">Commencer ici</h2>
+    <p class="bl-lead">Trois lectures pour bien démarrer, dans cet ordre.</p>
+    <ul class="bl-start-list">
+        <li>
+          <a class="bl-start-card" href="blog/debuter-sig-2026.html">
+            <span class="bl-meta">Débuter · 8 min de lecture</span>
+            <h3 class="bl-start-title">Comment débuter en SIG en 2026 : le guide complet</h3>
+            <span class="bl-start-go" aria-hidden="true">Lire l'article →</span>
+          </a>
+        </li>
+        <li>
+          <a class="bl-start-card" href="blog/qgis-vs-arcgis.html">
+            <span class="bl-meta">Choisir sa formation · 6 min de lecture</span>
+            <h3 class="bl-start-title">QGIS vs ArcGIS : lequel choisir pour débuter ?</h3>
+            <span class="bl-start-go" aria-hidden="true">Lire l'article →</span>
+          </a>
+        </li>
+        <li>
+          <a class="bl-start-card" href="blog/blogformation-geomatique-cote-divoire.html">
+            <span class="bl-meta">Choisir sa formation · 7 min de lecture</span>
+            <h3 class="bl-start-title">Formation géomatique en Côte d'Ivoire : où se former en 2026 ?</h3>
+            <span class="bl-start-go" aria-hidden="true">Lire l'article →</span>
+          </a>
+        </li>
+    </ul>
+  </div>
+</section>
 
-      <!-- NOUVEL ARTICLE -->
-      <article class="blog-card">
-        <div class="blog-card-image">Formation</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Formation</span>
-          <h2>Formation géomatique en Côte d'Ivoire : où se former en 2026 ?</h2>
-          <p>Comparatif des formations, prix, durées et débouchés pour devenir géomaticien en Côte d'Ivoire.</p>
-          <div class="blog-card-meta">16 octobre 2026 · 7 min de lecture</div>
-          <a href="blog/blogformation-geomatique-cote-divoire.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 1 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Débuter</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Guide débutant</span>
-          <h2>Comment débuter en SIG en 2026 : le guide complet</h2>
-          <p>Tout ce qu'il faut savoir pour se lancer dans les Systèmes d'Information Géographique, du choix du logiciel aux premières cartes.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 8 min de lecture</div>
-          <a href="blog/debuter-sig-2026.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 2 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Comparer</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Comparatif</span>
-          <h2>QGIS vs ArcGIS : lequel choisir pour débuter ?</h2>
-          <p>Deux logiciels phares de la géomatique. Lequel est fait pour vous ? Comparatif complet : prix, fonctionnalités, prise en main.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 6 min de lecture</div>
-          <a href="blog/qgis-vs-arcgis.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 3 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Carrière</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Carrière</span>
-          <h2>Les débouchés de la géomatique en Côte d'Ivoire</h2>
-          <p>BTP, urbanisme, agriculture, environnement... Découvrez tous les secteurs qui recrutent des profils SIG en Côte d'Ivoire.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 7 min de lecture</div>
-          <a href="blog/debouches-geomatique-ci.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 4 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Formations</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Formation</span>
-          <h2>Top 5 des formations SIG en Côte d'Ivoire</h2>
-          <p>Notre sélection des meilleures formations pour devenir géomaticien, avec comparatif des programmes et des tarifs.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 6 min de lecture</div>
-          <a href="blog/top-formations-sig-ci.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 5 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Terrain</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Tutoriel</span>
-          <h2>KoboToolbox : collecter des données terrain facilement</h2>
-          <p>Comment utiliser KoboToolbox pour créer des formulaires numériques et collecter des données avec un smartphone.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 8 min de lecture</div>
-          <a href="blog/kobotoolbox-tutoriel.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 6 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Erreurs</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Guide débutant</span>
-          <h2>Les 10 erreurs à éviter quand on débute en SIG</h2>
-          <p>Les pièges les plus fréquents chez les débutants en SIG, et comment les éviter pour progresser deux fois plus vite.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 7 min de lecture</div>
-          <a href="blog/erreurs-debutant-sig.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 7 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Collecte</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Guide pratique</span>
-          <h2>Réussir sa collecte de données terrain</h2>
-          <p>Guide complet pour préparer, réaliser et valider votre collecte de données terrain, avec les bonnes pratiques et outils.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 8 min de lecture</div>
-          <a href="blog/collecte-donnees-terrain.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 8 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Satellite</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Télédétection</span>
-          <h2>Introduction à Google Earth Engine pour débutants</h2>
-          <p>Découvrez la plateforme gratuite de Google pour analyser 40 ans d'images satellite en quelques clics.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 7 min de lecture</div>
-          <a href="blog/google-earth-engine-debutant.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 9 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Métiers</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Carrière</span>
-          <h2>Les métiers de la géomatique : guide complet 2026</h2>
-          <p>Géomaticien, topographe, développeur WebGIS... Découvrez les 8 grands métiers de la géomatique et leurs débouchés.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 9 min de lecture</div>
-          <a href="blog/metiers-geomatique.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 10 -->
-      <article class="blog-card">
-        <div class="blog-card-image">Python</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Programmation</span>
-          <h2>Cartographier avec Python : par où commencer ?</h2>
-          <p>Python est devenu LE langage de la géomatique. Guide pour débuter avec GeoPandas, Rasterio et les autres bibliothèques essentielles.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 9 min de lecture</div>
-          <a href="blog/python-sig-debutant.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
-      <!-- ARTICLE 11 -->
-      <article class="blog-card">
-        <div class="blog-card-image">PostGIS</div>
-        <div class="blog-card-content">
-          <span class="blog-card-tag">Bases de données</span>
-          <h2>PostGIS : la base de données spatiale expliquée simplement</h2>
-          <p>Découvrez PostGIS : la base de données open source qui équipe les plus grands projets SIG professionnels.</p>
-          <div class="blog-card-meta">7 octobre 2026 · 8 min de lecture</div>
-          <a href="blog/postgis-introduction.html" class="btn btn-primary">Lire l'article →</a>
-        </div>
-      </article>
-
+<!-- BANDEAU PLATEFORME E-LEARNING -->
+<section class="bl-platform" aria-labelledby="bl-platform-h">
+  <div class="container">
+    <div class="bl-platform-inner">
+      <div>
+        <h2 id="bl-platform-h">Apprendre à votre rythme, en ligne.</h2>
+        <p>Dès 10 000 FCFA, 7 jours d'essai accompagné.</p>
+      </div>
+      <a href="formations-video-geoexpert.html" class="btn">Découvrir la plateforme</a>
     </div>
   </div>
 </section>
+
+<!-- TOUS LES ARTICLES -->
+<section class="bl-section bl-all" aria-labelledby="bl-all-h">
+  <div class="container">
+    <h2 id="bl-all-h">Tous les articles</h2>
+
+    <div class="bl-tools">
+      <label for="blSearch" class="bl-lead" style="display:block;margin-bottom:8px;">Rechercher dans les titres</label>
+      <input type="search" id="blSearch" class="bl-search" placeholder="Exemple : QGIS, formation, Python" autocomplete="off">
+      <div class="bl-filters" role="group" aria-label="Filtrer par thème">
+        <button type="button" class="bl-filter" data-theme="tous" aria-pressed="true">Tous</button>
+        <button type="button" class="bl-filter" data-theme="debuter" aria-pressed="false">Débuter</button>
+        <button type="button" class="bl-filter" data-theme="choisir" aria-pressed="false">Choisir sa formation</button>
+        <button type="button" class="bl-filter" data-theme="metiers" aria-pressed="false">Métiers et débouchés</button>
+        <button type="button" class="bl-filter" data-theme="outils" aria-pressed="false">Tutoriels et outils</button>
+      </div>
+      <p class="bl-count" id="blCount" aria-live="polite"></p>
+    </div>
+
+    <ul class="bl-list" id="blList">
+        <li class="bl-item" data-themes="debuter choisir">
+          <a class="bl-card bl-debuter" href="blog/apprendre-sig-en-ligne.html">
+            <span class="bl-meta">Débuter · 5 min de lecture</span>
+            <h3 class="bl-title">Apprendre le SIG en ligne : est-ce possible, et comment s'y prendre ?</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="debuter outils">
+          <a class="bl-card bl-debuter" href="blog/ordinateur-pour-qgis.html">
+            <span class="bl-meta">Débuter · 5 min de lecture</span>
+            <h3 class="bl-title">QGIS : quel ordinateur faut-il vraiment ?</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="choisir">
+          <a class="bl-card bl-choisir" href="blog/formation-sig-a-distance-ci.html">
+            <span class="bl-meta">Choisir sa formation · 6 min de lecture</span>
+            <h3 class="bl-title">Formation SIG à distance en Côte d'Ivoire : ce qu'il faut regarder avant de choisir</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="choisir">
+          <a class="bl-card bl-choisir" href="blog/blogformation-geomatique-cote-divoire.html">
+            <span class="bl-meta">Choisir sa formation · 7 min de lecture</span>
+            <h3 class="bl-title">Formation géomatique en Côte d'Ivoire : où se former en 2026 ?</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="debuter">
+          <a class="bl-card bl-debuter" href="blog/debuter-sig-2026.html">
+            <span class="bl-meta">Débuter · 8 min de lecture</span>
+            <h3 class="bl-title">Comment débuter en SIG en 2026 : le guide complet</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="choisir debuter">
+          <a class="bl-card bl-choisir" href="blog/qgis-vs-arcgis.html">
+            <span class="bl-meta">Choisir sa formation · 6 min de lecture</span>
+            <h3 class="bl-title">QGIS vs ArcGIS : lequel choisir pour débuter ?</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="metiers">
+          <a class="bl-card bl-metiers" href="blog/debouches-geomatique-ci.html">
+            <span class="bl-meta">Métiers et débouchés · 7 min de lecture</span>
+            <h3 class="bl-title">Les débouchés de la géomatique en Côte d'Ivoire</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="choisir">
+          <a class="bl-card bl-choisir" href="blog/top-formations-sig-ci.html">
+            <span class="bl-meta">Choisir sa formation · 6 min de lecture</span>
+            <h3 class="bl-title">Top 5 des formations SIG en Côte d'Ivoire</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="outils">
+          <a class="bl-card bl-outils" href="blog/kobotoolbox-tutoriel.html">
+            <span class="bl-meta">Tutoriels et outils · 8 min de lecture</span>
+            <h3 class="bl-title">KoboToolbox : collecter des données terrain facilement</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="debuter">
+          <a class="bl-card bl-debuter" href="blog/erreurs-debutant-sig.html">
+            <span class="bl-meta">Débuter · 7 min de lecture</span>
+            <h3 class="bl-title">Les 10 erreurs à éviter quand on débute en SIG</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="outils">
+          <a class="bl-card bl-outils" href="blog/collecte-donnees-terrain.html">
+            <span class="bl-meta">Tutoriels et outils · 8 min de lecture</span>
+            <h3 class="bl-title">Réussir sa collecte de données terrain</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="outils">
+          <a class="bl-card bl-outils" href="blog/google-earth-engine-debutant.html">
+            <span class="bl-meta">Tutoriels et outils · 7 min de lecture</span>
+            <h3 class="bl-title">Introduction à Google Earth Engine pour débutants</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="metiers">
+          <a class="bl-card bl-metiers" href="blog/metiers-geomatique.html">
+            <span class="bl-meta">Métiers et débouchés · 9 min de lecture</span>
+            <h3 class="bl-title">Les métiers de la géomatique : guide complet 2026</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="outils">
+          <a class="bl-card bl-outils" href="blog/python-sig-debutant.html">
+            <span class="bl-meta">Tutoriels et outils · 9 min de lecture</span>
+            <h3 class="bl-title">Cartographier avec Python : par où commencer ?</h3>
+          </a>
+        </li>
+        <li class="bl-item" data-themes="outils">
+          <a class="bl-card bl-outils" href="blog/postgis-introduction.html">
+            <span class="bl-meta">Tutoriels et outils · 8 min de lecture</span>
+            <h3 class="bl-title">PostGIS : la base de données spatiale expliquée simplement</h3>
+          </a>
+        </li>
+    </ul>
+
+    <p class="bl-empty" id="blEmpty" hidden>Aucun article ne correspond à votre recherche.</p>
+    <div class="bl-more-wrap"><button type="button" class="bl-more" id="blMore" hidden>Voir plus d'articles</button></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var list = document.getElementById('blList'); if (!list) return;
+  var items = [].slice.call(list.querySelectorAll('.bl-item'));
+  var btns = [].slice.call(document.querySelectorAll('.bl-filter'));
+  var q = document.getElementById('blSearch'), more = document.getElementById('blMore');
+  var count = document.getElementById('blCount'), empty = document.getElementById('blEmpty');
+  var STEP = 6, shown = STEP, theme = 'tous';
+  function norm(t){ t = (t || '').toLowerCase(); try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {} return t; }
+  items.forEach(function(it){ it._t = norm(it.querySelector('.bl-title').textContent); });
+  function render(from){
+    var term = norm(q.value).replace(/^\s+|\s+$/g, '');
+    var match = items.filter(function(it){
+      var okTheme = theme === 'tous' || (' ' + it.getAttribute('data-themes') + ' ').indexOf(' ' + theme + ' ') > -1;
+      return okTheme && (!term || it._t.indexOf(term) > -1);
+    });
+    items.forEach(function(it){ it.hidden = true; });
+    match.slice(0, shown).forEach(function(it){ it.hidden = false; });
+    count.textContent = match.length + (match.length > 1 ? ' articles' : ' article');
+    empty.hidden = match.length > 0;
+    more.hidden = match.length <= shown;
+    if (from != null && match[from]) match[from].querySelector('a').focus();
+  }
+  btns.forEach(function(b){ b.addEventListener('click', function(){
+    theme = b.getAttribute('data-theme'); shown = STEP;
+    btns.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    render();
+  }); });
+  q.addEventListener('input', function(){ shown = STEP; render(); });
+  more.addEventListener('click', function(){ var from = shown; shown += STEP; render(from); });
+  render();
+})();
+</script>
 
 <!-- CTA -->
 <section class="job-banner">

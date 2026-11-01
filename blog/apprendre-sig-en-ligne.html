@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apprendre le SIG en ligne : est-ce possible, et comment s'y prendre ? | GeoExpert Academy</title>
+<meta name="description" content="Peut-on apprendre les SIG en ligne ? Oui, avec un ordinateur, un logiciel gratuit et un bon accompagnement. Méthode pas à pas et pièges à éviter.">
+<meta name="keywords" content="apprendre SIG en ligne, formation SIG en ligne, apprendre QGIS en ligne, formation géomatique à distance">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/apprendre-sig-en-ligne.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/apprendre-sig-en-ligne.html">
+<meta property="og:title" content="Apprendre le SIG en ligne : est-ce possible, et comment s'y prendre ?">
+<meta property="og:description" content="Peut-on apprendre les SIG en ligne ? Oui, avec un ordinateur, un logiciel gratuit et un bon accompagnement. Méthode pas à pas et pièges à éviter.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/logo-full.png">
+<meta property="article:published_time" content="2026-11-01">
+<meta property="article:author" content="GeoExpert Academy &amp; Consulting">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Apprendre le SIG en ligne : est-ce possible, et comment s'y prendre ?",
+  "description": "Peut-on apprendre les SIG en ligne ? Oui, avec un ordinateur, un logiciel gratuit et un bon accompagnement. Méthode pas à pas et pièges à éviter.",
+  "image": "https://geoexpertacademy.ci/images/logo-full.png",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://geoexpertacademy.ci/blog/apprendre-sig-en-ligne.html"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "GeoExpert Academy & Consulting"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GeoExpert Academy & Consulting",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://geoexpertacademy.ci/images/logo-full.png"
+    }
+  },
+  "datePublished": "2026-11-01",
+  "dateModified": "2026-11-01",
+  "inLanguage": "fr"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Faut-il un ordinateur pour apprendre le SIG en ligne ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, pour pratiquer. Un téléphone suffit pour regarder les vidéos, mais les manipulations se font sur ordinateur. Pour nos formations, nous conseillons Windows 10 ou 11 et 8 Go de mémoire vive."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il acheter un logiciel pour commencer ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non : QGIS est gratuit. ArcGIS demande une licence, souvent fournie par l'employeur ou l'école."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Combien de temps faut-il consacrer à l'apprentissage chaque semaine ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Quelques heures par semaine suffisent pour avancer à votre rythme, à condition de pratiquer régulièrement. Le temps total dépend de la formation choisie et de votre régularité."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on commencer sans aucune base ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, si la formation est conçue pour les débutants. Sur notre plateforme, plusieurs formations de niveau débutant, comme QGIS module 1, ne demandent aucun prérequis."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que faire si je suis bloqué pendant la formation ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Posez la question dès que possible. Sur notre plateforme, l'assistance du formateur est incluse pendant 3 mois, avec un délai indicatif de réponse sous 48 heures ouvrables."
+      }
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon-96x96.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-content a{ color:var(--teal); text-decoration:underline; }
+  .article-share{ margin-top:48px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .article-share > span{ font-size:14px; color:var(--ink-dim); font-weight:500; margin-right:8px; }
+  .compare-table{ width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px; }
+  .compare-table th{ background:var(--bg-soft); padding:12px; text-align:left; font-weight:600; color:var(--ink); border-bottom:1px solid var(--line); }
+  .compare-table td{ padding:12px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top; }
+  .compare-table tr:last-child td{ border-bottom:none; }
+  .article-elearning{ margin:48px 0; padding:28px 32px; background:#F6F3FA; border:1px solid var(--line); border-left:4px solid #0092A6; border-radius:var(--radius); }
+  .article-elearning h3{ margin:0 0 12px; font-family:'Montserrat','Inter',sans-serif; font-size:20px; font-weight:700; color:#4B3F92; }
+  .article-elearning p{ margin:0 0 16px; font-size:16px; line-height:1.65; color:var(--ink-dim); }
+  .article-elearning .elearning-intro{ color:var(--ink); }
+  .article-elearning .elearning-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; }
+  .article-elearning .elearning-actions .btn{ min-height:44px; }
+  .article-content .article-elearning a.btn-primary{ color:#fff; text-decoration:none; }
+  .article-content .article-elearning a.elearning-wa{ color:#A83C93; font-weight:600; font-size:16px; text-decoration:underline; padding:10px 0; display:inline-block; }
+  @media (max-width:600px){ .article-elearning{ padding:22px 20px; } .compare-table{ font-size:14px; } .compare-table th, .compare-table td{ padding:10px 8px; } }
+</style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Débuter</span>
+
+    <h1>Apprendre le SIG en ligne : est-ce possible, et comment s'y prendre ?</h1>
+
+    <div class="article-meta">
+      <span>1 novembre 2026</span>
+      <span>5 min de lecture</span>
+      <span>GeoExpert Academy &amp; Consulting</span>
+    </div>
+
+    <p class="article-lead">
+      Oui, on peut apprendre les SIG en ligne, à condition de pratiquer sur un ordinateur : la vidéo explique, mais ce sont les manipulations refaites par vous-même qui font progresser. Une formation en ligne convient si vous avez un ordinateur, quelques heures par semaine et un moyen de poser vos questions quand vous êtes bloqué. Voici comment vous y prendre, étape par étape.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Peut-on vraiment apprendre le SIG en ligne ?</h2>
+      <p>
+        Oui. Un système d'information géographique (SIG) s'apprend en manipulant : on importe
+        des données, on organise des couches, on produit une carte. Ces gestes se montrent très
+        bien en vidéo, parce que vous voyez chaque clic et que vous pouvez mettre en pause ou
+        revoir un passage autant de fois que nécessaire.
+      </p>
+      <p>
+        La limite est tout aussi claire : <strong>regarder ne suffit pas</strong>. Un téléphone
+        permet de suivre les vidéos, mais il faut un ordinateur pour refaire les manipulations.
+        Sans cette pratique, vous aurez compris sans savoir faire.
+      </p>
+
+      <h2>De quoi avez-vous besoin pour démarrer ?</h2>
+      <ul>
+        <li><strong>Un ordinateur</strong> : pour nos formations, nous conseillons Windows 10 ou 11 avec 8 Go de mémoire vive. Nous détaillons ce point dans l'article <a href="ordinateur-pour-qgis.html">QGIS : quel ordinateur faut-il vraiment ?</a></li>
+        <li><strong>Un logiciel</strong> : QGIS est gratuit. ArcGIS demande une licence, souvent fournie par l'employeur ou l'école.</li>
+        <li><strong>Une connexion internet</strong> : pour regarder les vidéos et télécharger les données utilisées dans les exercices.</li>
+        <li><strong>Un peu de temps</strong> : quelques heures par semaine suffisent pour avancer, à condition d'être régulier.</li>
+      </ul>
+
+      <h2>Comment organiser son apprentissage ?</h2>
+      <ol>
+        <li><strong>Choisissez un seul logiciel pour commencer.</strong> Si vous hésitez, notre comparatif <a href="qgis-vs-arcgis.html">QGIS vs ArcGIS</a> vous aide à décider. Pour débuter, nous conseillons QGIS, qui est gratuit.</li>
+        <li><strong>Suivez les leçons dans l'ordre.</strong> Importer et organiser ses données avant de les analyser évite de reprendre son travail plus tard.</li>
+        <li><strong>Pratiquez juste après chaque leçon.</strong> Refaites la manipulation sans la vidéo, puis comparez avec votre résultat.</li>
+        <li><strong>Fixez un rythme réaliste.</strong> Deux ou trois séances régulières par semaine valent mieux qu'une longue séance isolée.</li>
+        <li><strong>Posez vos questions dès que vous êtes bloqué.</strong> Un blocage laissé de côté pendant une semaine finit souvent par un abandon.</li>
+        <li><strong>Terminez par un petit projet personnel</strong>, par exemple la carte d'un quartier ou d'une parcelle que vous connaissez. C'est là que les gestes se fixent.</li>
+      </ol>
+      <p>
+        Pour éviter les pièges classiques, lisez aussi <a href="debuter-sig-2026.html">Comment débuter en SIG en 2026</a>.
+      </p>
+
+      <h2>Que doit proposer une bonne formation en ligne ?</h2>
+      <p>Une série de vidéos ne fait pas, à elle seule, une formation. Regardez surtout :</p>
+      <ul>
+        <li>des leçons <strong>progressives</strong>, qui partent de zéro si vous débutez ;</li>
+        <li>des <strong>exercices pratiques</strong>, avec des données à télécharger ;</li>
+        <li>des <strong>quiz</strong> pour vérifier que vous avez compris ;</li>
+        <li>un <strong>moyen de poser vos questions</strong> et d'obtenir une réponse ;</li>
+        <li>une <strong>période d'essai</strong>, pour vérifier que la méthode vous convient ;</li>
+        <li>une <strong>durée d'accès</strong> suffisante pour revoir les leçons.</li>
+      </ul>
+      <p>
+        Nous détaillons ces critères dans <a href="formation-sig-a-distance-ci.html">Formation SIG à distance en Côte d'Ivoire : ce qu'il faut regarder avant de choisir</a>.
+      </p>
+
+      <h2>Quelles sont les limites de la formation en ligne ?</h2>
+      <p>
+        Apprendre seul demande de la discipline : personne ne vous attend dans une salle. Sans
+        accompagnement, il est facile de se décourager au premier blocage. La qualité de la
+        connexion compte aussi, puisque les vidéos et les données se téléchargent. Enfin, une
+        formation en ligne vous apprend à manipuler un logiciel ; elle ne remplace pas
+        l'expérience d'un vrai projet et ne garantit pas un emploi.
+      </p>
+
+      <h2>Comment cela se passe-t-il sur la plateforme GeoExpert Academy ?</h2>
+      <p>
+        Notre plateforme e-learning propose des leçons pas à pas, des quiz, des ressources et des
+        lives avec le formateur, avec 100 h de vidéos au catalogue. Concrètement :
+      </p>
+      <ul>
+        <li><strong>7 jours d'essai accompagné</strong> : vous accédez à l'introduction et aux 2 premières leçons, et le formateur vous suit sur WhatsApp. Si la formation ne vous convient pas, vous pouvez demander le remboursement intégral dans ce délai ; sinon, toutes les leçons se débloquent à partir du 8e jour.</li>
+        <li><strong>Assistance du formateur pendant 3 mois</strong> pour les questions liées à la formation achetée.</li>
+        <li><strong>Accès aux vidéos pendant 12 mois</strong> pour une formation seule, 24 mois pour un pack.</li>
+        <li><strong>Attestation de fin de formation</strong> au format PDF, avec un code unique vérifiable sur notre site, une fois toutes les leçons terminées et l'exercice final validé par le formateur.</li>
+        <li><strong>Prix</strong> : de 10 000 à 25 000 FCFA par formation, selon la formation.</li>
+      </ul>
+
+      <h2>Par où commencer dès cette semaine ?</h2>
+      <p>
+        Vérifiez votre ordinateur, installez QGIS et ouvrez un premier projet. Si vous préférez
+        être guidé, utilisez la période d'essai d'une formation pour savoir si la méthode vous
+        convient avant d'aller plus loin.
+      </p>
+
+      <h2>Questions fréquentes</h2>
+
+      <h3>Faut-il un ordinateur pour apprendre le SIG en ligne ?</h3>
+      <p>Oui, pour pratiquer. Un téléphone suffit pour regarder les vidéos, mais les manipulations se font sur ordinateur. Pour nos formations, nous conseillons Windows 10 ou 11 et 8 Go de mémoire vive.</p>
+
+      <h3>Faut-il acheter un logiciel pour commencer ?</h3>
+      <p>Non : QGIS est gratuit. ArcGIS demande une licence, souvent fournie par l'employeur ou l'école.</p>
+
+      <h3>Combien de temps faut-il consacrer à l'apprentissage chaque semaine ?</h3>
+      <p>Quelques heures par semaine suffisent pour avancer à votre rythme, à condition de pratiquer régulièrement. Le temps total dépend de la formation choisie et de votre régularité.</p>
+
+      <h3>Peut-on commencer sans aucune base ?</h3>
+      <p>Oui, si la formation est conçue pour les débutants. Sur notre plateforme, plusieurs formations de niveau débutant, comme QGIS module 1, ne demandent aucun prérequis.</p>
+
+      <h3>Que faire si je suis bloqué pendant la formation ?</h3>
+      <p>Posez la question dès que possible. Sur notre plateforme, l'assistance du formateur est incluse pendant 3 mois, avec un délai indicatif de réponse sous 48 heures ouvrables.</p>
+
+      <aside class="article-elearning" aria-labelledby="elearning-titre">
+        <h3 id="elearning-titre">Apprendre à votre rythme, en ligne</h3>
+        <p>La plateforme e-learning GeoExpert Academy : leçons pas à pas, quiz, ressources et lives avec le formateur. Dès 10 000 FCFA, avec 7 jours d'essai accompagné sur WhatsApp.</p>
+        <div class="elearning-actions">
+          <a href="../formations-video-geoexpert.html" class="btn btn-primary">Découvrir la plateforme</a>
+          <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20souhaite%20des%20informations%20sur%20les%20formations%20vid%C3%A9o%20en%20ligne." class="elearning-wa" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+        </div>
+      </aside>
+
+      <div class="article-share">
+        <span>Partager cet article :</span>
+        <a href="https://wa.me/?text=Apprendre%20le%20SIG%20en%20ligne%20%3A%20est-ce%20possible%2C%20et%20comment%20s'y%20prendre%20%3F%20-%20https%3A%2F%2Fgeoexpertacademy.ci%2Fblog%2Fapprendre-sig-en-ligne.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">WhatsApp</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://geoexpertacademy.ci/blog/apprendre-sig-en-ligne.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">Facebook</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://geoexpertacademy.ci/blog/apprendre-sig-en-ligne.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Prêt à passer à la pratique ?</h3>
+      <p>Découvrez la plateforme e-learning GeoExpert Academy.</p>
+    </div>
+    <a href="../formations-video-geoexpert.html" class="btn btn-primary">Découvrir la plateforme</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script defer src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QGIS : quel ordinateur faut-il vraiment ? | GeoExpert Academy</title>
+<meta name="description" content="Quel ordinateur pour QGIS ? La configuration conseillée pour débuter (Windows 10 ou 11, 8 Go de mémoire vive), et comment vérifier la vôtre.">
+<meta name="keywords" content="ordinateur pour QGIS, configuration QGIS, QGIS 8 Go RAM, quel PC pour SIG, QGIS Windows 10">
+<link rel="canonical" href="https://geoexpertacademy.ci/blog/ordinateur-pour-qgis.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geoexpertacademy.ci/blog/ordinateur-pour-qgis.html">
+<meta property="og:title" content="QGIS : quel ordinateur faut-il vraiment ?">
+<meta property="og:description" content="Quel ordinateur pour QGIS ? La configuration conseillée pour débuter (Windows 10 ou 11, 8 Go de mémoire vive), et comment vérifier la vôtre.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/logo-full.png">
+<meta property="article:published_time" content="2026-11-01">
+<meta property="article:author" content="GeoExpert Academy &amp; Consulting">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "QGIS : quel ordinateur faut-il vraiment ?",
+  "description": "Quel ordinateur pour QGIS ? La configuration conseillée pour débuter (Windows 10 ou 11, 8 Go de mémoire vive), et comment vérifier la vôtre.",
+  "image": "https://geoexpertacademy.ci/images/logo-full.png",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://geoexpertacademy.ci/blog/ordinateur-pour-qgis.html"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "GeoExpert Academy & Consulting"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GeoExpert Academy & Consulting",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://geoexpertacademy.ci/images/logo-full.png"
+    }
+  },
+  "datePublished": "2026-11-01",
+  "dateModified": "2026-11-01",
+  "inLanguage": "fr"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quelle est la configuration conseillée pour QGIS ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour nos formations, nous conseillons Windows 10 ou 11, 8 Go de mémoire vive et de l'espace libre pour les données. C'est une configuration conseillée, pas un minimum officiel de QGIS."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on utiliser QGIS avec 4 Go de mémoire vive ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nous ne le conseillons pas pour suivre nos formations, car nous recommandons 8 Go. Avec 4 Go, cela pourrait fonctionner sur de petits jeux de données, mais nous ne pouvons pas le garantir. En cas de doute, écrivez-nous sur WhatsApp."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "QGIS fonctionne-t-il sur Mac et sur Linux ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, QGIS est téléchargeable sur Windows, Mac et Linux. La configuration que nous conseillons pour nos formations reste Windows 10 ou 11."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il une carte graphique particulière ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La configuration que nous conseillons ne fixe pas de carte graphique particulière. Si vous avez un doute sur votre ordinateur, écrivez-nous sur WhatsApp avant de commander."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Un téléphone suffit-il pour apprendre QGIS ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un téléphone suffit pour regarder les vidéos, mais il faut un ordinateur pour refaire les manipulations dans QGIS."
+      }
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon-96x96.png">
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  .article-page{ padding:60px 0 80px; }
+  .article-container{ max-width:760px; margin:0 auto; padding:0 24px; }
+  .article-back{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--teal); font-weight:500; margin-bottom:24px; }
+  .article-back:hover{ text-decoration:underline; }
+  .article-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-faint); margin-bottom:24px; }
+  .article-page h1{ font-size:clamp(30px,4.5vw,44px); margin-bottom:18px; line-height:1.15; }
+  .article-lead{ font-size:18px; color:var(--ink-dim); line-height:1.65; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .article-content h2{ font-size:26px; margin-top:44px; margin-bottom:14px; font-weight:600; }
+  .article-content h3{ font-size:19px; margin-top:28px; margin-bottom:10px; font-weight:600; }
+  .article-content p{ font-size:16px; line-height:1.75; margin-bottom:18px; color:var(--ink-dim); }
+  .article-content ul, .article-content ol{ margin:16px 0 24px 24px; font-size:16px; line-height:1.75; color:var(--ink-dim); }
+  .article-content li{ margin-bottom:10px; }
+  .article-content strong{ color:var(--ink); font-weight:600; }
+  .article-content a{ color:var(--teal); text-decoration:underline; }
+  .article-share{ margin-top:48px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .article-share > span{ font-size:14px; color:var(--ink-dim); font-weight:500; margin-right:8px; }
+  .compare-table{ width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px; }
+  .compare-table th{ background:var(--bg-soft); padding:12px; text-align:left; font-weight:600; color:var(--ink); border-bottom:1px solid var(--line); }
+  .compare-table td{ padding:12px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top; }
+  .compare-table tr:last-child td{ border-bottom:none; }
+  .article-elearning{ margin:48px 0; padding:28px 32px; background:#F6F3FA; border:1px solid var(--line); border-left:4px solid #0092A6; border-radius:var(--radius); }
+  .article-elearning h3{ margin:0 0 12px; font-family:'Montserrat','Inter',sans-serif; font-size:20px; font-weight:700; color:#4B3F92; }
+  .article-elearning p{ margin:0 0 16px; font-size:16px; line-height:1.65; color:var(--ink-dim); }
+  .article-elearning .elearning-intro{ color:var(--ink); }
+  .article-elearning .elearning-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; }
+  .article-elearning .elearning-actions .btn{ min-height:44px; }
+  .article-content .article-elearning a.btn-primary{ color:#fff; text-decoration:none; }
+  .article-content .article-elearning a.elearning-wa{ color:#A83C93; font-weight:600; font-size:16px; text-decoration:underline; padding:10px 0; display:inline-block; }
+  @media (max-width:600px){ .article-elearning{ padding:22px 20px; } .compare-table{ font-size:14px; } .compare-table th, .compare-table td{ padding:10px 8px; } }
+</style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1640508134183343');
+fbq('track', 'PageView');
+// Contact : clic sur un lien WhatsApp (sauf liens marqués data-fbq-skip)
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+  if (a && !a.hasAttribute('data-fbq-skip') && typeof fbq === 'function') fbq('track', 'Contact');
+}, true);
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main class="article-page">
+  <div class="article-container">
+
+    <a href="../blog.html" class="article-back">← Retour au blog</a>
+    <span class="blog-card-tag" style="display:inline-block;margin-bottom:16px;">Débuter</span>
+
+    <h1>QGIS : quel ordinateur faut-il vraiment ?</h1>
+
+    <div class="article-meta">
+      <span>1 novembre 2026</span>
+      <span>5 min de lecture</span>
+      <span>GeoExpert Academy &amp; Consulting</span>
+    </div>
+
+    <p class="article-lead">
+      Pour débuter avec QGIS, la configuration que nous conseillons pour nos formations est un ordinateur sous Windows 10 ou 11 avec 8 Go de mémoire vive. QGIS est gratuit et réputé fonctionner sur des ordinateurs peu puissants : ce sont surtout la taille de vos données et votre confort de travail qui demandent plus. Un téléphone permet de regarder les vidéos, mais pas de pratiquer.
+    </p>
+
+    <div class="article-content">
+
+      <h2>Quelle configuration est conseillée pour débuter avec QGIS ?</h2>
+      <p>
+        Pour suivre nos formations, nous conseillons :
+      </p>
+      <ul>
+        <li><strong>Windows 10 ou 11</strong> ;</li>
+        <li><strong>8 Go de mémoire vive</strong> (RAM) ;</li>
+        <li><strong>de l'espace libre</strong> sur le disque pour les données des exercices.</li>
+      </ul>
+      <p>
+        C'est une configuration <em>conseillée</em>, pas un minimum officiel. Les exigences
+        techniques exactes de chaque version de QGIS sont publiées dans la documentation du
+        logiciel : consultez-la avant d'acheter ou de remplacer un ordinateur.
+      </p>
+      <!-- À VÉRIFIER : minimums officiels de la version actuelle de QGIS (non repris ici volontairement). -->
+      <p>
+        QGIS existe aussi pour Mac et Linux, comme nous l'expliquons dans notre comparatif
+        <a href="qgis-vs-arcgis.html">QGIS vs ArcGIS</a>. Notre configuration conseillée reste
+        Windows 10 ou 11.
+      </p>
+
+      <h2>Pourquoi 8 Go de mémoire vive ?</h2>
+      <p>
+        Pendant une séance, votre ordinateur fait fonctionner en même temps Windows, QGIS, un
+        navigateur pour la vidéo de la leçon et parfois d'autres programmes. À cela s'ajoutent
+        les couches de données que vous ouvrez dans votre projet. Avec 8 Go, vous avez de la
+        marge pour que tout cela cohabite correctement.
+      </p>
+      <p>
+        Avec moins de mémoire, l'ordinateur <em>pourrait</em> ralentir dès que vous ouvrez
+        plusieurs couches volumineuses ou que vous gardez beaucoup de programmes ouverts.
+        Nous ne pouvons pas le garantir dans tous les cas : cela dépend de l'ordinateur et des données.
+      </p>
+      <!-- À VÉRIFIER : comportement exact avec 4 Go de RAM (formulé au conditionnel). -->
+
+      <h2>Un téléphone ou une tablette peuvent-ils suffire ?</h2>
+      <p>
+        Pour <strong>regarder les vidéos</strong>, oui : un téléphone suffit. Pour
+        <strong>refaire les manipulations</strong>, non : il faut un ordinateur. Or c'est la
+        pratique qui vous fait progresser. Si vous n'avez pas d'ordinateur personnel, réfléchissez
+        à l'endroit et aux horaires où vous pourrez en utiliser un régulièrement avant de vous inscrire.
+      </p>
+
+      <h2>Et pour ArcGIS ?</h2>
+      <p>
+        ArcGIS est un logiciel payant : il demande une licence, souvent fournie par l'employeur
+        ou l'école. Sur notre plateforme, les formations ArcGIS utilisent ArcMap, qui fonctionne
+        uniquement sous Windows. Notre comparatif indique par ailleurs qu'ArcGIS est en général
+        plus exigeant que QGIS sur la puissance de l'ordinateur. Dans les deux cas, la
+        configuration conseillée ci-dessus est un bon point de départ.
+      </p>
+
+      <h2>Ordinateur portable ou ordinateur fixe ?</h2>
+      <p>
+        Pour apprendre, les deux conviennent, à condition de respecter la configuration conseillée.
+        Un portable se déplace et fonctionne sur batterie : si l'alimentation électrique est
+        irrégulière là où vous travaillez, cela peut vous éviter de perdre une séance. Un ordinateur
+        fixe, lui, offre souvent un écran plus grand, ce qui est agréable pour garder la vidéo
+        d'un côté et QGIS de l'autre. Un écran plus grand est un confort, pas une obligation.
+        Une souris est utile pour manipuler précisément la carte, même si vous pouvez vous en passer.
+      </p>
+
+      <h2>Que faire si votre ordinateur est ancien ou limité ?</h2>
+      <ul>
+        <li><strong>Fermez les programmes inutiles</strong> pendant que vous travaillez dans QGIS.</li>
+        <li><strong>Travaillez sur de petits jeux de données</strong> pendant l'apprentissage : les exercices d'initiation n'ont pas besoin de données volumineuses.</li>
+        <li><strong>Gardez de l'espace libre</strong> sur le disque et supprimez les fichiers dont vous n'avez plus besoin.</li>
+        <li><strong>Sauvegardez régulièrement</strong> votre projet, surtout si votre ordinateur se bloque parfois.</li>
+        <li><strong>Posez la question avant de commander.</strong> Si vous hésitez sur votre configuration, écrivez-nous sur WhatsApp : nous vous confirmons si votre ordinateur convient.</li>
+      </ul>
+
+      <h2>Comment vérifier la mémoire vive de votre ordinateur ?</h2>
+      <p>
+        Sous Windows, ouvrez les paramètres, rubrique « Système », puis la section « À propos de ».
+        Vous y trouverez la mémoire vive installée (« RAM installée ») et la version de Windows.
+        Comparez ces informations avec la configuration conseillée ci-dessus.
+      </p>
+      <!-- À VÉRIFIER : intitulés exacts des menus Windows 10 et 11 en français. -->
+
+      <h2>Comment tester avant de vous engager ?</h2>
+      <p>
+        Le plus simple est d'installer QGIS, qui est gratuit, et d'ouvrir un petit projet pour
+        voir si l'ordinateur reste fluide. Si vous passez ensuite par l'une de nos formations,
+        la période d'essai de 7 jours, accompagnée sur WhatsApp, vous permet de vérifier que
+        tout fonctionne avant d'aller plus loin. Pour la méthode générale, voir
+        <a href="apprendre-sig-en-ligne.html">Apprendre le SIG en ligne : est-ce possible ?</a>
+      </p>
+
+      <h2>Questions fréquentes</h2>
+
+      <h3>Quelle est la configuration conseillée pour QGIS ?</h3>
+      <p>Pour nos formations, nous conseillons Windows 10 ou 11, 8 Go de mémoire vive et de l'espace libre pour les données. C'est une configuration conseillée, pas un minimum officiel de QGIS.</p>
+
+      <h3>Peut-on utiliser QGIS avec 4 Go de mémoire vive ?</h3>
+      <p>Nous ne le conseillons pas pour suivre nos formations, car nous recommandons 8 Go. Avec 4 Go, cela pourrait fonctionner sur de petits jeux de données, mais nous ne pouvons pas le garantir. En cas de doute, écrivez-nous sur WhatsApp.</p>
+
+      <h3>QGIS fonctionne-t-il sur Mac et sur Linux ?</h3>
+      <p>Oui, QGIS est téléchargeable sur Windows, Mac et Linux. La configuration que nous conseillons pour nos formations reste Windows 10 ou 11.</p>
+
+      <h3>Faut-il une carte graphique particulière ?</h3>
+      <p>La configuration que nous conseillons ne fixe pas de carte graphique particulière. Si vous avez un doute sur votre ordinateur, écrivez-nous sur WhatsApp avant de commander.</p>
+
+      <h3>Un téléphone suffit-il pour apprendre QGIS ?</h3>
+      <p>Un téléphone suffit pour regarder les vidéos, mais il faut un ordinateur pour refaire les manipulations dans QGIS.</p>
+
+      <aside class="article-elearning" aria-labelledby="elearning-titre">
+        <h3 id="elearning-titre">Apprendre à votre rythme, en ligne</h3>
+        <p class="elearning-intro">Pour pratiquer QGIS pas à pas, la plateforme propose « Votre premier projet SIG avec QGIS, 100 % gratuit » (QGIS, module 1), 15 000 FCFA.</p>
+        <p>La plateforme e-learning GeoExpert Academy : leçons pas à pas, quiz, ressources et lives avec le formateur. Dès 10 000 FCFA, avec 7 jours d'essai accompagné sur WhatsApp.</p>
+        <div class="elearning-actions">
+          <a href="../formations-video-geoexpert.html" class="btn btn-primary">Découvrir la plateforme</a>
+          <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20je%20souhaite%20des%20informations%20sur%20les%20formations%20vid%C3%A9o%20en%20ligne." class="elearning-wa" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+        </div>
+      </aside>
+
+      <div class="article-share">
+        <span>Partager cet article :</span>
+        <a href="https://wa.me/?text=QGIS%20%3A%20quel%20ordinateur%20faut-il%20vraiment%20%3F%20-%20https%3A%2F%2Fgeoexpertacademy.ci%2Fblog%2Fordinateur-pour-qgis.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">WhatsApp</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://geoexpertacademy.ci/blog/ordinateur-pour-qgis.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">Facebook</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://geoexpertacademy.ci/blog/ordinateur-pour-qgis.html" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px;font-size:13px;">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<section class="job-banner">
+  <div class="container job-banner-inner">
+    <div class="job-banner-text">
+      <h3>Prêt à passer à la pratique ?</h3>
+      <p>Découvrez la plateforme e-learning GeoExpert Academy.</p>
+    </div>
+    <a href="../formations-video-geoexpert.html" class="btn btn-primary">Découvrir la plateforme</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script defer src="../script.js"></script>
+</body>
+</html>
