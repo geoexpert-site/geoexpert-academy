@@ -6,6 +6,7 @@
 <title>Espace apprenant | GeoExpert Academy</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
+<link rel="preload" as="image" href="images/concentration1.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
@@ -183,10 +184,10 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   <div class="lp" id="loginCarousel">
     <!-- Le carrousel d'images en arrière-plan -->
     <div class="carousel-bg">
-      <div class="carousel-slide active" style="background-image: url('images/concentration1.jpg');"></div>
-      <div class="carousel-slide" style="background-image: url('images/concentration2.jpg');"></div>
-      <div class="carousel-slide" style="background-image: url('images/concentration3.jpg');"></div>
-      <div class="carousel-slide" style="background-image: url('images/concentration4.jpg');"></div>
+      <div class="carousel-slide active" style="background-image: url('images/concentration1.webp');"></div>
+      <div class="carousel-slide" data-bg="images/concentration2.webp"></div>
+      <div class="carousel-slide" data-bg="images/concentration3.webp"></div>
+      <div class="carousel-slide" data-bg="images/concentration4.webp"></div>
     </div>
     
     <!-- Le voile sombre pour lire le texte -->
@@ -204,7 +205,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
     </div>
   </div>
   <div class="fp"><div class="fbox">
-    <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting">
+    <img src="images/logo-full-sans-perte.webp" alt="GeoExpert Academy & Consulting">
     <h2>Bienvenue</h2><p>Entrez le code personnel reçu sur WhatsApp. Il vous est strictement réservé.</p>
     <input id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="GEO-XXXX-XXXX-XXXX" maxlength="20" aria-label="Code d'accès">
     <button class="btn" id="lb">Accéder à ma formation</button><div class="msg" id="lm" role="alert"></div>
@@ -229,7 +230,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   <header class="top">
     <button class="ib" id="burger" aria-label="Plan du cours"><span class="ic" data-i="menu"></span></button>
     <div style="display:flex; align-items:center; gap:12px;">
-      <img src="images/logo-full.png" alt="GeoExpert Academy">
+      <img src="images/logo-full-sans-perte.webp" alt="GeoExpert Academy">
       <span class="tt" id="who"></span>
     </div>
     <span class="sp"></span>
@@ -1132,6 +1133,10 @@ var sc=sessionStorage.getItem('gc');if(sc)login(sc,true);
   });
 })();
 
+// Photos 2 à 4 du carrousel : chargées après la page, avant la 1re rotation (5 s)
+addEventListener('load', function() { setTimeout(function() {
+  document.querySelectorAll('.carousel-slide[data-bg]').forEach(function(s) { s.style.backgroundImage = "url('" + s.dataset.bg + "')"; });
+}, 600); });
 // Script du carrousel de la page de connexion
 setInterval(function() {
   var slides = document.querySelectorAll('.carousel-slide');

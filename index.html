@@ -37,7 +37,6 @@
 <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <link rel="manifest" href="images/site.webmanifest">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 
 <!-- ✅ AJOUTÉ : Schema.org (rich snippets Google) -->
@@ -218,11 +217,11 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 <section class="hero hero-carousel" id="accueil">
   <!-- Carrousel en arrière-plan -->
   <div class="hero-bg-carousel" aria-hidden="true">
-    <div class="hero-bg-slide active" style="background-image:url('images/formation-salle-1.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/formation-terrain-1.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/formation-exercice-1.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/formation-salle-2.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/formation-terrain-2.jpg')"></div>
+    <div class="hero-bg-slide active"><picture><source type="image/webp" srcset="images/hero-salle-1.webp"><img src="images/formation-salle-1.jpg" alt="" width="651" height="869"  decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-terrain-1.webp"><img data-src="images/formation-terrain-1.jpg" alt="" width="1776" height="1000" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-exercice-1.webp"><img data-src="images/formation-exercice-1.jpg" alt="" width="1000" height="563" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-salle-2.webp"><img data-src="images/formation-salle-2.jpg" alt="" width="1000" height="884" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-terrain-2.webp"><img data-src="images/formation-terrain-2.jpg" alt="" width="651" height="869" decoding="async"></picture></div>
   </div>
 
   <!-- Voile sombre par-dessus les photos -->
@@ -1174,7 +1173,12 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   window.translation = { common: { selectedList: '{quantity} liste sélectionnée', selectedLists: '{quantity} listes sélectionnées', selectedOption: '{quantity} sélectionné', selectedOptions: '{quantity} sélectionnés' } };
   var AUTOHIDE = Boolean(0);
 </script>
-<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+<script>
+/* Charge un script / une feuille de style seulement quand la zone approche de l'écran */
+window.geoQuandVisible=function(el,fn){if(!el)return;if(!('IntersectionObserver' in window)){fn();return}
+new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();fn()}},{rootMargin:'800px 0px'}).observe(el)};
+geoQuandVisible(document.getElementById('sib-form-container'),function(){var s=document.createElement('script');s.src='https://sibforms.com/forms/end-form/build/main.js';document.body.appendChild(s)});
+</script>
 
 <!-- ============ APERÇU SERVICES ============ -->
 <section class="home-services-preview">
@@ -1380,7 +1384,14 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 </footer>
 
 <!-- Assistant GeoExpert -->
-<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script>
+/* Assistant : chargé à la première interaction, ou au plus tard après 8 s */
+(function(){var ok=false,ev=['pointerdown','touchstart','scroll','keydown'];function go(){if(ok)return;ok=true;
+ev.forEach(function(e){removeEventListener(e,go)});
+var s=document.createElement('script');s.src='https://code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js';s.async=true;document.body.appendChild(s)}
+ev.forEach(function(e){addEventListener(e,go,{passive:true})});
+setTimeout(go,8000)})();
+</script>
 
 <!-- ============ CTA STICKY MOBILE ============ -->
 <div class="mobile-cta-bar" aria-label="Actions rapides">
@@ -1405,7 +1416,16 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 </div>
 
 <!-- Leaflet puis script principal (ordre important) -->
-<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* Photos 2 à 5 du carrousel : après le chargement de la page, avant la 1re rotation (5 s) */
+addEventListener('load',function(){setTimeout(function(){
+document.querySelectorAll('.hero-bg-slide [data-srcset]').forEach(function(s){s.srcset=s.dataset.srcset});
+document.querySelectorAll('.hero-bg-slide img[data-src]').forEach(function(i){i.src=i.dataset.src})},600)});
+/* Carte : Leaflet (feuille de style + script) chargé quand la carte approche de l'écran */
+geoQuandVisible(document.getElementById('mapAbidjan'),function(){var p=2,fin=function(){if(--p)return;(function t(){window.geoDemarrerCarte?window.geoDemarrerCarte():setTimeout(t,50)})()};
+var l=document.createElement('link');l.rel='stylesheet';l.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';l.onload=l.onerror=fin;document.head.appendChild(l);
+var s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';s.onload=s.onerror=fin;document.body.appendChild(s)});
+</script>
 <script defer src="script.js"></script>
 
 </body>

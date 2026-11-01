@@ -326,11 +326,11 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 <!-- HERO AVEC CARROUSEL -->
 <section class="sales-hero-carousel">
   <div class="hero-bg-carousel">
-    <div class="hero-bg-slide active" style="background-image:url('images/presentiel-enligne.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/exercice.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/salle-formation3.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/salle-formation4.jpg')"></div>
-    <div class="hero-bg-slide" style="background-image:url('images/Kakemono.jpg')"></div>
+    <div class="hero-bg-slide active"><picture><source type="image/webp" srcset="images/hero-presentiel-enligne.webp"><img src="images/presentiel-enligne.jpg" alt="" width="800" height="600"  decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-exercice.webp"><img data-src="images/exercice.jpg" alt="" width="1067" height="600" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-salle-formation3.webp"><img data-src="images/salle-formation3.jpg" alt="" width="800" height="600" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-salle-formation4.webp"><img data-src="images/salle-formation4.jpg" alt="" width="800" height="600" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-kakemono.webp"><img data-src="images/Kakemono.jpg" alt="" width="450" height="600" decoding="async"></picture></div>
   </div>
   
   <div class="hero-overlay"></div>
@@ -381,7 +381,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
     
     <!-- VIGNETTE DE LA VIDÉO -->
     <!-- On utilise automatiquement la miniature YouTube de ta vidéo -->
-    <div id="video-container" style="position: relative; width: 100%; max-width: 850px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 40px rgba(75,63,146,0.15); border: 4px solid #fff; cursor: pointer; background: url('https://img.youtube.com/vi/rmPP7rMWABQ/maxresdefault.jpg') center/cover;">
+    <div id="video-container" style="position: relative; width: 100%; max-width: 850px; margin: 0 auto; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 40px rgba(75,63,146,0.15); border: 4px solid #fff; cursor: pointer; background: center/cover;" data-bg="https://img.youtube.com/vi/rmPP7rMWABQ/maxresdefault.jpg">
       
       <!-- Voile sombre -->
       <div style="position: absolute; inset: 0; background: rgba(15, 10, 31, 0.3); transition: background 0.3s;" id="video-overlay"></div>
@@ -902,7 +902,22 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 </div>
 
 <!-- Assistant GeoExpert (Tidio) -->
-<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script>
+/* Assistant : chargé à la première interaction, ou au plus tard après 8 s */
+(function(){var ok=false,ev=['pointerdown','touchstart','scroll','keydown'];function go(){if(ok)return;ok=true;
+ev.forEach(function(e){removeEventListener(e,go)});
+var s=document.createElement('script');s.src='https://code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js';s.async=true;document.body.appendChild(s)}
+ev.forEach(function(e){addEventListener(e,go,{passive:true})});
+setTimeout(go,8000)})();
+/* Photos 2 à 5 du carrousel : après le chargement de la page, avant la 1re rotation (5 s) */
+addEventListener('load',function(){setTimeout(function(){
+document.querySelectorAll('.hero-bg-slide [data-srcset]').forEach(function(s){s.srcset=s.dataset.srcset});
+document.querySelectorAll('.hero-bg-slide img[data-src]').forEach(function(i){i.src=i.dataset.src})},600)});
+/* Vignette de la vidéo : chargée quand elle approche de l'écran */
+(function(){var v=document.getElementById('video-container');if(!v)return;function g(){v.style.backgroundImage="url('"+v.dataset.bg+"')"}
+if(!('IntersectionObserver' in window)){g();return}
+new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();g()}},{rootMargin:'800px 0px'}).observe(v)})();
+</script>
 
 <script defer src="script.js"></script>
 

@@ -467,7 +467,14 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   </div>
 </footer>
 
-<script src="//code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js" async></script>
+<script>
+/* Assistant : chargé à la première interaction, ou au plus tard après 8 s */
+(function(){var ok=false,ev=['pointerdown','touchstart','scroll','keydown'];function go(){if(ok)return;ok=true;
+ev.forEach(function(e){removeEventListener(e,go)});
+var s=document.createElement('script');s.src='https://code.tidio.co/8lvi3oin8cfr09bfo5ojzducjkfppjze.js';s.async=true;document.body.appendChild(s)}
+ev.forEach(function(e){addEventListener(e,go,{passive:true})});
+setTimeout(go,8000)})();
+</script>
 <script defer src="script.js"></script>
 </body>
 </html>
