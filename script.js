@@ -260,16 +260,23 @@
 
     const maxRes = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     const hqRes  = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    presVideoFacade.style.backgroundImage = `url('${maxRes}')`;
-
-    const testImg = new Image();
-    testImg.src = maxRes;
-    testImg.onerror = () => {
-      presVideoFacade.style.backgroundImage = `url('${hqRes}')`;
+    // Vignette chargée seulement quand la vidéo approche de l'écran
+    let clique = false;
+    const chargerVignette = () => {
+      if (clique) return;
+      presVideoFacade.style.backgroundImage = `url('${maxRes}')`;
+      const testImg = new Image();
+      testImg.src = maxRes;
+      testImg.onerror = () => {
+        if (!clique) presVideoFacade.style.backgroundImage = `url('${hqRes}')`;
+      };
     };
+    if (window.geoQuandVisible) window.geoQuandVisible(presVideoFacade, chargerVignette);
+    else chargerVignette();
 
     presVideoFacade.addEventListener('click', function handler() {
       this.removeEventListener('click', handler);
+      clique = true;
       this.style.backgroundImage = 'none';
       this.innerHTML = `
         <iframe
@@ -491,12 +498,16 @@
 
   const mapEl = document.getElementById('mapAbidjan');
 
-  if (mapEl && typeof L === 'undefined') {
-    console.error('Leaflet (L) est introuvable : vérifie que leaflet.js est chargé AVANT script.js.');
+  // Leaflet est chargé à la demande (quand la carte approche de l'écran) : voir index.html
+  let carteDemarree = false;
+  window.geoDemarrerCarte = function () {
+  if (carteDemarree || !mapEl) return;
+  if (typeof L === 'undefined') {
     mapEl.textContent = "La carte n'a pas pu se charger. Recharge la page.";
+    return;
   }
-
-  if (mapEl && typeof L !== 'undefined') {
+  carteDemarree = true;
+  {
     const map = L.map('mapAbidjan', {
       closePopupOnClick: true,
       zoomAnimation: !PREFERS_REDUCED_MOTION,
@@ -566,6 +577,7 @@
     setTimeout(() => map.invalidateSize(), 400);
     window.addEventListener('resize', () => map.invalidateSize());
   }
+  };
   } catch (err) {
     console.error('[Section 7] erreur :', err);
   }
