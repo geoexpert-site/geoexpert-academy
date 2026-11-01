@@ -836,7 +836,7 @@ async function certPdf(c,b){
   doc.setTextColor(75,63,146);doc.setFont('helvetica','bold');doc.setFontSize(26);doc.text('ATTESTATION DE FIN DE FORMATION',W/2,58,{align:'center'});
   doc.setTextColor(42,42,40);doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text('Cette attestation est décernée à',W/2,74,{align:'center'});
   doc.setTextColor(168,60,147);doc.setFont('helvetica','bold');doc.setFontSize(30);doc.text(c.name,W/2,90,{align:'center'});
-  doc.setTextColor(42,42,40);doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text('pour avoir suivi avec succès la formation vidéo',W/2,104,{align:'center'});
+  doc.setTextColor(42,42,40);doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text('pour avoir suivi avec succès la formation e-learning',W/2,104,{align:'center'});
   doc.setTextColor(0,146,166);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text(doc.splitTextToSize(c.title,230),W/2,116,{align:'center'});
   doc.setTextColor(107,106,114);doc.setFont('helvetica','normal');doc.setFontSize(11);
   doc.text('Durée des vidéos : '+(c.hours||'')+'   ·   Délivrée le '+fdate(c.t),W/2,136,{align:'center'});

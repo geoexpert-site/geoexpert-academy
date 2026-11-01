@@ -5,8 +5,8 @@
 export const CHARTE = {
   version: '1.1', // 1.1 (31/10/2026) : règle de la Communauté WhatsApp et des lives (section 7)
   date: 'octobre 2026',
-  titre: 'Charte de l\'apprenant – Formations vidéo GeoExpert Academy',
-  intro: 'Bienvenue dans votre espace apprenant. Cette charte résume les règles de votre formation vidéo. Elle reprend les conditions générales de vente (CGV) que vous avez acceptées lors de votre inscription. En cas de différence, les CGV s\'appliquent.',
+  titre: 'Charte de l\'apprenant – Formations e-learning GeoExpert Academy',
+  intro: 'Bienvenue dans votre espace apprenant. Cette charte résume les règles de votre formation e-learning. Elle reprend les conditions générales de vente (CGV) que vous avez acceptées lors de votre inscription. En cas de différence, les CGV s\'appliquent.',
   sections: [
     { t: '1. Votre code d\'accès', items: [
       'Votre code d\'accès est personnel et réservé à une seule personne.',
