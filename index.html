@@ -988,35 +988,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
       <h2>Inscrivez-vous à une formation</h2>
       <p class="section-lead">
         Remplissez ce formulaire. Il ouvre une conversation WhatsApp pré-remplie.
-        <strong>Important : joignez votre capture de paiement dans le message WhatsApp avant l'envoi.</strong>
       </p>
-      <p class="inscription-note">
-        Espace apprenant (connexion, accès aux cours en ligne) bientôt disponible.
-      </p>
-
-      <div class="payment-block">
-        <h4>Paiement des formations en présentiel</h4>
-        <div class="payment-methods-grid">
-          <div class="payment-method-card">
-            <div class="payment-method-head">
-              <img src="images/logo-wave.png" alt="Logo Wave" class="payment-method-logo" width="36" height="36" loading="lazy">
-              <span class="payment-method-name">Wave</span>
-            </div>
-            <div class="payment-method-number">07 87 01 50 30</div>
-          </div>
-          <div class="payment-method-card">
-            <div class="payment-method-head">
-              <img src="images/logo-orange-money.png" alt="Logo Orange Money" class="payment-method-logo" width="36" height="36" loading="lazy">
-              <span class="payment-method-name">Orange Money</span>
-            </div>
-            <div class="payment-method-number">07 87 01 50 30</div>
-          </div>
-        </div>
-        <p class="payment-note">
-          Compte au nom de <strong>JEAN EUDES AKA</strong>. Après paiement, envoyez la
-          capture d'écran de la transaction via WhatsApp pour confirmer votre inscription.
-        </p>
-      </div>
     </div>
 
     <form class="inscription-form" id="inscriptionForm">
@@ -1069,8 +1041,14 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
         Message (facultatif)
         <textarea id="fMessage" name="message" rows="3" placeholder="Une question, une précision..."></textarea>
       </label>
-      <div style="background:#fff8e1;border-left:3px solid #ffa726;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13.5px;color:#7a5c00;line-height:1.5;">
-          <strong>Rappel :</strong> après avoir cliqué sur le bouton, joignez votre capture de paiement dans la conversation WhatsApp.
+      <div class="pay-online" id="payOnline" hidden>
+        <h4>Payer en ligne</h4>
+        <p class="pay-online-sub">Devenez Géomaticien Opérationnel. Wave, Orange Money, MTN, Moov ou carte bancaire.</p>
+        <a href="https://checkout.digitalpaye.com/pay/TwaTcCe6fbXX" class="btn btn-primary btn-block" target="_blank" rel="noopener">Payer l'inscription : 25 000 FCFA</a>
+        <a href="https://checkout.digitalpaye.com/pay/0S2XhfPEkAiY" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer le solde : 100 000 FCFA</a>
+        <a href="https://checkout.digitalpaye.com/pay/nHqSeKpKDh7a" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer la totalité : 125 000 FCFA</a>
+        <p class="pay-online-note">Paiement sécurisé par DigitalPaye. Après le paiement, nous vous contactons sur WhatsApp pour confirmer votre inscription.</p>
+        <p class="pay-online-help">Un problème de paiement ? <a href="https://wa.me/2250787015030?text=Bonjour%2C%20j%27ai%20un%20probl%C3%A8me%20de%20paiement%20en%20ligne%20pour%20ma%20formation." target="_blank" rel="noopener">Écrivez-nous sur WhatsApp</a></p>
       </div>
       <button type="submit" class="btn btn-primary btn-block">
         Envoyer via WhatsApp

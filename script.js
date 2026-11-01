@@ -197,13 +197,29 @@
       `Mode de formation : ${mode}`,
       `Formation : ${formation}`,
       ``,
-      `Je vais joindre ma capture d'écran de paiement dans ce chat.`,
     ];
+    if (formation === FORMATION_PAYABLE) lines.push(`Je paie / j'ai payé en ligne via DigitalPaye.`);
     if (message) lines.push(``, `Message : ${message}`);
 
     ouvrirLien(whatsappUrl(lines.join('\n')));
     form.reset();
+    majPaiement();
   });
+
+  // Bloc « Payer en ligne » : visible seulement quand les champs obligatoires sont remplis
+  // et que la formation choisie a des liens DigitalPaye.
+  const FORMATION_PAYABLE = "Devenez Géomaticien Opérationnel (Novembre 2026)";
+  const payBlock = document.getElementById('payOnline');
+  function majPaiement() {
+    if (!form || !payBlock) return;
+    const v = (id) => (document.getElementById(id)?.value ?? '').trim();
+    const ok = ['fName', 'fPhone', 'fProfession', 'fNiveau', 'fVille', 'fMode', 'fFormation'].every((id) => v(id))
+      && /^(\+?225)?0?[0-9]{8,10}$/.test(v('fPhone').replace(/\s+/g, ''))
+      && v('fFormation') === FORMATION_PAYABLE;
+    payBlock.hidden = !ok;
+  }
+  form?.addEventListener('input', majPaiement);
+  form?.addEventListener('change', majPaiement);
   } catch (err) {
     console.error('[Section 3] erreur :', err);
   }
