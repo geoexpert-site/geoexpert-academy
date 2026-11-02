@@ -3,3 +3,6 @@
 worker/.wrangler/
 # Documents de travail (cours, livret, kit…) : jamais dans le dépôt public. Les apprenants les reçoivent par « Mes ressources ».
 ressources/
+
+# Fichiers de quiz (contiennent les bonnes réponses) : jamais dans le dépôt public. Import par le bouton de l'admin.
+quiz/

@@ -388,7 +388,9 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [x] Admin, onglet ❓ Quiz : carte « Importer des quiz (fichier JSON) » (vérification puis import ; remplacement seulement si la case est cochée) · route `/admin/quiz-import` · tests : `test-import-quiz.mjs` 16/16, non-régression quiz 9/9 et résultats 11/11
 - [x] **En ligne le 02/11/2026** (accord de l'administrateur) : sauvegarde `GeoExpert-Sauvegardes\2026-11-02-avant-quiz-chapitre2\`, `geoexpert-admin` → 800eaffc ; production : 12 quiz `qgis2` (auteur « import quiz chapitre 2 »), QGIS 1 inchangé (18) ; code dans `main` (2589c2d)
 - retour en arrière : `wrangler rollback` du Worker admin ; quiz : `DELETE FROM quizzes WHERE who = 'import quiz chapitre 2'`
-- ⚠️ `quiz/quiz-qgis-chapitre1.json` est dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
+- [x] Réponses du chapitre 2 mélangées (12 / 12 / 12, `GeoExpert-Outils\melanger-quiz.mjs`) et mises à jour en test et en production (seulement les quiz « import quiz chapitre 2 »)
+- [x] `quiz/quiz-qgis-chapitre1.json` retiré du dépôt public ; dossier `quiz/` ignoré par git et non publié ; copies des fichiers de quiz : `GeoExpert-Sauvegardes\quiz\` (le fichier reste lisible dans l'historique git public)
+- (ancien constat) `quiz/quiz-qgis-chapitre1.json` était dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
