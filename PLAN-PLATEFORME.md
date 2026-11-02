@@ -382,6 +382,13 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [x] **Mise en ligne le 31/10/2026** (accord de l'administrateur) : `espace-apprenant-api` = **5682afa6** (avant 33abc68e) · `geoexpert-admin` = **475ca8c3** (avant 228e930d) · site : fusion de `phase-c` dans `main`.
 - [ ] 👤 Essai de l'administrateur avec « test 1 » : accepter la charte 1.1, ouvrir « Aide », chercher « code », toucher WhatsApp ; dans l'admin, onglet ❔, relire les 7 questions.
 
+## Quiz QGIS chapitre 2 + bouton « Importer des quiz » (demande du 02/11/2026)
+
+- [x] 12 quiz (leçons 2 à 13, 36 questions) importés ; les 12 titres du fichier correspondent au catalogue ; leçon 1 sans quiz ; fichier  gardé hors du dépôt public (ses réponses ne doivent pas être publiées)
+- [x] Admin, onglet ❓ Quiz : carte « Importer des quiz (fichier JSON) » (vérification puis import ; remplacement seulement si la case est cochée) · route  · tests :  16/16, non-régression quiz 9/9 et résultats 11/11
+- [x] **En ligne le 02/11/2026** (accord de l'administrateur) : sauvegarde ,  → 800eaffc ; production : 12 quiz  (auteur « import quiz chapitre 2 »), QGIS 1 inchangé (18) ; code dans  (2589c2d)
+- retour en arrière :  du Worker admin ; quiz : - ⚠️  est dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
