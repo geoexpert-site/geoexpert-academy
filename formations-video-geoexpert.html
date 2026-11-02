@@ -921,44 +921,42 @@ new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();g(
 
 <script defer src="script.js"></script>
 
-<!-- SCRIPT POUR LA MODAL, WHATSAPP ET LE CARROUSEL -->
+<script defer src="paiement-aide.js"></script>
+
+<!-- BOUTONS D'ACHAT (DigitalPaye) : écrit en ES5, indépendant du script suivant pour ne jamais rester bloqué -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    
-    // ==========================================
-    // 1. GESTION DES BOUTONS D'ACHAT (DigitalPaye)
-    // ==========================================
-    const btns = document.querySelectorAll('.order-btn');
-    
-    btns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
+(function () {
+  function init() {
+    var btns = document.querySelectorAll('.order-btn');
+    Array.prototype.forEach.call(btns, function (btn) {
+      btn.addEventListener('click', function (e) {
         e.preventDefault();
-        
-        // On récupère le lien DigitalPaye dans l'attribut data-link
-        const link = this.getAttribute('data-link');
-        const nomFormation = this.getAttribute('data-product') || '';
-        const prixFormation = this.getAttribute('data-price');
-        
-        const valeur = parseInt((prixFormation || '').replace(/\D/g, ''), 10) || 0;
+        var link = btn.getAttribute('data-link');
+        var nomFormation = btn.getAttribute('data-product') || '';
+        var prixFormation = btn.getAttribute('data-price');
+        var valeur = parseInt((prixFormation || '').replace(/\D/g, ''), 10) || 0;
 
-        // Tracking Google Analytics (Optionnel)
-        if (typeof gtag === 'function') {
-          gtag('event', 'begin_checkout', { currency: 'XOF', value: valeur, items: [{ item_name: nomFormation, price: valeur }] });
-        }
-
-        // Pixel Meta : début de commande
-        if (typeof fbq === 'function') {
-          fbq('track', 'InitiateCheckout', { content_name: nomFormation, value: valeur, currency: 'XOF' });
-        }
+        // Suivi : jamais bloquant, une seule fois par clic
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'begin_checkout', { currency: 'XOF', value: valeur, items: [{ item_name: nomFormation, price: valeur }] });
+          }
+        } catch (err) {}
+        try {
+          if (typeof fbq === 'function') {
+            fbq('track', 'InitiateCheckout', { content_name: nomFormation, value: valeur, currency: 'XOF' });
+          }
+        } catch (err) {}
         // On mémorise le choix pour l'événement Purchase de l'espace apprenant
         try { localStorage.setItem('geo:last-checkout', JSON.stringify({ n: nomFormation, v: valeur, t: Date.now() })); } catch (err) {}
 
-        // Si un lien DigitalPaye est présent, on redirige le client vers le paiement
         if (link) {
+          // Navigateur intégré (Facebook, Instagram, TikTok…) : fenêtre d'aide dans la page, sans attendre le pixel
+          try { if (window.geoPaiementAide && window.geoPaiementAide(link, nomFormation)) return; } catch (err) {}
           // On quitte la page dès que le pixel a fini d'envoyer InitiateCheckout (au plus 1,5 s d'attente).
           // Sans pixel (bloqueur de pub), on part tout de suite.
-          let parti = false;
-          const partir = function () { if (!parti) { parti = true; window.location.href = link; } };
+          var parti = false;
+          var partir = function () { if (!parti) { parti = true; window.location.href = link; } };
           if (typeof fbq !== 'function') { partir(); return; }
           try {
             new PerformanceObserver(function (liste) {
@@ -968,8 +966,8 @@ new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();g(
           setTimeout(partir, 1500);
         } else {
           // Sinon, on ouvre la Pop-up WhatsApp (Fallback de sécurité)
-          const modal = document.getElementById('modalAchat');
-          const inputFormation = document.getElementById('achatFormation');
+          var modal = document.getElementById('modalAchat');
+          var inputFormation = document.getElementById('achatFormation');
           if (modal && inputFormation) {
             inputFormation.value = prixFormation ? nomFormation + ' (' + prixFormation + ')' : nomFormation;
             modal.style.display = 'flex';
@@ -977,7 +975,15 @@ new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();g(
         }
       });
     });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
 
+<!-- SCRIPT POUR LA MODAL, WHATSAPP ET LE CARROUSEL -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
     // ==========================================
     // 2. GESTION DE LA POP-UP WHATSAPP (Fallback)
     // ==========================================

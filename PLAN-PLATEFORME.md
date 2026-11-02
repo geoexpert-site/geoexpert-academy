@@ -493,3 +493,9 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
   `codes_supprimes`, que `listCodes()` écarte. Test `test-purge.mjs` 15/15 (liste KV en retard simulée) ; non-régression 203/203.
   Sauvegarde `GeoExpert-Sauvegardes\2026-10-25-avant-correctif-index\` ; `geoexpert-admin` → a1f554e9 (avant : d9240891),
   `espace-apprenant-api` → fe27980e (avant : 0c9d319f).
+
+## Paiement dans les navigateurs intégrés Facebook/Instagram/TikTok (demande du 02/11/2026)
+- [x] `paiement-aide.js` (script partagé, ES5) : fenêtre d'aide dans la page si l'agent utilisateur est un navigateur intégré (FBAN/FBAV/FB_IAB/Instagram/musical_ly/TikTok/Bytedance/Snapchat/LinkedInApp/« ; wv) »). Chrome/Safari/Firefox : rien ne change.
+- [x] `formations-video-geoexpert.html` : boutons d'achat réécrits en ES5 dans leur propre `<script>` (suivi sans blocage, InitiateCheckout une fois par clic) ; `index.html` : script ajouté (3 liens « Payer »).
+- [x] Testé Playwright (FB, Instagram, TikTok avec window.open et pixel bloqués, iPhone, Chrome, Safari simulés). Copies avant : voir sauvegardes du jour.
+- [ ] 👤 Essai réel depuis Facebook, Instagram et TikTok ; mise en ligne (3 fichiers : paiement-aide.js, formations-video-geoexpert.html, index.html). Retour arrière : remettre les 2 pages d'origine et supprimer paiement-aide.js.
