@@ -384,10 +384,11 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 
 ## Quiz QGIS chapitre 2 + bouton « Importer des quiz » (demande du 02/11/2026)
 
-- [x] 12 quiz (leçons 2 à 13, 36 questions) importés ; les 12 titres du fichier correspondent au catalogue ; leçon 1 sans quiz ; fichier  gardé hors du dépôt public (ses réponses ne doivent pas être publiées)
-- [x] Admin, onglet ❓ Quiz : carte « Importer des quiz (fichier JSON) » (vérification puis import ; remplacement seulement si la case est cochée) · route  · tests :  16/16, non-régression quiz 9/9 et résultats 11/11
-- [x] **En ligne le 02/11/2026** (accord de l'administrateur) : sauvegarde ,  → 800eaffc ; production : 12 quiz  (auteur « import quiz chapitre 2 »), QGIS 1 inchangé (18) ; code dans  (2589c2d)
-- retour en arrière :  du Worker admin ; quiz : - ⚠️  est dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
+- [x] 12 quiz (leçons 2 à 13, 36 questions) importés ; les 12 titres du fichier correspondent au catalogue ; leçon 1 sans quiz ; le fichier `quiz-qgis-chapitre2.json` reste hors du dépôt public (ses réponses ne doivent pas être publiées)
+- [x] Admin, onglet ❓ Quiz : carte « Importer des quiz (fichier JSON) » (vérification puis import ; remplacement seulement si la case est cochée) · route `/admin/quiz-import` · tests : `test-import-quiz.mjs` 16/16, non-régression quiz 9/9 et résultats 11/11
+- [x] **En ligne le 02/11/2026** (accord de l'administrateur) : sauvegarde `GeoExpert-Sauvegardes\2026-11-02-avant-quiz-chapitre2\`, `geoexpert-admin` → 800eaffc ; production : 12 quiz `qgis2` (auteur « import quiz chapitre 2 »), QGIS 1 inchangé (18) ; code dans `main` (2589c2d)
+- retour en arrière : `wrangler rollback` du Worker admin ; quiz : `DELETE FROM quizzes WHERE who = 'import quiz chapitre 2'`
+- ⚠️ `quiz/quiz-qgis-chapitre1.json` est dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
