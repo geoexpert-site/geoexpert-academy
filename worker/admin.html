@@ -451,6 +451,13 @@
         <div id="qList" style="margin-top:16px;"></div>
       </div>
       <div class="a-card" id="qEdit" hidden></div>
+      <div class="a-card" id="qImp">
+        <h2>📥 Importer des quiz</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Choisissez un fichier .json (même format que les chapitres précédents). Une vérification s'affiche d'abord, rien n'est enregistré avant votre confirmation. Un quiz déjà existant n'est jamais remplacé sans que vous cochiez « Remplacer ».</p>
+        <input type="file" id="qiFile" accept=".json,application/json" hidden>
+        <button class="b" id="qiBtn" type="button">Importer des quiz (fichier JSON)</button>
+        <div id="qiOut" style="margin-top:14px;"></div>
+      </div>
     </div>
 
     <!-- Onglet Annonces -->
@@ -1175,6 +1182,51 @@ window.preparerPdf = async function (PDFLib, src) {
     }
     draw(); box.scrollIntoView({ block: 'start' });
   }
+
+  // ----- Import de quiz (fichier JSON) : vérification, puis import après confirmation
+  (function () {
+    var file = null, out = $('qiOut');
+    var LAB = { nouveau: 'Nouveau quiz', existe: 'Quiz déjà présent : conservé', remplace: 'Sera remplacé', inconnue: 'Titre inconnu : ignoré', invalide: 'Invalide : ignoré' };
+    $('qiBtn').addEventListener('click', function () { $('qiFile').value = ''; $('qiFile').click(); });
+    $('qiFile').addEventListener('change', function () {
+      var f = $('qiFile').files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        try { file = JSON.parse(String(rd.result).replace(/^﻿/, '')); } catch (e) { out.className = 'err'; out.textContent = 'Ce fichier n\'est pas un JSON valide.'; return; }
+        check(); };
+      rd.readAsText(f, 'utf-8');
+    });
+    async function check(replace) {
+      out.className = ''; out.textContent = 'Vérification...';
+      try { draw(await call('/admin/quiz-import', 'POST', { mode: 'verifier', fichier: file, remplacer: replace || [] }), replace || []); }
+      catch (e) { out.className = 'err'; out.textContent = e.message; }
+    }
+    function draw(r, replace) {
+      out.className = ''; out.textContent = '';
+      out.appendChild(el('h3', '', r.formation + ' : ' + r.lecons.length + ' leçon(s) dans le fichier'));
+      var tb = el('table'), tr = el('tr');
+      ['Leçon du fichier', 'Questions', 'Résultat', 'Remplacer'].forEach(function (t) { tr.appendChild(el('th', '', t)); }); tb.appendChild(tr);
+      var boxes = [], ok = 0;
+      r.lecons.forEach(function (l) {
+        var row = el('tr'), st = l.statut === 'existe' && replace.indexOf(l.k) >= 0 ? 'remplace' : l.statut;
+        row.appendChild(el('td', '', l.lecon)); row.appendChild(el('td', '', String(l.n)));
+        row.appendChild(el('td', '', LAB[st] + (l.detail && st !== 'nouveau' ? ' — ' + l.detail : '')));
+        var c = el('td');
+        if (l.statut === 'existe' || l.statut === 'remplace') { var cb = el('input'); cb.type = 'checkbox'; cb.checked = replace.indexOf(l.k) >= 0; cb.setAttribute('aria-label', 'Remplacer le quiz : ' + l.lecon); cb.addEventListener('change', function () { check(boxes.filter(function (x) { return x.cb.checked; }).map(function (x) { return x.k; })); }); boxes.push({ cb: cb, k: l.k }); c.appendChild(cb); }
+        row.appendChild(c); tb.appendChild(row);
+        if (st === 'nouveau' || st === 'remplace') ok++;
+      });
+      var w = el('div'); w.style.overflowX = 'auto'; w.appendChild(tb); out.appendChild(w);
+      var go = el('button', 'b', ok ? 'Importer ' + ok + ' quiz' : 'Rien à importer'); go.type = 'button'; go.disabled = !ok;
+      var msg = el('div'); msg.style.marginTop = '10px';
+      go.addEventListener('click', async function () {
+        go.disabled = true; go.textContent = 'Import...';
+        try { var res = await call('/admin/quiz-import', 'POST', { mode: 'importer', fichier: file, remplacer: replace }); out.className = 'ok'; out.textContent = '✓ ' + res.importes + ' quiz importé(s) dans ' + res.formation + '.'; file = null; await load(); }
+        catch (e) { go.disabled = false; go.textContent = 'Importer ' + ok + ' quiz'; msg.className = 'err'; msg.textContent = e.message; }
+      });
+      out.appendChild(go); out.appendChild(msg);
+    }
+  })();
 
   // ----- Annonces
   function modTitle(k) { var m = state.catalog.filter(function (c) { return c.key === k; })[0]; return m ? m.title.split(' : ')[0] : k; }

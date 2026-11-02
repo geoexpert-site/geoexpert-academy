@@ -1746,6 +1746,46 @@ async function admin(req, env, url) {
     return reply({ ok: true }, 200, req, env);
   }
 
+  // Import de quiz depuis un fichier JSON : { formation, lecons: [{ lecon, quiz: [{ question, options, correct, explication }] }] }.
+  // Deux temps : « verifier » (rien n'est écrit) puis « importer ». Un quiz déjà présent n'est remplacé que si sa leçon est dans « remplacer ».
+  if (url.pathname === '/admin/quiz-import' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), f = b.fichier || {};
+    const norm = s => String(s || '').normalize('NFC').replace(/\s+/g, ' ').trim().toLowerCase();
+    const mod = CAT.find(x => norm(x.title.split(' : ')[0]) === norm(f.formation));
+    if (!mod) return reply({ error: 'Formation « ' + String(f.formation || '').slice(0, 80) + ' » inconnue. Le champ « formation » doit être le nom de la formation, par exemple « QGIS - Chapitre 2 ».' }, 400, req, env);
+    if (!Array.isArray(f.lecons) || !f.lecons.length || f.lecons.length > 60) return reply({ error: 'Le fichier doit contenir une liste « lecons » (60 au plus).' }, 400, req, env);
+    const existing = new Map((await env.DB.prepare('SELECT k, data FROM quizzes WHERE k LIKE ?').bind(mod.key + '-%').all()).results.map(r => [r.k, JSON.parse(r.data).length]));
+    const remplacer = new Set(Array.isArray(b.remplacer) ? b.remplacer.map(String) : []);
+    const rows = [], writes = [];
+    for (const l of f.lecons) {
+      const title = String((l && l.lecon) || '');
+      const v = mod.videos.find(x => norm(x.title) === norm(title));
+      const row = { lecon: title.slice(0, 160), k: v ? v.k : '', n: 0, statut: '', detail: '' };
+      rows.push(row);
+      if (!v) { row.statut = 'inconnue'; row.detail = 'Aucune leçon de ' + mod.title.split(' : ')[0] + ' n\'a ce titre : rien n\'est importé.'; continue; }
+      const qs = Array.isArray(l.quiz) ? l.quiz : [];
+      row.n = qs.length;
+      const long = qs.findIndex(x => !x || String(x.question || '').length > 300 || String(x.explication || '').length > 300 || (Array.isArray(x.options) ? x.options : []).some(o => String(o || '').length > 150));
+      if (long >= 0) { row.statut = 'invalide'; row.detail = 'Question ' + (long + 1) + ' : texte trop long (question et explication 300 caractères, réponse 150).'; continue; }
+      const cq = cleanQuiz(qs.map(x => ({ q: x.question, choices: x.options, answer: x.correct, explain: x.explication })));
+      if (cq.error) { row.statut = 'invalide'; row.detail = cq.error; continue; }
+      if (existing.has(v.k)) {
+        row.detail = 'Un quiz de ' + existing.get(v.k) + ' question(s) existe déjà.';
+        if (!remplacer.has(v.k)) { row.statut = 'existe'; continue; }
+        row.statut = 'remplace';
+      } else row.statut = 'nouveau';
+      writes.push({ k: v.k, questions: cq.questions, title: v.title });
+    }
+    if (b.mode !== 'importer') return reply({ formation: mod.title.split(' : ')[0], lecons: rows }, 200, req, env);
+    if (rows.some(r => r.statut === 'invalide')) return reply({ error: 'Le fichier contient des quiz invalides : rien n\'a été importé.', lecons: rows }, 400, req, env);
+    if (writes.length) {
+      await env.DB.batch(writes.map(w => env.DB.prepare('INSERT INTO quizzes (k, data, updated, who) VALUES (?, ?, ?, ?) ON CONFLICT (k) DO UPDATE SET data = excluded.data, updated = excluded.updated, who = excluded.who').bind(w.k, JSON.stringify(w.questions), now, who)));
+      await journal(env, who, 'Quiz importés (fichier)', '', '', mod.title.split(' : ')[0] + ' : ' + writes.length + ' quiz, ' + writes.reduce((n, w) => n + w.questions.length, 0) + ' question(s), dont ' + rows.filter(r => r.statut === 'remplace').length + ' remplacé(s)');
+    }
+    return reply({ ok: true, importes: writes.length, formation: mod.title.split(' : ')[0], lecons: rows }, 200, req, env);
+  }
+
   // Attestations et avis : liste, création d'une attestation, révocation, statut d'un avis.
   if (url.pathname === '/admin/attestations' && req.method === 'GET') {
     if (!env.DB) return reply({ certificats: [], avis: [] }, 200, req, env);
