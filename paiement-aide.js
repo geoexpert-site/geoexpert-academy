@@ -81,7 +81,7 @@
     boite.appendChild(titre);
 
     function guide() {
-      var g = el('p', 'gx-guide', 'Appuyez sur ••• en haut à droite, puis sur « Ouvrir dans le navigateur » ');
+      var g = el('p', 'gx-guide', 'Appuyez sur ••• en haut à droite : la page s’ouvre dans votre navigateur. ');
       var f = el('span', '', '↗');
       f.setAttribute('aria-hidden', 'true');
       g.appendChild(f);
