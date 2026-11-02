@@ -6,6 +6,7 @@
   var WHATSAPP = '2250787015030';
   var UA = navigator.userAgent || '';
   var EST_INTEGRE = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|musical_ly|TikTok|Bytedance|BytedanceWebview|Snapchat|LinkedInApp|; wv\)/i.test(UA);
+  var EST_TIKTOK = /musical_ly|TikTok|Bytedance/i.test(UA);
   var EST_IOS = /iPhone|iPad|iPod/i.test(UA);
   var EST_ANDROID = /Android/i.test(UA);
   var LIEN_DIGITALPAYE = /^https?:\/\/checkout\.digitalpaye\.com\//i;
@@ -31,6 +32,8 @@
       '.gx-etapes li{margin-bottom:6px}' +
       '.gx-lien{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ccc;border-radius:8px;font-size:16px;font-family:inherit;margin-bottom:10px}' +
       '.gx-info{margin:0 0 10px;font-size:16px;color:#0b6b2e;font-weight:600}' +
+      '.gx-guide{margin:0 0 12px;padding:12px 14px;border:2px solid #0092A6;border-radius:10px;background:#F6F3FA;font-size:16px;font-weight:600;line-height:1.4}' +
+      '.gx-guide span{font-size:22px;color:#A83C93}' +
       '.gx-note{margin:6px 0 0;font-size:16px;color:#555}'
     ));
     document.head.appendChild(s);
@@ -77,11 +80,30 @@
     boite.appendChild(fermer);
     boite.appendChild(titre);
 
-    if (EST_ANDROID) {
+    function guide() {
+      var g = el('p', 'gx-guide', 'Appuyez sur ••• en haut à droite, puis sur « Ouvrir dans le navigateur » ');
+      var f = el('span', '', '↗');
+      f.setAttribute('aria-hidden', 'true');
+      g.appendChild(f);
+      return g;
+    }
+    if (EST_ANDROID && EST_TIKTOK) {
+      // TikTok bloque intent:// : consigne manuelle à la place du bouton
+      boite.appendChild(guide());
+    } else if (EST_ANDROID) {
       var sansProtocole = lien.replace(/^https?:\/\//i, '');
       var intent = 'intent://' + sansProtocole + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(lien) + ';end';
       var chrome = el('a', 'btn btn-primary', 'Ouvrir dans Chrome');
       chrome.href = intent;
+      var aide = null;
+      chrome.onclick = function () {
+        // Sans réponse après 1,5 s (page toujours visible) : consigne manuelle sous le bouton
+        setTimeout(function () {
+          if (aide || document.hidden || !document.getElementById('gx-aide')) return;
+          aide = guide();
+          chrome.parentNode.insertBefore(aide, chrome.nextSibling);
+        }, 1500);
+      };
       boite.appendChild(chrome);
     } else if (EST_IOS) {
       var ol = el('ol', 'gx-etapes');
