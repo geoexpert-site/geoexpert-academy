@@ -499,3 +499,11 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [x] `formations-video-geoexpert.html` : boutons d'achat réécrits en ES5 dans leur propre `<script>` (suivi sans blocage, InitiateCheckout une fois par clic) ; `index.html` : script ajouté (3 liens « Payer »).
 - [x] Testé Playwright (FB, Instagram, TikTok avec window.open et pixel bloqués, iPhone, Chrome, Safari simulés). Copies avant : voir sauvegardes du jour.
 - [ ] 👤 Essai réel depuis Facebook, Instagram et TikTok ; mise en ligne (3 fichiers : paiement-aide.js, formations-video-geoexpert.html, index.html). Retour arrière : remettre les 2 pages d'origine et supprimer paiement-aide.js.
+
+## Corrections de l'audit du site (demande du 03/11/2026)
+- [x] Lot 1 : `guwsyvzssOco` (Google Earth) ajouté à `LIENS` ; les 11 liens de la page de vente sont dans `LIENS`. Les 3 liens « Payer » du présentiel (index.html) n'y sont pas (hors demande).
+- [x] Lot 2 : menus de 12 articles de blog, article renommé `formation-geomatique-cote-divoire.html` (ancienne adresse = redirection `noindex`), `<title>` de postgis, `og-image.jpg` + `og-image-formations-video.jpg` + `favicon.png`, sitemap, `noindex` sur pub-video/motion-design, `audit/` exclu de `_config.yml`.
+- [x] Lot 3 : textes de la page de vente (code envoyé sur WhatsApp, ligne DigitalPaye avant les 11 boutons, modale morte supprimée), « 7+ ans », « depuis 2016 », CGV §3.2 et FAQ (paiement en ligne), bouton « Découvrir la plateforme ». **Licence ArcGIS laissée telle quelle** (choix du formateur : ne pas la promouvoir, elle se règle en privé avec l'apprenant).
+- [x] **En ligne le 03/11/2026** : `espace-apprenant-api` → df788391 (avant : d4c47913) ; site : `main` = dc30a69 (avant : 81230ce) ; sauvegarde `GeoExpert-Sauvegardes\2026-11-03-avant-corrections-audit\`. `audit/` non poussé (dépôt public).
+- retour en arrière : `npx wrangler rollback d4c47913` (dans `worker/`, avec `-c wrangler-prod.toml`) ; site : `git revert dc30a69`.
+- [ ] 👤 Tester un paiement Google Earth (doit arriver avec code créable) ; aperçus de liens WhatsApp / Facebook.
