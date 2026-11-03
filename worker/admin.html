@@ -174,6 +174,12 @@
   .arow.fin { opacity: .55; }
   /* Portfolio et parrainage (phase B) */
   .pfflt { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .exdr { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 0 0 12px 18px; font-size: 13.5px; color: var(--dim); }
+  .exdr > span { flex: 1 1 260px; overflow-wrap: anywhere; }
+  .exdr label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
+  .exdr select, .exdr input[type=file] { max-width: 100%; min-width: 0; }
+  #pdfs .vid > * { min-width: 0; overflow-wrap: anywhere; } #pdfs .vid input[type=file] { max-width: 100%; }
+  @media (max-width: 768px) { .exdr { padding-left: 0; } }
   .pfflt button.on { background: var(--indigo); color: #fff; border-color: var(--indigo); }
   .pfc { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px; border-top: 1px solid var(--line); }
   .pfc:first-child { border-top: 0; }
@@ -272,6 +278,7 @@
       <button data-t="quiz">❓ Quiz</button>
       <button data-t="att">🎓 Attestations & avis <span id="avCount" class="cnt" hidden></span></button>
       <button data-t="pf">🗺️ Portfolio <span id="pfCount" class="cnt" hidden></span></button>
+      <button data-t="exv">✅ Exercices à valider <span id="exvCount" class="cnt" hidden></span></button>
       <button data-t="par">🤝 Parrainage <span id="parCount" class="cnt" hidden></span></button>
       <button data-t="aide">❔ Aide & « Et après ? »</button>
       <button data-t="new">➕ Nouvel accès</button>
@@ -387,6 +394,16 @@
         <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Les apprenants déposent leurs cartes (JPG, PNG ou PDF, 5 Mo au maximum) dans « Mon portfolio ». Regardez-les, laissez un commentaire (l'apprenant le voit), puis <b>Validez</b>. Une carte validée apparaît sur la page publique <b>Réalisations des apprenants</b> seulement si l'apprenant a coché l'accord de publication ; il peut le retirer à tout moment.</p>
         <div class="pfflt" id="pfFlt"></div>
         <div id="pfList"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Exercices à valider (03/11/2026) -->
+    <div data-p="exv" hidden>
+      <div class="a-card">
+        <h2>✅ Exercices pratiques des apprenants</h2>
+        <p style="font-size:14px; color:var(--dim); margin:-8px 0 12px;">Quand un apprenant clique sur « Envoyer mon exercice au formateur », WhatsApp s'ouvre pour qu'il vous envoie ses fichiers, et l'exercice apparaît ici. Regardez son travail sur WhatsApp, puis cliquez <b>Valider</b> : l'exercice suivant s'ouvre dans son espace. Ou <b>À reprendre</b> : écrivez ce qu'il doit corriger (il le voit sous l'exercice) ; l'exercice suivant reste fermé. Le bouton <b>💬 WhatsApp</b> prépare un message pour le prévenir.</p>
+        <div class="pfflt" id="exvFlt"></div>
+        <div id="exvList"></div>
       </div>
     </div>
 
@@ -567,7 +584,7 @@
     <!-- Onglet PDF -->
     <div class="a-card" data-p="pdf" hidden>
       <h2>Fichiers d'exercices (PDF / ZIP)</h2>
-      <p style="font-size:14px; color:var(--dim); margin-bottom:20px;">Les fichiers sont protégés : seuls les apprenants connectés peuvent les ouvrir. <strong>Taille maximale : 10 Mo.</strong></p>
+      <p style="font-size:14px; color:var(--dim); margin-bottom:20px;">Les fichiers sont protégés : seuls les apprenants connectés peuvent les ouvrir. Pour chaque exercice : les <b>consignes</b> (PDF, 10 Mo max.) et, si besoin, les <b>données nécessaires</b> (un ZIP de 10 Mo max. envoyé ici, ou un gros fichier déjà déposé dans le stockage R2). Un exercice s'ouvre pour l'apprenant quand vous avez validé le précédent (onglet « Exercices à valider »).</p>
       <div id="pdfs"></div>
     </div>
 
@@ -654,7 +671,7 @@ window.preparerPdf = async function (PDFLib, src) {
     state = await call('/admin/state', 'GET');
     var sel = $('nProd'); sel.textContent = '';
     state.products.forEach(function (p) { var o = el('option', '', LABELS[p] || p); o.value = p; sel.appendChild(o); });
-    renderDash(); renderRelances(); renderList(); renderVids(); renderPdfs();
+    renderDash(); renderRelances(); renderList(); renderVids();
     try { PAY = await call('/admin/paiements', 'GET'); } catch (e) { PAY = null; }
     renderPaiements();
     renderAnnonces((await call('/admin/annonces', 'GET')).annonces);
@@ -666,7 +683,9 @@ window.preparerPdf = async function (PDFLib, src) {
     try { renderParrainages(await call('/admin/parrainages', 'GET')); } catch (e) { renderParrainages({ filleuls: [], config: { module: 'google', mois: 1 }, texte: '' }); }
     if (!AIDE_EDIT) { try { AIDE = await call('/admin/aide', 'GET'); } catch (e) { AIDE = null; } renderAide(); }
     try { R2 = await call('/admin/r2', 'GET'); } catch (e) { R2 = null; }
-    renderContent(true); renderR2();
+    renderContent(true); renderR2(); renderPdfs();
+    try { EXV = (await call('/admin/exercices', 'GET')).envois || []; } catch (e) { EXV = []; }
+    renderExv();
     try { RS = await call('/admin/ressources', 'GET'); } catch (e) { RS = null; }
     renderRessources();
     renderLog((await call('/admin/journal', 'GET')).entries);
@@ -737,7 +756,7 @@ window.preparerPdf = async function (PDFLib, src) {
           var lab2 = el('label', 'r2l'); lab2.appendChild(document.createTextNode('📦 Rattacher un gros fichier :'));
           var s2 = el('select'); s2.setAttribute('aria-label', 'Rattacher un gros fichier à la leçon ' + (i + 1));
           var o0 = el('option', '', 'Choisir un fichier déposé…'); o0.value = ''; s2.appendChild(o0);
-          R2.objects.forEach(function (o) { var op = el('option', '', o.key + ' (' + fsize(o.size) + ')'); op.value = o.key; s2.appendChild(op); });
+          R2.objects.filter(function (o) { return !/\/$/.test(o.key); }).forEach(function (o) { var op = el('option', '', o.key + ' (' + fsize(o.size) + ')'); op.value = o.key; s2.appendChild(op); });
           lab2.appendChild(s2); fz.appendChild(lab2);
           s2.addEventListener('change', async function () {
             var key = s2.value; if (!key) return;
@@ -916,6 +935,55 @@ window.preparerPdf = async function (PDFLib, src) {
       });
       ctl.appendChild(del);
       wrap.appendChild(row);
+    });
+  }
+
+  // ----- Exercices pratiques à valider (03/11/2026)
+  var EXV = [], EXF = 'envoye';
+  var EXS = { envoye: '⏳ À valider', valide: '✅ Validé', a_reprendre: '↩️ À reprendre' };
+  function renderExv() {
+    var n = EXV.filter(function (x) { return x.statut === 'envoye'; }).length;
+    $('exvCount').textContent = n; $('exvCount').hidden = !n;
+    var flt = $('exvFlt'); flt.textContent = '';
+    [['envoye', 'À valider'], ['a_reprendre', 'À reprendre'], ['valide', 'Validés'], ['', 'Tous']].forEach(function (f) {
+      var c = f[0] ? EXV.filter(function (x) { return x.statut === f[0]; }).length : EXV.length;
+      var b = el('button', 'b sec' + (EXF === f[0] ? ' on' : ''), f[1] + ' (' + c + ')'); b.type = 'button';
+      b.addEventListener('click', function () { EXF = f[0]; renderExv(); });
+      flt.appendChild(b);
+    });
+    var list = $('exvList'); list.textContent = '';
+    var sel = EXV.filter(function (x) { return !EXF || x.statut === EXF; });
+    if (!sel.length) { list.appendChild(el('p', '', EXV.length ? 'Aucun exercice dans cette catégorie.' : 'Aucun exercice envoyé pour le moment.')); return; }
+    var wrap = el('div', 'acts'); list.appendChild(wrap);
+    sel.forEach(function (x) {
+      var s = state.students.filter(function (y) { return y.code === x.code; })[0] || {}, name = s.label || x.code, form = x.module.split(' : ')[0];
+      var r = el('div', 'arow'), t = el('b');
+      var nm = el('button', 'lnk', name); nm.type = 'button'; nm.addEventListener('click', function () { openFiche(x.code); });
+      t.appendChild(nm); t.appendChild(document.createTextNode(' · ' + x.exercice + ' · ' + form)); r.appendChild(t);
+      r.appendChild(el('small', '', EXS[x.statut] + ' · ' + (x.statut === 'valide' && x.tv ? 'validé le ' + fdt(x.tv) : 'envoyé le ' + fdt(x.t))
+        + (x.who === 'reprise' ? ' (coché par l\'apprenant avant le 03/11/2026)' : '') + (x.commentaire ? ' · « ' + x.commentaire + ' »' : '')));
+      var ctl = el('div', 'actl'); r.appendChild(ctl);
+      if (s.phone) {
+        var msg = x.statut === 'valide' ? 'Bonjour ' + name + ', votre ' + x.exercice.toLowerCase() + ' (' + form + ') est validé. Bravo !' + (x.suivant ? ' L\'' + x.suivant.toLowerCase() + ' est maintenant ouvert dans votre espace.' : '')
+          : x.statut === 'a_reprendre' ? 'Bonjour ' + name + ', votre ' + x.exercice.toLowerCase() + ' (' + form + ') est à reprendre' + (x.commentaire ? ' : ' + x.commentaire : '.') + '\n\nRenvoyez-le depuis votre espace quand c\'est corrigé.'
+          : 'Bonjour ' + name + ', j\'ai bien reçu votre ' + x.exercice.toLowerCase() + ' (' + form + '). Je le regarde et je reviens vers vous.';
+        var w = el('a', 'b sec', '💬 WhatsApp'); w.href = waLink(s.phone, msg); w.target = '_blank'; w.rel = 'noopener'; ctl.appendChild(w);
+      }
+      function go(label, statut, cls) {
+        var b = el('button', 'b sec ' + cls, label); b.type = 'button';
+        b.addEventListener('click', async function () {
+          var com = '';
+          if (statut === 'a_reprendre') { com = prompt('Ce que ' + name + ' doit corriger (il le verra sous l\'exercice) :', x.commentaire || ''); if (com === null) return; }
+          else if (!confirm('Valider « ' + x.exercice + ' » de ' + name + ' (' + form + ') ?\n\n' + (x.suivant ? '« ' + x.suivant + ' » s\'ouvrira dans son espace.' : 'C\'est le dernier exercice de cette formation.'))) return;
+          b.disabled = true;
+          try { await call('/admin/ex-statut', 'POST', { code: x.code, k: x.k, statut: statut, commentaire: com }); await load(); }
+          catch (e) { alert(e.message); b.disabled = false; }
+        });
+        ctl.appendChild(b);
+      }
+      if (x.statut !== 'valide') go('Valider', 'valide', 'fic');
+      if (x.statut !== 'a_reprendre') go('À reprendre', 'a_reprendre', '');
+      wrap.appendChild(r);
     });
   }
 
@@ -1789,11 +1857,11 @@ window.preparerPdf = async function (PDFLib, src) {
       if (qd.length) ul.appendChild(el('li', 'exh', 'Quiz faits : ' + qd.length + ' · moyenne ' + Math.round(qd.reduce(function (a, l) { return a + l.quiz.score * 100 / (l.quiz.total || 1); }, 0) / qd.length) + ' %'));
       if (m.exercises && m.exercises.length) {
         var ne = m.exercises.filter(function (x) { return x.done; }).length;
-        ul.appendChild(el('li', 'exh', 'Exercices faits : ' + ne + ' / ' + m.exercises.length));
+        ul.appendChild(el('li', 'exh', 'Exercices validés : ' + ne + ' / ' + m.exercises.length));
         m.exercises.forEach(function (x) {
           var li = el('li'); li.appendChild(el('span', '', x.done ? '✓' : ''));
           li.appendChild(el('span', '', x.title));
-          li.appendChild(el('small', '', x.done > 1 ? fdt(x.done) : ''));
+          li.appendChild(el('small', '', x.done > 1 ? 'validé le ' + fdt(x.done) : x.st === 'envoye' ? '⏳ envoyé le ' + fdt(x.t) + ', à valider' : x.st === 'a_reprendre' ? '↩️ à reprendre' : ''));
           ul.appendChild(li);
         });
       }
@@ -2138,6 +2206,42 @@ window.preparerPdf = async function (PDFLib, src) {
     btn.disabled = false;
   });
 
+  // Données nécessaires d'un exercice : petit fichier (10 Mo max.) envoyé ici, ou gros fichier choisi dans R2.
+  function exDataRow(x) {
+    var r = el('div', 'exdr');
+    r.appendChild(el('span', '', '📁 Données nécessaires : ' + (x.d ? (x.d.r2 ? x.d.r2 + ' (' + fsize(x.d.size) + ', stockage R2)' : (x.d.name || 'fichier envoyé')) : 'aucune')));
+    function after(msg) { alert(msg); return load().then(function () { document.querySelector('[data-t=pdf]').click(); }); }
+    if (x.d) {
+      var del = el('button', 'b sec red', 'Retirer'); del.type = 'button';
+      del.addEventListener('click', async function () {
+        if (!confirm('Retirer les données de « ' + x.title + ' » ?' + (x.d.r2 ? '\n\nLe fichier reste dans le stockage R2.' : ''))) return;
+        try { await call('/admin/ex-donnees', 'POST', { k: x.k, r2: '' }); await after('Données retirées.'); } catch (e) { alert(e.message); }
+      });
+      r.appendChild(del);
+    }
+    var lab = el('label', 'r2l'); lab.appendChild(document.createTextNode('Envoyer (10 Mo max.) :'));
+    var f = el('input'); f.type = 'file'; f.setAttribute('aria-label', 'Données nécessaires de ' + x.title);
+    f.addEventListener('change', async function () {
+      var file = f.files[0]; if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { alert('Fichier trop volumineux (10 Mo au maximum).\n\nPour un gros fichier, déposez-le dans le stockage R2 puis choisissez-le dans la liste « Gros fichier R2 ».'); f.value = ''; return; }
+      try { await call('/admin/file?k=' + encodeURIComponent(x.k + '-d') + '&name=' + encodeURIComponent(file.name), 'PUT', null, file); await after('Données envoyées.'); } catch (e) { alert(e.message); f.value = ''; }
+    });
+    lab.appendChild(f); r.appendChild(lab);
+    var objs = R2 && R2.enabled ? R2.objects.filter(function (o) { return !/\/$/.test(o.key); }) : [];
+    if (objs.length) {
+      var l2 = el('label', 'r2l'); l2.appendChild(document.createTextNode('📦 Gros fichier R2 :'));
+      var s2 = el('select'); s2.setAttribute('aria-label', 'Gros fichier de données pour ' + x.title);
+      var o0 = el('option', '', 'Choisir un fichier déposé…'); o0.value = ''; s2.appendChild(o0);
+      objs.forEach(function (o) { var op = el('option', '', o.key + ' (' + fsize(o.size) + ')'); op.value = o.key; s2.appendChild(op); });
+      s2.addEventListener('change', async function () {
+        if (!s2.value) return;
+        try { await call('/admin/ex-donnees', 'POST', { k: x.k, r2: s2.value }); await after('Données rattachées à « ' + x.title + ' ».'); } catch (e) { alert(e.message); s2.value = ''; }
+      });
+      l2.appendChild(s2); r.appendChild(l2);
+    }
+    return r;
+  }
+
   function renderPdfs() {
     var box = $('pdfs'); box.textContent = '';
     state.catalog.forEach(function (m) {
@@ -2157,10 +2261,11 @@ window.preparerPdf = async function (PDFLib, src) {
         f.addEventListener('change', async function () {
           if (!f.files[0]) return;
           if(f.files[0].size > 10 * 1024 * 1024) { alert("Fichier trop volumineux (max 10 Mo). Utilisez Bunny Storage pour les gros fichiers."); return; }
-          try { await call('/admin/file?k=' + encodeURIComponent(x.k), 'PUT', null, f.files[0]); alert('Fichier envoyé avec succès.'); await load(); document.querySelector('[data-t=pdf]').click(); }
+          try { await call('/admin/file?k=' + encodeURIComponent(x.k) + '&name=' + encodeURIComponent(f.files[0].name), 'PUT', null, f.files[0]); alert('Fichier envoyé avec succès.'); await load(); document.querySelector('[data-t=pdf]').click(); }
           catch (e) { alert(e.message); }
         });
         r.appendChild(f); box.appendChild(r);
+        box.appendChild(exDataRow(x));
       });
     });
   }

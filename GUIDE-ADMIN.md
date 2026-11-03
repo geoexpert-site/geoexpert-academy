@@ -123,7 +123,8 @@ Si c'est par exemple **votre propre paiement de test**, cliquez sur **Ignorer** 
 - sa dernière visite, ses connexions (et un avertissement si le code est utilisé depuis 4 réseaux ou plus) ;
 - la dernière leçon ouverte ;
 - **leçon par leçon**, ce qu'il a terminé et quand (« date inconnue » = terminé avant la mise à jour) ;
-- sous chaque formation, **« Exercices faits : X / Y »** : les exercices que l'apprenant a cochés « J'ai fait l'exercice », avec la date.
+- sous chaque formation, **« Exercices validés : X / Y »** : les exercices pratiques que vous avez validés, avec la date ;
+  « ⏳ envoyé le …, à valider » ou « ↩️ à reprendre » pour les autres (voir 7 quinquies bis).
 
 **Notes de suivi privées** (en bas de la fiche) :
 1. Écrivez votre note (ex. : « relancé sur WhatsApp », « bloqué sur la leçon 4 »).
@@ -324,6 +325,55 @@ Au-delà de 300 Mo, demandez à Claude : il utilise un outil d'envoi en plusieur
 
 ---
 
+## 7 quinquies bis. Exercices pratiques : consignes, données, validation (depuis le 03/11/2026)
+
+Chaque exercice pratique (ArcGIS et QGIS, chapitres 1 et 2) se présente ainsi chez l'apprenant, dans l'onglet
+**Exercices** de ses leçons :
+
+```
+Exercice pratique 1            [Ouvrir le PDF]      ← les consignes
+   📁 Données nécessaires (105 Mo)   [Télécharger]  ← s'il y en a
+   [Envoyer mon exercice au formateur]               ← ouvre WhatsApp
+Exercice pratique 2            [Après validation de l'exercice 1]   ← fermé
+```
+
+**L'exercice suivant ne s'ouvre que quand vous avez validé le précédent.** Pendant l'essai (7 jours), les exercices
+restent fermés comme avant.
+
+### Mettre les consignes et les données (onglet **📄 Fichiers (PDF/ZIP)**)
+
+Sous chaque exercice :
+- **Consignes** : choisissez le PDF (10 Mo maximum). « ✔️ En ligne » s'affiche quand c'est fait.
+- **📁 Données nécessaires** (facultatif), au choix :
+  - **Envoyer (10 Mo max.)** : un ZIP de données léger, envoyé directement depuis cette page ;
+  - **📦 Gros fichier R2** : un fichier déjà déposé dans le stockage R2 (voir 7 quater), par exemple
+    `exercices/module-1/exercice-donnees.zip`. Il n'est pas envoyé une deuxième fois.
+  - **Retirer** : l'apprenant ne voit plus les données (un gros fichier reste dans R2).
+
+Conseil : un ZIP par exercice, qui contient toutes les couches nécessaires (un shapefile = plusieurs fichiers).
+
+### Valider les exercices (onglet **✅ Exercices à valider**)
+
+1. L'apprenant clique sur **Envoyer mon exercice au formateur** : WhatsApp s'ouvre avec un message prêt, il y joint
+   ses fichiers. Chez lui, l'exercice indique « Envoyé le … : en attente de validation par le formateur ».
+2. Dans l'Admin, l'onglet **✅ Exercices à valider** affiche un compteur rose et la liste : nom de l'apprenant
+   (cliquez pour ouvrir sa fiche), exercice, formation, date d'envoi.
+3. Regardez son travail sur WhatsApp, puis :
+   - **Valider** : l'exercice passe en « Exercice validé par le formateur » et **l'exercice suivant s'ouvre** dans son
+     espace (à sa prochaine visite ou en rechargeant la page). Il compte dans « Exercices validés » et les badges.
+   - **À reprendre** : écrivez ce qu'il doit corriger. Il voit « À reprendre : votre commentaire » sous l'exercice et peut
+     le renvoyer. L'exercice suivant reste fermé.
+4. **💬 WhatsApp** prépare un message pour le prévenir (« bien reçu », « validé, l'exercice suivant est ouvert » ou
+   « à reprendre : … »). Il faut que son numéro soit enregistré dans sa fiche.
+
+Filtres : **À valider**, **À reprendre**, **Validés**, **Tous**. Une validation peut être retirée (« À reprendre ») :
+l'exercice suivant se referme. Chaque validation est notée dans le **Journal**.
+
+Les exercices que des apprenants avaient déjà cochés « J'ai fait l'exercice » avant le 03/11/2026 comptent comme
+validés (mention « coché par l'apprenant avant le 03/11/2026 ») : personne ne se retrouve bloqué.
+
+---
+
 ## 7 quinquies. Mes ressources (onglet **📂 Ressources**)
 
 Les documents de la rubrique **« Mes ressources »** de l'espace apprenant : livret d'accueil, kit de démarrage SIG,
@@ -449,7 +499,9 @@ Elle propose la suite avec le **prix du site** et le **lien de paiement habituel
   nombre de **semaines actives d'affilée**, et 5 **badges** liés à de vraies étapes (1re leçon, 1er chapitre terminé,
   1er exercice fait, 4 semaines d'affilée, formation terminée).
 - **Mes notes** (colonne de gauche, sous « Tableau de bord ») : toutes ses notes, leçon par leçon.
-- **J'ai fait l'exercice** : une case sous chaque exercice ; vous le voyez dans sa fiche.
+- **Exercices pratiques** (depuis le 03/11/2026) : consignes, données nécessaires, bouton « Envoyer mon exercice au formateur »
+  (WhatsApp) et statut (en attente, à reprendre, validé). L'exercice suivant s'ouvre après votre validation (voir 7 quinquies bis).
+  L'ancienne case « J'ai fait l'exercice » a disparu.
 - **Économie de données** : une case sous la vidéo ; la qualité est limitée à la taille de l'écran (beaucoup moins de
   données sur téléphone). Elle se coche toute seule si le téléphone signale une connexion lente.
 - **Mon attestation** (phase 3) : carte dans « Attestation et assistance », après les deux cartes habituelles ; PDF + lien de vérification.
@@ -490,4 +542,4 @@ Onglet **📜 Journal** de l'administration : tout ce qui a été fait, du plus 
 (300 dernières actions) avec la date, l'action, l'apprenant concerné, le détail et l'adresse e-mail de la personne connectée.
 
 Actions enregistrées : code créé, code désactivé / réactivé, accès prolongé, tout débloqué, module ajouté,
-code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, annonce publiée / retirée, quiz enregistré / supprimé, attestation délivrée / révoquée, avis publiable / masqué, contenu modifié, fichier de leçon envoyé / retiré, données d'un apprenant supprimées, mot de passe incorrect.
+code remplacé (perdu), vidéos Bunny modifiées, fichier d'exercice envoyé, note de suivi ajoutée / supprimée (sans son texte), numéro WhatsApp enregistré / supprimé, relance faite, liste exportée, annonce publiée / retirée, quiz enregistré / supprimé, attestation délivrée / révoquée, avis publiable / masqué, contenu modifié, fichier de leçon envoyé / retiré, données d'un apprenant supprimées, exercice validé / à reprendre, données d'exercice rattachées / retirées, mot de passe incorrect.

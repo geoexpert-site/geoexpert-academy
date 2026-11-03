@@ -282,6 +282,37 @@ function fmtSize(n) {
   return n >= 1e9 ? (n / 1e9).toFixed(1).replace('.', ',') + ' Go' : n >= 1e6 ? Math.round(n / 1e6) + ' Mo' : Math.max(1, Math.round(n / 1e3)) + ' Ko';
 }
 
+// ---------------------------------------------------------------- Exercices pratiques (03/11/2026)
+// Chaque exercice = consignes (PDF, clé « arc1-e1 ») + données nécessaires facultatives (clé « arc1-e1-d ») :
+// petit fichier envoyé dans l'administration (KV) ou gros fichier choisi dans R2 (cfg.exd[exercice] = { r2, size }).
+// L'apprenant envoie son travail au formateur sur WhatsApp ; l'exercice suivant s'ouvre quand le formateur l'a validé.
+function exShort(e) { return String(e.title).replace(/\s*\(.*\)\s*$/, ''); }
+function exDonnees(cfg, k) {
+  const r = cfg.exd[k];
+  return r && r.r2 ? { r2: r.r2, size: r.size || 0 } : cfg.files[k + '-d'] ? { kv: true } : null;
+}
+// Gros fichier de données d'un exercice (pour /dl/), au même format qu'un fichier de leçon : { r2, title }.
+async function exDataFile(env, k) {
+  const base = k.replace(/-d$/, ''), m = findModule(moduleOf(base)), e = m && m.exercises.find(x => x.k === base);
+  const d = e && exDonnees(await getCfg(env), base);
+  return d && d.r2 ? { r2: d.r2, title: 'Donnees ' + exShort(e) } : null;
+}
+// Statuts des exercices d'un apprenant : { k: { statut, commentaire, t, tv } }. null si la base est indisponible.
+async function loadExSuivi(env, c) {
+  if (!env.DB) return null;
+  try {
+    const r = await env.DB.prepare('SELECT k, statut, commentaire, t, tv FROM ex_suivi WHERE code = ?').bind(c).all();
+    const o = {}; for (const x of r.results) o[x.k] = x; return o;
+  } catch (e) { return null; }
+}
+// Numéro de l'exercice à faire valider d'abord (1, 2…), ou 0 si l'exercice est ouvert. Sans base : rien n'est bloqué.
+function exAttente(m, k, sv) {
+  const i = m.exercises.findIndex(e => e.k === k);
+  if (i <= 0 || !sv) return 0;
+  const p = sv[m.exercises[i - 1].k];
+  return p && p.statut === 'valide' ? 0 : i;
+}
+
 // ---------------------------------------------------------------- Gros fichiers (Cloudflare R2, binding FICHIERS)
 // Le bucket n'est jamais public. Après les vérifications de /api/file, l'apprenant reçoit un lien signé de courte durée
 // vers CE Worker (/dl/…), qui lit le fichier dans R2 et l'envoie en continu (streaming) : presque aucun temps de calcul,
@@ -292,7 +323,7 @@ async function download(req, env, url) {
   const html = (status, msg) => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Téléchargement</title>'
     + '<p style="font:16px sans-serif;margin:40px auto;max-width:480px;padding:0 16px">' + msg + '</p>', { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
   const [, , k, exp, sig] = url.pathname.split('/');
-  const f = /^[a-z0-9]+-v\d{2,3}-f\d+$/.test(k || '') ? lessonFile(k) : null;
+  const f = /^[a-z0-9]+-v\d{2,3}-f\d+$/.test(k || '') ? lessonFile(k) : /^[a-z0-9]+-e\d+-d$/.test(k || '') ? await exDataFile(env, k) : null;
   if (!env.FICHIERS || !env.DL_SECRET || !f || !f.r2 || !/^\d{10}$/.test(exp || '') || !(await safeEqual(sig || '', await dlSig(env, k, f.r2, exp))))
     return html(403, 'Lien de téléchargement non valable. Retournez dans votre espace apprenant et cliquez à nouveau sur « Télécharger ».');
   if (Date.now() / 1000 > +exp) return html(403, 'Ce lien de téléchargement a expiré. Retournez dans votre espace apprenant et cliquez à nouveau sur « Télécharger ».');
@@ -488,7 +519,7 @@ async function readJson(req) {
 async function getCfg(env) {
   const raw = await env.ACCESS.get('cfg');
   const c = raw ? JSON.parse(raw) : {};
-  return { ids: c.ids || {}, files: c.files || {}, names: c.names || {} };
+  return { ids: c.ids || {}, files: c.files || {}, names: c.names || {}, exd: c.exd || {} };
 }
 async function findStudent(env, code) {
   const c = normCode(code);
@@ -1091,7 +1122,7 @@ async function api(req, env, url) {
   if (startAccess(rec, now)) await env.ACCESS.put('s:' + c, JSON.stringify(rec));
 
   if (url.pathname === '/api/login') {
-    const cfg = await getCfg(env);
+    const cfg = await getCfg(env), sv = await loadExSuivi(env, c);
     // Pendant l'essai, une leçon bloquée ne renvoie que son titre, sa durée et sa date de déblocage.
     const mods = rec.modules.map(g => {
       const m = findModule(g.m); if (!m) return null;
@@ -1104,7 +1135,13 @@ async function api(req, env, url) {
         }),
         exercises: m.exercises.map(e => {
           const t = trialLock(rec, e.k, now);
-          return t ? { k: e.k, title: e.title, locked: true, unlockAt: t } : { k: e.k, title: e.title, ready: !!cfg.files[e.k] };
+          if (t) return { k: e.k, title: e.title, locked: true, unlockAt: t };
+          const o = { k: e.k, title: e.title, ready: !!cfg.files[e.k] }, att = exAttente(m, e.k, sv);
+          if (att) return Object.assign(o, { attente: att });   // bloqué : l'exercice précédent n'est pas encore validé
+          const d = exDonnees(cfg, e.k), s = sv && sv[e.k];
+          if (d) o.donnees = { k: e.k + '-d', ready: d.kv || !!env.FICHIERS, title: 'Données nécessaires' + (d.size ? ' (' + fmtSize(d.size) + ')' : '') };
+          if (s) Object.assign(o, { st: s.statut, t: s.t, tv: s.tv }, s.statut === 'a_reprendre' && s.commentaire ? { com: s.commentaire } : {});
+          return o;
         }),
       };
     }).filter(Boolean);
@@ -1160,7 +1197,7 @@ async function api(req, env, url) {
   }
 
   // Leçons, exercices, fichiers et quiz : seulement après l'acceptation de la charte.
-  if (['/api/play', '/api/file', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
+  if (['/api/play', '/api/file', '/api/ex-envoi', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
     return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
 
   // Rendez-vous live : lien Teams seulement pour un apprenant concerné, de 30 min avant le début jusqu'à la fin.
@@ -1357,15 +1394,8 @@ async function api(req, env, url) {
       else st.push(env.DB.prepare('INSERT INTO notes (code, k, text, updated) VALUES (?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET text = excluded.text, updated = excluded.updated')
         .bind(c, k, text, now));
     }
-    // Exercices faits : { exercice: date (ms) | 0 (décoché) }
-    const exs = Object.entries(body.ex && typeof body.ex === 'object' ? body.ex : {}).slice(0, 100);
-    for (const [k, v] of exs) {
-      if (!ownsExercise(rec, k)) continue;
-      const t = Number(v);
-      if (!t) st.push(env.DB.prepare('DELETE FROM exercises WHERE code = ? AND k = ?').bind(c, k));
-      else st.push(env.DB.prepare('INSERT INTO exercises (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING')
-        .bind(c, k, t > 1.6e12 && t <= now + 60000 ? Math.floor(t) : now));
-    }
+    // Exercices faits (table « exercises ») : écrits seulement quand le formateur valide (/admin/ex-statut).
+    // L'ancienne case « J'ai fait l'exercice » (body.ex) est ignorée.
     // Objectif de la semaine : 0 (aucun) à 7 leçons
     if (body.goal !== undefined && body.goal !== null) {
       const goal = Math.min(Math.max(parseInt(body.goal, 10) || 0, 0), 7);
@@ -1395,14 +1425,41 @@ async function api(req, env, url) {
     return reply({ url: 'https://' + host + '/embed/' + env.LIBRARY_ID + '/' + id + '?token=' + token + '&expires=' + expires + '&autoplay=false&preload=false', label: rec.label }, 200, req, env);
   }
 
+  // Exercice pratique envoyé au formateur (sur WhatsApp, par la page) : il passe « en attente de validation ».
+  if (url.pathname === '/api/ex-envoi') {
+    if (!env.DB) return reply({ error: 'Enregistrement indisponible pour le moment.' }, 503, req, env);
+    const k = String(body.k || ''), m = findModule(moduleOf(k));
+    if (!ownsExercise(rec, k)) return reply({ error: 'Cet exercice ne fait pas partie de votre formation.' }, 403, req, env);
+    const e = entitled(rec, k, now);
+    if (!e.ok) return reply({ error: 'Cet exercice n\'est pas encore disponible.' }, 403, req, env);
+    const sv = await loadExSuivi(env, c), att = exAttente(m, k, sv);
+    if (att) return reply({ error: 'Cet exercice s\'ouvrira quand le formateur aura validé l\'exercice ' + att + '.' }, 403, req, env);
+    if (sv && sv[k] && sv[k].statut === 'valide') return reply({ ok: true, st: 'valide', t: sv[k].t, tv: sv[k].tv }, 200, req, env);
+    await env.DB.prepare("INSERT INTO ex_suivi (code, k, statut, t) VALUES (?, ?, 'envoye', ?) ON CONFLICT (code, k) DO UPDATE SET statut = 'envoye', t = excluded.t")
+      .bind(c, k, now).run();
+    return reply({ ok: true, st: 'envoye', t: now }, 200, req, env);
+  }
+
   if (url.pathname === '/api/file') {
     const k = String(body.k || '');
     const e = entitled(rec, k, now);
     if (e.trial) return reply({ error: 'Cet exercice sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
     if (/-f\d+$/.test(k) && !ownsLesson(rec, lessonOfFile(k))) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
+    // Exercice pratique (consignes ou données) : ouvert seulement quand l'exercice précédent est validé par le formateur.
+    const exm = /^([a-z0-9]+-e\d+)(-d)?$/.exec(k);
+    let big = /-f\d+$/.test(k) ? lessonFile(k) : null;
+    if (exm) {
+      const m = findModule(moduleOf(k)), e = m && m.exercises.find(x => x.k === exm[1]);
+      if (!e) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
+      const att = exAttente(m, e.k, await loadExSuivi(env, c));
+      if (att) return reply({ error: 'Cet exercice s\'ouvrira quand le formateur aura validé l\'exercice ' + att + '.' }, 403, req, env);
+      if (exm[2]) {
+        big = exDonnees(await getCfg(env), e.k);
+        if (!big) return reply({ error: 'Ce fichier sera disponible prochainement.' }, 404, req, env);
+      }
+    }
     // Gros fichier (R2) : mêmes vérifications que ci-dessus, puis un lien signé de courte durée (la page l'ouvre directement).
-    const big = /-f\d+$/.test(k) ? lessonFile(k) : null;
     if (big && big.r2) {
       if (!env.FICHIERS || !env.DL_SECRET) return reply({ error: 'Ce fichier sera disponible prochainement.' }, 404, req, env);
       const exp = String(Math.floor(now / 1000) + DL_MINUTES * 60);
@@ -1415,7 +1472,8 @@ async function api(req, env, url) {
     let filename = k + ext;
     if (m) {
       const ex = m.exercises.find(x => x.k === k) || (m.videos.find(v => v.k === lessonOfFile(k)) || { files: [] }).files.find(x => x.k === k);
-      if (ex) filename = ex.title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '') + ext;
+      if (exm && exm[2]) filename = cleanFilename('Donnees ' + exShort(m.exercises.find(x => x.k === exm[1])), ext);
+      else if (ex) filename = cleanFilename(exm ? exShort(ex) : ex.title, ext);
     }
 
     const buf = await env.ACCESS.get('f:' + k, 'arrayBuffer');
@@ -1644,7 +1702,7 @@ async function admin(req, env, url) {
     students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
-      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => ({ k: e.k, title: e.title, has: !!cfg.files[e.k] })) })),
+      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => { const d = exDonnees(cfg, e.k); return { k: e.k, title: e.title, has: !!cfg.files[e.k], name: cfg.names[e.k] || '', d: d ? (d.r2 ? d : { kv: true, name: cfg.names[e.k + '-d'] || '' }) : null }; }) })),
       products: Object.keys(PRODUCTS), students, stats: dashboardStats(students, prog, now),
     }, 200, req, env);
   }
@@ -1655,7 +1713,7 @@ async function admin(req, env, url) {
     const raw = c && await env.ACCESS.get('s:' + c);
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw);
-    const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' };
+    const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' }, sv = (await loadExSuivi(env, c)) || {};
     let act = 0, notes = [], phone = '', relances = [], chartes = [];
     const quiz = {};
     if (env.DB) {
@@ -1688,7 +1746,7 @@ async function admin(req, env, url) {
       modules: rec.modules.map(g => {
         const m = findModule(g.m); if (!m) return null;
         return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0, quiz: quiz[v.k] || null })),
-          exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0 })) };
+          exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0, st: (sv[e.k] || {}).statut || '', t: (sv[e.k] || {}).t || 0 })) };
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
@@ -1833,6 +1891,53 @@ async function admin(req, env, url) {
     if (b.status === 'publiable' && !row.consent) return reply({ error: 'L\'apprenant n\'a pas accepté que cet avis soit publié.' }, 400, req, env);
     await env.DB.prepare('UPDATE reviews SET status = ? WHERE id = ?').bind(b.status, row.id).run();
     await journal(env, who, b.status === 'publiable' ? 'Avis publié sur le site' : b.status === 'masque' ? 'Avis masqué' : 'Avis remis en « nouveau »', '', row.name, '');
+    return reply({ ok: true }, 200, req, env);
+  }
+
+  // ---- Exercices pratiques : envois des apprenants, validation par le formateur (débloque l'exercice suivant).
+  if (url.pathname === '/admin/exercices' && req.method === 'GET') {
+    if (!env.DB) return reply({ envois: [] }, 200, req, env);
+    const r = await env.DB.prepare('SELECT * FROM ex_suivi ORDER BY t DESC LIMIT 1000').all();
+    return reply({ envois: r.results.map(x => {
+      const m = findModule(moduleOf(x.k)), i = m ? m.exercises.findIndex(e => e.k === x.k) : -1;
+      return { code: prettyCode(x.code), k: x.k, module: m ? m.title : '', exercice: i >= 0 ? exShort(m.exercises[i]) : x.k, num: i + 1,
+        suivant: m && m.exercises[i + 1] ? exShort(m.exercises[i + 1]) : '', statut: x.statut, commentaire: x.commentaire, t: x.t, tv: x.tv, who: x.who };
+    }) }, 200, req, env);
+  }
+  if (url.pathname === '/admin/ex-statut' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req), c = normCode(b.code), k = String(b.k || ''), m = findModule(moduleOf(k));
+    if (!c || !(await env.ACCESS.get('s:' + c))) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    if (!m || !m.exercises.some(e => e.k === k)) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    if (!['valide', 'a_reprendre'].includes(b.statut)) return reply({ error: 'Statut inconnu.' }, 400, req, env);
+    const com = String(b.commentaire || '').replace(/[\u0000-\u0009\u000b-\u001f<>]/g, ' ').trim().slice(0, 600);
+    const ok = b.statut === 'valide';
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO ex_suivi (code, k, statut, commentaire, t, tv, who) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET statut = excluded.statut, commentaire = excluded.commentaire, tv = excluded.tv, who = excluded.who')
+        .bind(c, k, b.statut, com, now, ok ? now : 0, who),
+      ok ? env.DB.prepare('INSERT INTO exercises (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING').bind(c, k, now)
+        : env.DB.prepare('DELETE FROM exercises WHERE code = ? AND k = ?').bind(c, k),
+    ]);
+    await journal(env, who, ok ? 'Exercice validé' : 'Exercice à reprendre', prettyCode(c), '', exShort(m.exercises.find(e => e.k === k)) + ' · ' + m.title.split(' : ')[0] + (com ? ' · ' + com : ''));
+    return reply({ ok: true }, 200, req, env);
+  }
+  // Données nécessaires d'un exercice : gros fichier choisi dans R2 (r2 = clé), ou retrait (r2 = '') du fichier actuel.
+  if (url.pathname === '/admin/ex-donnees' && req.method === 'POST') {
+    const b = await readJson(req), k = String(b.k || ''), m = findModule(moduleOf(k));
+    if (!m || !m.exercises.some(e => e.k === k)) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    const key = String(b.r2 || '').slice(0, 1024);
+    let obj = null;
+    if (key) {
+      if (!env.FICHIERS) return reply({ error: 'Stockage des gros fichiers (R2) non relié à ce Worker.' }, 503, req, env);
+      obj = await env.FICHIERS.head(key);
+      if (!obj) return reply({ error: 'Fichier introuvable dans le stockage R2 : vérifiez son nom.' }, 404, req, env);
+    }
+    const cfg = await getCfg(env);
+    delete cfg.files[k + '-d']; delete cfg.names[k + '-d'];
+    if (obj) cfg.exd[k] = { r2: key, size: obj.size }; else delete cfg.exd[k];
+    await env.ACCESS.put('cfg', JSON.stringify(cfg));
+    await env.ACCESS.delete('f:' + k + '-d');   // petit fichier envoyé avant : remplacé ou retiré (un gros fichier reste dans R2)
+    await journal(env, who, obj ? 'Données d\'exercice rattachées' : 'Données d\'exercice retirées', '', '', k + (obj ? ' · ' + key + ' (' + fmtSize(obj.size) + ')' : ''));
     return reply({ ok: true }, 200, req, env);
   }
 
@@ -2067,7 +2172,7 @@ async function admin(req, env, url) {
       for (const x of all) {
         st.push(env.DB.prepare('DELETE FROM avis_info WHERE id IN (SELECT id FROM reviews WHERE code = ?)').bind(x));
         st.push(env.DB.prepare('DELETE FROM filleuls WHERE parrain = ?').bind(x));
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes', 'portfolio', 'parrains', 'filleuls']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'ex_suivi', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes', 'portfolio', 'parrains', 'filleuls']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
         st.push(env.DB.prepare('INSERT OR IGNORE INTO codes_supprimes (code, t) VALUES (?, ?)').bind(x, now));
       }
@@ -2148,6 +2253,7 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE contacts SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE relances SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE exercises SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE ex_suivi SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE prefs SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE quiz_results SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE certificates SET code = ? WHERE code = ?').bind(code, old),
@@ -2473,7 +2579,9 @@ async function admin(req, env, url) {
   if (url.pathname === '/admin/file' && req.method === 'PUT') {
     const k = url.searchParams.get('k') || '';
     const lessonFile = /^[a-z0-9]+-v\d{2,3}-f\d+$/.test(k);
-    if (!/^[a-z0-9]+-e\d+$/.test(k) && !lessonFile) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    if (!/^[a-z0-9]+-e\d+(-d)?$/.test(k) && !lessonFile) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    const exo = !lessonFile && (findModule(moduleOf(k)) || { exercises: [] }).exercises.find(e => e.k === k.replace(/-d$/, ''));
+    if (!lessonFile && !exo) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
     const lesson = lessonFile && (findModule(moduleOf(k)) || { videos: [] }).videos.find(v => v.k === lessonOfFile(k));
     if (lessonFile && !lesson) return reply({ error: 'Leçon inconnue.' }, 400, req, env);
     const fname = String(url.searchParams.get('name') || '').replace(/[^\w.\- ]/g, '').slice(-80);
@@ -2481,6 +2589,7 @@ async function admin(req, env, url) {
     if (buf.byteLength < 100 || buf.byteLength > 10 * 1024 * 1024) return reply({ error: 'Fichier vide ou supérieur à 10 Mo.' }, 400, req, env);
     await env.ACCESS.put('f:' + k, buf);
     const cfg = await getCfg(env); cfg.files[k] = true; if (fname) cfg.names[k] = fname;
+    if (/-d$/.test(k)) delete cfg.exd[k.slice(0, -2)];   // données d'exercice : le petit fichier remplace un gros fichier R2
     await env.ACCESS.put('cfg', JSON.stringify(cfg));
     if (lessonFile && !(lesson.files || []).some(f => f.k === k)) {
       const title = String(url.searchParams.get('title') || fname.replace(/\.[^.]*$/, '') || 'Fichier').trim().slice(0, 120);

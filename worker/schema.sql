@@ -289,3 +289,23 @@ CREATE TABLE IF NOT EXISTS filleuls (
   who TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS filleuls_parrain ON filleuls (parrain);
+
+-- Exercices pratiques validés par le formateur (03/11/2026) -----------------------------------------
+-- L'apprenant envoie son exercice sur WhatsApp (statut « envoye ») ; le formateur le valide (« valide »)
+-- ou demande de le reprendre (« a_reprendre », avec un commentaire que l'apprenant voit).
+-- L'exercice suivant d'un module s'ouvre quand le précédent est « valide ». t = envoi, tv = validation.
+-- La table « exercises » garde les exercices faits (validés) pour les compteurs, badges et suivi.
+CREATE TABLE IF NOT EXISTS ex_suivi (
+  code TEXT NOT NULL,
+  k TEXT NOT NULL,
+  statut TEXT NOT NULL DEFAULT 'envoye',
+  commentaire TEXT NOT NULL DEFAULT '',
+  t INTEGER NOT NULL DEFAULT 0,
+  tv INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (code, k)
+);
+CREATE INDEX IF NOT EXISTS ex_suivi_statut ON ex_suivi (statut);
+-- Reprise : les exercices déjà cochés « J'ai fait l'exercice » avant ce changement comptent comme validés
+-- (aucun apprenant ne se retrouve bloqué). Sans effet sur les lignes déjà présentes.
+INSERT OR IGNORE INTO ex_suivi (code, k, statut, t, tv, who) SELECT code, k, 'valide', done_at, done_at, 'reprise' FROM exercises;

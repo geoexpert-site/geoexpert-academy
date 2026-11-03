@@ -392,6 +392,23 @@ Règles permanentes : `REGLES-PLATEFORME.md`. Mise en ligne et retour en arrièr
 - [x] `quiz/quiz-qgis-chapitre1.json` retiré du dépôt public ; dossier `quiz/` ignoré par git et non publié ; copies des fichiers de quiz : `GeoExpert-Sauvegardes\quiz\` (le fichier reste lisible dans l'historique git public)
 - (ancien constat) `quiz/quiz-qgis-chapitre1.json` était dans le dépôt public (réponses lisibles) : à retirer ; réponses du chapitre 2 : 17 / 36 sur la 3e option
 
+## Exercices pratiques : données nécessaires + validation par le formateur (demande du 03/11/2026)
+
+Demande : sous chaque exercice, les consignes (PDF) **et** les données nécessaires ; l'exercice suivant ne s'ouvre
+qu'après validation du formateur. Choix de l'administrateur : envoi du travail **par WhatsApp** ; refus = « À reprendre »
+**avec un commentaire** visible par l'apprenant.
+
+- [x] Données : `arc1-e1-d` = petit fichier (KV, 10 Mo, `/admin/file`) ou gros fichier R2 (`cfg.exd[exercice] = { r2, size }`, `/admin/ex-donnees`) ; téléchargement par `/api/file` (KV) ou lien signé `/dl/<k>-d/…` (R2)
+- [x] Table D1 `ex_suivi` (code, k, statut envoye / valide / a_reprendre, commentaire, t, tv, who) ; `exercises` = exercices **validés** (compteurs, badges, fiche) ; la case « J'ai fait l'exercice » est retirée et `body.ex` de `/api/progress` ignoré
+- [x] Déblocage : exercice N fermé tant que N−1 n'est pas « valide » (connexion : `attente`, `/api/file` et `/api/ex-envoi` → 403) ; essai inchangé (exercices fermés jusqu'à la fin de l'essai)
+- [x] Reprise : `schema.sql` recopie les exercices déjà cochés en « valide » (`who = 'reprise'`) → personne n'est bloqué
+- [x] Page apprenant (onglet Exercices) : « Après validation de l'exercice N » (bouton désactivé), ligne « 📁 Données nécessaires (taille) », bouton vert « Envoyer mon exercice au formateur » (WhatsApp + `/api/ex-envoi`), statuts « Envoyé le … : en attente », « À reprendre : … », « Exercice validé par le formateur le … » ; badge « Premier exercice fait » = 1er exercice validé
+- [x] Admin : onglet **✅ Exercices à valider** (compteur, filtres, Valider / À reprendre + commentaire, 💬 WhatsApp préparé, journal) ; onglet 📄 Fichiers : ligne « Données nécessaires » (envoi 10 Mo, choix R2, Retirer) ; nom du fichier de consignes gardé (un ZIP n'est plus téléchargé en « .pdf ») ; fiche : « Exercices validés : X / Y » ; les « dossiers » vides de R2 (`lecons/`) ne sont plus proposés
+- [x] Tests : `GeoExpert-Outils\test-exercices.mjs` (`api` : serveur + page dans Edge, ordinateur et téléphone ; `admin` : onglets) · captures : `geoexpert-captures\exercices-validation\`
+- [x] Résultats (03/11/2026) : `api` 72/72, `admin` 16/16, preuve pixel 20/20 (`exercices-validation\preuve-pixel\`, page d'avant = git HEAD, même serveur et mêmes données) : notes, aide, onglet Exercices sans exercice pratique (Télédétection) **identiques** ; tableau de bord : seulement la ligne du badge « Premier exercice fait » (nouveau texte, même hauteur) ; onglet Exercices QGIS : le changement demandé
+- [x] Worker de TEST : `schema.sql` appliqué à `geoexpert-test`, `espace-apprenant-api-test` → c9254d26, `geoexpert-admin-test` → 8f283ba6 ; `verif-test-exercices.mjs` 6/6 (code temporaire supprimé)
+- [ ] Mise en ligne (accord de l'administrateur) : sauvegarde, **`schema.sql` en production d'abord**, puis les deux Workers, puis la page `espace-apprenant.html` (commit sur `main`)
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
