@@ -410,6 +410,15 @@ qu'après validation du formateur. Choix de l'administrateur : envoi du travail 
 - [x] **En ligne le 03/11/2026** (accord de l'administrateur) : sauvegarde `GeoExpert-Sauvegardes\2026-11-03-avant-exercices-valides\` (KV, D1, page et code d'avant, `versions-avant.txt`) ; `schema.sql` appliqué à `geoexpert-prod` (aucun exercice coché avant : rien à reprendre) ; `espace-apprenant-api` → fb584ba2 (avant df788391), `geoexpert-admin` → 87e331c9 (avant 800eaffc) ; page dans `main` (0585783) ; `verif-test-exercices.mjs prod` 6/6 (code temporaire et lignes supprimés), `/admin/exercices` sans Access → 302
 - retour en arrière : `wrangler rollback` des deux Workers (versions ci-dessus) + `espace-apprenant.html` de la sauvegarde ; la table `ex_suivi` peut rester (sans effet sur l'ancien code)
 
+## Données du cours, quiz proposé en fin de leçon, leçons de préparation (demande du 03/11/2026)
+
+- [x] Onglet **« Données du cours »** (entre « Mes notes » et « Exercices », seulement si la leçon a des fichiers) ; « Exercices » = exercices pratiques seulement ; onglets passent à la ligne si besoin (téléphone)
+- [x] Quiz proposé à la fin d'une leçon (« Terminer et continuer », « Marquer comme terminée », « Terminer le module ») : fenêtre « Faire le quiz / Plus tard », une fois par leçon (`P.qp`, sur l'appareil), pas si déjà fait (`quizFaits` renvoyé à la connexion)
+- [x] Exercices : « Préparez-le avec les leçons : X à Y (n sur N terminées) » + lien vers la prochaine leçon (indication, sans blocage) ; Admin, onglet 📄 Fichiers : « 📚 Leçons à suivre avant » (de / à) → `cfg.exl`, route `/admin/ex-lecons`
+- [x] Tests : `test-exercices.mjs` api 96/96, admin 18/18, pixels 20/20 (écrans sans ces nouveautés identiques)
+- [x] **En ligne le 03/11/2026** (accord de l'administrateur, « mets en ligne directement ») : sauvegarde `GeoExpert-Sauvegardes6-11-03-avant-donnees-cours-quiz\` (23 clés KV, D1, page) ; `espace-apprenant-api` → 76298f9d (avant fb584ba2), `geoexpert-admin` → 3494e2f9 (avant 87e331c9) ; page dans `main` (e2304f1) ; `verif-test-exercices.mjs prod` 7/7
+- à faire : `test-progres.mjs` et `test-prod-phase2.mjs` testent encore l'ancienne case « J'ai fait l'exercice » (retirée) : à adapter avant le prochain `tous-les-tests.mjs`
+
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
 - **Branche de travail :** `phase-1` (le site en ligne = branche `main`, non touchée).
