@@ -20,4 +20,5 @@ exclude:
   - REGLES-PLATEFORME.md
   - worker/
   - quiz/
+  - audit/
   - settings.json
