@@ -85,7 +85,7 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.pl .go{background:var(--mag);border:0;color:#fff;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}.pl .go .ic{width:34px;height:34px}.pl .go svg{fill:#fff}
 .pl .er{padding:20px;text-align:center}.wm{position:absolute;z-index:3;pointer-events:none;color:rgba(255,255,255,.5);font:600 14px Inter;text-shadow:0 0 4px #000;transition:all 1.2s}
 .ctl{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.ctl .sp{flex:1}
-.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-top:8px}.tabs button{border:0;background:none;color:var(--dim);padding:10px 14px;font-weight:600;border-bottom:3px solid transparent}.tabs button.on{color:var(--ink);border-color:var(--teal)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line);margin-top:8px}.tabs button{border:0;background:none;color:var(--dim);padding:10px 14px;font-weight:600;border-bottom:3px solid transparent}.tabs button.on{color:var(--ink);border-color:var(--teal)}
 .pn{padding:16px 0}.pn textarea{width:100%;min-height:150px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:15px Inter;resize:vertical}
 .ex{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.ex span:nth-child(2){flex:1}.note{color:var(--dim);font-size:13px}
 .trial{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--mag);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-weight:500}.trial .ic{flex:0 0 18px;margin-top:2px;color:var(--mag)}
@@ -105,6 +105,7 @@ h2.s{font-size:18px;margin:26px 0 12px}.grid{display:grid;grid-template-columns:
 .bdg{grid-column:1/-1}.bdg h3{margin-bottom:4px}.bd{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.bd b{display:block;font-size:14px}.bd small{color:var(--dim);font-size:12.5px}
 .bi{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--dim)}.bi .ic{width:15px;height:15px}.bd.on .bi{background:var(--teal);color:#fff}
 .exs{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:-4px 0 8px 30px;font-size:13.5px;color:var(--dim)}.exs span:not(.ic){flex:1 1 220px}.exs .btn{padding:8px 13px;font-size:13.5px}
+.exs.exp{margin-top:-6px}.exs .lk{border:0;background:none;padding:0;color:var(--teal);font:600 13.5px Inter;cursor:pointer;text-decoration:underline}.qzp{max-width:440px}
 .exs.ok{color:var(--teal);font-weight:600}.exs.rep{color:var(--mag);font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere}.exs .ic{width:16px;height:16px}.ex.exdo{margin-left:30px;border-top-style:dashed}
 .exd{display:flex;align-items:center;gap:8px;margin:-4px 0 6px 30px;font-size:13.5px;color:var(--dim);cursor:pointer}.exd input{width:17px;height:17px;accent-color:var(--teal)}.exd.on{color:var(--teal);font-weight:600}
 .nt{margin-bottom:12px}.nt h3{font-size:16px;margin:2px 0 8px}.ntx{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;font-size:14.5px}
@@ -928,7 +929,7 @@ function lesson(k){
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
  if(l.ready&&!l.lock)m.appendChild(vitCtl());
- var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){setDone(k,!P.done[k]);lesson(k)}},ic('check'),done?'Terminée':'Marquer comme terminée');
+ var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){var was=P.done[k];setDone(k,!was);lesson(k);if(!was)quizPropose(k,function(){})}},ic('check'),done?'Terminée':'Marquer comme terminée');
 
 var nx=a[ix+1],pv=a[ix-1];
         
@@ -938,8 +939,8 @@ if(!pv) prevBtn.disabled = true; // On désactive proprement si on est à la 1è
 
 // 2. Création du bouton Suivant / Terminer
 var nextBtn = nx 
-  ? h('button',{class:'btn mag',onclick:function(){ setDone(k,true); lesson(nx.k); }}, 'Terminer et continuer', ic('right'))
-  : h('button',{class:'btn mag',onclick:function(){ setDone(k,true); home(); }}, 'Terminer le module');
+  ? h('button',{class:'btn mag',onclick:function(){ setDone(k,true); quizPropose(k,function(){ lesson(nx.k); }); }}, 'Terminer et continuer', ic('right'))
+  : h('button',{class:'btn mag',onclick:function(){ setDone(k,true); quizPropose(k,home); }}, 'Terminer le module');
 
 // 3. On ajoute tout ça à la page
 m.appendChild(h('div',{class:'ctl'},
@@ -950,16 +951,17 @@ m.appendChild(h('div',{class:'ctl'},
 ));
 
  var tabs=h('div',{class:'tabs'}),pn=h('div',{class:'pn'});
- var hasQuiz=!l.lock&&(D.quiz||[]).indexOf(k)>-1;if(tab==='quiz'&&!hasQuiz)tab='notes';
- [['notes','Mes notes'],['ex','Exercices'],['aide','Aide']].concat(hasQuiz?[['quiz','Quiz']]:[]).forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
+ var hasQuiz=!l.lock&&(D.quiz||[]).indexOf(k)>-1;if(tab==='quiz'&&!hasQuiz)tab='notes';var hasDon=!!(l.files&&l.files.length);if(tab==='don'&&!hasDon)tab='notes';
+ [['notes','Mes notes']].concat(hasDon?[['don','Données du cours']]:[],[['ex','Exercices'],['aide','Aide']]).concat(hasQuiz?[['quiz','Quiz']]:[]).forEach(function(t){tabs.appendChild(h('button',{class:tab===t[0]?'on':'',onclick:function(){tab=t[0];lesson(k)}},t[1]))});
  if(tab==='notes'){var ta=h('textarea',{placeholder:'Écrivez vos notes pour cette leçon : elles sont enregistrées automatiquement sur votre compte.','aria-label':'Mes notes'});ta.value=P.notes[k]||'';var tm;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){setNote(k,ta.value)},400)});pn.appendChild(ta)}
  
+ // Données du cours : fichiers joints à cette leçon (onglet affiché seulement s'il y en a, 03/11/2026)
+ if(tab==='don')l.files.forEach(function(f){var fb=h('button',{class:'btn alt',onclick:function(e){openFile(f.k,e.currentTarget)}},f.ready?'Télécharger':'Bientôt');if(!f.ready)fb.disabled=true;
+    pn.appendChild(h('div',{class:'ex'},ic('folder'),h('span',{text:f.title}),fb))});
+
  // --- CORRECTION DES BOUTONS D'EXERCICES ---
  if(tab==='ex'){
-   // Fichiers joints à cette leçon (données, consignes…), avant les exercices du module
-   l.files.forEach(function(f){var fb=h('button',{class:'btn alt',onclick:function(e){openFile(f.k,e.currentTarget)}},f.ready?'Télécharger':'Bientôt');if(!f.ready)fb.disabled=true;
-    pn.appendChild(h('div',{class:'ex'},ic('pdf'),h('span',{text:f.title}),fb))});
-   if(!l.m.exercises.length&&!l.files.length) pn.appendChild(h('p',{class:'note',text:'Ce module ne contient pas d\'exercice PDF.'}));
+   if(!l.m.exercises.length) pn.appendChild(h('p',{class:'note',text:'Ce module ne contient pas d\'exercice PDF.'}));
    l.m.exercises.forEach(function(x){
      var btn = h('button', {class:'btn alt', onclick: function(e){ openFile(x.k, e.currentTarget); }});
      if (x.locked) {
@@ -975,6 +977,7 @@ m.appendChild(h('div',{class:'ctl'},
        btn.disabled = true; // Désactivation propre
      }
      pn.appendChild(h('div',{class:'ex'}, ic('pdf'), h('span',{text:x.title}), btn));
+     if(x.prep&&!x.locked&&!l.lock)exPrep(x,pn);
      if(!x.locked&&!l.lock&&!x.attente)exSuivi(x,l,k,pn);
    });
  }
@@ -1003,7 +1006,7 @@ async function quiz(k,pn){
  btn.addEventListener('click',async function(){
   if(j.questions.some(function(x,i){return sel[i]===undefined})){res.textContent='Répondez à toutes les questions avant de valider.';res.className='qzr ko';return}
   btn.disabled=true;
-  try{var r2=await post('/api/quiz-answer',{code:code,k:k,answers:sel}),c=await r2.json();if(!r2.ok)throw new Error(c.error)}
+  try{var r2=await post('/api/quiz-answer',{code:code,k:k,answers:sel}),c=await r2.json();if(!r2.ok)throw new Error(c.error);D.quizFaits=(D.quizFaits||[]).concat(k)}
   catch(e){res.textContent=e.message||'Envoi impossible. Vérifiez votre connexion.';res.className='qzr ko';btn.disabled=false;return}
   form.querySelectorAll('.qzq').forEach(function(f,i){
    f.querySelectorAll('input').forEach(function(x){x.disabled=true});
@@ -1069,6 +1072,26 @@ async function play(l,pl){
 }
 
 // --- CORRECTION DE LA FONCTION DE TELECHARGEMENT ---
+// Leçons qui préparent un exercice (indication, sans blocage) : « Préparez-le avec les leçons 1 à 3 (2 sur 3 terminées) ».
+function exPrep(x,pn){
+ var n=x.prep.filter(function(v){return P.done[v.k]}).length,a=x.prep[0].t,b=x.prep[x.prep.length-1].t,nx=x.prep.filter(function(v){return!P.done[v.k]})[0];
+ var r=h('div',{class:'exs exp'},ic('note'),h('span',{text:(x.prep.length>1?'Préparez-le avec les leçons : '+a+' à '+b:'Préparez-le avec la leçon : '+a)+' ('+n+' sur '+x.prep.length+' terminée'+(n>1?'s':'')+')'}));
+ if(nx)r.appendChild(h('button',{class:'lk',onclick:function(){tab='notes';lesson(nx.k)}},'Voir : '+nx.t));
+ pn.appendChild(r);
+}
+// Quiz proposé en fin de leçon (03/11/2026) : une seule fois par leçon, jamais obligatoire.
+function quizPropose(k,suite){
+ P.qp=P.qp||{};
+ if((D.quiz||[]).indexOf(k)<0||(D.quizFaits||[]).indexOf(k)>-1||P.qp[k]){suite();return}
+ P.qp[k]=1;sv();
+ var ov=h('div',{class:'chov',role:'dialog','aria-modal':'true','aria-labelledby':'qpT'}),box=h('div',{class:'card chbox qzp'});
+ var close=function(){ov.remove();document.body.style.overflow=''};
+ box.appendChild(h('h2',{id:'qpT',text:'Leçon terminée, bravo !'}));
+ box.appendChild(h('p',{text:'Un petit quiz vous attend pour vérifier ce que vous avez retenu. Il ne prend que 2 minutes.'}));
+ var go=h('button',{class:'btn mag',onclick:function(){close();tab='quiz';lesson(k)}},'Faire le quiz');
+ box.appendChild(h('div',{class:'chbt'},go,h('button',{class:'btn alt',onclick:function(){close();suite()}},'Plus tard')));
+ ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';go.focus();
+}
 // Exercice pratique : données nécessaires, puis envoi au formateur (WhatsApp) et validation (03/11/2026).
 function exSuivi(x,l,k,pn){
  if(x.donnees){var db=h('button',{class:'btn alt',onclick:function(e){openFile(x.donnees.k,e.currentTarget)}},x.donnees.ready?'Télécharger':'Bientôt');if(!x.donnees.ready)db.disabled=true;

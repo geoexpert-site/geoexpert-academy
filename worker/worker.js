@@ -297,6 +297,18 @@ async function exDataFile(env, k) {
   const d = e && exDonnees(await getCfg(env), base);
   return d && d.r2 ? { r2: d.r2, title: 'Donnees ' + exShort(e) } : null;
 }
+// Leçons qui préparent un exercice (cfg.exl[exercice] = { de, a } : clés de leçon) → leçons visibles de « de » à « a ».
+function exLecons(m, cfg, k) {
+  const r = cfg.exl[k]; if (!r) return null;
+  const v = vis(m), i = v.findIndex(x => x.k === r.de), j = v.findIndex(x => x.k === r.a);
+  return i < 0 || j < i ? null : v.slice(i, j + 1);
+}
+// Quiz déjà faits par un apprenant (clés de leçon), pour ne proposer le quiz de fin de leçon qu'une fois.
+async function loadQuizFaits(env, c) {
+  if (!env.DB) return [];
+  try { return (await env.DB.prepare('SELECT k FROM quiz_results WHERE code = ?').bind(c).all()).results.map(r => r.k); }
+  catch (e) { return []; }
+}
 // Statuts des exercices d'un apprenant : { k: { statut, commentaire, t, tv } }. null si la base est indisponible.
 async function loadExSuivi(env, c) {
   if (!env.DB) return null;
@@ -519,7 +531,7 @@ async function readJson(req) {
 async function getCfg(env) {
   const raw = await env.ACCESS.get('cfg');
   const c = raw ? JSON.parse(raw) : {};
-  return { ids: c.ids || {}, files: c.files || {}, names: c.names || {}, exd: c.exd || {} };
+  return { ids: c.ids || {}, files: c.files || {}, names: c.names || {}, exd: c.exd || {}, exl: c.exl || {} };
 }
 async function findStudent(env, code) {
   const c = normCode(code);
@@ -1136,7 +1148,8 @@ async function api(req, env, url) {
         exercises: m.exercises.map(e => {
           const t = trialLock(rec, e.k, now);
           if (t) return { k: e.k, title: e.title, locked: true, unlockAt: t };
-          const o = { k: e.k, title: e.title, ready: !!cfg.files[e.k] }, att = exAttente(m, e.k, sv);
+          const o = { k: e.k, title: e.title, ready: !!cfg.files[e.k] }, att = exAttente(m, e.k, sv), lec = exLecons(m, cfg, e.k);
+          if (lec) o.prep = lec.map(v => ({ k: v.k, t: v.title.split(' : ')[0] }));   // « Préparez-le avec les leçons … »
           if (att) return Object.assign(o, { attente: att });   // bloqué : l'exercice précédent n'est pas encore validé
           const d = exDonnees(cfg, e.k), s = sv && sv[e.k];
           if (d) o.donnees = { k: e.k + '-d', ready: d.kv || !!env.FICHIERS, title: 'Données nécessaires' + (d.size ? ' (' + fmtSize(d.size) + ')' : '') };
@@ -1170,6 +1183,7 @@ async function api(req, env, url) {
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
       annonces: await loadAnnonces(env, rec, now),
       quiz: await loadQuizKeys(env, rec),
+      quizFaits: await loadQuizFaits(env, c),
       lives: await loadLives(env, rec, now),
       communaute: !!(await getReglage(env, 'communaute')),
       portfolio: !!(env.FICHIERS && env.DL_SECRET),
@@ -1702,7 +1716,7 @@ async function admin(req, env, url) {
     students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
-      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => { const d = exDonnees(cfg, e.k); return { k: e.k, title: e.title, has: !!cfg.files[e.k], name: cfg.names[e.k] || '', d: d ? (d.r2 ? d : { kv: true, name: cfg.names[e.k + '-d'] || '' }) : null }; }) })),
+      catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => { const d = exDonnees(cfg, e.k); return { k: e.k, title: e.title, has: !!cfg.files[e.k], name: cfg.names[e.k] || '', lec: cfg.exl[e.k] || null, d: d ? (d.r2 ? d : { kv: true, name: cfg.names[e.k + '-d'] || '' }) : null }; }) })),
       products: Object.keys(PRODUCTS), students, stats: dashboardStats(students, prog, now),
     }, 200, req, env);
   }
@@ -1922,6 +1936,21 @@ async function admin(req, env, url) {
     return reply({ ok: true }, 200, req, env);
   }
   // Données nécessaires d'un exercice : gros fichier choisi dans R2 (r2 = clé), ou retrait (r2 = '') du fichier actuel.
+  // Leçons qui préparent un exercice (affichées à l'apprenant, sans bloquer) : de = a = '' pour retirer.
+  if (url.pathname === '/admin/ex-lecons' && req.method === 'POST') {
+    const b = await readJson(req), k = String(b.k || ''), m = findModule(moduleOf(k));
+    if (!m || !m.exercises.some(e => e.k === k)) return reply({ error: 'Exercice inconnu.' }, 400, req, env);
+    const de = String(b.de || ''), a = String(b.a || ''), cfg = await getCfg(env);
+    if (de || a) {
+      const v = vis(m), i = v.findIndex(x => x.k === de), j = v.findIndex(x => x.k === a);
+      if (i < 0 || j < 0) return reply({ error: 'Leçon inconnue.' }, 400, req, env);
+      if (j < i) return reply({ error: 'La dernière leçon doit venir après la première.' }, 400, req, env);
+      cfg.exl[k] = { de, a };
+    } else delete cfg.exl[k];
+    await env.ACCESS.put('cfg', JSON.stringify(cfg));
+    await journal(env, who, 'Leçons de préparation d\'un exercice', '', '', k + (de ? ' · ' + de + ' → ' + a : ' · retirées'));
+    return reply({ ok: true }, 200, req, env);
+  }
   if (url.pathname === '/admin/ex-donnees' && req.method === 'POST') {
     const b = await readJson(req), k = String(b.k || ''), m = findModule(moduleOf(k));
     if (!m || !m.exercises.some(e => e.k === k)) return reply({ error: 'Exercice inconnu.' }, 400, req, env);

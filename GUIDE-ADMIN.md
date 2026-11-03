@@ -219,6 +219,9 @@ Pour l'arrêter plus tôt : **Retirer**, dans la liste « Annonces publiées ».
 4. **+ Ajouter une question** (5 au maximum), puis **Enregistrer le quiz**.
 
 Côté apprenant : un onglet **Quiz** apparaît sous la leçon (pas pendant l'essai si la leçon est encore bloquée).
+Depuis le 03/11/2026, quand l'apprenant termine une leçon qui a un quiz (« Terminer et continuer » ou « Marquer comme
+terminée »), une petite fenêtre le lui propose : **Faire le quiz** ou **Plus tard**. Une seule fois par leçon, jamais
+obligatoire, et plus du tout s'il l'a déjà fait.
 Il répond, puis voit son score, la bonne réponse en vert et votre explication. Il peut le refaire autant qu'il veut.
 Dans la liste, vous voyez combien d'apprenants ont répondu et leur **moyenne**.
 **Supprimer le quiz** efface aussi les résultats (après confirmation).
@@ -258,7 +261,7 @@ Choisissez une **formation** : toutes ses leçons s'affichent dans l'ordre.
 - **Supprimer** : à éviter (préférez Masquer) ; la progression des apprenants sur cette leçon ne comptera plus.
 - **+ Ajouter une leçon** : titre + durée. Après l'enregistrement, ajoutez sa vidéo dans l'onglet **🎬 Vidéos Bunny**.
 - **📎 Joindre un fichier** (10 Mo max., par exemple les données du TP en .zip) : choisissez le fichier, donnez-lui un nom ;
-  il apparaît tout de suite dans l'onglet « Exercices » de la leçon chez l'apprenant. **Retirer** pour l'enlever.
+  il apparaît tout de suite dans l'onglet « Données du cours » de la leçon chez l'apprenant. **Retirer** pour l'enlever.
 
 Rien ne change chez les apprenants avant **Enregistrer** (une fenêtre résume les changements). Ils voient la nouvelle version
 en moins d'une minute. **Annuler les changements** efface ce que vous n'avez pas enregistré.
@@ -315,7 +318,7 @@ Au-delà de 300 Mo, demandez à Claude : il utilise un outil d'envoi en plusieur
 1. Admin → **📚 Contenu** → choisissez la formation.
 2. Sous la leçon : **📦 Rattacher un gros fichier** → choisissez le fichier dans la liste → donnez le **nom que verront les apprenants**
    (ex. « Plan ancien de 1950 »).
-3. C'est tout : il apparaît dans l'onglet « Exercices » de la leçon chez l'apprenant, avec sa taille
+3. C'est tout : il apparaît dans l'onglet « Données du cours » de la leçon chez l'apprenant, avec sa taille
    (« Plan ancien de 1950 (200 Mo) »), et se télécharge avec le bouton **Télécharger** comme les autres fichiers.
 
 - **Retirer** (à côté du fichier) : les apprenants ne le voient plus, mais il **reste dans R2** (et compte dans les 10 Go).
@@ -350,7 +353,11 @@ Sous chaque exercice :
     `exercices/module-1/exercice-donnees.zip`. Il n'est pas envoyé une deuxième fois.
   - **Retirer** : l'apprenant ne voit plus les données (un gros fichier reste dans R2).
 
-Conseil : un ZIP par exercice, qui contient toutes les couches nécessaires (un shapefile = plusieurs fichiers).
+- **📚 Leçons à suivre avant** (facultatif) : choisissez la première et la dernière leçon qui préparent l'exercice.
+  L'apprenant voit sous l'exercice « Préparez-le avec les leçons : Leçon 1 à Leçon 3 (2 sur 3 terminées) » et un lien
+  vers la prochaine leçon à suivre. C'est une **indication, pas un blocage** : seule votre validation ouvre l'exercice suivant.
+
+Conseil : un fichier par exercice ; s'il faut plusieurs fichiers (un shapefile = plusieurs fichiers), un ZIP.
 
 ### Valider les exercices (onglet **✅ Exercices à valider**)
 
@@ -506,7 +513,7 @@ Elle propose la suite avec le **prix du site** et le **lien de paiement habituel
   données sur téléphone). Elle se coche toute seule si le téléphone signale une connexion lente.
 - **Mon attestation** (phase 3) : carte dans « Attestation et assistance », après les deux cartes habituelles ; PDF + lien de vérification.
 - **Votre avis** (phase 3) : carte au même endroit, quand une formation est terminée.
-- **Fichiers de la leçon** (phase 3) : dans l'onglet « Exercices » de la leçon, avant les exercices du module.
+- **Données du cours** (depuis le 03/11/2026) : onglet de la leçon, entre « Mes notes » et « Exercices », affiché seulement si des fichiers sont joints à la leçon (onglet Contenu). L'onglet « Exercices » ne contient plus que les exercices pratiques.
 - **Mes ressources** (colonne de gauche, sous « Mes notes ») : livret, kit, guide, cours PDF à son nom, et la charte.
 - **Charte de l'apprenant** : fenêtre à la 1re connexion et à chaque nouvelle version (voir 7 sexies).
 - **Rendez-vous live**, **Communauté** et **vitesse de lecture** : voir 7 septies.

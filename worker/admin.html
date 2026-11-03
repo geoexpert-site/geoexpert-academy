@@ -176,6 +176,7 @@
   .pfflt { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
   .exdr { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 0 0 12px 18px; font-size: 13.5px; color: var(--dim); }
   .exdr > span { flex: 1 1 260px; overflow-wrap: anywhere; }
+  .exdr select { max-width: 260px; }
   .exdr label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
   .exdr select, .exdr input[type=file] { max-width: 100%; min-width: 0; }
   #pdfs .vid > * { min-width: 0; overflow-wrap: anywhere; } #pdfs .vid input[type=file] { max-width: 100%; }
@@ -2242,6 +2243,29 @@ window.preparerPdf = async function (PDFLib, src) {
     return r;
   }
 
+  // Leçons qui préparent l'exercice : l'apprenant voit « Préparez-le avec les leçons … à … (2 sur 3 terminées) », sans blocage.
+  function exLecRow(m, x) {
+    var r = el('div', 'exdr'), vs = m.videos.filter(function (v) { return !v.hidden; });
+    r.appendChild(el('span', '', '📚 Leçons à suivre avant :'));
+    function sel(label, val) {
+      var l = el('label', 'r2l'); l.appendChild(document.createTextNode(label));
+      var s = el('select'); s.setAttribute('aria-label', label + ' (' + x.title + ')');
+      var o0 = el('option', '', '—'); o0.value = ''; s.appendChild(o0);
+      vs.forEach(function (v, i) { var o = el('option', '', (i + 1) + '. ' + v.title); o.value = v.k; s.appendChild(o); });
+      s.value = val || ''; l.appendChild(s); r.appendChild(l); return s;
+    }
+    var de = sel('de', x.lec && x.lec.de), a = sel('à', x.lec && x.lec.a);
+    async function save() {
+      if (!!de.value !== !!a.value) return;   // on attend les deux (ou aucun)
+      try { await call('/admin/ex-lecons', 'POST', { k: x.k, de: de.value, a: a.value }); x.lec = de.value ? { de: de.value, a: a.value } : null; ok.textContent = '✔️ Enregistré'; }
+      catch (e) { alert(e.message); de.value = x.lec ? x.lec.de : ''; a.value = x.lec ? x.lec.a : ''; }
+    }
+    de.addEventListener('change', function () { if (de.value && !a.value) a.value = de.value; save(); });
+    a.addEventListener('change', function () { if (a.value && !de.value) de.value = a.value; save(); });
+    var ok = el('small', '', x.lec ? '' : 'facultatif'); r.appendChild(ok);
+    return r;
+  }
+
   function renderPdfs() {
     var box = $('pdfs'); box.textContent = '';
     state.catalog.forEach(function (m) {
@@ -2265,7 +2289,7 @@ window.preparerPdf = async function (PDFLib, src) {
           catch (e) { alert(e.message); }
         });
         r.appendChild(f); box.appendChild(r);
-        box.appendChild(exDataRow(x));
+        box.appendChild(exDataRow(x)); box.appendChild(exLecRow(m, x));
       });
     });
   }
