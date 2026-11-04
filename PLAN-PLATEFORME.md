@@ -417,7 +417,7 @@ qu'après validation du formateur. Choix de l'administrateur : envoi du travail 
 - [x] Exercices : « Préparez-le avec les leçons : X à Y (n sur N terminées) » + lien vers la prochaine leçon (indication, sans blocage) ; Admin, onglet 📄 Fichiers : « 📚 Leçons à suivre avant » (de / à) → `cfg.exl`, route `/admin/ex-lecons`
 - [x] Tests : `test-exercices.mjs` api 96/96, admin 18/18, pixels 20/20 (écrans sans ces nouveautés identiques)
 - [x] **En ligne le 03/11/2026** (accord de l'administrateur, « mets en ligne directement ») : sauvegarde `GeoExpert-Sauvegardes\2026-11-03-avant-donnees-cours-quiz\` (23 clés KV, D1, page) ; `espace-apprenant-api` → 76298f9d (avant fb584ba2), `geoexpert-admin` → 3494e2f9 (avant 87e331c9) ; page dans `main` (e2304f1) ; `verif-test-exercices.mjs prod` 7/7
-- à faire : `test-progres.mjs` et `test-prod-phase2.mjs` testent encore l'ancienne case « J'ai fait l'exercice » (retirée) : à adapter avant le prochain `tous-les-tests.mjs`
+- [x] (04/11/2026) `test-progres.mjs` et `test-prod-phase2.mjs` adaptés : envoi de l'exercice au formateur au lieu de l'ancienne case ; `test-progres.mjs` 14/14 (test en ligne) et admin 3/3 ; `test-prod-phase2.mjs` non relancé (il écrit en production)
 
 ## Environnement de test et sauvegardes (où se trouve quoi)
 
