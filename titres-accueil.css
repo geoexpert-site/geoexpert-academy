@@ -1,0 +1,7 @@
+/* Police des titres de l'accueil : Montserrat gras, majuscules (style apprécié lors de la refonte) */
+h1, .hero h1, section h2{
+  font-family:var(--font-display);
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:-.02em;
+}
