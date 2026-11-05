@@ -38,7 +38,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <link rel="manifest" href="images/site.webmanifest">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="refonte.css">
 
 <!-- ✅ AJOUTÉ : Schema.org (rich snippets Google) -->
 <script type="application/ld+json">
@@ -115,23 +114,98 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   <a href="formations-video-geoexpert.html" style="color: #fff; text-decoration: underline; font-weight: 700; margin-left: 5px;">Découvrir les formations en ligne →</a>
 </div>
 
-<!-- ============ EN-TÊTE ============ -->
-<header class="site-header rf-header" id="header">
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="header">
   <div class="container header-inner">
     <a href="#accueil" class="brand">
+      <!-- ✅ CORRIGÉ : eager + width/height pour éviter le CLS -->
       <picture>
         <source srcset="images/logo-full.webp" type="image/webp">
         <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager" decoding="async">
       </picture>
     </a>
-    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
-      <div class="nav-item"><a href="#objectifs">Formations</a></div>
-      <div class="nav-item"><a href="#fondateur">À propos</a></div>
-      <div class="nav-item"><a href="#temoignages">Témoignages</a></div>
-      <div class="nav-item"><a href="#tarifs">Tarifs</a></div>
-      <div class="nav-item"><a href="#essai">Essai 7 jours</a></div>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="contact.html">Contact</a>
+      </div>
     </nav>
-    <a href="formations-video-geoexpert.html" class="btn btn-primary header-cta">Commencer l'essai</a>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert."
+       class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Zm4.48-6.13c-.25-.12-1.45-.71-1.67-.8-.22-.08-.39-.12-.55.13-.16.24-.63.79-.78.96-.14.16-.29.18-.53.06-.25-.12-1.04-.38-1.98-1.21-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.65.31-.22.25-.86.84-.86 2.04s.88 2.37 1 2.53c.12.16 1.74 2.66 4.22 3.72.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.45-.59 1.66-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.47-.28Z"/></svg>
+      WhatsApp
+    </a>
+    <!-- ✅ CORRIGÉ : aria-expanded et aria-controls ajoutés -->
     <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
       <span></span><span></span><span></span>
     </button>
@@ -139,420 +213,42 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
 </header>
 
 
-<!-- ============ HERO ============ -->
-<section class="rf-hero" id="accueil">
-  <div class="container rf-hero-grid">
-    <div class="rf-hero-text">
-      <p class="rf-eyebrow">Abidjan, Bouaké, Côte d'Ivoire · Formation &amp; Consulting en Géomatique</p>
-      <h1>Des données du terrain.<br><span class="rf-grad-text">Des décisions cartographiées.</span></h1>
-      <p class="rf-hero-lead">Apprenez les SIG, la cartographie et la télédétection avec un formateur qui vous suit pas à pas, en ligne ou en présentiel, à partir de 10 000 FCFA.</p>
-      <div class="rf-hero-actions">
-        <a href="formations-video-geoexpert.html" class="btn btn-primary">Commencer mon essai de 7 jours accompagné</a>
-        <p class="rf-reassure">Le formateur vous suit sur WhatsApp. Si la formation ne vous convient pas, remboursement intégral dans les 7 jours.</p>
-        <a href="https://wa.me/2250787015030?text=Bonjour%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert%20GeoExpert." class="rf-wa-link" target="_blank" rel="noopener">Ou parler à un expert sur WhatsApp</a>
-      </div>
-      <div class="rf-hero-facts">
-        <span>QGIS · ArcGIS · Google Earth Engine</span>
-        <span>80 % de pratique terrain</span>
-        <span>Attestation de fin de formation</span>
-      </div>
+<!-- ============ HERO avec carrousel ============ -->
+<section class="hero hero-carousel" id="accueil">
+  <!-- Carrousel en arrière-plan -->
+  <div class="hero-bg-carousel" aria-hidden="true">
+    <div class="hero-bg-slide active"><picture><source type="image/webp" srcset="images/hero-salle-1.webp"><img src="images/formation-salle-1.jpg" alt="" width="651" height="869"  decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-terrain-1.webp"><img data-src="images/formation-terrain-1.jpg" alt="" width="1776" height="1000" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-exercice-1.webp"><img data-src="images/formation-exercice-1.jpg" alt="" width="1000" height="563" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-salle-2.webp"><img data-src="images/formation-salle-2.jpg" alt="" width="1000" height="884" decoding="async"></picture></div>
+    <div class="hero-bg-slide"><picture><source type="image/webp" data-srcset="images/hero-terrain-2.webp"><img data-src="images/formation-terrain-2.jpg" alt="" width="651" height="869" decoding="async"></picture></div>
+  </div>
+
+  <!-- Voile sombre par-dessus les photos -->
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  <!-- Contenu par-dessus -->
+  <div class="container hero-inner">
+    <p class="eyebrow">Abidjan, Bouaké, Côte d'Ivoire · Formation & Consulting en Géomatique</p>
+    <h1>Transformez des données du terrain<br>en <span class="text-accent">décisions cartographiées.</span></h1>
+    <p class="hero-lead">
+      GeoExpert Academy & Consulting est un centre de <strong>formation géomatique</strong> à
+      Abidjan et Bouaké. Nous formons étudiants, professionnels et organisations aux SIG,
+      à la cartographie, à la collecte de données et à la télédétection, avec des formations
+      intensives et un accompagnement personnalisé.
+    </p>
+    <div class="hero-actions">
+      <a href="#formations" class="btn btn-primary">Voir les formations disponibles</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert%20GeoExpert."
+         class="btn btn-outline" target="_blank" rel="noopener">Parler à un expert</a>
     </div>
-    <div class="rf-hero-media">
-      <picture>
-        <source type="image/webp" srcset="images/hero-salle-1.webp">
-        <img src="images/formation-salle-1.jpg" alt="Séance de formation GeoExpert Academy en salle" width="651" height="869" fetchpriority="high" decoding="async">
-      </picture>
+    <div class="hero-stats">
+      <div><span class="stat-num">ArcGIS · QGIS · GEE · ArcGIS ONLINE</span><span class="stat-label">GOOGLE EARTH PRO · GLOBAL MAPPER · AUTO CAD</span></div>
+      <div><span class="stat-num">80%</span><span class="stat-label">Pratique terrain</span></div>
+      <div><span class="stat-num">Certificat Professionnel</span><span class="stat-label">Accompagnement personnalisé</span></div>
     </div>
   </div>
 </section>
-
-
-<!-- ============ 01 VOS OBJECTIFS ============ -->
-<section class="rf-section" id="objectifs">
-  <div class="container">
-    <div class="rf-head">
-      <p class="rf-num">01 / Vos objectifs</p>
-      <h2 class="rf-title">Votre objectif.<br>Votre prochaine étape.</h2>
-      <p class="rf-lead">Débutant ou déjà en poste, vous commencez là où vous en êtes. Choisissez le logiciel ou le domaine qui correspond à votre métier.</p>
-    </div>
-    <div class="rf-goals">
-      <article class="rf-goal">
-        <span class="rf-goal-n">01</span>
-        <p class="rf-goal-kicker">Logiciel libre</p>
-        <h3>QGIS</h3>
-        <p>Cartographie, analyse spatiale et projet SIG complet avec un logiciel gratuit, du premier clic à la carte finale.</p>
-        <a href="formations-video-geoexpert.html">Commencer l'essai</a>
-      </article>
-      <article class="rf-goal">
-        <span class="rf-goal-n">02</span>
-        <p class="rf-goal-kicker">Référence des entreprises</p>
-        <h3>ArcGIS</h3>
-        <p>Cartes professionnelles, géotraitements et ArcGIS Online. Une licence ArcGIS est nécessaire pour pratiquer.</p>
-        <a href="formations-video-geoexpert.html">Commencer l'essai</a>
-      </article>
-      <article class="rf-goal">
-        <span class="rf-goal-n">03</span>
-        <p class="rf-goal-kicker">Images &amp; cartes en ligne</p>
-        <h3>Télédétection / Webmapping</h3>
-        <p>Analyse d'images satellitaires (Sentinel, Landsat, Google Earth Engine) et diffusion de cartes en ligne.</p>
-        <a href="formations-video-geoexpert.html">Commencer l'essai</a>
-      </article>
-      <article class="rf-goal">
-        <span class="rf-goal-n">04</span>
-        <p class="rf-goal-kicker">Collecte de données</p>
-        <h3>Terrain</h3>
-        <p>Collecte avec GPS et smartphone grâce à KoboToolbox, repérage et vérification avec Google Earth Pro.</p>
-        <a href="formations-video-geoexpert.html">Commencer l'essai</a>
-      </article>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ 02 QUI SUIS-JE ============ -->
-<section class="rf-section rf-soft fondateur" id="fondateur" style="border-bottom:0">
-  <div class="container rf-about">
-    <div class="rf-about-photo">
-      <picture>
-        <source srcset="images/fondateur.webp" type="image/webp">
-        <img src="images/fondateur.jpg" alt="Jean Eudes AKA, Fondateur de GeoExpert Academy & Consulting" width="400" height="500" loading="lazy" decoding="async">
-      </picture>
-    </div>
-    <div class="rf-about-text">
-      <p class="rf-num">02 / Qui suis-je</p>
-      <h2 class="rf-title">Jean Eudes AKA</h2>
-      <p class="rf-role">Fondateur &amp; Formateur</p>
-      <ul class="fondateur-credentials">
-        <li>Doctorant en Géographie physique, option Hydrologie et Environnement (thèse en cours)</li>
-        <li>Master en Géographie physique, option Hydrologie et Environnement</li>
-        <li>Ingénieur Géomatique dans une agence de gestion foncière</li>
-      </ul>
-      <p class="rf-about-quote">Depuis 2016, notre mission est de démocratiser la géomatique en Côte d'Ivoire. À travers Les Cartes Géographiques, puis GeoExpert Academy &amp; Consulting, nous accompagnons les étudiants, les professionnels, les entreprises et les institutions dans l'acquisition de compétences pratiques en SIG, cartographie, télédétection et analyse spatiale. En parallèle de mes fonctions d'ingénieur, je poursuis une vision claire : faire de la géomatique un levier d'innovation, d'aide à la décision et de développement pour tous les secteurs d'activité.</p>
-      <div class="rf-strengths">
-        <div class="rf-strength"><strong>Depuis 2016</strong><span>Une mission : démocratiser la géomatique en Côte d'Ivoire</span></div>
-        <div class="rf-strength"><strong>7 ans et plus</strong><span>d'expérience en cartographie SIG, collecte terrain et analyse de données</span></div>
-        <div class="rf-strength"><strong>Abidjan &amp; Bouaké</strong><span>Présentiel dans ces deux villes, ou 100 % en ligne</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ 03 AVIS ============ -->
-<section class="rf-section temoignages" id="temoignages" style="border-bottom:0">
-  <div class="container">
-    <div class="rf-head">
-      <p class="rf-num">03 / Ils nous font confiance</p>
-      <h2 class="rf-title">Ce que disent<br>nos apprenants.</h2>
-      <p class="rf-lead">Des messages reçus après les formations et les prestations de consulting.</p>
-    </div>
-    <div class="rf-reviews">
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-          Merci beaucoup formateur, je peux maintenant analyser mes données collectées dans QGIS.
-          Avant, je n'arrivais pas à afficher les données GPX dans un logiciel SIG, j'étais obligé
-          de demander l'aide des gens. Maintenant c'est plus facile pour moi.
-        </p>
-        <div class="temoignage-author">
-          <span class="temoignage-avatar">KD</span>
-          <div>
-            <p class="temoignage-name">Kouamé Kouakou Donatien</p>
-            <p class="temoignage-formation">Formation Géomatique, SIG & Cartographie</p>
-          </div>
-        </div>
-      </div>
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-          J'ai pas pu assister à la formation de juin parce que javais dejà fais une formation special Qgis avec 
-          vous. Mais c'était bien. Qgis est très facile il reste maintenant à me perfectionner en ArcGIS.
-        </p>
-        <div class="temoignage-author">
-          <span class="temoignage-avatar">BS</span>
-          <div>
-            <p class="temoignage-name">Bamba Souleymane</p>
-            <p class="temoignage-formation">Formation QGIS</p>
-          </div>
-        </div>
-      </div>
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-           Je recommande vivement cette page, passionnée de cartographie et géographie  
-           on y apprend beaucoup de choses. Bon courage pour la suite et chapeau pour le boulot 
-        </p>
-        <div class="temoignage-author">
-          <picture>
-            <source srcset="images/temoignagerubis.webp" type="image/webp">
-            <img src="images/temoignagerubis.jpg" alt="Rubis De Rubis, apprenante GeoExpert Academy" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
-          </picture>
-          <div>
-            <p class="temoignage-name">Rubis De Rubis</p>
-            <p class="temoignage-formation">Formation Cartographie</p>
-          </div>
-        </div>
-      </div>
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-           J’aime bien cette communauté. 😊Elle apporte son soutien et une explication détaillée des questions géographiques. Je la recommande énormément pour 
-           tous vos travaux car j’ai été satisfaite. Merci 🙏🏼à l’équipe.❤️ 
-        </p>
-        <div class="temoignage-author">
-          <picture>
-           <source srcset="images/temoignageyao.webp" type="image/webp">
-           <img src="images/temoignageyao.jpg" alt="Yao Marina, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
-          </picture>
-          <div>
-            <p class="temoignage-name">Yao Marina</p>
-            <p class="temoignage-formation">Consulting</p>
-          </div>
-        </div>
-      </div>
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-           j'ai aimé votre travail merci. 
-        </p>
-        <div class="temoignage-author">
-          <picture>
-            <source srcset="images/temoignagevanessa.webp" type="image/webp">
-            <img src="images/temoignagevanessa.jpg" alt="Vanessa Vansor, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
-          </picture>
-          <div>
-            <p class="temoignage-name">Vanessa Vansor</p>
-            <p class="temoignage-formation">Consulting</p>
-          </div>
-        </div>
-      </div>
-<div class="temoignage-card">
-        <p class="temoignage-quote">
-           Merci infiniment pour votre travail ! J'avais sollicité une carte des lacs de 
-           Yamoussoukro. Vous me l'avez 
-           transmis rapidement et le résultat est à la hauteur de mes attentes. 
-           Je suis très satisfaite
-           de votre professionnalisme et de votre réactivité. Que Dieu vous bénisse 
-        </p>
-        <div class="temoignage-author">
-          <picture>
-            <source srcset="images/temoignageamon.webp" type="image/webp">
-            <img src="images/temoignageamon.jpg" alt="Anoman Messikely, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
-          </picture>
-          <div>
-            <p class="temoignage-name">Anoman Messikely</p>
-            <p class="temoignage-formation">Consulting</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="rf-reviews-cta">
-    <!-- ✅ CORRIGÉ : avis-cta et avis-form DANS le .container maintenant -->
-    <div class="avis-cta">
-      <p><strong>Vous avez suivi une formation ou demandez un service chez nous ?</strong><br>Partagez votre expérience, elle sera publiée après validation.</p>
-      <button class="btn btn-outline" id="btnLaisserAvis">Laisser un avis</button>
-    </div>
-
-    <!-- ✅ CORRIGÉ : name="" ajoutés sur les inputs pour accessibilité et SEO -->
-    <form class="avis-form" id="avisForm">
-      <label>
-        Nom complet
-        <input type="text" id="avisNom" name="nom" required placeholder="Ex: Dosso Albert Mabri" autocomplete="name">
-      </label>
-      <label>
-        Formation suivie
-        <input type="text" id="avisFormation" name="formation" required placeholder="Ex: Géomatique, SIG & Cartographie">
-      </label>
-      <label>
-        Votre avis
-        <textarea id="avisMessage" name="message" rows="4" required placeholder="Qu'avez-vous appris ? Qu'est-ce qui vous a aidé ?"></textarea>
-      </label>
-      <button type="submit" class="btn btn-primary btn-block">Envoyer via WhatsApp</button>
-    </form>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ 04 TARIFS ============ -->
-<section class="rf-section rf-soft" id="tarifs" style="border-bottom:0">
-  <div class="container">
-    <div class="rf-head">
-      <p class="rf-num">04 / Tarifs</p>
-      <h2 class="rf-title">Un parcours.<br>Un prix clair.</h2>
-      <p class="rf-lead">Formez-vous en présentiel pour un accompagnement intensif, ou 100 % en ligne pour avancer à votre rythme. Les sessions en direct sont confirmées dès que le nombre minimum d'inscrits est atteint.</p>
-    </div>
-    <div class="rf-prices">
-
-      <article class="rf-price-card rf-feature">
-        <span class="rf-price-tag">Nouveau · 100 % en ligne</span>
-        <h3>Formations e-learning à la demande</h3>
-        <p class="rf-price-desc">Apprenez QGIS, ArcGIS et la télédétection à votre rythme, avec un espace membre privé, un suivi de progression et une assistance par WhatsApp.</p>
-        <ul class="rf-price-list">
-          <li><strong>7 jours d'essai accompagné</strong>, remboursement intégral si la formation ne vous convient pas</li>
-          <li>Lecteur vidéo sécurisé, prise de notes, exercices et jeux de données à télécharger</li>
-          <li>Attestation et accompagnement de 3 mois inclus</li>
-        </ul>
-        <div class="rf-price-amount">
-          <span class="rf-big">À partir de 10 000 FCFA</span>
-          <small>Paiement sécurisé : Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire</small>
-        </div>
-        <a href="formations-video-geoexpert.html" class="btn btn-primary">Découvrir la plateforme</a>
-      </article>
-
-      <article class="rf-price-card">
-        <span class="rf-price-tag">Prochaine session : novembre 2026 · Inscriptions ouvertes</span>
-        <h3>Devenez Géomaticien Opérationnel</h3>
-        <p class="rf-price-desc">40 heures pour apprendre les SIG, l'analyse spatiale, la télédétection, la cartographie professionnelle et le WebGIS, avec une collecte de données terrain et un projet de fin de formation.</p>
-        <ul class="rf-price-list">
-          <li><strong>Durée :</strong> 40 heures, tous les samedis, plus un suivi en ligne entre les séances</li>
-          <li><strong>Format :</strong> présentiel ou en ligne</li>
-          <li><strong>Outils :</strong> QGIS • ArcGIS • KoboToolbox • Google Earth Pro</li>
-        </ul>
-        <div class="rf-price-amount">
-          <span class="rf-big"><s>145 000 FCFA</s><br>125 000 FCFA</span>
-          <small>Offre promotionnelle valable jusqu'au 30 décembre 2026 · 25 000 FCFA inscription + 100 000 FCFA formation</small>
-        </div>
-        <a href="#inscription" class="btn btn-primary">Je réserve ma place</a>
-      </article>
-
-      <article class="rf-price-card">
-        <span class="rf-price-tag">Inscriptions sur liste d'attente</span>
-        <h3>Analyse d'images satellitaires &amp; télédétection</h3>
-        <p class="rf-price-desc">30 heures pour maîtriser l'acquisition, le traitement et l'analyse d'images satellitaires au service de l'environnement, de l'agriculture, de l'urbanisme et du développement territorial.</p>
-        <ul class="rf-price-list">
-          <li><strong>Durée :</strong> 30 heures</li>
-          <li><strong>Niveau :</strong> intermédiaire à professionnel</li>
-          <li><strong>Outils :</strong> Google Earth Engine • ArcGIS • Sentinel • Landsat</li>
-        </ul>
-        <div class="rf-price-amount">
-          <span class="rf-big">Disponible sur demande</span>
-          <small>Formation personnalisée selon vos besoins.</small>
-        </div>
-        <a href="https://wa.me/2250787015030" class="btn btn-outline" target="_blank" rel="noopener">Se renseigner</a>
-      </article>
-
-    </div>
-    <div class="rf-price-foot">
-      <p><strong>Consulting et cartographie sur mesure ?</strong> Décrivez-nous votre projet, nous vous répondons sur WhatsApp.</p>
-      <a href="services.html" class="btn btn-outline">Voir nos services</a>
-      <a href="tarifs.html" class="btn btn-outline">Voir tous nos tarifs →</a>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ 05 COMMENT ÇA MARCHE + INSCRIPTION ============ -->
-<section class="rf-section" id="essai" style="border-bottom:0">
-  <div class="container rf-how">
-    <div>
-      <p class="rf-num">05 / Comment ça marche</p>
-      <h2 class="rf-title">3 étapes.<br>Pas à pas.</h2>
-      <ol class="rf-steps">
-        <li class="rf-step"><span class="rf-step-n">1</span><div><h3>Je m'inscris</h3><p>Je choisis ma formation et je paie en ligne (Wave, Orange Money, MTN MoMo, Moov Money ou carte), ou je remplis le formulaire pour une session en direct.</p></div></li>
-        <li class="rf-step"><span class="rf-step-n">2</span><div><h3>Je commence l'essai accompagné</h3><p>Pendant 7 jours, j'accède à l'introduction et aux 2 premières leçons. Le formateur me suit sur WhatsApp, et je suis remboursé intégralement si la formation ne me convient pas.</p></div></li>
-        <li class="rf-step"><span class="rf-step-n">3</span><div><h3>J'apprends à mon rythme</h3><p>À partir du 8e jour, toutes les leçons sont débloquées, avec 3 mois d'assistance du formateur sur WhatsApp.</p></div></li>
-      </ol>
-      <div class="rf-how-cta">
-        <a href="formations-video-geoexpert.html" class="btn btn-primary">Commencer mon essai de 7 jours</a>
-      </div>
-    </div>
-    <div class="rf-form-card" id="inscription">
-      <p class="section-eyebrow" style="margin-bottom:6px">Session en direct</p>
-      <h3>Inscrivez-vous à une formation</h3>
-      <p>Remplissez ce formulaire. Il ouvre une conversation WhatsApp pré-remplie.</p>
-    <form class="inscription-form" id="inscriptionForm">
-      <label>
-        Nom complet
-        <input type="text" id="fName" name="nom" required placeholder="Ex : Kouassi Aya" autocomplete="name">
-      </label>
-      <label>
-        Numéro WhatsApp
-        <input type="tel" id="fPhone" name="telephone" required placeholder="Ex : 07 87 01 50 30" autocomplete="tel">
-      </label>
-      <label>
-        Profession / niveau d'étude / domaine d'activité
-        <input type="text" id="fProfession" name="profession" required placeholder="Ex : Topographe, Étudiant en géographie...">
-      </label>
-      <label>
-        Niveau en SIG / Cartographie / Géomatique / DAO
-        <select id="fNiveau" name="niveau" required>
-          <option value="">— Choisir votre niveau —</option>
-          <option value="Débutant">Débutant</option>
-          <option value="Intermédiaire">Intermédiaire</option>
-          <option value="Avancé">Avancé</option>
-        </select>
-      </label>
-      <label>
-        Ville de résidence
-        <input type="text" id="fVille" name="ville" required placeholder="Ex : Abidjan" autocomplete="address-level2">
-      </label>
-      <label>
-        Mode de formation souhaité
-        <select id="fMode" name="mode" required>
-          <option value="">— Choisir un mode —</option>
-          <option value="En ligne">En ligne</option>
-          <option value="Présentiel">Présentiel</option>
-          <option value="Mixte">Mixte</option>
-        </select>
-      </label>
-      <label>
-        Formation souhaitée
-        <select id="fFormation" name="formation" required>
-          <option value="">— Choisir une formation —</option>
-          <option value="Devenez Géomaticien Opérationnel (Novembre 2026)">Devenez Géomaticien Opérationnel (Novembre 2026)</option>
-          <option value="Initiation à AutoCAD">Initiation à AutoCAD</option>
-          <option value="Analyse d'Images Satellitaires & Télédétection">Analyse d'Images Satellitaires & Télédétection</option>
-          <option value="Collecte Mobile de Données & SIG">Collecte Mobile de Données & SIG</option>
-          <option value="Autre / à préciser">Autre / à préciser</option>
-        </select>
-      </label>
-      <label>
-        Message (facultatif)
-        <textarea id="fMessage" name="message" rows="3" placeholder="Une question, une précision..."></textarea>
-      </label>
-      <div class="pay-online" id="payOnline" hidden>
-        <h4>Payer en ligne</h4>
-        <p class="pay-online-sub">Devenez Géomaticien Opérationnel. Wave, Orange Money, MTN, Moov ou carte bancaire.</p>
-        <a href="https://checkout.digitalpaye.com/pay/TwaTcCe6fbXX" class="btn btn-primary btn-block" target="_blank" rel="noopener">Payer l'inscription : 25 000 FCFA</a>
-        <a href="https://checkout.digitalpaye.com/pay/0S2XhfPEkAiY" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer le solde : 100 000 FCFA</a>
-        <a href="https://checkout.digitalpaye.com/pay/nHqSeKpKDh7a" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer la totalité : 125 000 FCFA</a>
-        <p class="pay-online-note">Paiement sécurisé par DigitalPaye. Après le paiement, nous vous contactons sur WhatsApp pour confirmer votre inscription.</p>
-        <p class="pay-online-help">Un problème de paiement ? <a href="https://wa.me/2250787015030?text=Bonjour%2C%20j%27ai%20un%20probl%C3%A8me%20de%20paiement%20en%20ligne%20pour%20ma%20formation." target="_blank" rel="noopener">Écrivez-nous sur WhatsApp</a></p>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">
-        Envoyer via WhatsApp
-      </button>
-    </form>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ 06 FAQ ============ -->
-<section class="rf-section rf-soft" id="faq" style="border-bottom:0">
-  <div class="container rf-faq-wrap">
-    <div>
-      <p class="rf-num">06 / Bonnes questions</p>
-      <h2 class="rf-title">Quelques questions<br>fréquentes.</h2>
-      <p class="rf-lead">Vous ne trouvez pas votre réponse ? Écrivez-nous sur WhatsApp.</p>
-      <p style="margin-top:20px"><a class="btn btn-outline" href="faq.html">Voir toutes les questions →</a></p>
-    </div>
-    <div class="rf-faq">
-      <details><summary>Comment fonctionne la garantie de 7 jours ?</summary><p>Garantie 7 jours, avec accompagnement : pendant les 7 premiers jours, vous accédez à l'introduction et aux 2 premières leçons de votre formation, et le formateur vous suit sur WhatsApp pour s'assurer que vous comprenez. Si, après ces leçons, la formation ne vous convient pas, demandez le remboursement par WhatsApp dans ce délai : il est intégral. Sinon, toutes les autres leçons se débloquent à partir du 8e jour.</p></details>
-      <details><summary>Pourquoi toutes les leçons ne sont-elles pas disponibles tout de suite ?</summary><p>Les 7 premiers jours sont une période d'essai accompagnée : vous suivez l'introduction et les 2 premières leçons avec l'aide du formateur, et vous pouvez être remboursé intégralement si la formation ne vous convient pas. À partir du 8e jour, toutes les leçons sont débloquées.</p></details>
-      <details><summary>Comment payer une formation e-learning ?</summary><p>Vous pouvez payer directement par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire en cliquant sur le bouton de la formation souhaitée, sur la page des <a href="formations-video-geoexpert.html#formations">formations e-learning</a>.</p></details>
-      <details><summary>Comment recevoir mon code d'accès ?</summary><p>Après le paiement, vous êtes redirigé vers votre espace apprenant. Cliquez sur « Demander mon code d'accès » pour recevoir votre code personnel par WhatsApp.</p></details>
-      <details><summary>Faut-il un niveau particulier pour suivre vos formations ?</summary><p>Aucune connaissance en SIG n'est exigée. Nos formations sont conçues pour accueillir des débutants complets. Une aisance de base avec un ordinateur (fichiers, dossiers, navigation) est simplement recommandée.</p></details>
-      <details><summary>Les formations sont-elles en présentiel ou en ligne ?</summary><p>Les deux formats existent. Nous proposons des sessions en présentiel à Abidjan et à Bouaké, ainsi que des formations 100% en ligne pour les apprenants hors de ces villes.</p></details>
-      <details><summary>L'assistance du formateur est-elle incluse ?</summary><p>Oui, 3 mois d'assistance du formateur sur WhatsApp sont inclus, avec une réponse sous 48 heures ouvrables, pour les questions liées aux cours et aux exercices achetés.</p></details>
-      <details><summary>Comment obtenir l'attestation de fin de formation ?</summary><p>L'attestation de fin de formation vous est délivrée lorsque vous avez terminé toutes les leçons de la formation et que le formateur a validé votre exercice final, envoyé par WhatsApp. Elle vous est envoyée au format PDF, avec un code unique vérifiable sur notre site, dans la section <a href="verifier-certificat.html">« Vérifier un certificat »</a>. Pour un pack, vous recevez une attestation pour chaque formation terminée.</p></details>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============ POUR ALLER PLUS LOIN (sections existantes, contenu inchangé) ============ -->
-<div class="rf-more"><div class="container">
-  <p class="rf-num">Pour aller plus loin</p>
-  <h2 class="rf-title">Tout GeoExpert<br>en un coup d'œil.</h2>
-</div></div>
-<div class="rf-extra">
 <!-- ============ VIDÉO DE PRÉSENTATION ============ -->
 <section class="presentation-video">
   <div class="container">
@@ -623,7 +319,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
     })();
   </script>
 </section>
-
+  
 <!-- ============ POUR QUI ============ -->
 <section class="who-section">
   <div class="container">
@@ -691,6 +387,138 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
         <h3>Immobilier</h3>
         <p>Évaluation foncière, prospection de terrains, analyse de valeur par localisation.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FONDATEUR ============ -->
+<section class="fondateur" id="fondateur">
+  <div class="container fondateur-inner">
+    <div class="fondateur-photo">
+      <!-- ✅ CORRIGÉ : width/height + lazy -->
+      <picture>
+        <source srcset="images/fondateur.webp" type="image/webp">
+        <img src="images/fondateur.jpg" alt="Jean Eudes AKA, Fondateur de GeoExpert Academy & Consulting" width="400" height="500" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="fondateur-text">
+      <p class="section-eyebrow">L'expert derrière GeoExpert</p>
+      <h2>Jean Eudes AKA</h2>
+      <p class="fondateur-role">Fondateur & Formateur</p>
+
+      <ul class="fondateur-credentials">
+        <li>Doctorant en Géographie physique, option Hydrologie et Environnement (thèse en cours)</li>
+        <li>Master en Géographie physique, option Hydrologie et Environnement</li>
+        <li>Ingénieur Géomatique dans une agence de gestion foncière</li>
+        <li>Plus de 7 ans d'expérience en cartographie SIG, collecte de données terrain, analyse et traitement de données</li>
+      </ul>
+
+      <p class="fondateur-quote">
+        Depuis 2016, notre mission est de démocratiser la géomatique en Côte d'Ivoire. À travers Les Cartes Géographiques, puis GeoExpert Academy & Consulting, 
+        nous accompagnons les étudiants, les professionnels, les entreprises et les institutions dans l'acquisition de compétences pratiques en SIG, cartographie, 
+        télédétection et analyse spatiale. En parallèle de mes fonctions d'ingénieur, je poursuis une vision claire : faire de la géomatique un levier d'innovation, d'aide à la décision et de développement pour tous les secteurs d'activité.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORMATIONS ============ -->
+<section class="formations" id="formations">
+  <div class="container">
+    <p class="section-eyebrow">Catalogue & Offres</p>
+    <h2>Choisissez votre parcours de formation</h2>
+    <p class="section-lead">Formez-vous en présentiel pour un accompagnement intensif, ou 100% en ligne pour avancer à votre rythme. Les sessions en direct sont confirmées dès que le nombre minimum d'inscrits est atteint.</p>
+
+    <div class="formation-grid">
+
+      <!-- CARTE FORMATIONS EN LIGNE (Valorisée) -->
+      <article class="formation-card featured" style="background: linear-gradient(135deg, #fff 0%, var(--bg-soft) 100%); border: 2px solid var(--magenta); display: flex; flex-direction: column;">
+        <span class="formation-tag" style="background: var(--magenta); color: #fff;">Nouveau · 100% en ligne</span>
+        <h3>Formations e-learning à la demande</h3>
+        <p class="formation-desc">
+          Apprenez QGIS, ArcGIS et la télédétection à votre rythme. Accédez à plus de 100 h de vidéos au catalogue et bénéficiez d'un <strong>espace membre privé</strong> avec suivi de progression et assistance par WhatsApp.
+        </p>
+        
+        <!-- Liste à puces valorisant l'espace apprenant -->
+        <ul class="programme-list" style="margin-bottom: 24px; font-size: 14px; gap: 8px;">
+          <li><strong>Plateforme e-learning dédiée</strong> (accès 24h/24)</li>
+          <li><strong>Lecteur vidéo sécurisé</strong> avec filigrane personnalisé</li>
+          <li><strong>Suivi de progression</strong> : cochez vos leçons terminées</li>
+          <li><strong>Prise de notes</strong> intégrée sous chaque vidéo</li>
+          <li><strong>Téléchargement</strong> des exercices et jeux de données</li>
+        </ul>
+
+        <ul class="formation-meta">
+          <li><strong>Format :</strong> Vidéos en streaming (à la demande)</li>
+          <li><strong>Public :</strong> Débutants et professionnels</li>
+          <li><strong>Inclus :</strong> Attestation et Accompagnement 3 mois</li>
+        </ul>
+        
+        <div class="formation-price">
+          <span class="price-amount">À partir de 10 000 FCFA</span>
+          <span class="price-detail">Paiement sécurisé : Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire</span>
+        </div>
+        
+        <a href="formations-video-geoexpert.html" class="btn btn-primary btn-block" style="background: var(--magenta); border: 0; margin-top: 10px;">Découvrir la plateforme</a>
+      </article>
+
+      <!-- FORMATION CONFIRMÉE -->
+      <article class="formation-card featured">
+        <span class="formation-tag">Prochaine session : novembre 2026 · Inscriptions ouvertes</span>
+        <h3>Devenez Géomaticien Opérationnel</h3>
+        <p class="formation-desc">
+        40 heures pour apprendre les Systèmes d’Information Géographique, l’analyse spatiale, 
+        la télédétection par imagerie satellite, la cartographie professionnelle et la diffusion de cartes en ligne (WebGIS). 
+        Vous terminerez par une collecte de données terrain et un projet de fin de formation.
+        </p>
+        <ul class="formation-meta">
+          <li><strong>Durée :</strong> 40 heures Tous les samedis. Plus un suivi en ligne entre les séances</li> 
+          <li><strong>Public :</strong> Tous secteurs, du débutant au professionnel</li>
+          <li><strong>Format :</strong> Présentiel ou En ligne et cours en ligne en semaine non comptabilisé dans les 40 heures</li>
+          <li><strong>Outils enseignés :</strong> QGIS • ArcGIS • KoboToolbox • Google Earth Pro</li>
+        </ul>
+        <div class="formation-price">
+          <span class="price-amount"><s>145 000 FCFA</s> <span class="price-detail">Tarif normal</span>
+          <br> 125 000 FCFA <span class="price-detail">Offre promotionnelle valable jusqu'au 30 décembre 2026</span> </span> 
+          <span class="price-detail">25 000 FCFA inscription + 100 000 FCFA formation</span>
+        </div>
+        <a href="#inscription" class="btn btn-primary btn-block">Je réserve ma place</a>
+      </article>
+      
+      <!-- PLACEHOLDER 1 -->
+      <!-- ✅ CORRIGÉ : <p> fermé AVANT <ul> (HTML invalide avant) -->
+      <article class="formation-card placeholder">
+        <span class="formation-tag tag-muted">Inscriptions sur liste d'attente</span>
+        <h3>Analyse d'Images Satellitaires & Télédétection</h3>
+        <p class="formation-desc">30 heures de formation pour maîtriser les techniques d'acquisition, de traitement et d'analyse d'images satellitaires pour produire des informations utiles à la gestion de l'environnement, de l'agriculture, de l'urbanisme, des ressources naturelles et du développement territorial.</p>
+        <ul class="formation-meta">
+          <li><strong>Durée :</strong> 30 heures</li>
+          <li><strong>Niveau :</strong> Intermédiaire à Professionnel</li>
+          <li><strong>Format :</strong> Présentiel ou En ligne</li>
+          <li><strong>Outils enseignés :</strong> Google Earth Engine • ARCGIS • Sentinel • Landsat</li>
+        </ul>
+        <div class="formation-price">
+          <span class="price-amount">Disponible sur demande</span>
+          <span class="price-detail">Formation personnalisée selon vos besoins.</span>
+        </div>
+        <a href="https://wa.me/2250787015030" class="btn btn-outline btn-block" target="_blank" rel="noopener">Se renseigner</a>
+      </article>
+
+      <!-- PLACEHOLDER 2 -->
+
+    </div>
+        <!-- Lien vers la page Tarifs -->
+    <div class="formations-cta">
+      <p class="formations-cta-text">
+        Vous souhaitez voir l'ensemble de nos tarifs et formations spécialisées ?
+      </p>
+      <a href="tarifs.html" class="btn btn-outline">
+        Voir tous nos tarifs
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
     </div>
   </div>
 </section>
@@ -819,6 +647,139 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   </div>
 </section>
 
+<!-- BANNIÈRE FORMATIONS EN LIGNE -->
+<section style="padding: 70px 20px; background: #fff; text-align: center;">
+  <div class="container" style="max-width: 900px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 40px; box-shadow: 0 20px 40px rgba(0,146,166,0.08);">
+    <p class="section-eyebrow" style="justify-content: center; color: var(--magenta);">Nouveauté GeoExpert</p>
+    <h2 style="font-size: clamp(28px, 4vw, 40px); margin-bottom: 16px;">Vous ne pouvez pas vous déplacer à Abidjan ?</h2>
+    <p style="font-size: 17px; color: var(--ink-dim); max-width: 600px; margin: 0 auto 28px;">
+      Découvrez nos formations e-learning. Apprenez le SIG depuis chez vous, à votre rythme, avec l'accompagnement d'un formateur par WhatsApp.
+    </p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <a href="formations-video-geoexpert.html" class="btn btn-primary" style="background: var(--gradient-brand);">Découvrir les formations e-learning</a>
+      <a href="tarifs.html" class="btn btn-outline">Comparer les tarifs</a>
+    </div>
+  </div>
+</section>
+<!-- ============ TÉMOIGNAGES ============ -->
+<section class="temoignages" id="temoignages">
+  <div class="container">
+    <p class="section-eyebrow">Ils nous font confiance</p>
+    <h2>Témoignages</h2>
+    <p class="section-lead">Ce que nos apprenants disent après la formation.</p>
+
+    <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+          Merci beaucoup formateur, je peux maintenant analyser mes données collectées dans QGIS.
+          Avant, je n'arrivais pas à afficher les données GPX dans un logiciel SIG, j'étais obligé
+          de demander l'aide des gens. Maintenant c'est plus facile pour moi.
+        </p>
+        <div class="temoignage-author">
+          <span class="temoignage-avatar">KD</span>
+          <div>
+            <p class="temoignage-name">Kouamé Kouakou Donatien</p>
+            <p class="temoignage-formation">Formation Géomatique, SIG & Cartographie</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+          J'ai pas pu assister à la formation de juin parce que javais dejà fais une formation special Qgis avec 
+          vous. Mais c'était bien. Qgis est très facile il reste maintenant à me perfectionner en ArcGIS.
+        </p>
+        <div class="temoignage-author">
+          <span class="temoignage-avatar">BS</span>
+          <div>
+            <p class="temoignage-name">Bamba Souleymane</p>
+            <p class="temoignage-formation">Formation QGIS</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+           Je recommande vivement cette page, passionnée de cartographie et géographie  
+           on y apprend beaucoup de choses. Bon courage pour la suite et chapeau pour le boulot 
+        </p>
+        <div class="temoignage-author">
+          <picture>
+            <source srcset="images/temoignagerubis.webp" type="image/webp">
+            <img src="images/temoignagerubis.jpg" alt="Rubis De Rubis, apprenante GeoExpert Academy" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <p class="temoignage-name">Rubis De Rubis</p>
+            <p class="temoignage-formation">Formation Cartographie</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+           J’aime bien cette communauté. 😊Elle apporte son soutien et une explication détaillée des questions géographiques. Je la recommande énormément pour 
+           tous vos travaux car j’ai été satisfaite. Merci 🙏🏼à l’équipe.❤️ 
+        </p>
+        <div class="temoignage-author">
+          <picture>
+           <source srcset="images/temoignageyao.webp" type="image/webp">
+           <img src="images/temoignageyao.jpg" alt="Yao Marina, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <p class="temoignage-name">Yao Marina</p>
+            <p class="temoignage-formation">Consulting</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+           j'ai aimé votre travail merci. 
+        </p>
+        <div class="temoignage-author">
+          <picture>
+            <source srcset="images/temoignagevanessa.webp" type="image/webp">
+            <img src="images/temoignagevanessa.jpg" alt="Vanessa Vansor, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <p class="temoignage-name">Vanessa Vansor</p>
+            <p class="temoignage-formation">Consulting</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <div class="temoignages-grid">
+      <div class="temoignage-card">
+        <p class="temoignage-quote">
+           Merci infiniment pour votre travail ! J'avais sollicité une carte des lacs de 
+           Yamoussoukro. Vous me l'avez 
+           transmis rapidement et le résultat est à la hauteur de mes attentes. 
+           Je suis très satisfaite
+           de votre professionnalisme et de votre réactivité. Que Dieu vous bénisse 
+        </p>
+        <div class="temoignage-author">
+          <picture>
+            <source srcset="images/temoignageamon.webp" type="image/webp">
+            <img src="images/temoignageamon.jpg" alt="Anoman Messikely, cliente consulting GeoExpert" class="temoignage-avatar" width="60" height="60" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <p class="temoignage-name">Anoman Messikely</p>
+            <p class="temoignage-formation">Consulting</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ POURQUOI NOUS CHOISIR ============ -->
 <section class="pourquoi-section" id="pourquoi-nous">
   <div class="container">
     <p class="section-eyebrow">Notre différence</p>
@@ -892,6 +853,7 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   </div>
 </section>
 
+<!-- ============ NOTRE MÉTHODE ============ -->
 <section class="methode-section" id="methode">
   <div class="container">
     <p class="section-eyebrow">Notre pédagogie</p>
@@ -925,6 +887,32 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
         <p>Après la formation, vous restez connecté à la communauté : questions, exercices, aide sur vos projets. Le suivi continue.</p>
       </div>
     </div>
+  </div>
+</section>
+
+    <!-- ✅ CORRIGÉ : avis-cta et avis-form DANS le .container maintenant -->
+    <div class="avis-cta">
+      <p><strong>Vous avez suivi une formation ou demandez un service chez nous ?</strong><br>Partagez votre expérience, elle sera publiée après validation.</p>
+      <button class="btn btn-outline" id="btnLaisserAvis">Laisser un avis</button>
+    </div>
+
+    <!-- ✅ CORRIGÉ : name="" ajoutés sur les inputs pour accessibilité et SEO -->
+    <form class="avis-form" id="avisForm">
+      <label>
+        Nom complet
+        <input type="text" id="avisNom" name="nom" required placeholder="Ex: Dosso Albert Mabri" autocomplete="name">
+      </label>
+      <label>
+        Formation suivie
+        <input type="text" id="avisFormation" name="formation" required placeholder="Ex: Géomatique, SIG & Cartographie">
+      </label>
+      <label>
+        Votre avis
+        <textarea id="avisMessage" name="message" rows="4" required placeholder="Qu'avez-vous appris ? Qu'est-ce qui vous a aidé ?"></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Envoyer via WhatsApp</button>
+    </form>
+
   </div>
 </section>
 
@@ -992,6 +980,82 @@ src="https://www.facebook.com/tr?id=1640508134183343&ev=PageView&noscript=1"
   </div>
 </section>
 
+<!-- ============ INSCRIPTION ============ -->
+<section class="inscription" id="inscription">
+  <div class="inscription-inner">
+    <div class="inscription-text">
+      <p class="section-eyebrow">Étape suivante</p>
+      <h2>Inscrivez-vous à une formation</h2>
+      <p class="section-lead">
+        Remplissez ce formulaire. Il ouvre une conversation WhatsApp pré-remplie.
+      </p>
+    </div>
+
+    <form class="inscription-form" id="inscriptionForm">
+      <label>
+        Nom complet
+        <input type="text" id="fName" name="nom" required placeholder="Ex : Kouassi Aya" autocomplete="name">
+      </label>
+      <label>
+        Numéro WhatsApp
+        <input type="tel" id="fPhone" name="telephone" required placeholder="Ex : 07 87 01 50 30" autocomplete="tel">
+      </label>
+      <label>
+        Profession / niveau d'étude / domaine d'activité
+        <input type="text" id="fProfession" name="profession" required placeholder="Ex : Topographe, Étudiant en géographie...">
+      </label>
+      <label>
+        Niveau en SIG / Cartographie / Géomatique / DAO
+        <select id="fNiveau" name="niveau" required>
+          <option value="">— Choisir votre niveau —</option>
+          <option value="Débutant">Débutant</option>
+          <option value="Intermédiaire">Intermédiaire</option>
+          <option value="Avancé">Avancé</option>
+        </select>
+      </label>
+      <label>
+        Ville de résidence
+        <input type="text" id="fVille" name="ville" required placeholder="Ex : Abidjan" autocomplete="address-level2">
+      </label>
+      <label>
+        Mode de formation souhaité
+        <select id="fMode" name="mode" required>
+          <option value="">— Choisir un mode —</option>
+          <option value="En ligne">En ligne</option>
+          <option value="Présentiel">Présentiel</option>
+          <option value="Mixte">Mixte</option>
+        </select>
+      </label>
+      <label>
+        Formation souhaitée
+        <select id="fFormation" name="formation" required>
+          <option value="">— Choisir une formation —</option>
+          <option value="Devenez Géomaticien Opérationnel (Novembre 2026)">Devenez Géomaticien Opérationnel (Novembre 2026)</option>
+          <option value="Initiation à AutoCAD">Initiation à AutoCAD</option>
+          <option value="Analyse d'Images Satellitaires & Télédétection">Analyse d'Images Satellitaires & Télédétection</option>
+          <option value="Collecte Mobile de Données & SIG">Collecte Mobile de Données & SIG</option>
+          <option value="Autre / à préciser">Autre / à préciser</option>
+        </select>
+      </label>
+      <label>
+        Message (facultatif)
+        <textarea id="fMessage" name="message" rows="3" placeholder="Une question, une précision..."></textarea>
+      </label>
+      <div class="pay-online" id="payOnline" hidden>
+        <h4>Payer en ligne</h4>
+        <p class="pay-online-sub">Devenez Géomaticien Opérationnel. Wave, Orange Money, MTN, Moov ou carte bancaire.</p>
+        <a href="https://checkout.digitalpaye.com/pay/TwaTcCe6fbXX" class="btn btn-primary btn-block" target="_blank" rel="noopener">Payer l'inscription : 25 000 FCFA</a>
+        <a href="https://checkout.digitalpaye.com/pay/0S2XhfPEkAiY" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer le solde : 100 000 FCFA</a>
+        <a href="https://checkout.digitalpaye.com/pay/nHqSeKpKDh7a" class="btn btn-outline btn-block" target="_blank" rel="noopener">Payer la totalité : 125 000 FCFA</a>
+        <p class="pay-online-note">Paiement sécurisé par DigitalPaye. Après le paiement, nous vous contactons sur WhatsApp pour confirmer votre inscription.</p>
+        <p class="pay-online-help">Un problème de paiement ? <a href="https://wa.me/2250787015030?text=Bonjour%2C%20j%27ai%20un%20probl%C3%A8me%20de%20paiement%20en%20ligne%20pour%20ma%20formation." target="_blank" rel="noopener">Écrivez-nous sur WhatsApp</a></p>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        Envoyer via WhatsApp
+      </button>
+    </form>
+  </div>
+</section>
 <!-- ============ BANNIÈRE EMPLOI ============ -->
 <!-- ✅ CORRIGÉ : div interne inutile supprimé -->
 <section class="job-banner">
@@ -1181,75 +1245,37 @@ new IntersectionObserver(function(e,o){if(e[0].isIntersecting){o.disconnect();fn
     <div id="resultat" role="status" aria-live="polite"></div>
   </div>
 </section>
-</div>
 
-
-<!-- ============ PIED DE PAGE ============ -->
-<footer class="rf-footer">
-  <div class="container">
-    <div class="rf-footer-grid">
-      <div>
-        <div class="brand">
-          <picture>
-            <source srcset="images/logo-full.webp" type="image/webp">
-            <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy" decoding="async">
-          </picture>
-        </div>
-        <p>Formation et consulting en géomatique à Abidjan et Bouaké, en présentiel et en ligne.</p>
-      <div class="social-icons">
-        <a href="https://www.facebook.com/profile.php?id=61590209789158" target="_blank" rel="noopener" aria-label="Facebook GeoExpert Academy">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
-        </a>
-        <a href="https://www.tiktok.com/@geoexpertacademy" target="_blank" rel="noopener" aria-label="TikTok GeoExpert Academy">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82c-1.02-.9-1.64-2.16-1.7-3.6h-3.15v13.9c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1-2.94-2.94 2.94 2.94 0 0 1 2.94-2.94c.3 0 .59.05.86.13v-3.2a6.15 6.15 0 0 0-.86-.06A6.14 6.14 0 0 0 2.7 16.19a6.14 6.14 0 0 0 6.11 6.13 6.14 6.14 0 0 0 6.11-6.13V9.07a8.7 8.7 0 0 0 5.08 1.63V7.55a5.32 5.32 0 0 1-3.4-1.73Z"/></svg>
-        </a>
-        <a href="https://www.youtube.com/@geoexpertacademyconsulting0794" target="_blank" rel="noopener" aria-label="YouTube GeoExpert Academy">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.02-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.98.13c-.4.05-1.26.05-2.02.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.2 3.28.2 3.28s.2 1.4.8 2.02c.77.8 1.77.78 2.22.86C6.8 19.05 12 19.1 12 19.1s4.1-.01 6.98-.14c.4-.05 1.26-.05 2.02-.85.6-.62.8-2.02.8-2.02s.2-1.64.2-3.28v-1.44c0-1.64-.2-3.28-.2-3.28ZM9.98 14.6V8.85l5.4 2.88-5.4 2.87Z"/></svg>
-        </a>
-        <a href="https://www.linkedin.com/company/geoexpert-academy-consulting" target="_blank" rel="noopener" aria-label="LinkedIn GeoExpert Academy">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
-        </a>
-      </div>
-      </div>
-      <div>
-        <h4>Formations</h4>
-        <ul>
-          <li><a href="formations-video-geoexpert.html">Plateforme e-learning</a></li>
-          <li><a href="#tarifs">Tarifs</a></li>
-          <li><a href="ressources.html">Ressources gratuites</a></li>
-          <li><a href="verifier-certificat.html">Vérifier une attestation</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>GeoExpert</h4>
-        <ul>
-          <li><a href="a-propos.html">À propos</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="realisations.html">Réalisations</a></li>
-          <li><a href="blog.html">Blog</a></li>
-          <li><a href="faq.html">FAQ</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <ul>
-          <li><a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20des%20informations." target="_blank" rel="noopener">WhatsApp : 07 87 01 50 30</a></li>
-          <li><a href="tel:+2250787015030">Appeler</a></li>
-          <li><a href="contact.html">Page contact</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="rf-footer-bottom">
-      <p>&copy; 2026 GeoExpert Academy &amp; Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
-      <div class="rf-footer-legal">
-        <a href="politique-confidentialite.html">Politique de confidentialité</a>
-        <a href="mentions-legales.html">Mentions légales</a>
-        <a href="cgv.html">CGV</a>
-      </div>
-    </div>
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+ <div class="footer-inner">
+  <div class="brand">
+    <picture>
+      <source srcset="images/logo-full.webp" type="image/webp">
+      <img src="images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy" decoding="async">
+    </picture>
   </div>
+  <div class="social-icons">
+    <a href="https://www.facebook.com/profile.php?id=61590209789158" target="_blank" rel="noopener" aria-label="Facebook GeoExpert Academy">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@geoexpertacademy" target="_blank" rel="noopener" aria-label="TikTok GeoExpert Academy">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82c-1.02-.9-1.64-2.16-1.7-3.6h-3.15v13.9c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1-2.94-2.94 2.94 2.94 0 0 1 2.94-2.94c.3 0 .59.05.86.13v-3.2a6.15 6.15 0 0 0-.86-.06A6.14 6.14 0 0 0 2.7 16.19a6.14 6.14 0 0 0 6.11 6.13 6.14 6.14 0 0 0 6.11-6.13V9.07a8.7 8.7 0 0 0 5.08 1.63V7.55a5.32 5.32 0 0 1-3.4-1.73Z"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@geoexpertacademyconsulting0794" target="_blank" rel="noopener" aria-label="YouTube GeoExpert Academy">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.02-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.98.13c-.4.05-1.26.05-2.02.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.2 3.28.2 3.28s.2 1.4.8 2.02c.77.8 1.77.78 2.22.86C6.8 19.05 12 19.1 12 19.1s4.1-.01 6.98-.14c.4-.05 1.26-.05 2.02-.85.6-.62.8-2.02.8-2.02s.2-1.64.2-3.28v-1.44c0-1.64-.2-3.28-.2-3.28ZM9.98 14.6V8.85l5.4 2.88-5.4 2.87Z"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/company/geoexpert-academy-consulting" target="_blank" rel="noopener" aria-label="LinkedIn GeoExpert Academy">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.34 18.34V9.75H5.67v8.59h2.67ZM7 8.63a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Zm11.34 9.71v-4.7c0-2.52-1.35-3.69-3.15-3.69-1.45 0-2.1.8-2.46 1.36v-1.16h-2.67c.04.75 0 8.19 0 8.19h2.67v-4.57c0-.25.02-.49.1-.67.2-.5.66-1.02 1.44-1.02 1.02 0 1.43.78 1.43 1.92v4.34h2.64Z"/></svg>
+    </a>
+  </div>
+  <!-- ✅ AJOUTÉ : lien vers politique de confidentialité et mentions légales -->
+    <a href="politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="cgv.html" class="footer-legal-link">CGV</a>
+  <p>&copy; 2026 GeoExpert Academy & Consulting, Abidjan, Bouaké Côte d'Ivoire.</p>
+</div>
 </footer>
-
 
 <!-- Assistant GeoExpert -->
 <script>
