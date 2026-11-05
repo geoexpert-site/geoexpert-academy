@@ -534,3 +534,8 @@ qu'après validation du formateur. Choix de l'administrateur : envoi du travail 
 - [x] **En ligne le 03/11/2026** : `espace-apprenant-api` → df788391 (avant : d4c47913) ; site : `main` = dc30a69 (avant : 81230ce) ; sauvegarde `GeoExpert-Sauvegardes\2026-11-03-avant-corrections-audit\`. `audit/` non poussé (dépôt public).
 - retour en arrière : `npx wrangler rollback d4c47913` (dans `worker/`, avec `-c wrangler-prod.toml`) ; site : `git revert dc30a69`.
 - [ ] 👤 Tester un paiement Google Earth (doit arriver avec code créable) ; aperçus de liens WhatsApp / Facebook.
+
+## Corrections de l'audit, suite (05/11/2026)
+- [x] Page de vente : nombre de leçons affiché pour ArcGIS 1 et 2, QGIS 1 et 2, Télédétection (d'après le catalogue du Worker) ; Webmapping, KoboToolbox et Google Earth sans chiffre tant que leurs vidéos ne sont pas en ligne. `ressources.html` : le bouton mène à la page e-learning.
+- Laissés tels quels : « Bientôt disponible » de `tarifs.html` (avec « Me prévenir »), licence ArcGIS (choix du formateur), liste d'attente présentiel de l'accueil.
+- Branche `corrections-audit`, étiquette `sauvegarde-avant-corrections-audit` ; **pas encore publié** (accord de l'administrateur à demander).
