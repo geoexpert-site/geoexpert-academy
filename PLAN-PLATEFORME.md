@@ -540,7 +540,7 @@ qu'après validation du formateur. Choix de l'administrateur : envoi du travail 
 - Laissés tels quels : « Bientôt disponible » de `tarifs.html` (avec « Me prévenir »), licence ArcGIS (choix du formateur), liste d'attente présentiel de l'accueil.
 - Branche `corrections-audit`, étiquette `sauvegarde-avant-corrections-audit` ; **pas encore publié** (accord de l'administrateur à demander).
 
-## Progression guidée des leçons (demande du 07/11/2026) — **PAS EN LIGNE, ne pas publier avant le 09/11/2026 ni sans accord**
+## Progression guidée des leçons (demande du 07/11/2026) — **EN LIGNE le 07/11/2026** (l'administrateur a demandé la mise en ligne immédiate, avant le 09/11)
 
 Détails, règles, étapes et retour en arrière : `MISE-EN-LIGNE-PROGRESSION.md` · guide : `GUIDE-ADMIN.md` §7 decies. Branche `progression-lecons`, étiquette `sauvegarde-avant-progression`.
 
@@ -551,4 +551,5 @@ Détails, règles, étapes et retour en arrière : `MISE-EN-LIGNE-PROGRESSION.md
 - [x] Anciens apprenants : fenêtre de reprise de 15 min à la 1re connexion (rien perdu) ; leçon avancée terminée → tout ce qui précède ouvert
 - [x] Interrupteur de secours : `PROG_GUIDEE = "non"` dans la configuration du Worker
 - [x] Tests : `test-progression.mjs` api 38/38, page 30/30, admin 6/6
-- [ ] 👤 Accord de mise en ligne (après le 09/11/2026) ; ⚠️ vérifier avec « test 1 » sur une **vraie vidéo Bunny** que les événements `timeupdate` arrivent (non testé : lecteur simulé)
+- [x] **Mise en ligne 07/11/2026** : sauvegarde `GeoExpert-Sauvegardes6-11-07-avant-progression\` ; tables `watch`, `deblocages` en production ; `main` = c4f41c2 ; `espace-apprenant-api` → 27dfaac1 (avant 76298f9d), `geoexpert-admin` → f7a7a3ce (avant 3494e2f9) ; `verif-prod-progression.mjs` 7/7 (code temporaire supprimé)
+- [ ] 👤 ⚠️ vérifier avec « test 1 » sur une **vraie vidéo Bunny** que les événements `timeupdate` arrivent (non testé : lecteur simulé)
