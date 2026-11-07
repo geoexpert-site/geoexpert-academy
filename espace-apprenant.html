@@ -384,6 +384,7 @@ async function wtSend(){var W=PJ&&PJ.W;if(!W||W.busy)return;var b=Object.keys(W.
  catch(e){}
  W.busy=false}
 function wtResult(l,j){
+ var ind=document.getElementById('wtI');if(ind&&cur&&cur.k===l.k&&j&&j.pct!==undefined)ind.textContent='Suivi de la lecture : '+j.pct+' % (terminée à 90 %)';
  if(!j||!j.done||P.done[l.k])return;
  setDone(l.k,true);var n=plNext(l);side();
  if(DN&&DN.k===l.k){DN.b.classList.remove('alt');if(DN.b.lastChild)DN.b.lastChild.textContent='Terminée'}
@@ -991,6 +992,7 @@ function lesson(k){
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
  if(l.ready&&!l.lock)m.appendChild(vitCtl());
+ if(plOn()&&l.ready&&!l.lock&&!P.done[k])m.appendChild(h('p',{class:'note',id:'wtI',text:'Suivi de la lecture : '+(l.w||0)+' % (terminée à 90 %)'}));
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){if(P.done[k]){setDone(k,false);lesson(k);return}tryFinish(l,function(){setDone(k,true);lesson(k);quizPropose(k,function(){})})}},ic('check'),done?'Terminée':'Marquer comme terminée');DN={k:k,b:dn};
 
 var nx=a[ix+1],pv=a[ix-1];
@@ -1109,7 +1111,9 @@ addEventListener('message',function(e){
  if(!PJ||e.source!==PJ.f.contentWindow)return;var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
  if(!d||d.context!=='player.js')return;
  if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
- else if(d.event==='timeupdate'&&PJ.W){var tv=d.value||{};wtTick(+tv.seconds,+tv.duration)}
+ else if(PJ.W&&(d.event==='timeupdate'||d.event==='progress')){var tv=d.value;if(tv&&typeof tv==='object')wtTick(+(tv.seconds!==undefined?tv.seconds:tv.currentTime),+tv.duration);else if(d.event==='timeupdate')wtTick(+tv,0);PJ.W.tu=Date.now()}
+ else if(PJ.W&&(d.method==='getCurrentTime'||d.event==='getCurrentTime')){var cv=d.value;wtTick(+(cv&&typeof cv==='object'?cv.seconds:cv),0)}
+ else if(PJ.W&&(d.method==='getDuration'||d.event==='getDuration')){var dv=+(d.value&&typeof d.value==='object'?d.value.duration:d.value);if(dv>0)PJ.W.dur=dv}
  else if(d.event==='pause'&&PJ.W)wtSend();
  else if(d.event==='ended'&&PJ.W)wtEnded();
  else if(d.event==='play'){if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}// certains lecteurs remettent 1x au démarrage
@@ -1132,7 +1136,8 @@ async function play(l,pl){
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
   pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   vitesse(f);
-  if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}wtSend()},15000)}
+  if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.n=0;W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}if(++W.n%15===0)wtSend()},1000);
+   W.poll=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.poll);return}if(PJ&&PJ.W===W&&PJ.ready&&(!W.tu||Date.now()-W.tu>3000)){pjSend('getCurrentTime',undefined,'wtc');if(!W.dur||W.n%10===0)pjSend('getDuration',undefined,'wtd')}},1000)}
   pl.appendChild(f);pl.appendChild(wm);
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
