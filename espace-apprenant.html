@@ -1115,7 +1115,7 @@ function dgLog(raw){if(!DIAG||!PJ)return;var D=PJ.D=PJ.D||{n:0,t:{},last:''},x=r
  if(x&&x.event==='ready')D.ready=(typeof raw==='string'?raw:JSON.stringify(raw)).slice(0,900);
  if(!(x&&x.event==='timeupdate'&&D.t[k]>2))D.last=(typeof raw==='string'?raw:JSON.stringify(raw)).slice(0,160)}
 function dgShow(){var n=document.getElementById('wtD'),D=PJ&&PJ.D,W=PJ&&PJ.W;if(!n||!PJ)return;
- n.textContent='DIAGNOSTIC · origine du lecteur : '+PJ.origin+' · prêt : '+(PJ.ready?'oui':'non')+' · messages reçus : '+(D?D.n:0)+' · types : '+(D?JSON.stringify(D.t):'{}')+' · origine réelle des messages : '+(PJ.real||'?')+' · envois : '+(PJ.sent||0)+(PJ.err?' · ERREUR d\'envoi : '+PJ.err:'')+' · ignorés (autre fenêtre) : '+(D&&D.other||0)+(D&&D.otherLast?' ['+D.otherLast+']':'')+' · message prêt complet : '+(D&&D.ready?D.ready:'aucun')+' · dernier : '+(D?D.last:'')+' · suivi actif : '+(W?'oui':'non')+' · cases en attente : '+(W?Object.keys(W.buf).length:0)+' · position : '+(W&&W.last!==null?Math.round(W.last):'aucune')+' · durée : '+(W?Math.round(W.dur):0)+' · dernier envoi au serveur : '+(W&&W.st?W.st:'aucun')+' · demandes de position : '+(W&&W.rq||0)}
+ n.textContent='DIAGNOSTIC · origine du lecteur : '+PJ.origin+' · prêt : '+(PJ.ready?'oui':'non')+' · messages reçus : '+(D?D.n:0)+' · types : '+(D?JSON.stringify(D.t):'{}')+' · bibliothèque Bunny : '+(PJ.lib?'chargée':'non')+' · prête : '+(PJ.libReady?'oui':'non')+' · timeupdate reçus : '+(PJ.libN||0)+' · origine réelle des messages : '+(PJ.real||'?')+' · envois : '+(PJ.sent||0)+(PJ.err?' · ERREUR d\'envoi : '+PJ.err:'')+' · ignorés (autre fenêtre) : '+(D&&D.other||0)+(D&&D.otherLast?' ['+D.otherLast+']':'')+' · message prêt complet : '+(D&&D.ready?D.ready:'aucun')+' · dernier : '+(D?D.last:'')+' · suivi actif : '+(W?'oui':'non')+' · cases en attente : '+(W?Object.keys(W.buf).length:0)+' · position : '+(W&&W.last!==null?Math.round(W.last):'aucune')+' · durée : '+(W?Math.round(W.dur):0)+' · dernier envoi au serveur : '+(W&&W.st?W.st:'aucun')+' · demandes de position : '+(W&&W.rq||0)}
 addEventListener('message',function(e){
  if(!PJ)return;
  if(e.source!==PJ.f.contentWindow&&e.origin!==PJ.origin){if(DIAG){var Dx=PJ.D=PJ.D||{n:0,t:{},last:''};Dx.other=(Dx.other||0)+1;if(Dx.other<4)Dx.otherLast=(e.origin+' '+(typeof e.data==='string'?e.data:JSON.stringify(e.data))).slice(0,120)}return}
@@ -1141,17 +1141,22 @@ function vitCtl(){
  VUI={s:s,n:n};
  return h('div',{class:'vit'},h('label',null,'Vitesse de lecture ',s),n);
 }
+// Bibliothèque officielle de Bunny (player.js), chargée AVANT le lecteur comme l'exige leur documentation ; contrôlée par SRI.
+function pjLoad(){if(window.playerjs)return Promise.resolve();return loadJs('https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js','sha384-XrHkN6ZCRISKuHi/i0GQH2eCz73exJqEECthnQxoWgdEMB8g5pD/sZEPXZPYFCwj').catch(function(){})}
 async function play(l,pl){
  var b=pl.querySelector('.go');if(b)b.disabled=true;
  try{var r=await post('/api/play',{code:code,k:l.k}),j=await r.json();
   if(r.status===403&&j.locked){var nl=L.filter(function(x){return x.k===j.need})[0];if(nl){pl.textContent='';plModal(l,nl);return}}
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
+  await pjLoad();
   pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   vitesse(f);
   if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.n=0;W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}if(++W.n%15===0)wtSend()},1000);
    if(DIAG){setInterval(dgShow,1000)}
    W.poll=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.poll);return}if(PJ&&PJ.W===W&&PJ.ready&&(!W.tu||Date.now()-W.tu>3000)){pjSend('getCurrentTime',undefined,'wtc');W.rq=(W.rq||0)+1;if(!W.dur||W.n%10===0)pjSend('getDuration',undefined,'wtd')}},1000)}
   pl.appendChild(f);pl.appendChild(wm);
+  if(window.playerjs&&PJ){try{var lib=new playerjs.Player(f);PJ.lib=lib;lib.on('ready',function(){PJ.libReady=1;
+   if(PJ.W){lib.on('timeupdate',function(v){PJ.libN=(PJ.libN||0)+1;if(PJ.W)PJ.W.tu=Date.now();v=v||{};wtTick(+v.seconds,+v.duration)});lib.on('ended',function(){wtEnded()});lib.on('pause',function(){wtSend()})}})}catch(e){PJ.err='bibliothèque : '+String(e.message||e).slice(0,80)}}
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
  }catch(e){pl.textContent='';pl.appendChild(h('div',{class:'er',text:'Lecture impossible pour le moment. Réessayez.'}))}
