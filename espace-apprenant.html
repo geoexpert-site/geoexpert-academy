@@ -68,7 +68,8 @@ details.m{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;over
 details.m summary{list-style:none;cursor:pointer;padding:12px;display:flex;gap:8px;align-items:center;font:600 13.5px Montserrat}
 details.m summary::-webkit-details-marker{display:none}details.m summary .n{margin-left:auto;font:500 12px Inter;color:var(--dim)}
 .ls{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);padding:10px 12px;font-size:13.5px}
-.ls:hover{background:var(--soft)}.ls.on{background:rgba(0,146,166,.12);box-shadow:inset 3px 0 var(--teal)}.ls[disabled]{opacity:.5;cursor:not-allowed}
+.ls:hover{background:var(--soft)}.ls.on{background:rgba(0,146,166,.12);box-shadow:inset 3px 0 var(--teal)}.ls[disabled]{opacity:.5;cursor:not-allowed}.ls.pl{opacity:.6}.ls.pl span:last-child{color:var(--dim)}
+.pltoast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;max-width:min(520px,calc(100vw - 32px));background:var(--indigo);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(20,18,40,.3)}
 .dot{flex:0 0 20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:#fff;margin-top:1px}.dot .ic{width:12px;height:12px}.dot.d{background:var(--teal);border-color:var(--teal)}
 .ls small{display:block;color:var(--dim);font-size:12px}
 main{padding:28px;max-width:1000px;width:100%}
@@ -320,7 +321,7 @@ async function login(c,silent){
  finally{b.disabled=false}
 }
 function start(){
- L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,files:v.files||[],m:m,i:i,lock:m.locked||!!v.locked,at:v.locked?v.unlockAt:m.unlockAt})})});
+ L=[];D.modules.forEach(function(m){m.videos.forEach(function(v,i){L.push({k:v.k,t:v.title,d:v.dur,ready:v.ready,rdy:!!(v.ready||v.rd),w:v.w||0,files:v.files||[],m:m,i:i,lock:m.locked||!!v.locked,at:v.locked?v.unlockAt:m.unlockAt})})});
  // Correction : on supprime totalement la page de login pour ne pas laisser de vide
  $('login').style.display = 'none'; 
  $('app').hidden=false;$('who').textContent=D.label;
@@ -331,6 +332,65 @@ function acc(){return L.filter(function(l){return!l.lock})}
 function prog(){var a=acc(),n=a.filter(function(l){return P.done[l.k]}).length;return{n:n,t:a.length,p:a.length?Math.round(n*100/a.length):0}}
 function mprog(m){var a=L.filter(function(l){return l.m===m}),n=a.filter(function(l){return P.done[l.k]}).length;return{n:n,t:a.length,p:a.length?Math.round(n*100/a.length):0}}
 function top(){var p=prog();$('pct').textContent=p.p+' %';$('pbar').style.width=p.p+'%'}
+
+// ===== Progression guidée (08/11/2026) : une leçon ne s'ouvre que si la précédente est terminée (vidéo vue à 90 %).
+// Les mêmes règles sont appliquées par le Worker (c'est lui qui fait foi) ; ici elles servent à l'affichage immédiat.
+function plOn(){return!!(D&&D.prog&&D.prog.on)}
+function plSeq(m){var pre=D.prog.pre&&D.prog.pre[m.key],pm=pre&&D.modules.filter(function(x){return x.key===pre})[0];
+ return(pm?plSeq(pm):[]).concat(L.filter(function(l){return l.m===m}))}
+function plNeed(l){
+ if(!plOn()||l.lock)return null;
+ var unl=D.prog.unl||[];if(unl.indexOf(l.k)>-1||unl.indexOf(l.m.key)>-1)return null;
+ var seq=plSeq(l.m),i=seq.indexOf(l);if(i<=0)return null;
+ var p=-1;seq.forEach(function(x,j){if(P.done[x.k])p=j});p++;
+ while(p<seq.length-1&&!seq[p].rdy)p++;
+ return i<=p?null:seq[p]}
+function plLab(x,o){var s=String(x.t).split(' : ')[0],b=/^Introduction/i.test(s)?"l'Introduction":/^Leçon/i.test(s)?'la '+s:'la leçon « '+s+' »',ch=/Chapitre\s+\d+/.exec(x.m.title);
+ return b+(o&&x.m!==o.m&&ch?' du '+ch[0]:'')}
+function plMsg(need,l){return'Vous devez terminer '+plLab(need,l)+' avant de passer à '+plLab(l,need)+'.'}
+function plModal(l,need){
+ var ov=h('div',{class:'chov',role:'dialog','aria-modal':'true','aria-labelledby':'plT'}),box=h('div',{class:'card chbox qzp'});
+ var esc=function(e){if(e.key==='Escape')close()};
+ var close=function(){ov.remove();document.body.style.overflow='';document.removeEventListener('keydown',esc)};
+ box.appendChild(h('h2',{id:'plT',text:'Leçon verrouillée'}));
+ box.appendChild(h('p',{text:plMsg(need,l)}));
+ var go=h('button',{class:'btn mag',onclick:function(){close();lesson(need.k);closeS()}},'Aller à '+plLab(need));
+ box.appendChild(h('div',{class:'chbt'},go,
+  h('a',{class:'btn wa',href:wa("Bonjour GeoExpert Academy, je n'arrive pas à ouvrir la leçon « "+l.t+' » ('+D.label+' / '+l.m.title+').'),target:'_blank',rel:'noopener'},"Contacter l'assistance sur WhatsApp"),
+  h('button',{class:'btn alt',onclick:close},'Fermer')));
+ ov.addEventListener('click',function(e){if(e.target===ov)close()});document.addEventListener('keydown',esc);
+ ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';go.focus();
+}
+function plToast(t){var o=document.getElementById('pltoast');if(o)o.remove();
+ var n=h('div',{class:'pltoast',id:'pltoast',role:'status',text:t});document.body.appendChild(n);setTimeout(function(){if(n.parentNode)n.remove()},7000)}
+// Leçon qui suit l (même formation, ou 1re leçon du chapitre suivant si l'apprenant l'a).
+function plNext(l){var a=L.filter(function(x){return x.m===l.m}),n=a[a.indexOf(l)+1];if(n)return n;
+ var pre=(D.prog&&D.prog.pre)||{},mm=D.modules.filter(function(x){return pre[x.key]===l.m.key})[0];return mm?L.filter(function(x){return x.m===mm})[0]:null}
+// Terminer une leçon avec vidéo : seulement si elle a été vue à 90 % (le Worker le confirme), sinon message.
+async function tryFinish(l,ok){
+ if(!plOn()||!l.rdy||P.done[l.k]){ok();return}
+ try{var r=await post('/api/watch',{code:code,k:l.k,dur:sec(l.d),b:[]}),j=await r.json();
+  if(r.ok&&j.done){ok();return}
+  plToast("Regardez la vidéo jusqu'à la fin (au moins 90 %) pour terminer cette leçon"+(r.ok&&j.pct?'. Vous en êtes à '+j.pct+' %':'')+'.')}
+ catch(e){plToast('Impossible de vérifier votre progression pour le moment. Vérifiez votre connexion.')}
+}
+// Suivi de la vidéo : cases de 5 s réellement parcourues, envoyées au Worker toutes les 15 s, à la pause et à la fin.
+function wtTick(sc,dur){var W=PJ&&PJ.W;if(!W||!(sc>=0))return;if(dur>0)W.dur=dur;
+ if(W.last!==null){var dl=sc-W.last;if(dl>0&&dl<=5){for(var i=Math.floor(W.last/5),e=Math.floor(sc/5);i<e;i++)W.buf[i]=1}}W.last=sc}
+function wtEnded(){var W=PJ&&PJ.W;if(!W)return;if(W.last!==null&&W.dur>0&&W.last>=W.dur-8)for(var i=Math.floor(W.last/5),e=Math.ceil(W.dur/5);i<e;i++)W.buf[i]=1;wtSend()}
+async function wtSend(){var W=PJ&&PJ.W;if(!W||W.busy)return;var b=Object.keys(W.buf).map(Number).slice(0,100);if(!b.length)return;W.busy=true;
+ try{var r=await fetch(API+'/api/watch',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,k:W.k,dur:Math.round(W.dur),b:b})}),j=await r.json();
+  if(r.ok){var left=j.left||[];b.forEach(function(i){if(left.indexOf(i)<0)delete W.buf[i]});wtResult(W.l,j)}}
+ catch(e){}
+ W.busy=false}
+function wtResult(l,j){
+ if(!j||!j.done||P.done[l.k])return;
+ setDone(l.k,true);var n=plNext(l);side();
+ if(DN&&DN.k===l.k){DN.b.classList.remove('alt');if(DN.b.lastChild)DN.b.lastChild.textContent='Terminée'}
+ plToast(n&&!plNeed(n)&&!n.lock?'Bravo, '+plLab(n,l)+' est débloquée.':'Bravo, vous avez terminé cette leçon.')}
+var DN=null;
+addEventListener('pagehide',function(){wtSend()});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')wtSend()});
 
 function side(){
  var s=$('side');s.textContent='';
@@ -351,8 +411,8 @@ function side(){
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
   d.appendChild(h('summary',null,m.locked?ic('lock'):null,h('span',{text:m.title.split(' : ')[0]}),h('span',{class:'n',text:m.locked?'bientôt':mp.n+'/'+mp.t})));
   L.filter(function(l){return l.m===m}).forEach(function(l){
-   var done=P.done[l.k],b=h('button',{class:'ls'+(cur&&cur.k===l.k?' on':''),onclick:function(){lesson(l.k);closeS()}},
-    h('span',{class:'dot'+(done?' d':'')},done?ic('check'):l.lock?ic('lock'):null),h('span',null,l.t,h('small',{text:l.lock&&l.at?'Disponible à partir du '+fdate(l.at):l.d})));
+   var done=P.done[l.k],pn=!done&&plNeed(l),b=h('button',pn?{class:'ls'+(cur&&cur.k===l.k?' on':'')+' pl','aria-disabled':'true',title:'Terminez la leçon précédente pour ouvrir celle-ci',onclick:function(){lesson(l.k)}}:{class:'ls'+(cur&&cur.k===l.k?' on':''),onclick:function(){lesson(l.k);if(!plNeed(l)||P.done[l.k])closeS()}},
+    h('span',{class:'dot'+(done?' d':'')},done?ic('check'):(l.lock||pn)?ic('lock'):null),h('span',null,l.t,h('small',{text:l.lock&&l.at?'Disponible à partir du '+fdate(l.at):l.d})));
    if(l.lock)b.disabled=true;d.appendChild(b)});
   s.appendChild(d)});
  top();
@@ -916,7 +976,9 @@ function home(){
 }
 
 function lesson(k){
- var l=L.filter(function(x){return x.k===k})[0];if(!l)return;cur=l;setLast(k);
+ var l=L.filter(function(x){return x.k===k})[0];if(!l)return;
+ var nd=!P.done[k]&&plNeed(l);if(nd){plModal(l,nd);return}
+ cur=l;setLast(k);
  var m=$('main');m.textContent='';var a=acc(),ix=a.indexOf(l);
  
  // Correction : on remonte automatiquement en haut de la page lors du clic sur une vidéo
@@ -929,7 +991,7 @@ function lesson(k){
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
  if(l.ready&&!l.lock)m.appendChild(vitCtl());
- var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){var was=P.done[k];setDone(k,!was);lesson(k);if(!was)quizPropose(k,function(){})}},ic('check'),done?'Terminée':'Marquer comme terminée');
+ var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){if(P.done[k]){setDone(k,false);lesson(k);return}tryFinish(l,function(){setDone(k,true);lesson(k);quizPropose(k,function(){})})}},ic('check'),done?'Terminée':'Marquer comme terminée');DN={k:k,b:dn};
 
 var nx=a[ix+1],pv=a[ix-1];
         
@@ -939,8 +1001,8 @@ if(!pv) prevBtn.disabled = true; // On désactive proprement si on est à la 1è
 
 // 2. Création du bouton Suivant / Terminer
 var nextBtn = nx 
-  ? h('button',{class:'btn mag',onclick:function(){ setDone(k,true); quizPropose(k,function(){ lesson(nx.k); }); }}, 'Terminer et continuer', ic('right'))
-  : h('button',{class:'btn mag',onclick:function(){ setDone(k,true); quizPropose(k,home); }}, 'Terminer le module');
+  ? h('button',{class:'btn mag',onclick:function(){ tryFinish(l,function(){ setDone(k,true); quizPropose(k,function(){ lesson(nx.k); }); }); }}, 'Terminer et continuer', ic('right'))
+  : h('button',{class:'btn mag',onclick:function(){ tryFinish(l,function(){ setDone(k,true); quizPropose(k,home); }); }}, 'Terminer le module');
 
 // 3. On ajoute tout ça à la page
 m.appendChild(h('div',{class:'ctl'},
@@ -1046,7 +1108,10 @@ function vitApply(v){if(!PJ)return;pjSend('setPlaybackRate',v);clearTimeout(PJ.c
 addEventListener('message',function(e){
  if(!PJ||e.source!==PJ.f.contentWindow)return;var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
  if(!d||d.context!=='player.js')return;
- if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
+ if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
+ else if(d.event==='timeupdate'&&PJ.W){var tv=d.value||{};wtTick(+tv.seconds,+tv.duration)}
+ else if(d.event==='pause'&&PJ.W)wtSend();
+ else if(d.event==='ended'&&PJ.W)wtEnded();
  else if(d.event==='play'){if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}// certains lecteurs remettent 1x au démarrage
  else if(d.event==='playbackratechange'){var r=+(d.value&&typeof d.value==='object'?d.value.playbackRate:d.value);
   if(VIT.indexOf(r)>-1){PJ.rate=r;vitSet(r);if(VUI&&document.body.contains(VUI.s))VUI.s.value=String(r);vitNote('')}}
@@ -1063,9 +1128,12 @@ function vitCtl(){
 async function play(l,pl){
  var b=pl.querySelector('.go');if(b)b.disabled=true;
  try{var r=await post('/api/play',{code:code,k:l.k}),j=await r.json();
+  if(r.status===403&&j.locked){var nl=L.filter(function(x){return x.k===j.need})[0];if(nl){pl.textContent='';plModal(l,nl);return}}
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
   pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
-  vitesse(f);pl.appendChild(f);pl.appendChild(wm);
+  vitesse(f);
+  if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}wtSend()},15000)}
+  pl.appendChild(f);pl.appendChild(wm);
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
  }catch(e){pl.textContent='';pl.appendChild(h('div',{class:'er',text:'Lecture impossible pour le moment. Réessayez.'}))}

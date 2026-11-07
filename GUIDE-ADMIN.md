@@ -500,6 +500,26 @@ Elle propose la suite avec le **prix du site** et le **lien de paiement habituel
 
 ---
 
+## 7 decies. Progression guidée : débloquer un apprenant à la main
+
+**Le principe** : un apprenant ne peut ouvrir une leçon que s'il a **terminé la précédente**. Une leçon est « terminée » quand il a regardé
+**au moins 90 %** de sa vidéo (le serveur le vérifie ; cliquer sur « Terminer » sans avoir regardé ne suffit plus).
+La 1re leçon (Introduction) de chaque formation est toujours ouverte, une leçon dont la vidéo n'est pas encore en ligne ne bloque pas la suite,
+et **les quiz ne bloquent rien**. Le chapitre 2 (QGIS, ArcGIS) s'ouvre à la fin du chapitre 1 pour qui a les deux.
+
+**Débloquer à la main (sans passer par Claude)**
+1. Onglet **Apprenants** → tapez son nom → bouton **Fiche**.
+2. Dans la fenêtre, descendez jusqu'à **« Progression guidée : débloquer à la main »** (section Actions).
+3. Pour chaque formation : choisissez la leçon dans la liste puis **Débloquer cette leçon** ; ou **Débloquer tout le cours**.
+4. Confirmez. L'apprenant la voit ouverte à sa prochaine ouverture de page (ou en rechargeant).
+5. Pour remettre le verrou : **Rétablir le verrou** à côté de la ligne 🔓. Chaque action est notée dans le **Journal**.
+
+Dans la liste **Leçons terminées** de la fiche : 🔒 = leçon verrouillée (avec « vue à 62 % » si la vidéo est commencée), 🔓 = débloquée à la main.
+
+**Si un apprenant dit « je suis bloqué »** : ouvrez sa fiche, regardez « vue à … % » ; s'il a bien regardé (réseau coupé, vidéo en plein écran…),
+débloquez la leçon. **Interrupteur de secours** (à demander à Claude, 1 commande) : désactive toute la progression guidée pour tout le monde,
+sans rien perdre ; tout redevient comme avant.
+
 ## 8. Ce que l'apprenant voit de nouveau (phases 2 et 3, ressources et charte)
 
 - **Mes progrès** (sous « Vos modules ») : objectif de la semaine qu'il choisit (1 à 7 leçons) avec une jauge,

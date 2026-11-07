@@ -309,3 +309,24 @@ CREATE INDEX IF NOT EXISTS ex_suivi_statut ON ex_suivi (statut);
 -- Reprise : les exercices déjà cochés « J'ai fait l'exercice » avant ce changement comptent comme validés
 -- (aucun apprenant ne se retrouve bloqué). Sans effet sur les lignes déjà présentes.
 INSERT OR IGNORE INTO ex_suivi (code, k, statut, t, tv, who) SELECT code, k, 'valide', done_at, done_at, 'reprise' FROM exercises;
+
+-- Progression guidée (08/11/2026) : une leçon ne s'ouvre que si la précédente est terminée.
+-- « watch » : portion de la vidéo réellement regardée (créneaux de 5 s, '1' = vu), vérifiée par le Worker à chaque envoi ;
+--   done = 1 quand 90 % au moins sont vus (la leçon est alors ajoutée à « progress »).
+-- « deblocages » : déblocage manuel par l'administrateur (k = une leçon, ou la clé d'une formation = tout le cours).
+CREATE TABLE IF NOT EXISTS watch (
+  code TEXT NOT NULL,
+  k TEXT NOT NULL,
+  seen TEXT NOT NULL DEFAULT '',
+  n INTEGER NOT NULL DEFAULT 0,
+  last_t INTEGER NOT NULL DEFAULT 0,
+  done INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (code, k)
+);
+CREATE TABLE IF NOT EXISTS deblocages (
+  code TEXT NOT NULL,
+  k TEXT NOT NULL,
+  t INTEGER NOT NULL DEFAULT 0,
+  who TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (code, k)
+);

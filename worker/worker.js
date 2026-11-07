@@ -847,6 +847,66 @@ function entitled(rec, k, now) {
   return t ? { ok: false, from: t, trial: true } : { ok: true, from: g.from };
 }
 
+// ---------------------------------------------------------------- Progression guidée (08/11/2026)
+// Une leçon ne s'ouvre que si la précédente est terminée (vidéo vue à 90 %). Les quiz ne bloquent rien.
+// - la 1re leçon de chaque formation est toujours ouverte ; une leçon sans vidéo en ligne ne bloque pas la suite ;
+// - ancien fonctionnement : une leçon plus avancée déjà terminée ouvre aussi tout ce qui la précède ;
+// - chapitre 2 (qgis2, arc2) : s'ouvre à la fin du chapitre 1, si l'apprenant a les deux formations ;
+// - déblocage manuel par l'administrateur : table « deblocages » (une leçon, ou toute la formation).
+const PREREQ = { qgis2: 'qgis1', arc2: 'arc1' };
+const SEG = 5;          // une case de « watch » = 5 secondes de vidéo
+const WATCH_OK = 0.9;   // part de la vidéo à voir pour terminer la leçon
+function durSec(s) { const p = String(s || '').split(':').map(Number); return p.length && !p.some(x => !isFinite(x)) ? p.reduce((a, x) => a * 60 + x, 0) : 0; }
+function chapOf(m) { const x = /Chapitre\s+\d+/.exec(m.title || ''); return x ? x[0] : ''; }
+// Suite ordonnée des leçons qui comptent pour une formation (le chapitre précédent est devant, s'il est dans l'accès).
+function progSeq(rec, mk, ids) {
+  const m = findModule(mk); if (!m) return [];
+  const pre = PREREQ[mk];
+  return (pre && rec.modules.some(g => g.m === pre) ? progSeq(rec, pre, ids) : [])
+    .concat(vis(m).map(v => ({ k: v.k, m: m.key, ch: chapOf(m), title: v.title, ready: !!ids[v.k] })));
+}
+// Leçon à terminer avant d'ouvrir k (élément de la suite), ou null si k est ouverte.
+function progNeed(seq, done, unl, k) {
+  const i = seq.findIndex(x => x.k === k);
+  if (i <= 0 || unl.has(k) || unl.has(moduleOf(k))) return null;
+  let p = -1; seq.forEach((x, j) => { if (done[x.k]) p = j; });
+  p++;
+  while (p < seq.length - 1 && !seq[p].ready) p++;
+  return i <= p ? null : seq[p];
+}
+// Interrupteur de secours : PROG_GUIDEE = "non" dans la configuration du Worker désactive toute la progression guidée.
+function progOn(env) { return !!env.DB && String(env.PROG_GUIDEE || '').toLowerCase() !== 'non'; }
+function lessonLabel(x, other) {
+  const s = String(x.title).split(' : ')[0];
+  const base = /^Introduction/i.test(s) ? 'l\'Introduction' : /^Leçon/i.test(s) ? 'la ' + s : 'la leçon « ' + s + ' »';
+  return base + (other && x.m !== other.m && x.ch ? ' du ' + x.ch : '');
+}
+function progMsg(need, at) { return 'Vous devez terminer ' + lessonLabel(need, at) + ' avant de passer à ' + lessonLabel(at, need) + '.'; }
+async function loadDoneUnl(env, c) {
+  const [d, u] = await env.DB.batch([
+    env.DB.prepare('SELECT k FROM progress WHERE code = ?').bind(c),
+    env.DB.prepare('SELECT k FROM deblocages WHERE code = ?').bind(c),
+  ]);
+  const done = {}; d.results.forEach(r => { done[r.k] = 1; });
+  return { done, unl: new Set(u.results.map(r => r.k)) };
+}
+// Verrou de progression d'une leçon, vérifié dans le Worker : null si ouverte, sinon { need, at, msg }.
+async function progLock(env, rec, c, k, cfg) {
+  if (!progOn(env)) return null;
+  try {
+    const seq = progSeq(rec, moduleOf(k), cfg.ids), at = seq.find(x => x.k === k);
+    if (!at) return null;
+    const { done, unl } = await loadDoneUnl(env, c);
+    const need = progNeed(seq, done, unl, k);
+    return need ? { need, at, msg: progMsg(need, at) } : null;
+  } catch (e) { return null; }
+}
+function watchPct(rows, v) {
+  const r = rows[v.k], d = durSec(v.dur);
+  return r && d && !r.done ? Math.min(99, Math.round(r.n * SEG * 100 / d)) : 0;
+}
+function progDeny(lk, req, env) { return reply({ error: lk.msg, locked: true, need: lk.need.k }, 403, req, env); }
+
 // ---------------------------------------------------------------- Cloudflare Access (administration)
 // Vérifie le jeton que Cloudflare Access ajoute après la connexion par e-mail. Renvoie l'e-mail, ou null.
 let jwks = null, jwksAt = 0;
@@ -1131,18 +1191,25 @@ async function api(req, env, url) {
   const st = studentStatus(rec, now);
   if (st === 'revoked') return reply(generic, 401, req, env);
   if (st === 'expired') return reply({ error: 'Votre accès a expiré. Écrivez-nous sur WhatsApp pour le renouveler.' }, 403, req, env);
-  if (startAccess(rec, now)) await env.ACCESS.put('s:' + c, JSON.stringify(rec));
+  let recDirty = startAccess(rec, now);
+  // Progression guidée : un code créé avant la mise en service n'a pas de « progV ». À son premier passage, on le marque et on
+  // ouvre une fenêtre de 15 minutes pendant laquelle /api/sync reprend toute la progression gardée sur son téléphone (aucune perte).
+  if (!rec.progV) { rec.progV = now; rec.progMig = now + 15 * 60000; recDirty = true; }
+  if (recDirty) await env.ACCESS.put('s:' + c, JSON.stringify(rec));
 
   if (url.pathname === '/api/login') {
     const cfg = await getCfg(env), sv = await loadExSuivi(env, c);
+    let wrows = {}, unlK = null;
+    if (env.DB) { try { const [w, u] = await env.DB.batch([env.DB.prepare('SELECT k, n, done FROM watch WHERE code = ?').bind(c), env.DB.prepare('SELECT k FROM deblocages WHERE code = ?').bind(c)]);
+      w.results.forEach(r => { wrows[r.k] = r; }); unlK = u.results.map(r => r.k); } catch (e) { /* tables absentes : pas de verrou */ } }
     // Pendant l'essai, une leçon bloquée ne renvoie que son titre, sa durée et sa date de déblocage.
     const mods = rec.modules.map(g => {
       const m = findModule(g.m); if (!m) return null;
       return {
         key: m.key, title: m.title, meta: m.meta, locked: now < g.from, unlockAt: g.from,
         videos: vis(m).map(v => {
-          const t = trialLock(rec, v.k, now);
-          return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k],
+          const t = trialLock(rec, v.k, now), wp = watchPct(wrows, v);
+          return t ? { k: v.k, title: v.title, dur: v.dur, locked: true, unlockAt: t, rd: !!cfg.ids[v.k] } : { k: v.k, title: v.title, dur: v.dur, ready: !!cfg.ids[v.k], ...(wp ? { w: wp } : {}),
             files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title + ' (' + fmtSize(f.size || 0) + ')', ready: !!env.FICHIERS } : { k: f.k, title: f.title, ready: !!cfg.files[f.k] }) };
         }),
         exercises: m.exercises.map(e => {
@@ -1178,6 +1245,7 @@ async function api(req, env, url) {
     const startAt = rec.premiereUtilisation || (rec.essai ? 0 : rec.created);
     return reply({
       label: rec.label, expires: rec.expires, trialEnd: te > now ? te : 0, modules: mods, progress,
+      prog: unlK && progOn(env) ? { on: true, pre: PREREQ, unl: unlK } : { on: false },
       trialStart: te > now ? rec.premiereUtilisation : 0,
       assistanceEnd: startAt ? addMonths(startAt, 3 + (rec.assistMois || 0)) : 0,
       prevVisit: Math.max(prevLogin, (progress && progress.act) || 0),
@@ -1211,7 +1279,7 @@ async function api(req, env, url) {
   }
 
   // Leçons, exercices, fichiers et quiz : seulement après l'acceptation de la charte.
-  if (['/api/play', '/api/file', '/api/ex-envoi', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
+  if (['/api/play', '/api/watch', '/api/file', '/api/ex-envoi', '/api/quiz', '/api/quiz-answer', '/api/live-link', '/api/live-replay', '/api/communaute'].includes(url.pathname) && !(await charteAcceptee(env, c)))
     return reply({ error: 'Acceptez d\'abord la charte de l\'apprenant : rechargez la page.', charte: true }, 403, req, env);
 
   // Rendez-vous live : lien Teams seulement pour un apprenant concerné, de 30 min avant le début jusqu'à la fin.
@@ -1256,6 +1324,8 @@ async function api(req, env, url) {
     const k = String(body.k || '');
     const e = entitled(rec, k, now);
     if (!ownsLesson(rec, k) || !e.ok) return reply({ error: 'Ce quiz n\'est pas disponible pour vous.' }, 403, req, env);
+    const lkq = await progLock(env, rec, c, k, await getCfg(env));
+    if (lkq) return progDeny(lkq, req, env);
     const row = await env.DB.prepare('SELECT data FROM quizzes WHERE k = ?').bind(k).first();
     if (!row) return reply({ error: 'Pas de quiz pour cette leçon.' }, 404, req, env);
     const qs = JSON.parse(row.data);
@@ -1393,9 +1463,20 @@ async function api(req, env, url) {
     if (!env.DB) return reply({ error: 'Sauvegarde indisponible pour le moment.' }, 503, req, env);
     const st = [];
     const done = Object.entries(body.done && typeof body.done === 'object' ? body.done : {}).slice(0, 400);
+    // Progression guidée : une leçon n'est enregistrée « terminée » que si la vidéo a été vue à 90 % (table « watch »),
+    // si elle n'a pas de vidéo en ligne, si elle l'était déjà, ou pendant la fenêtre de reprise d'un ancien code.
+    const strict = progOn(env) && !(rec.progMig && now < rec.progMig);
+    let okDone = null;
+    if (strict && done.some(([, v]) => Number(v) !== 0)) {
+      const cfgS = await getCfg(env);
+      const [wd, pd] = await env.DB.batch([env.DB.prepare('SELECT k FROM watch WHERE code = ? AND done = 1').bind(c), env.DB.prepare('SELECT k FROM progress WHERE code = ?').bind(c)]);
+      okDone = new Set(wd.results.concat(pd.results).map(r => r.k));
+      okDone.ids = cfgS.ids;
+    }
     for (const [k, v] of done) {
       if (!ownsLesson(rec, k)) continue;
       const t = Number(v);
+      if (t !== 0 && okDone && !okDone.has(k) && okDone.ids[k]) continue;
       if (t === 0) st.push(env.DB.prepare('DELETE FROM progress WHERE code = ? AND k = ?').bind(c, k));
       else st.push(env.DB.prepare('INSERT INTO progress (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING')
         .bind(c, k, t === 1 ? 1 : (t > 1.6e12 && t <= now + 60000 ? Math.floor(t) : now)));
@@ -1430,6 +1511,8 @@ async function api(req, env, url) {
     if (e.trial) return reply({ error: 'Cette leçon sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Ce module sera débloqué le ' + fmtDate(e.from) + '.' }, 403, req, env);
     const cfg = await getCfg(env);
+    const lk = await progLock(env, rec, c, k, cfg);
+    if (lk) return progDeny(lk, req, env);
     const id = cfg.ids[k];
     if (!id) return reply({ error: 'Cette vidéo sera disponible prochainement.' }, 404, req, env);
     if (!env.BUNNY_TOKEN_KEY || !env.LIBRARY_ID) return reply({ error: 'Configuration vidéo incomplète.' }, 500, req, env);
@@ -1437,6 +1520,41 @@ async function api(req, env, url) {
     const token = await sha256hex(env.BUNNY_TOKEN_KEY + id + expires);
     const host = env.PLAYER_HOST || 'iframe.mediadelivery.net';
     return reply({ url: 'https://' + host + '/embed/' + env.LIBRARY_ID + '/' + id + '?token=' + token + '&expires=' + expires + '&autoplay=false&preload=false', label: rec.label }, 200, req, env);
+  }
+
+  // Suivi de la vidéo regardée : la page envoie les cases de 5 s vues ; le Worker limite ce qu'il accepte au temps réellement écoulé
+  // (au plus 2,25 fois la vitesse normale, 60 s d'avance au maximum par envoi) et termine la leçon à 90 %.
+  if (url.pathname === '/api/watch') {
+    if (!env.DB) return reply({ error: 'Suivi indisponible pour le moment.' }, 503, req, env);
+    const k = String(body.k || '');
+    if (!ownsLesson(rec, k) || !entitled(rec, k, now).ok) return reply({ error: 'Cette vidéo ne fait pas partie de votre formation.' }, 403, req, env);
+    const cfg = await getCfg(env);
+    const lk = await progLock(env, rec, c, k, cfg);
+    if (lk) return progDeny(lk, req, env);
+    if (!cfg.ids[k]) return reply({ error: 'Cette vidéo sera disponible prochainement.' }, 404, req, env);
+    const v = vis(findModule(moduleOf(k))).find(x => x.k === k);
+    const dc = durSec(v && v.dur), dp = Math.round(Number(body.dur) || 0);
+    const D = dc ? (dp >= dc * 0.8 && dp < dc ? dp : dc) : dp;
+    if (D < 10 || D > 6 * 3600) return reply({ error: 'Durée de la vidéo inconnue.' }, 400, req, env);
+    const nb = Math.ceil(D / SEG);
+    const row = await env.DB.prepare('SELECT seen, n, last_t, done FROM watch WHERE code = ? AND k = ?').bind(c, k).first();
+    const was = !!(row && row.done);
+    let seen = ((row && row.seen) || '').padEnd(nb, '0').slice(0, nb);
+    const elapsed = row && row.last_t ? Math.min(Math.max(now - row.last_t, 0), 60000) : 20000;
+    const room = Math.floor((elapsed / 1000 * 2.25 + 3) / SEG) + 1;
+    let add = 0;
+    const left = [];   // cases au-delà du temps écoulé : la page les renverra au prochain envoi
+    const idx = [...new Set((Array.isArray(body.b) ? body.b.slice(0, 120) : []).map(x => Math.floor(Number(x))))].filter(i => i >= 0 && i < nb).sort((a, b) => a - b);
+    for (const i of idx) { if (seen[i] === '1') continue; if (add >= room) { left.push(i); continue; } seen = seen.slice(0, i) + '1' + seen.slice(i + 1); add++; }
+    const n = seen.split('1').length - 1, fin = was || n >= Math.ceil(nb * WATCH_OK);
+    const st = [env.DB.prepare('INSERT INTO watch (code, k, seen, n, last_t, done) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET seen = excluded.seen, n = excluded.n, last_t = excluded.last_t, done = excluded.done')
+      .bind(c, k, seen, n, now, fin ? 1 : 0)];
+    if (fin && !was) {
+      st.push(env.DB.prepare('INSERT INTO progress (code, k, done_at) VALUES (?, ?, ?) ON CONFLICT (code, k) DO NOTHING').bind(c, k, now));
+      st.push(env.DB.prepare('INSERT INTO learners (code, last, last_activity) VALUES (?, ?, ?) ON CONFLICT (code) DO UPDATE SET last_activity = excluded.last_activity').bind(c, k, now));
+    }
+    await env.DB.batch(st);
+    return reply({ pct: Math.min(100, Math.round(n * 100 / nb)), done: fin, left, t: fin && !was ? now : undefined }, 200, req, env);
   }
 
   // Exercice pratique envoyé au formateur (sur WhatsApp, par la page) : il passe « en attente de validation ».
@@ -1460,6 +1578,7 @@ async function api(req, env, url) {
     if (e.trial) return reply({ error: 'Cet exercice sera disponible à partir du ' + fmtDate(e.from) + '.' }, 403, req, env);
     if (!e.ok) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
     if (/-f\d+$/.test(k) && !ownsLesson(rec, lessonOfFile(k))) return reply({ error: 'Fichier non disponible pour votre formation.' }, 403, req, env);
+    if (/-f\d+$/.test(k)) { const lkf = await progLock(env, rec, c, lessonOfFile(k), await getCfg(env)); if (lkf) return progDeny(lkf, req, env); }
     // Exercice pratique (consignes ou données) : ouvert seulement quand l'exercice précédent est validé par le formateur.
     const exm = /^([a-z0-9]+-e\d+)(-d)?$/.exec(k);
     let big = /-f\d+$/.test(k) ? lessonFile(k) : null;
@@ -1654,6 +1773,7 @@ async function createAccess(env, code, label, product, phone, immediate, now) {
   const rec = {
     label, product, modules, created: now, expires: null, active: true, logins: 0, seen: [],
     essai: true, mois: product.startsWith('pack-') ? MONTHS_PACK : MONTHS_SINGLE, premiereUtilisation: null, accesComplet: immediate,
+    progV: now,   // progression guidée dès le départ (pas de fenêtre de reprise)
   };
   await env.ACCESS.put('s:' + code, JSON.stringify(rec));
   if (env.DB) await env.DB.prepare('INSERT OR IGNORE INTO codes (code, created) VALUES (?, ?)').bind(code, now).run();
@@ -1728,7 +1848,7 @@ async function admin(req, env, url) {
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw);
     const progress = (await loadProgress(env, c)) || { done: {}, notes: {}, last: '' }, sv = (await loadExSuivi(env, c)) || {};
-    let act = 0, notes = [], phone = '', relances = [], chartes = [];
+    let act = 0, notes = [], phone = '', relances = [], chartes = [], debl = [], watchN = {};
     const quiz = {};
     if (env.DB) {
       const [l, n, ct, rl, qr, ch] = await env.DB.batch([
@@ -1740,6 +1860,10 @@ async function admin(req, env, url) {
         env.DB.prepare('SELECT version, t FROM chartes WHERE code = ? ORDER BY t DESC').bind(c),
       ]);
       chartes = ch.results;
+      try {
+        const [dl, wt] = await env.DB.batch([env.DB.prepare('SELECT k, t, who FROM deblocages WHERE code = ? ORDER BY t DESC').bind(c), env.DB.prepare('SELECT k, n, done FROM watch WHERE code = ?').bind(c)]);
+        debl = dl.results; wt.results.forEach(x => { watchN[x.k] = x; });
+      } catch (e) { /* tables absentes */ }
       act = (l.results[0] && l.results[0].last_activity) || 0;
       notes = n.results;
       phone = (ct.results[0] && ct.results[0].phone) || '';
@@ -1749,6 +1873,7 @@ async function admin(req, env, url) {
     // Début de l'accès : première connexion (nouveaux codes) ou création (anciens codes).
     const start = rec.premiereUtilisation || (rec.essai ? 0 : rec.created);
     const lastLesson = progress.last && findModule(moduleOf(progress.last));
+    const cfgF = await getCfg(env), unlF = new Set(debl.map(x => x.k));
     return reply({
       code: prettyCode(c), label: rec.label, product: rec.product || '', active: rec.active, created: rec.created,
       premiereUtilisation: rec.premiereUtilisation || 0, essai: !!rec.essai, accesComplet: !!rec.accesComplet,
@@ -1759,14 +1884,40 @@ async function admin(req, env, url) {
       lastLesson: lastLesson ? (lastLesson.videos.find(v => v.k === progress.last) || {}).title || '' : '',
       modules: rec.modules.map(g => {
         const m = findModule(g.m); if (!m) return null;
-        return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => ({ k: v.k, title: v.title, done: progress.done[v.k] || 0, quiz: quiz[v.k] || null })),
+        const seqF = progSeq(rec, m.key, cfgF.ids);
+        return { key: m.key, title: m.title, from: g.from, lessons: vis(m).map(v => {
+            const nd = progNeed(seqF, progress.done, unlF, v.k), w = watchN[v.k], d = durSec(v.dur);
+            return { k: v.k, title: v.title, done: progress.done[v.k] || 0, quiz: quiz[v.k] || null, locked: !!nd, unl: unlF.has(v.k),
+              w: w && !w.done && d ? Math.min(99, Math.round(w.n * SEG * 100 / d)) : 0 };
+          }),
           exercises: m.exercises.map(e => ({ k: e.k, title: e.title, done: (progress.ex && progress.ex[e.k]) || 0, st: (sv[e.k] || {}).statut || '', t: (sv[e.k] || {}).t || 0 })) };
       }).filter(Boolean),
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
       adminNotes: notes, phone, relances, certificats: (await loadCertsAndReviews(env, c)).certs,
       chartes, charteVersion: CHARTE.version,
+      deblocages: debl,
     }, 200, req, env);
+  }
+
+  // Déblocage manuel de la progression guidée : une leçon (k = clé de leçon) ou toute la formation (k = clé de formation).
+  if (url.pathname === '/admin/deblocage' && req.method === 'POST') {
+    if (!env.DB) return reply({ error: 'Base de données indisponible.' }, 503, req, env);
+    const b = await readJson(req);
+    const c = normCode(b.code);
+    const raw = c && await env.ACCESS.get('s:' + c);
+    if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
+    const rec = JSON.parse(raw), k = String(b.k || '');
+    const mod = rec.modules.some(g => g.m === k) ? findModule(k) : null;
+    if (!mod && !ownsLesson(rec, k)) return reply({ error: 'Cette leçon ou cette formation ne fait pas partie de son accès.' }, 400, req, env);
+    if (b.on === false) {
+      await env.DB.prepare('DELETE FROM deblocages WHERE code = ? AND k = ?').bind(c, k).run();
+      await journal(env, who, 'Verrou de progression rétabli', prettyCode(c), rec.label, mod ? mod.title : k);
+    } else {
+      await env.DB.prepare('INSERT INTO deblocages (code, k, t, who) VALUES (?, ?, ?, ?) ON CONFLICT (code, k) DO UPDATE SET t = excluded.t, who = excluded.who').bind(c, k, now, who).run();
+      await journal(env, who, mod ? 'Formation débloquée à la main (progression)' : 'Leçon débloquée à la main (progression)', prettyCode(c), rec.label, mod ? mod.title : k);
+    }
+    return reply({ ok: true }, 200, req, env);
   }
 
   if (url.pathname === '/admin/note' && req.method === 'POST') {
@@ -2201,7 +2352,7 @@ async function admin(req, env, url) {
       for (const x of all) {
         st.push(env.DB.prepare('DELETE FROM avis_info WHERE id IN (SELECT id FROM reviews WHERE code = ?)').bind(x));
         st.push(env.DB.prepare('DELETE FROM filleuls WHERE parrain = ?').bind(x));
-        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'ex_suivi', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes', 'portfolio', 'parrains', 'filleuls']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
+        for (const t of ['progress', 'notes', 'learners', 'contacts', 'relances', 'admin_notes', 'exercises', 'ex_suivi', 'prefs', 'quiz_results', 'reviews', 'codes', 'paiements', 'chartes', 'portfolio', 'parrains', 'filleuls', 'watch', 'deblocages']) st.push(env.DB.prepare('DELETE FROM ' + t + ' WHERE code = ?').bind(x));
         st.push(env.DB.prepare("UPDATE journal SET label = '(données supprimées)' WHERE code = ?").bind(prettyCode(x)));
         st.push(env.DB.prepare('INSERT OR IGNORE INTO codes_supprimes (code, t) VALUES (?, ?)').bind(x, now));
       }
@@ -2293,6 +2444,8 @@ async function admin(req, env, url) {
         env.DB.prepare('UPDATE parrains SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE filleuls SET code = ? WHERE code = ?').bind(code, old),
         env.DB.prepare('UPDATE filleuls SET parrain = ? WHERE parrain = ?').bind(code, old),
+        env.DB.prepare('UPDATE watch SET code = ? WHERE code = ?').bind(code, old),
+        env.DB.prepare('UPDATE deblocages SET code = ? WHERE code = ?').bind(code, old),
       ]);
     }
     rec.active = false; rec.remplacePar = code;

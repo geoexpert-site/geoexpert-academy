@@ -1751,6 +1751,36 @@ window.preparerPdf = async function (PDFLib, src) {
       b3.addEventListener('click', function () { ficheAction(b3, CONFIRM.unlock(CONF), '/admin/update', { code: f.code, unlockNow: true }); });
       r3.ctl.appendChild(b3); box.appendChild(r3.row);
     }
+    // Progression guidée : débloquer à la main une leçon précise, ou tout le cours
+    var unlSet = {}; (f.deblocages || []).forEach(function (x) { unlSet[x.k] = x; });
+    var rp = actRow('Progression guidée : débloquer à la main', 'Une leçon ne s\'ouvre que si la précédente est terminée (vidéo vue à 90 %). Ici, vous ouvrez une leçon précise, ou tout un cours, sans attendre. Les quiz ne bloquent jamais.');
+    f.modules.forEach(function (m) {
+      var line = el('div'); line.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0;width:100%;';
+      line.appendChild(el('b', '', m.title.split(' : ')[0] + ' :'));
+      if (unlSet[m.key]) {
+        line.appendChild(el('span', '', '🔓 tout le cours est ouvert (' + fdt(unlSet[m.key].t) + ')'));
+        var bo = el('button', 'b sec', 'Rétablir le verrou'); bo.type = 'button';
+        bo.addEventListener('click', function () { ficheAction(bo, 'Rétablir le verrou de progression de « ' + m.title + ' » pour ' + f.label + ' ?', '/admin/deblocage', { code: f.code, k: m.key, on: false }); });
+        line.appendChild(bo);
+      } else {
+        var sel2 = el('select'); sel2.setAttribute('aria-label', 'Leçon à débloquer');
+        m.lessons.forEach(function (l) { var o = el('option', '', (l.done ? '✓ ' : l.unl ? '🔓 ' : l.locked ? '🔒 ' : '') + l.title); o.value = l.k; sel2.appendChild(o); });
+        var b1 = el('button', 'b sec', 'Débloquer cette leçon'); b1.type = 'button';
+        b1.addEventListener('click', function () { ficheAction(b1, 'Débloquer « ' + sel2.options[sel2.selectedIndex].text.replace(/^[✓🔓🔒] /, '') + ' » pour ' + f.label + ' ?', '/admin/deblocage', { code: f.code, k: sel2.value }); });
+        var b2 = el('button', 'b sec', 'Débloquer tout le cours'); b2.type = 'button';
+        b2.addEventListener('click', function () { ficheAction(b2, 'Débloquer TOUT le cours « ' + m.title + ' » pour ' + f.label + ' ?\n\nToutes ses leçons s\'ouvriront tout de suite.', '/admin/deblocage', { code: f.code, k: m.key }); });
+        line.appendChild(sel2); line.appendChild(b1); line.appendChild(b2);
+      }
+      rp.ctl.appendChild(line);
+      m.lessons.filter(function (l) { return l.unl; }).forEach(function (l) {
+        var ln = el('div'); ln.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 2px 14px;width:100%;font-size:13px;';
+        ln.appendChild(el('span', '', '🔓 ' + l.title + ' (' + fdt(unlSet[l.k].t) + ')'));
+        var br = el('button', 'b sec', 'Rétablir le verrou'); br.type = 'button';
+        br.addEventListener('click', function () { ficheAction(br, 'Rétablir le verrou de « ' + l.title + ' » pour ' + f.label + ' ?', '/admin/deblocage', { code: f.code, k: l.k, on: false }); });
+        ln.appendChild(br); rp.ctl.appendChild(ln);
+      });
+    });
+    rp.row.id = 'fProg'; box.appendChild(rp.row);
     // Attestation de fin de formation (une par formation)
     f.modules.forEach(function (m) {
       var c = (f.certificats || []).filter(function (x) { return x.module === m.key; })[0];
@@ -1850,7 +1880,7 @@ window.preparerPdf = async function (PDFLib, src) {
       m.lessons.forEach(function (l) {
         var li = el('li'); li.appendChild(el('span', '', l.done ? '✓' : ''));
         li.appendChild(el('span', '', l.title));
-        li.appendChild(el('small', '', l.done > 1 ? fdt(l.done) : l.done ? 'date inconnue' : ''));
+        li.appendChild(el('small', '', l.done > 1 ? fdt(l.done) : l.done ? 'date inconnue' : l.unl ? '🔓 débloquée à la main' : l.locked ? '🔒 verrouillée' + (l.w ? ' · vue à ' + l.w + ' %' : '') : l.w ? 'vue à ' + l.w + ' %' : ''));
         if (l.quiz) li.appendChild(el('small', '', 'Quiz : ' + l.quiz.score + ' / ' + l.quiz.total));
         ul.appendChild(li);
       });

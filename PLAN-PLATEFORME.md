@@ -539,3 +539,16 @@ qu'après validation du formateur. Choix de l'administrateur : envoi du travail 
 - [x] Page de vente : nombre de leçons affiché pour ArcGIS 1 et 2, QGIS 1 et 2, Télédétection (d'après le catalogue du Worker) ; Webmapping, KoboToolbox et Google Earth sans chiffre tant que leurs vidéos ne sont pas en ligne. `ressources.html` : le bouton mène à la page e-learning.
 - Laissés tels quels : « Bientôt disponible » de `tarifs.html` (avec « Me prévenir »), licence ArcGIS (choix du formateur), liste d'attente présentiel de l'accueil.
 - Branche `corrections-audit`, étiquette `sauvegarde-avant-corrections-audit` ; **pas encore publié** (accord de l'administrateur à demander).
+
+## Progression guidée des leçons (demande du 07/11/2026) — **PAS EN LIGNE, ne pas publier avant le 09/11/2026 ni sans accord**
+
+Détails, règles, étapes et retour en arrière : `MISE-EN-LIGNE-PROGRESSION.md` · guide : `GUIDE-ADMIN.md` §7 decies. Branche `progression-lecons`, étiquette `sauvegarde-avant-progression`.
+
+- [x] Décision de l'administrateur : « terminée » = **vidéo vue à 90 %** (cases de 5 s envoyées par la page à `/api/watch`, plausibilité vérifiée par le Worker) ; les boutons « Terminer » restent mais n'ont d'effet qu'à 90 %
+- [x] Verrou dans le Worker (`/api/play`, `/api/quiz*`, `/api/file` de leçon), `/api/sync` n'accepte plus une leçon non regardée ; tables D1 `watch` et `deblocages` (`schema.sql`)
+- [x] Page : cadenas + texte grisé, fenêtre « Vous devez terminer … » (Aller à la Leçon X / WhatsApp), « Bravo, la Leçon Y est débloquée. »
+- [x] Administration : fiche → « Progression guidée : débloquer à la main » (leçon ou cours) ; 🔒 / 🔓 / « vue à X % »
+- [x] Anciens apprenants : fenêtre de reprise de 15 min à la 1re connexion (rien perdu) ; leçon avancée terminée → tout ce qui précède ouvert
+- [x] Interrupteur de secours : `PROG_GUIDEE = "non"` dans la configuration du Worker
+- [x] Tests : `test-progression.mjs` api 38/38, page 30/30, admin 6/6
+- [ ] 👤 Accord de mise en ligne (après le 09/11/2026) ; ⚠️ vérifier avec « test 1 » sur une **vraie vidéo Bunny** que les événements `timeupdate` arrivent (non testé : lecteur simulé)
