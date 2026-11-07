@@ -380,8 +380,9 @@ function wtTick(sc,dur){var W=PJ&&PJ.W;if(!W||!(sc>=0))return;if(dur>0)W.dur=dur
 function wtEnded(){var W=PJ&&PJ.W;if(!W)return;if(W.last!==null&&W.dur>0&&W.last>=W.dur-8)for(var i=Math.floor(W.last/5),e=Math.ceil(W.dur/5);i<e;i++)W.buf[i]=1;wtSend()}
 async function wtSend(){var W=PJ&&PJ.W;if(!W||W.busy)return;var b=Object.keys(W.buf).map(Number).slice(0,100);if(!b.length)return;W.busy=true;
  try{var r=await fetch(API+'/api/watch',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,k:W.k,dur:Math.round(W.dur),b:b})}),j=await r.json();
+  W.st=r.status+' '+JSON.stringify(j).slice(0,80);
   if(r.ok){var left=j.left||[];b.forEach(function(i){if(left.indexOf(i)<0)delete W.buf[i]});wtResult(W.l,j)}}
- catch(e){}
+ catch(e){if(W)W.st='erreur réseau : '+e.message}
  W.busy=false}
 function wtResult(l,j){
  var ind=document.getElementById('wtI');if(ind&&cur&&cur.k===l.k&&j&&j.pct!==undefined)ind.textContent='Suivi de la lecture : '+j.pct+' % (terminée à 90 %)';
@@ -992,6 +993,7 @@ function lesson(k){
  pl.appendChild(l.lock?h('div',{class:'er',text:'Cette leçon sera disponible à partir du '+fdate(l.at)+'.'}):l.ready?go:h('div',{class:'er',text:'Cette vidéo sera disponible prochainement.'}));m.appendChild(pl);
  if(l.ready&&!l.lock)m.appendChild(ecoToggle(l,pl));
  if(l.ready&&!l.lock)m.appendChild(vitCtl());
+ if(DIAG&&l.ready&&!l.lock)m.appendChild(h('p',{class:'note',id:'wtD',style:'font:12px monospace;word-break:break-all;background:#fff8e1;padding:8px;border-radius:8px',text:'DIAGNOSTIC : lancez la vidéo.'}));
  if(plOn()&&l.ready&&!l.lock&&!P.done[k])m.appendChild(h('p',{class:'note',id:'wtI',text:'Suivi de la lecture : '+(l.w||0)+' % (terminée à 90 %)'}));
  var done=!!P.done[k],dn=h('button',{class:'btn'+(done?'':' alt'),onclick:function(){if(P.done[k]){setDone(k,false);lesson(k);return}tryFinish(l,function(){setDone(k,true);lesson(k);quizPropose(k,function(){})})}},ic('check'),done?'Terminée':'Marquer comme terminée');DN={k:k,b:dn};
 
@@ -1107,8 +1109,14 @@ function pjSend(method,value,listener){
 function vitNote(t){if(VUI&&document.body.contains(VUI.n))VUI.n.textContent=t}
 function vitApply(v){if(!PJ)return;pjSend('setPlaybackRate',v);clearTimeout(PJ.chk);
  PJ.chk=setTimeout(function(){if(PJ&&!PJ.ready)vitNote('Réglage non pris en compte par le lecteur : utilisez la roue dentée ⚙ de la vidéo.')},4000)}
+var DIAG=/[?&]diag=1/.test(location.search);
+function dgLog(raw){if(!DIAG||!PJ)return;var D=PJ.D=PJ.D||{n:0,t:{},last:''},x=raw,k;if(typeof x==='string'){try{x=JSON.parse(x)}catch(e){}}
+ k=x&&typeof x==='object'?(x.context||'?')+':'+(x.event||x.method||'?'):'texte';D.n++;D.t[k]=(D.t[k]||0)+1;
+ if(!(x&&x.event==='timeupdate'&&D.t[k]>2))D.last=(typeof raw==='string'?raw:JSON.stringify(raw)).slice(0,160)}
+function dgShow(){var n=document.getElementById('wtD'),D=PJ&&PJ.D,W=PJ&&PJ.W;if(!n||!PJ)return;
+ n.textContent='DIAGNOSTIC · origine du lecteur : '+PJ.origin+' · prêt : '+(PJ.ready?'oui':'non')+' · messages reçus : '+(D?D.n:0)+' · types : '+(D?JSON.stringify(D.t):'{}')+' · dernier : '+(D?D.last:'')+' · suivi actif : '+(W?'oui':'non')+' · cases en attente : '+(W?Object.keys(W.buf).length:0)+' · position : '+(W&&W.last!==null?Math.round(W.last):'aucune')+' · durée : '+(W?Math.round(W.dur):0)+' · dernier envoi au serveur : '+(W&&W.st?W.st:'aucun')+' · demandes de position : '+(W&&W.rq||0)}
 addEventListener('message',function(e){
- if(!PJ||e.source!==PJ.f.contentWindow)return;var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
+ if(!PJ||e.source!==PJ.f.contentWindow)return;dgLog(e.data);var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
  if(!d||d.context!=='player.js')return;
  if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
  else if(PJ.W&&(d.event==='timeupdate'||d.event==='progress')){var tv=d.value;if(tv&&typeof tv==='object')wtTick(+(tv.seconds!==undefined?tv.seconds:tv.currentTime),+tv.duration);else if(d.event==='timeupdate')wtTick(+tv,0);PJ.W.tu=Date.now()}
@@ -1137,7 +1145,8 @@ async function play(l,pl){
   pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   vitesse(f);
   if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.n=0;W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}if(++W.n%15===0)wtSend()},1000);
-   W.poll=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.poll);return}if(PJ&&PJ.W===W&&PJ.ready&&(!W.tu||Date.now()-W.tu>3000)){pjSend('getCurrentTime',undefined,'wtc');if(!W.dur||W.n%10===0)pjSend('getDuration',undefined,'wtd')}},1000)}
+   if(DIAG){setInterval(dgShow,1000)}
+   W.poll=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.poll);return}if(PJ&&PJ.W===W&&PJ.ready&&(!W.tu||Date.now()-W.tu>3000)){pjSend('getCurrentTime',undefined,'wtc');W.rq=(W.rq||0)+1;if(!W.dur||W.n%10===0)pjSend('getDuration',undefined,'wtd')}},1000)}
   pl.appendChild(f);pl.appendChild(wm);
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
