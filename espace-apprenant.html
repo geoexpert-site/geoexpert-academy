@@ -1142,7 +1142,7 @@ function vitCtl(){
  return h('div',{class:'vit'},h('label',null,'Vitesse de lecture ',s),n);
 }
 // Bibliothèque officielle de Bunny (player.js), chargée AVANT le lecteur comme l'exige leur documentation ; contrôlée par SRI.
-function pjLoad(){if(window.playerjs)return Promise.resolve();return loadJs('https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js','sha384-XrHkN6ZCRISKuHi/i0GQH2eCz73exJqEECthnQxoWgdEMB8g5pD/sZEPXZPYFCwj').catch(function(){})}
+function pjLoad(){if(window.playerjs)return Promise.resolve();return loadJs('https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js','sha384-FzNVGZdy6ImmE/3LFewUFSxAVlmjM0wP4aKlUJYalPvzGkIEva94s2WZgmeQPVvC').catch(function(){})}
 async function play(l,pl){
  var b=pl.querySelector('.go');if(b)b.disabled=true;
  try{var r=await post('/api/play',{code:code,k:l.k}),j=await r.json();
