@@ -68,7 +68,7 @@ details.m{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;over
 details.m summary{list-style:none;cursor:pointer;padding:12px;display:flex;gap:8px;align-items:center;font:600 13.5px Montserrat}
 details.m summary::-webkit-details-marker{display:none}details.m summary .n{margin-left:auto;font:500 12px Inter;color:var(--dim)}
 .ls{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);padding:10px 12px;font-size:13.5px}
-.ls:hover{background:var(--soft)}.ls.on{background:rgba(0,146,166,.12);box-shadow:inset 3px 0 var(--teal)}.ls[disabled]{opacity:.5;cursor:not-allowed}.ls.pl{opacity:.6}.ls.pl span:last-child{color:var(--dim)}
+.ls:hover{background:var(--soft)}.ls.on{background:rgba(0,146,166,.12);box-shadow:inset 3px 0 var(--teal)}.ls[disabled]{opacity:.5;cursor:not-allowed}.ls.plk{opacity:.6}.ls.plk span:last-child{color:var(--dim)}
 .pltoast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;max-width:min(520px,calc(100vw - 32px));background:var(--indigo);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(20,18,40,.3)}
 .dot{flex:0 0 20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:#fff;margin-top:1px}.dot .ic{width:12px;height:12px}.dot.d{background:var(--teal);border-color:var(--teal)}
 .ls small{display:block;color:var(--dim);font-size:12px}
@@ -411,7 +411,7 @@ function side(){
   if(cur&&cur.m===m||(!cur&&D.modules[0]===m))d.open=true;
   d.appendChild(h('summary',null,m.locked?ic('lock'):null,h('span',{text:m.title.split(' : ')[0]}),h('span',{class:'n',text:m.locked?'bientôt':mp.n+'/'+mp.t})));
   L.filter(function(l){return l.m===m}).forEach(function(l){
-   var done=P.done[l.k],pn=!done&&plNeed(l),b=h('button',pn?{class:'ls'+(cur&&cur.k===l.k?' on':'')+' pl','aria-disabled':'true',title:'Terminez la leçon précédente pour ouvrir celle-ci',onclick:function(){lesson(l.k)}}:{class:'ls'+(cur&&cur.k===l.k?' on':''),onclick:function(){lesson(l.k);if(!plNeed(l)||P.done[l.k])closeS()}},
+   var done=P.done[l.k],pn=!done&&plNeed(l),b=h('button',pn?{class:'ls'+(cur&&cur.k===l.k?' on':'')+' plk','aria-disabled':'true',title:'Terminez la leçon précédente pour ouvrir celle-ci',onclick:function(){lesson(l.k)}}:{class:'ls'+(cur&&cur.k===l.k?' on':''),onclick:function(){lesson(l.k);if(!plNeed(l)||P.done[l.k])closeS()}},
     h('span',{class:'dot'+(done?' d':'')},done?ic('check'):(l.lock||pn)?ic('lock'):null),h('span',null,l.t,h('small',{text:l.lock&&l.at?'Disponible à partir du '+fdate(l.at):l.d})));
    if(l.lock)b.disabled=true;d.appendChild(b)});
   s.appendChild(d)});
