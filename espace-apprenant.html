@@ -646,7 +646,7 @@ async function replay(l,pl,btn){
  try{var r=await post('/api/live-replay',{code:code,id:l.id}),j=await r.json();if(!r.ok||String(j.url).indexOf('https://')!==0)throw new Error(j.error||'Replay indisponible.');
   if(j.kind!=='bunny'){if(w){w.opener=null;w.location.href=j.url}else location.href=j.url;return}
   if(w)w.close();pl.style.display='';pl.textContent='';
-  var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:'Replay : '+l.sujet}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
+  var f=h('iframe',{referrerpolicy:'origin',src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:'Replay : '+l.sujet}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   vitesse(f);pl.appendChild(f);pl.appendChild(wm);if(!pl.nextSibling||!pl.nextSibling.classList.contains('vit'))pl.after(vitCtl());
   var mv=function(){wm.style.top=(8+Math.random()*78)+'%';wm.style.left=(4+Math.random()*55)+'%'};mv();
   var t=setInterval(function(){if(!document.body.contains(wm)){clearInterval(t);return}mv()},12000);
@@ -1149,7 +1149,7 @@ async function play(l,pl){
   if(r.status===403&&j.locked){var nl=L.filter(function(x){return x.k===j.need})[0];if(nl){pl.textContent='';plModal(l,nl);return}}
   if(!r.ok||String(j.url).indexOf('https://')!==0){pl.textContent='';pl.appendChild(h('div',{class:'er',text:j.error||'Lecture impossible.'}));return}
   await pjLoad();
-  pl.textContent='';var f=h('iframe',{src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
+  pl.textContent='';var f=h('iframe',{referrerpolicy:'origin',src:j.url+(ecoOn()?'&levelCap=true':''),allow:'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture',allowfullscreen:'true',title:l.t}),wm=h('div',{class:'wm',text:j.label+' · GeoExpert Academy'});
   vitesse(f);
   if(plOn()&&l.rdy&&!P.done[l.k]){var W=PJ.W={k:l.k,l:l,last:null,buf:{},dur:sec(l.d),busy:false};W.n=0;W.timer=setInterval(function(){if(!document.body.contains(f)){clearInterval(W.timer);return}if(++W.n%15===0)wtSend()},1000);
    if(DIAG){setInterval(dgShow,1000)}
