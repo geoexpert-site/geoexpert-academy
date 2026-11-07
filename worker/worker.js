@@ -947,9 +947,9 @@ async function journal(env, who, action, code, label, detail) {
 // ---------------------------------------------------------------- Paiements DigitalPaye (webhooks)
 // Liens de paiement du site (formations-video-geoexpert.html, attribut data-link) → produit. Prix attendus en FCFA.
 const LIENS = {
-  'l0sNNklrbHcH': 'arc1', 'qKk96zGepbQ0': 'arc2', 'EVli5Yhhk9QD': 'qgis1', 'cK0Q6QrMdEBB': 'qgis2',
+  'l0sNNklrbHcH': 'arc1', 'qKk96zGepbQ0': 'arc2', 'ePsSN4SGdIuy': 'qgis1', 'cK0Q6QrMdEBB': 'qgis2',
   'amqThnoWczd8': 'tele', 'DBeEmN5qdD0F': 'web', 't1orZESwHB7C': 'kobo', 'rxlgDDoMiBCu': 'google', 'guwsyvzssOco': 'google',
-  'iuiqjHbR5b7a': 'pack-qgis', 'y1udN30HlczI': 'pack-arcgis', 'Al3BVi8KpMq9': 'pack-complet',
+  'bwuYwnL68LBd': 'pack-qgis', 'y1udN30HlczI': 'pack-arcgis', 'Al3BVi8KpMq9': 'pack-complet',
 };
 const PRIX = { arc1: 15000, arc2: 20000, qgis1: 15000, qgis2: 20000, tele: 25000, web: 20000, kobo: 15000, google: 10000, 'pack-qgis': 25000, 'pack-arcgis': 25000, 'pack-complet': 100000 };
 const PAY_OK = ['transaction.successful', 'payment_link.paid', 'order.paid'];
