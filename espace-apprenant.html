@@ -1115,9 +1115,11 @@ function dgLog(raw){if(!DIAG||!PJ)return;var D=PJ.D=PJ.D||{n:0,t:{},last:''},x=r
  if(x&&x.event==='ready')D.ready=(typeof raw==='string'?raw:JSON.stringify(raw)).slice(0,900);
  if(!(x&&x.event==='timeupdate'&&D.t[k]>2))D.last=(typeof raw==='string'?raw:JSON.stringify(raw)).slice(0,160)}
 function dgShow(){var n=document.getElementById('wtD'),D=PJ&&PJ.D,W=PJ&&PJ.W;if(!n||!PJ)return;
- n.textContent='DIAGNOSTIC · origine du lecteur : '+PJ.origin+' · prêt : '+(PJ.ready?'oui':'non')+' · messages reçus : '+(D?D.n:0)+' · types : '+(D?JSON.stringify(D.t):'{}')+' · message prêt complet : '+(D&&D.ready?D.ready:'aucun')+' · dernier : '+(D?D.last:'')+' · suivi actif : '+(W?'oui':'non')+' · cases en attente : '+(W?Object.keys(W.buf).length:0)+' · position : '+(W&&W.last!==null?Math.round(W.last):'aucune')+' · durée : '+(W?Math.round(W.dur):0)+' · dernier envoi au serveur : '+(W&&W.st?W.st:'aucun')+' · demandes de position : '+(W&&W.rq||0)}
+ n.textContent='DIAGNOSTIC · origine du lecteur : '+PJ.origin+' · prêt : '+(PJ.ready?'oui':'non')+' · messages reçus : '+(D?D.n:0)+' · types : '+(D?JSON.stringify(D.t):'{}')+' · ignorés (autre fenêtre) : '+(D&&D.other||0)+(D&&D.otherLast?' ['+D.otherLast+']':'')+' · message prêt complet : '+(D&&D.ready?D.ready:'aucun')+' · dernier : '+(D?D.last:'')+' · suivi actif : '+(W?'oui':'non')+' · cases en attente : '+(W?Object.keys(W.buf).length:0)+' · position : '+(W&&W.last!==null?Math.round(W.last):'aucune')+' · durée : '+(W?Math.round(W.dur):0)+' · dernier envoi au serveur : '+(W&&W.st?W.st:'aucun')+' · demandes de position : '+(W&&W.rq||0)}
 addEventListener('message',function(e){
- if(!PJ||e.source!==PJ.f.contentWindow)return;dgLog(e.data);var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
+ if(!PJ)return;
+ if(e.source!==PJ.f.contentWindow&&e.origin!==PJ.origin){if(DIAG){var Dx=PJ.D=PJ.D||{n:0,t:{},last:''};Dx.other=(Dx.other||0)+1;if(Dx.other<4)Dx.otherLast=(e.origin+' '+(typeof e.data==='string'?e.data:JSON.stringify(e.data))).slice(0,120)}return}
+ dgLog(e.data);var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
  if(!d||d.context!=='player.js')return;
  if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
  else if(PJ.W&&(d.event==='timeupdate'||d.event==='progress')){var tv=d.value;if(tv&&typeof tv==='object')wtTick(+(tv.seconds!==undefined?tv.seconds:tv.currentTime),+tv.duration);else if(d.event==='timeupdate')wtTick(+tv,0);PJ.W.tu=Date.now()}
