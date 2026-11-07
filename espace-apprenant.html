@@ -1122,7 +1122,10 @@ addEventListener('message',function(e){
  if(DIAG){PJ.real=e.origin}
  dgLog(e.data);var d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
  if(!d||d.context!=='player.js')return;
- if(d.event==='ready'){PJ.ready=true;pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
+ if(d.event==='ready'){PJ.ready=true;
+  var ms=d.value&&d.value.methods;
+  if(ms&&ms.indexOf('setPlaybackRate')<0){PJ.norate=1;if(VUI&&document.body.contains(VUI.s)){if(VUI.s.parentNode)VUI.s.parentNode.style.display='none';vitNote('Pour changer la vitesse de lecture, utilisez la roue dentée ⚙ de la vidéo.')}}
+pjSend('addEventListener','playbackratechange','vit');pjSend('addEventListener','play','vit');if(PJ.W){pjSend('addEventListener','timeupdate','wt');pjSend('addEventListener','pause','wt');pjSend('addEventListener','ended','wt')}if(vitGet()!==1)pjSend('setPlaybackRate',vitGet())}
  else if(PJ.W&&(d.event==='timeupdate'||d.event==='progress')){var tv=d.value;if(tv&&typeof tv==='object')wtTick(+(tv.seconds!==undefined?tv.seconds:tv.currentTime),+tv.duration);else if(d.event==='timeupdate')wtTick(+tv,0);PJ.W.tu=Date.now()}
  else if(PJ.W&&(d.method==='getCurrentTime'||d.event==='getCurrentTime')){var cv=d.value;wtTick(+(cv&&typeof cv==='object'?cv.seconds:cv),0)}
  else if(PJ.W&&(d.method==='getDuration'||d.event==='getDuration')){var dv=+(d.value&&typeof d.value==='object'?d.value.duration:d.value);if(dv>0)PJ.W.dur=dv}
