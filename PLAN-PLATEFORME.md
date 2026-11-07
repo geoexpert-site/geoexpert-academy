@@ -553,3 +553,6 @@ Détails, règles, étapes et retour en arrière : `MISE-EN-LIGNE-PROGRESSION.md
 - [x] Tests : `test-progression.mjs` api 38/38, page 30/30, admin 6/6
 - [x] **Mise en ligne 07/11/2026** : sauvegarde `GeoExpert-Sauvegardes6-11-07-avant-progression\` ; tables `watch`, `deblocages` en production ; `main` = c4f41c2 ; `espace-apprenant-api` → 27dfaac1 (avant 76298f9d), `geoexpert-admin` → f7a7a3ce (avant 3494e2f9) ; `verif-prod-progression.mjs` 7/7 (code temporaire supprimé)
 - [ ] 👤 ⚠️ vérifier avec « test 1 » sur une **vraie vidéo Bunny** que les événements `timeupdate` arrivent (non testé : lecteur simulé)
+- [x] **08/11/2026 — suivi vidéo validé sur la vraie vidéo Bunny** (93 %, leçon terminée) : la page était en `<meta name="referrer" content="no-referrer">`, ce qui coupait player.js ; correctif = `referrerpolicy="origin"` sur les iframes vidéo uniquement. La bibliothèque officielle `player-0.1.0.min.js` (assets.mediadelivery.net, SRI) est chargée avant le lecteur ; le suivi marche par `timeupdate`. Diagnostic : ajouter `?diag=1` à l'adresse de l'espace apprenant. Versions de la page : main = 2f855d9. Solution « notre propre lecteur hls.js » inutile.
+- [ ] 👤 À vérifier : la vitesse de lecture (0,75x à 2x) devrait maintenant fonctionner (messages player.js reçus) ; avec 0.1.0, la commande setPlaybackRate part par `send`, comme dans notre code
+
