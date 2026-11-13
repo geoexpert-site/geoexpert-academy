@@ -1732,8 +1732,19 @@ function normPhone(p) {
   return d.length >= 8 && d.length <= 15 ? d : null;
 }
 
+// Comptes de test (marqués par l'administrateur) : exclus des chiffres et des listes de suivi, mais ils fonctionnent normalement.
+async function testCodes(env) {
+  const out = new Set();
+  await Promise.all((await listCodes(env)).map(async c => {
+    const raw = await env.ACCESS.get('s:' + c);
+    if (raw) { try { if (JSON.parse(raw).test) out.add(c); } catch (e) { /* ignoré */ } }
+  }));
+  return out;
+}
 // Chiffres du tableau de bord : uniquement de vraies données (aucune estimation).
-function dashboardStats(students, prog, now) {
+// Les comptes de test sont écartés avant tout calcul ; leur nombre est donné à part (testExclus).
+function dashboardStats(all, prog, now) {
+  const students = all.filter(s => !s.test), testExclus = all.length - students.length;
   const WEEK = 7 * DAY;
   const valid = students.filter(s => s.active && !(s.expires && s.expires < now));
   const used = valid.filter(s => s.premiereUtilisation || s.logins || s.lastActivity);
@@ -1757,6 +1768,7 @@ function dashboardStats(students, prog, now) {
     desactives: students.filter(s => !s.active).length,
     expires: students.filter(s => s.active && s.expires && s.expires < now).length,
     modules,
+    testExclus,
   };
 }
 // Nouveau code libre (12 caractères).
@@ -1828,12 +1840,12 @@ async function admin(req, env, url) {
         done: p.n || 0, lessons: rec.modules.reduce((s, g) => { const m = findModule(g.m); return s + (m ? vis(m).length : 0); }, 0),
         lastActivity: Math.max(rec.lastLogin || 0, p.act || 0, p.lastDone || 0), synced: !!p.seen, remplace: !!rec.remplacePar,
         lastLesson: p.last ? ((findModule(moduleOf(p.last)) || { videos: [] }).videos.find(v => v.k === p.last) || {}).title || '' : '',
-        phone: p.phone || '', marks: p.marks || {}, exDone: p.ex || 0,
+        test: !!rec.test, phone: p.phone || '', marks: p.marks || {}, exDone: p.ex || 0,
         exTotal: rec.modules.reduce((s, g) => s + ((findModule(g.m) || { exercises: [] }).exercises.length), 0),
       };
     }))).filter(Boolean);
     // À supprimer : accès terminé depuis plus de 12 mois (durée annoncée dans la politique de confidentialité).
-    students.forEach(s => { s.due = dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
+    students.forEach(s => { s.due = s.test ? [] : dueRelances(s, now); s.purgeable = !!(s.expires && s.expires < addMonths(now, -12)); });
     students.sort((a, b) => b.created - a.created);
     return reply({
       catalog: CAT.map(m => ({ key: m.key, title: m.title, videos: m.videos.map(v => ({ k: v.k, title: v.title, dur: v.dur, hidden: !!v.hidden, id: cfg.ids[v.k] || '', files: (v.files || []).map(f => f.r2 ? { k: f.k, title: f.title, has: true, r2: f.r2, size: f.size || 0 } : { k: f.k, title: f.title, has: !!cfg.files[f.k] }) })), exercises: m.exercises.map(e => { const d = exDonnees(cfg, e.k); return { k: e.k, title: e.title, has: !!cfg.files[e.k], name: cfg.names[e.k] || '', lec: cfg.exl[e.k] || null, d: d ? (d.r2 ? d : { kv: true, name: cfg.names[e.k + '-d'] || '' }) : null }; }) })),
@@ -1895,7 +1907,7 @@ async function admin(req, env, url) {
       synced: !!(act || Object.keys(progress.done).length),
       remplace: rec.remplace ? prettyCode(rec.remplace) : '', remplacePar: rec.remplacePar ? prettyCode(rec.remplacePar) : '',
       adminNotes: notes, phone, relances, certificats: (await loadCertsAndReviews(env, c)).certs,
-      chartes, charteVersion: CHARTE.version,
+      chartes, charteVersion: CHARTE.version, test: !!rec.test,
       deblocages: debl,
     }, 200, req, env);
   }
@@ -2016,6 +2028,8 @@ async function admin(req, env, url) {
       env.DB.prepare('SELECT id, code, module, name, title, hours, t, who, revoked FROM certificates ORDER BY t DESC LIMIT 500'),
       env.DB.prepare('SELECT r.id, r.code, r.module, r.name, r.stars, r.text, r.consent, r.t, r.status, i.id AS v2, i.profession FROM reviews r LEFT JOIN avis_info i ON i.id = r.id ORDER BY r.t DESC LIMIT 500'),
     ]);
+    const tst = await testCodes(env);
+    a.results = a.results.filter(x => !tst.has(x.code)); r.results = r.results.filter(x => !tst.has(x.code));
     const pc = x => ({ ...x, code: prettyCode(x.code) });
     // Nom tel qu'il sera affiché sur le site : prénom + initiale (nouvel accord), sinon prénom seul (ancien accord).
     return reply({ certificats: a.results.map(pc), avis: r.results.map(x => ({ ...pc(x), v2: !!x.v2, profession: x.profession || '', nomPublic: x.v2 ? pubName(x.name) : prenomOf(x.name) })) }, 200, req, env);
@@ -2063,7 +2077,8 @@ async function admin(req, env, url) {
   if (url.pathname === '/admin/exercices' && req.method === 'GET') {
     if (!env.DB) return reply({ envois: [] }, 200, req, env);
     const r = await env.DB.prepare('SELECT * FROM ex_suivi ORDER BY t DESC LIMIT 1000').all();
-    return reply({ envois: r.results.map(x => {
+    const tst = await testCodes(env);
+    return reply({ envois: r.results.filter(x => !tst.has(x.code)).map(x => {
       const m = findModule(moduleOf(x.k)), i = m ? m.exercises.findIndex(e => e.k === x.k) : -1;
       return { code: prettyCode(x.code), k: x.k, module: m ? m.title : '', exercice: i >= 0 ? exShort(m.exercises[i]) : x.k, num: i + 1,
         suivant: m && m.exercises[i + 1] ? exShort(m.exercises[i + 1]) : '', statut: x.statut, commentaire: x.commentaire, t: x.t, tv: x.tv, who: x.who };
@@ -2124,7 +2139,9 @@ async function admin(req, env, url) {
   // ---- Portfolio des apprenants : liste (avec liens de lecture signés), commentaire, validation, suppression.
   if (url.pathname === '/admin/portfolio' && req.method === 'GET') {
     if (!env.DB) return reply({ cartes: [] }, 200, req, env);
+    const tst = await testCodes(env);
     const r = await env.DB.prepare("SELECT * FROM portfolio WHERE statut != 'envoi' ORDER BY t DESC LIMIT 500").all();
+    r.results = r.results.filter(x => !tst.has(x.code));
     const ok = env.DL_SECRET && env.FICHIERS;
     const cartes = await Promise.all(r.results.map(async x => Object.assign(pfRow(x), {
       code: prettyCode(x.code), name: x.name, nomPublic: pubName(x.name), who: x.who,
@@ -2161,6 +2178,8 @@ async function admin(req, env, url) {
     ]);
     const pc = {}; p.results.forEach(x => { pc[x.code] = x.pcode; });
     const cfg = await parrainCfg(env);
+    const tst = await testCodes(env);
+    f.results = f.results.filter(x => !tst.has(x.code) && !tst.has(x.parrain));
     const filleuls = await Promise.all(f.results.map(async x => {
       const [a, b] = await Promise.all([env.ACCESS.get('s:' + x.code), env.ACCESS.get('s:' + x.parrain)]);
       const fr = a ? JSON.parse(a) : null, pr = b ? JSON.parse(b) : null, e = etatFilleul(x, fr, now);
@@ -2475,7 +2494,8 @@ async function admin(req, env, url) {
       env.DB.prepare('SELECT ref, t, prenom, nom, phone, montant, lien, product, statut, raison, code, envoye_t, who FROM paiements ORDER BY t DESC LIMIT 300'),
       env.DB.prepare('SELECT statut, COUNT(*) AS n FROM paiements GROUP BY statut'),
     ]);
-    const paiements = await Promise.all(l.results.map(async p => {
+    const tst = await testCodes(env);
+    const paiements = await Promise.all(l.results.filter(p => !(p.code && tst.has(p.code))).map(async p => {
       const o = Object.assign({}, p, { code: p.code ? prettyCode(p.code) : '' });
       if (p.code) {
         const raw = await env.ACCESS.get('s:' + p.code), rec = raw ? JSON.parse(raw) : null;
@@ -2542,6 +2562,7 @@ async function admin(req, env, url) {
     const rec = JSON.parse(raw);
     if (b.active === true && rec.remplacePar) return reply({ error: 'Ce code a été remplacé par ' + prettyCode(rec.remplacePar) + ' : il ne peut pas être réactivé.' }, 400, req, env);
     if (typeof b.active === 'boolean') rec.active = b.active;
+    if (typeof b.test === 'boolean') { if (b.test) rec.test = true; else delete rec.test; }
     if (b.addDays) {
       const add = Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500);
       // Code pas encore utilisé : les jours s'ajouteront à la date de fin calculée à la première utilisation.
@@ -2551,6 +2572,7 @@ async function admin(req, env, url) {
     if (b.unlockNow) { rec.modules.forEach(g => { g.from = Math.min(g.from, now); }); rec.accesComplet = true; }
     await env.ACCESS.put('s:' + c, JSON.stringify(rec));
     if (typeof b.active === 'boolean') await journal(env, who, b.active ? 'Code réactivé' : 'Code désactivé', prettyCode(c), rec.label);
+    if (typeof b.test === 'boolean') await journal(env, who, b.test ? 'Compte marqué « test » (exclu des statistiques)' : 'Compte de test retiré (de nouveau compté)', prettyCode(c), rec.label);
     if (b.addDays) await journal(env, who, 'Accès prolongé', prettyCode(c), rec.label, '+' + Math.min(Math.max(parseInt(b.addDays, 10) || 0, 0), 1500) + ' jours');
     if (b.unlockNow) await journal(env, who, 'Tout débloqué', prettyCode(c), rec.label);
     return reply({ ok: true }, 200, req, env);

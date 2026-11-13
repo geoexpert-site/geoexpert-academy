@@ -97,6 +97,9 @@
   .badge { display: inline-block; font: 700 11px Inter; letter-spacing: .4px; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; background: var(--soft); color: var(--teal); margin-left: 6px; vertical-align: middle; }
   .badge.off { color: #c0392b; background: #fdf2f2; }
   .badge.essai { color: var(--mag); }
+  .badge.test { color: #fff; background: var(--mag); }
+  .tsw { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px; color: var(--dim); cursor: pointer; font-weight: 500; }
+  .tsw input { width: auto; margin: 0; }
   .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .facts div { background: var(--bg); border-radius: 10px; padding: 10px 12px; }
   .facts b { display: block; font-size: 14px; }
@@ -1449,7 +1452,7 @@ window.preparerPdf = async function (PDFLib, src) {
   }
   function renderRelances() {
     var list = $('relList'); list.textContent = '';
-    var due = state.students.filter(function (s) { return s.due && s.due.length; });
+    var due = state.students.filter(function (s) { return !s.test && s.due && s.due.length; });
     var n = due.reduce(function (a, s) { return a + s.due.length; }, 0);
     $('relCount').textContent = n; $('relCount').hidden = !n;
     due.forEach(function (s) {
@@ -1464,7 +1467,7 @@ window.preparerPdf = async function (PDFLib, src) {
     if (!n) list.appendChild(el('p', '', '✅ Personne à relancer aujourd\'hui.'));
     // Suivi de l'essai
     var tl = $('trialList'); tl.textContent = '';
-    var now = Date.now(), trial = state.students.filter(function (s) { return s.active && s.finEssai > now; })
+    var now = Date.now(), trial = state.students.filter(function (s) { return !s.test && s.active && s.finEssai > now; })
       .sort(function (a, b) { return a.premiereUtilisation - b.premiereUtilisation; });
     trial.forEach(function (s) {
       var c = relCtx(s), r = el('div', 'rrow'), who = el('div'), day = Math.min(7, dayOf(s.premiereUtilisation) + 1);
@@ -1631,7 +1634,8 @@ window.preparerPdf = async function (PDFLib, src) {
     var hors = [];
     if (s.desactives) hors.push(s.desactives + ' code(s) désactivé(s) ou remplacé(s)');
     if (s.expires) hors.push(s.expires + ' accès expiré(s)' + (s.apurger ? ', dont ' + s.apurger + ' depuis plus de 12 mois (données à supprimer, voir « Apprenants »)' : ''));
-    $('dashNote').textContent = (hors.length ? 'Non comptés : ' + hors.join(' et ') + '. ' : '') + 'Chiffres mis à jour à chaque ouverture de l\'administration.';
+    var tn = s.testExclus ? s.total + ' apprenant' + (s.total > 1 ? 's' : '') + ' (' + s.testExclus + ' compte' + (s.testExclus > 1 ? 's' : '') + ' de test non compté' + (s.testExclus > 1 ? 's' : '') + '). ' : '';
+    $('dashNote').textContent = tn + (hors.length ? 'Non comptés : ' + hors.join(' et ') + '. ' : '') + 'Chiffres mis à jour à chaque ouverture de l\'administration.';
   }
 
   // ----- Export de la liste des apprenants (fichier CSV qui s'ouvre directement dans Excel : « ; » et UTF-8)
@@ -1643,7 +1647,7 @@ window.preparerPdf = async function (PDFLib, src) {
   function d10(ms) { return ms ? new Date(ms).toLocaleDateString('fr-FR') : ''; }
   $('export').addEventListener('click', async function () {
     var now = Date.now(), head = ['Nom', 'Code', 'Numéro WhatsApp', 'Formations', 'Statut', 'Code créé le', 'Première connexion', 'Fin de l\'essai', 'Fin de l\'accès', 'Fin de l\'assistance', 'Leçons terminées', 'Total leçons', 'Progression (%)', 'Exercices faits', 'Dernière visite', 'Connexions', 'À relancer'];
-    var rows = state.students.map(function (s) {
+    var rows = state.students.filter(function (s) { return !s.test; }).map(function (s) {
       var statut = !s.active ? (s.remplace ? 'Remplacé' : 'Désactivé') : (s.expires && s.expires < now) ? 'Expiré' : s.finEssai > now ? 'En essai' : (s.essai && !s.premiereUtilisation) ? 'Pas encore utilisé' : 'Accès complet';
       var start = s.premiereUtilisation || (s.essai ? 0 : s.created), assist = '';
       if (start) { var d = new Date(start); d.setUTCMonth(d.getUTCMonth() + 3); assist = d10(d.getTime()); }
@@ -1814,6 +1818,9 @@ window.preparerPdf = async function (PDFLib, src) {
       });
       r4.ctl.appendChild(b4); box.appendChild(r4.row);
     }
+    // Compte de test
+    var rt = actRow('Compte de test', f.test ? 'Compte marqué « test » : non compté dans les statistiques, relances, exports et listes de suivi. Il fonctionne normalement.' : 'Cochez pour ne plus compter ce compte dans les statistiques (il continue de fonctionner).');
+    rt.ctl.appendChild(testSwitch(f, function () { openFiche(f.code); })); box.appendChild(rt.row);
     // Désactiver / réactiver
     var r5 = actRow(f.active ? 'Désactiver le code' : 'Réactiver le code', f.active ? 'Par exemple après un remboursement. Réversible.' : 'L\'apprenant pourra de nouveau se connecter.');
     var b5 = el('button', 'b sec' + (f.active ? ' red' : ''), f.active ? 'Désactiver' : 'Réactiver'); b5.type = 'button';
@@ -1843,6 +1850,7 @@ window.preparerPdf = async function (PDFLib, src) {
     var h = el('h2'); h.id = 'fName'; h.textContent = f.label;
     var st = !f.active ? ['Désactivé', 'off'] : (f.expires && f.expires < now) ? ['Expiré', 'off'] : f.finEssai > now ? ['En essai', 'essai'] : (f.essai && !f.premiereUtilisation) ? ['Pas encore utilisé', ''] : ['Accès complet', ''];
     h.appendChild(el('span', 'badge ' + st[1], st[0]));
+    if (f.test) h.appendChild(el('span', 'badge test', 'TEST'));
     body.appendChild(h);
     body.appendChild(el('div', 'sub', f.code + (f.product ? ' · ' + (LABELS[f.product] || f.product) : '')));
 
@@ -2006,11 +2014,29 @@ window.preparerPdf = async function (PDFLib, src) {
     unlock: function (s) { return 'Débloquer toutes les leçons de ' + s.label + ' maintenant, sans attendre la fin de l\'essai ?\n\nCette action ne peut pas être annulée.'; },
   };
 
+  // Interrupteur « Compte de test » : le compte marche normalement mais n'est plus compté dans les chiffres ni les listes de suivi.
+  function testSwitch(s, after) {
+    var lab = el('label', 'tsw'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!s.test;
+    cb.setAttribute('aria-label', 'Compte de test : ' + s.label);
+    cb.addEventListener('change', async function () {
+      var want = cb.checked;
+      if (!confirm(want ? 'Marquer le compte de ' + s.label + ' comme « compte de test » ?' + String.fromCharCode(10, 10) + 'Il ne sera plus compté dans le tableau de bord, les relances, l’export et les listes de suivi. Il continue de fonctionner normalement.'
+        : 'Compter de nouveau le compte de ' + s.label + ' dans les statistiques ?')) { cb.checked = !want; return; }
+      cb.disabled = true;
+      try { await call('/admin/update', 'POST', { code: s.code, test: want }); await load(); if (after) after(); }
+      catch (e) { alert(e.message); cb.checked = !want; cb.disabled = false; }
+    });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode('Compte de test'));
+    return lab;
+  }
   function renderList() {
     var tb = $('rows'); tb.textContent = '';
     state.students.forEach(function (s) {
       var tr = el('tr');
-      tr.appendChild(el('td', '', s.label));
+      var tdn = el('td', '', s.label);
+      if (s.test) tdn.appendChild(el('span', 'badge test', 'TEST'));
+      tdn.appendChild(testSwitch(s));
+      tr.appendChild(tdn);
       tr.appendChild(el('td', 'code', s.code));
       var now = Date.now();
       
