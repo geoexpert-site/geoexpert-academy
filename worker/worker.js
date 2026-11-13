@@ -2041,6 +2041,7 @@ async function admin(req, env, url) {
     const raw = c && await env.ACCESS.get('s:' + c);
     if (!raw) return reply({ error: 'Code introuvable.' }, 404, req, env);
     const rec = JSON.parse(raw), m = findModule(String(b.module || ''));
+    if (rec.test) return reply({ error: 'Ce compte est marqué « test » : aucune attestation ne peut être émise (elle serait vérifiable publiquement). Décochez « Compte de test » dans sa fiche en cas d’erreur.' }, 400, req, env);
     if (!m || !rec.modules.some(g => g.m === m.key)) return reply({ error: 'Cette formation ne fait pas partie de son accès.' }, 400, req, env);
     const name = String(b.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
     if (name.length < 3) return reply({ error: 'Écrivez le nom complet qui figurera sur l\'attestation.' }, 400, req, env);
