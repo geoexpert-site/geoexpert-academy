@@ -102,12 +102,126 @@
     calculer();
   });
 
-  $('s-clear').addEventListener('click', function () { $('s-txt').value = ''; effacerResultat(); });
+  $('s-clear').addEventListener('click', function () { $('s-txt').value = ''; effacerResultat(); $('s-multi').hidden = true; parcellesImportees = []; OC.cacher($('s-import-msg')); });
 
   // Copier le résultat, CSV, schéma
   $('s-copy-wrap').appendChild(OC.boutonCopier(function () { return dernier ? S.texteResultat(dernier) : ''; }, 'le résultat', 'Copier le résultat'));
   $('s-csv').addEventListener('click', function () { if (dernier) OC.telecharger(S.versCsv(dernier), 'text/csv;charset=utf-8', 'points-parcelle.csv'); });
   $('s-svg').addEventListener('click', function () { if (svg) OC.telecharger(svg, 'image/svg+xml;charset=utf-8', 'schema-parcelle.svg'); });
+
+  // --- Importer un fichier de parcelles (lu localement) ---
+  var parcellesImportees = [];
+
+  function zoneAutoUtm(p) { // zone 29N ou 30N où le plus de points tombent en Côte d'Ivoire (si le fichier n'indique pas la zone)
+    var meilleure = 30, max = -1;
+    [29, 30].forEach(function (zz) {
+      var n = 0;
+      p.points.forEach(function (q) { try { C.utmVersGps(q.est, q.nord, { z: zz, h: 'N' }, false); n++; } catch (e) {} });
+      if (n > max) { max = n; meilleure = zz; }
+    });
+    return meilleure;
+  }
+  function analyserParcelle(p) {
+    return S.analyser(window.GeoImport.versTexte(p.mode, p.points), p.mode, p.mode === 'utm' ? zoneAutoUtm(p) : 0);
+  }
+  function chargerParcelle(p) { // met la parcelle dans la zone de saisie et calcule
+    var GI = window.GeoImport;
+    document.querySelector('input[name="smode"][value="' + p.mode + '"]').checked = true;
+    majMode();
+    if (p.mode === 'utm') $('s-zone').value = String(zoneAutoUtm(p));
+    $('s-txt').value = GI.versTexte(p.mode, p.points) + '\n';
+    calculer();
+  }
+
+  function afficherTableau() {
+    var wrap = $('s-multi-table'); wrap.textContent = '';
+    var table = document.createElement('table'); table.className = 'cv-table';
+    var cap = document.createElement('caption'); cap.style.cssText = 'position:absolute;left:-9999px'; cap.textContent = 'Surface de chaque parcelle importée';
+    table.appendChild(cap);
+    var thead = document.createElement('thead'), trh = document.createElement('tr');
+    ['Parcelle', 'Points', 'Surface (m\u00b2)', 'Hectares', 'ha-a-ca', 'Périmètre (m)', 'Statut', ''].forEach(function (c) { var th = document.createElement('th'); th.scope = 'col'; th.textContent = c; trh.appendChild(th); });
+    thead.appendChild(trh); table.appendChild(thead);
+    var tb = document.createElement('tbody'), total = 0, nbOk = 0, tsv = ['Parcelle\tPoints\tSurface (m2)\tHectares\tha-a-ca\tPérimètre (m)\tStatut'];
+    parcellesImportees.forEach(function (l) {
+      var r = l.res, tr = document.createElement('tr');
+      var trous = l.trous ? ' (trous ignorés : ' + l.trous + ')' : '';
+      var vals = r.ok
+        ? [l.libelle, String(r.points.length), S.fr(r.surface, 2), S.fr(r.surface / 10000, 4), S.texteHaAca(r), S.fr(r.perimetre, 2), (r.croise ? 'Contour croisé : surface sans sens' : 'OK') + trous]
+        : [l.libelle, '', '', '', '', '', r.erreur];
+      vals.forEach(function (v, i) {
+        var td = document.createElement('td'); td.textContent = v;
+        if (i === 6 && (!r.ok || r.croise)) td.className = 'err';
+        tr.appendChild(td);
+      });
+      var tdv = document.createElement('td');
+      if (r.ok) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'cv-copy'; b.textContent = 'Voir';
+        b.setAttribute('aria-label', 'Voir le détail de la parcelle ' + l.libelle);
+        b.addEventListener('click', function () { chargerParcelle(l.p); $('s-res').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        tdv.appendChild(b);
+        if (!r.croise) { total += r.surface; nbOk++; }
+      }
+      tr.appendChild(tdv); tb.appendChild(tr);
+      tsv.push(vals.map(function (x) { return x; }).join('\t'));
+    });
+    if (nbOk > 1) {
+      var trT = document.createElement('tr');
+      ['Total (' + nbOk + ' parcelles valides)', '', S.fr(total, 2), S.fr(total / 10000, 4), S.texteHaAca({ haAca: S.formatHaAca(total) }), '', '', ''].forEach(function (v) {
+        var td = document.createElement('td'); td.textContent = v; td.style.fontWeight = '700'; trT.appendChild(td);
+      });
+      tb.appendChild(trT);
+    }
+    table.appendChild(tb); wrap.appendChild(table);
+    $('s-multi-copy').textContent = '';
+    $('s-multi-copy').appendChild(OC.boutonCopier(tsv.join('\n'), 'le tableau', 'Copier le tableau'));
+    $('s-multi').hidden = false;
+  }
+
+  function lireTexteFichier(f) {
+    return new Promise(function (ok, ko) {
+      var fr = new FileReader();
+      fr.onload = function () { ok(String(fr.result)); };
+      fr.onerror = function () { ko(new Error('lecture impossible')); };
+      fr.readAsText(f);
+    });
+  }
+
+  $('s-file').addEventListener('change', function () {
+    var input = this, fichiers = Array.prototype.slice.call(input.files || []), msg = $('s-import-msg'), GI = window.GeoImport;
+    OC.cacher(msg);
+    if (!fichiers.length) return;
+    Promise.all(fichiers.map(function (f) {
+      if (f.size > GI.MAX_OCTETS) return Promise.resolve({ nom: f.name, erreur: 'fichier trop gros (5 Mo maximum)' });
+      return lireTexteFichier(f).then(function (t) { var r = GI.lireParcelles(f.name, t); r.nom = f.name; return r; },
+        function () { return { nom: f.name, erreur: 'lecture impossible' }; });
+    })).then(function (res) {
+      var parcelles = [], erreurs = [], MAX_PARCELLES = 500, tronque = false;
+      res.forEach(function (r) {
+        if (r.erreur) { erreurs.push(r.nom + ' : ' + r.erreur); return; }
+        if (!r.parcelles.length) { erreurs.push(r.nom + ' : aucune parcelle ni point trouvé'); return; }
+        r.parcelles.forEach(function (p) {
+          if (parcelles.length >= MAX_PARCELLES) { tronque = true; return; }
+          p.fichier = r.nom; p.libelle = (fichiers.length > 1 ? r.nom + ' : ' : '') + p.libelle; parcelles.push(p);
+        });
+      });
+      input.value = '';
+      if (!parcelles.length) { msg.className = 'cv-msg err'; msg.textContent = 'Aucune parcelle importée. ' + erreurs.join(' ; '); msg.hidden = false; return; }
+      var info = parcelles.length + ' parcelle' + (parcelles.length > 1 ? 's' : '') + ' importée' + (parcelles.length > 1 ? 's' : '') + '.';
+      var trous = parcelles.reduce(function (s, p) { return s + (p.trous || 0); }, 0);
+      if (trous) info += ' ' + trous + ' trou' + (trous > 1 ? 's' : '') + ' ignoré' + (trous > 1 ? 's' : '') + ' : la surface est celle du contour extérieur, trous compris.';
+      if (tronque) info += ' Seules les ' + MAX_PARCELLES + ' premières parcelles ont été gardées.';
+      if (erreurs.length) info += ' Problème : ' + erreurs.join(' ; ') + '.';
+      msg.className = 'cv-msg info'; msg.textContent = info; msg.hidden = false;
+      effacerResultat(); $('s-multi').hidden = true;
+      if (parcelles.length === 1) { chargerParcelle(parcelles[0]); return; }
+      parcellesImportees = parcelles.map(function (p) { return { libelle: p.libelle, trous: p.trous || 0, p: p, res: analyserParcelle(p) }; });
+      afficherTableau();
+    });
+  });
+
+  $('s-multi-csv').addEventListener('click', function () {
+    if (parcellesImportees.length) OC.telecharger(S.versCsvParcelles(parcellesImportees), 'text/csv;charset=utf-8', 'surfaces-parcelles.csv');
+  });
 
   majMode();
 })();

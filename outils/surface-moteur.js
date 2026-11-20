@@ -186,6 +186,25 @@
     return '﻿' + out.join('\r\n') + '\r\n';
   }
 
+  // Tableau de plusieurs parcelles. lignes : [{ libelle, res (résultat d'analyser, ok ou non), trous }]
+  function versCsvParcelles(lignes) {
+    function cellule(v) {
+      var s = String(v);
+      if (/^[=+@\t\r-]/.test(s) && isNaN(parseFloat(s))) s = "'" + s; // neutralise les formules dans les tableurs
+      else if (/^[=+@\t\r]/.test(s)) s = "'" + s;
+      if (/[";\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+    var out = ['Parcelle;Points;Surface (m2);Surface (ha);ha-a-ca;Perimetre (m);Zone UTM;Statut'];
+    lignes.forEach(function (l) {
+      var r = l.res, trous = l.trous ? ' (trous ignorés : ' + l.trous + ')' : '';
+      out.push(r.ok
+        ? [l.libelle, r.points.length, r.surface.toFixed(2), (r.surface / 10000).toFixed(4), texteHaAca(r), r.perimetre.toFixed(2), r.label, (r.croise ? 'Contour croisé : surface sans sens' : 'OK') + trous].map(cellule).join(';')
+        : [l.libelle, '', '', '', '', '', '', r.erreur].map(cellule).join(';'));
+    });
+    return '\ufeff' + out.join('\r\n') + '\r\n';
+  }
+
   // --- Dessin SVG (couleurs écrites en dur : le fichier téléchargé doit s'afficher partout) ---
   function longueurJolie(m) { // 1, 2 ou 5 x 10^k
     var p = Math.pow(10, Math.floor(Math.log10(m))), f = m / p;
@@ -226,6 +245,6 @@
 
   root.GeoSurface = {
     analyser: analyser, formatHaAca: formatHaAca, texteResultat: texteResultat, texteHaAca: texteHaAca,
-    versCsv: versCsv, dessinSvg: dessinSvg, fr: fr, jetons: jetons, MAX_POINTS: MAX_POINTS
+    versCsv: versCsv, versCsvParcelles: versCsvParcelles, dessinSvg: dessinSvg, fr: fr, jetons: jetons, MAX_POINTS: MAX_POINTS
   };
 })(typeof window !== 'undefined' ? window : globalThis);

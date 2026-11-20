@@ -165,6 +165,13 @@
         <small>La Côte d'Ivoire est à cheval sur les zones 29N (à l'ouest de 6° O) et 30N.</small>
       </div>
 
+      <div class="cv-field cv-import">
+        <label for="s-file">Importer un fichier de parcelles</label>
+        <input type="file" id="s-file" multiple accept=".csv,.txt,.tsv,.gpx,.kml,.geojson,.json">
+        <small>Fichiers CSV, GPX, KML ou GeoJSON, un ou plusieurs à la fois. Un fichier de polygones (GeoJSON, KML, WKT) donne une surface par parcelle ; un tracé GPX ou un CSV de points donne une parcelle (ou une par valeur de la colonne « parcelle » ou « lot »). Le fichier est lu dans votre navigateur et n'est envoyé nulle part. Les trous éventuels sont ignorés.</small>
+        <div id="s-import-msg" class="cv-msg info" role="status" hidden></div>
+      </div>
+
       <div class="cv-field">
         <label for="s-txt">Points du contour (au moins 3, dans l'ordre)</label>
         <textarea id="s-txt" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="s-aide"></textarea>
@@ -188,6 +195,12 @@
       </div>
 
       <div id="s-msg" class="cv-msg" role="alert" hidden></div>
+      <div id="s-multi" class="sf-multi" hidden>
+        <h2 class="sf-h">Parcelles importées</h2>
+        <div id="s-multi-actions" class="cv-actions"><span id="s-multi-copy"></span><button type="button" class="btn btn-outline" id="s-multi-csv">Télécharger le tableau en CSV</button></div>
+        <div id="s-multi-table" class="cv-table-wrap"></div>
+        <p class="cv-hint">Cliquez sur « Voir » pour afficher le détail et le schéma d'une parcelle.</p>
+      </div>
       <div id="s-warn" class="sf-warn" aria-live="polite"></div>
       <div id="s-res" class="cv-result" aria-live="polite"></div>
 
@@ -204,7 +217,7 @@
 
     <div class="cv-below">
       <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir la surface par un géomètre agréé.</p>
-      <p class="cv-scope">Surface calculée sur le plan UTM (zones 29N et 30N). Les terrains avec trous, les cours d'eau et les plans cadastraux importés en fichiers ne sont pas pris en charge. Pour ces cas, utilisez QGIS. <a href="../formation-qgis">Découvrir la formation QGIS</a></p>
+      <p class="cv-scope">Surface calculée sur le plan UTM (zones 29N et 30N). Les terrains avec trous (les trous sont ignorés à l'import), les cours d'eau et les plans cadastraux complexes ne sont pas pris en charge. Pour ces cas, utilisez QGIS. <a href="../formation-qgis">Découvrir la formation QGIS</a></p>
       <p class="cv-scope">Vos coordonnées sont en GPS ? <a href="convertisseur-coordonnees.html">Convertissez-les en UTM avec notre convertisseur</a>.</p>
     </div>
   </div>
@@ -289,6 +302,7 @@
 <script defer src="proj4.js"></script>
 <script defer src="convertisseur-coordonnees.js"></script>
 <script defer src="outils-commun.js"></script>
+<script defer src="convertisseur-import.js"></script>
 <script defer src="surface-moteur.js"></script>
 <script defer src="surface-ui.js"></script>
 </body>

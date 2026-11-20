@@ -7,3 +7,7 @@
 .sf-draw { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
 .sf-draw svg { display: block; max-width: 100%; height: auto; }
 #s-copy-wrap .cv-copy { min-height: 46px; padding: 0 18px; }
+
+.sf-multi { margin-top: 16px; }
+.sf-h { font-size: 18px; margin: 0 0 10px; color: var(--ink); }
+.sf-multi .cv-table-wrap { margin-top: 12px; }
