@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordonnées vers KML, GeoJSON et CSV : outil gratuit | GeoExpert Academy</title>
+<meta name="description" content="Transformez vos coordonnées UTM ou GPS en fichier KML (Google Earth), GeoJSON (QGIS) ou CSV. Gratuit, dans votre navigateur, rien n'est envoyé.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/coordonnees-vers-kml-geojson">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/coordonnees-vers-kml-geojson">
+<meta property="og:title" content="Coordonnées vers KML, GeoJSON et CSV">
+<meta property="og:description" content="Transformez vos coordonnées UTM ou GPS en fichier KML (Google Earth), GeoJSON (QGIS) ou CSV. Gratuit, dans votre navigateur, rien n'est envoyé.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Comment ouvrir un fichier KML dans Google Earth ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Dans Google Earth Pro, ouvrez le menu « Fichier », puis « Ouvrir », et choisissez le fichier .kml téléchargé. Vos points, votre ligne ou votre polygone apparaissent sur le globe. Vous pouvez aussi double-cliquer sur le fichier si Google Earth Pro est installé sur votre ordinateur."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Quelle est la différence entre KML, GeoJSON et CSV ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Le KML est le format de Google Earth. Le GeoJSON est un format ouvert, très utilisé dans QGIS et sur le web. Le CSV est un simple tableau : il contient ici les coordonnées UTM et GPS de chaque point, et s'ouvre dans un tableur ou dans QGIS. Les trois contiennent les mêmes points."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Dans quel ordre écrire la longitude et la latitude ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Dans les fichiers KML et GeoJSON, la longitude vient toujours avant la latitude. L'outil respecte cet ordre pour vous : vous saisissez vos points comme d'habitude (latitude, longitude en GPS ; Est, Nord en UTM). En Côte d'Ivoire, la longitude est négative, car le pays est à l'ouest du méridien de Greenwich."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Comment ouvrir le fichier GeoJSON dans QGIS ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Dans QGIS, ouvrez le menu « Couche », puis « Ajouter une couche », puis « Ajouter une couche vecteur », et choisissez le fichier .geojson. La couche est en WGS84 (EPSG:4326). Pour travailler en UTM, vous pouvez ensuite l'exporter dans le système EPSG:32630 (zone 30N) ou EPSG:32629 (zone 29N)."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Mes coordonnées sont-elles envoyées sur un serveur ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Non. Tout est calculé dans votre navigateur, et le fichier est fabriqué sur votre appareil au moment du téléchargement. Aucune coordonnée n'est envoyée ni enregistrée."
+   }
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+<link rel="stylesheet" href="outils-index.css">
+<link rel="stylesheet" href="surface.css">
+<link rel="stylesheet" href="outils-sig.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html">Outils SIG</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li><a href="index.html">Outils SIG</a></li>
+    <li aria-current="page">Coordonnées vers KML / GeoJSON / CSV</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <p class="ot-all"><a href="index.html">← Tous les outils SIG</a></p>
+    <h1>Coordonnées vers fichier KML, GeoJSON ou CSV</h1>
+    <p class="cv-lead">Outil gratuit : collez vos points en UTM ou en GPS, choisissez points, ligne ou polygone, puis téléchargez un fichier prêt pour Google Earth ou QGIS.</p>
+    <p class="cv-privacy">Vos coordonnées restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour l'utiliser.</p></noscript>
+    <div class="cv-card">
+      <div id="saisie"></div>
+
+      <div class="cv-field" style="margin:14px 0">
+        <span class="cv-label">Que représentent ces points ?</span>
+        <div class="cv-mode" role="radiogroup" aria-label="Géométrie" style="margin:6px 0 0">
+          <label><input type="radio" name="geom" value="points"> Des points séparés</label>
+          <label><input type="radio" name="geom" value="ligne"> Une ligne (un tracé)</label>
+          <label><input type="radio" name="geom" value="polygone" checked> Un polygone (refermé automatiquement)</label>
+        </div>
+      </div>
+
+      <div class="cv-row2" style="margin-bottom:14px">
+        <div class="cv-field"><label for="g-fichier">Nom du fichier</label><input type="text" id="g-fichier" value="mes-points" maxlength="80" autocomplete="off"><small>Sans l'extension. Les accents et les caractères spéciaux sont retirés du nom du fichier.</small></div>
+        <div class="cv-field"><label for="g-objet">Nom de l'objet</label><input type="text" id="g-objet" value="Mon objet" maxlength="100" autocomplete="off"><small>Affiché dans Google Earth et QGIS. Les accents sont conservés.</small></div>
+      </div>
+
+      <div class="cv-actions">
+        <button type="button" class="btn btn-primary" id="g-kml">Télécharger le KML</button>
+        <button type="button" class="btn btn-primary" id="g-json">Télécharger le GeoJSON</button>
+        <button type="button" class="btn btn-primary" id="g-csv">Télécharger le CSV</button>
+      </div>
+      <div class="cv-actions" style="margin-top:10px">
+        <button type="button" class="btn btn-outline" id="g-exemple">Exemple</button>
+        <button type="button" class="btn btn-outline" id="g-clear">Effacer</button>
+      </div>
+      <div id="g-msg" class="cv-msg err" role="alert" hidden></div>
+      <div id="g-info" class="sf-warn" aria-live="polite"></div>
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir les mesures par un géomètre agréé.</p>
+      <p class="cv-scope">Les fichiers KML et GeoJSON sont toujours en <strong>WGS84</strong> (latitude et longitude), avec la <strong>longitude en premier</strong>, comme l'exigent ces formats. Le CSV contient les coordonnées UTM et GPS, séparées par des points-virgules.</p>
+      <p class="cv-scope">Vous voulez seulement voir vos points sur une carte ? <a href="visualiseur-coordonnees-carte.html">Utilisez le visualiseur de coordonnées</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert cet outil ?</h2>
+    <p>Vous avez une liste de coordonnées relevées sur le terrain, en GPS ou en UTM, et vous voulez les voir dans Google Earth ou les ouvrir dans QGIS. Cet outil les transforme en fichier KML, GeoJSON ou CSV, en quelques secondes et sans installer de logiciel.</p>
+    <p>Vous choisissez si les points restent séparés, forment une ligne (un tracé, un chemin) ou un polygone (une parcelle, dont le contour est refermé automatiquement). Les fichiers sont toujours en WGS84, le système utilisé par les GPS et par Google Earth.</p>
+    <p>Le KML s'ouvre dans Google Earth, le GeoJSON dans QGIS et sur le web, le CSV dans un tableur ou dans QGIS.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Comment ça marche ?</h2>
+    <p>Si vous saisissez des coordonnées UTM, l'outil les convertit en latitude et longitude (WGS84). Si vous saisissez du GPS, il calcule aussi l'Est et le Nord UTM pour le CSV. Il écrit ensuite le fichier choisi, dans le navigateur, puis vous le télécharge.</p>
+    <div class="cv-example">
+      <strong>Exemple : un terrain de 100 m de côté à Abidjan (UTM 30N)</strong><br>
+      Points : <code>388000; 592000</code> · <code>388100; 592000</code> · <code>388100; 592100</code> · <code>388000; 592100</code><br>
+      Le premier point devient, en GPS, la latitude <code>5,35501912</code> et la longitude <code>-4,01084653</code>.<br>
+      Dans le fichier KML, il est écrit <code>-4.01084653,5.35501912,0</code> : la <strong>longitude</strong> d'abord, puis la latitude, puis l'altitude. Le polygone est refermé en répétant ce premier point à la fin.
+    </div>
+    <p style="margin-top:16px">Le nom de l'objet est échappé automatiquement dans le KML (par exemple le signe « &amp; » devient <code>&amp;amp;</code>), et le nom du fichier téléchargé est nettoyé : sans accents ni caractères spéciaux.</p>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Comment ouvrir un fichier KML dans Google Earth ?</summary>
+        <p>Dans Google Earth Pro, ouvrez le menu « Fichier », puis « Ouvrir », et choisissez le fichier .kml téléchargé. Vos points, votre ligne ou votre polygone apparaissent sur le globe. Vous pouvez aussi double-cliquer sur le fichier si Google Earth Pro est installé sur votre ordinateur.</p></details>
+      <details><summary>Quelle est la différence entre KML, GeoJSON et CSV ?</summary>
+        <p>Le KML est le format de Google Earth. Le GeoJSON est un format ouvert, très utilisé dans QGIS et sur le web. Le CSV est un simple tableau : il contient ici les coordonnées UTM et GPS de chaque point, et s'ouvre dans un tableur ou dans QGIS. Les trois contiennent les mêmes points.</p></details>
+      <details><summary>Dans quel ordre écrire la longitude et la latitude ?</summary>
+        <p>Dans les fichiers KML et GeoJSON, la longitude vient toujours avant la latitude. L'outil respecte cet ordre pour vous : vous saisissez vos points comme d'habitude (latitude, longitude en GPS ; Est, Nord en UTM). En Côte d'Ivoire, la longitude est négative, car le pays est à l'ouest du méridien de Greenwich.</p></details>
+      <details><summary>Comment ouvrir le fichier GeoJSON dans QGIS ?</summary>
+        <p>Dans QGIS, ouvrez le menu « Couche », puis « Ajouter une couche », puis « Ajouter une couche vecteur », et choisissez le fichier .geojson. La couche est en WGS84 (EPSG:4326). Pour travailler en UTM, vous pouvez ensuite l'exporter dans le système EPSG:32630 (zone 30N) ou EPSG:32629 (zone 29N).</p></details>
+      <details><summary>Mes coordonnées sont-elles envoyées sur un serveur ?</summary>
+        <p>Non. Tout est calculé dans votre navigateur, et le fichier est fabriqué sur votre appareil au moment du téléchargement. Aucune coordonnée n'est envoyée ni enregistrée.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Autres outils gratuits</h2>
+    <ul class="sig-liens">
+        <li><a href="visualiseur-coordonnees-carte.html">Visualiseur de coordonnées sur une carte</a></li>
+        <li><a href="convertisseur-coordonnees.html">Convertisseur de coordonnées GPS ⇄ UTM</a></li>
+        <li><a href="calculateur-surface-parcelle.html">Calculateur de surface de parcelle</a></li>
+        <li><a href="distance-gisement-entre-deux-points.html">Distance et gisement entre deux points</a></li>
+        <li><a href="index.html">Tous les outils SIG</a></li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Allez plus loin avec QGIS</h2>
+    <p>Ouvrir, nettoyer et mettre en page ces fichiers se fait dans QGIS. Pour numériser dans Google Earth Pro et exporter en KML, découvrez aussi la <a href="../formation-google-earth-pro">formation Google Earth Pro</a>.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-qgis" class="btn btn-light">Voir la formation QGIS</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20QGIS%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="index.html" class="footer-legal-link">Tous les outils SIG</a>
+    <a href="coordonnees-vers-kml-geojson.html" class="footer-legal-link">Coordonnées vers KML / GeoJSON / CSV</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page. -->
+<script defer src="../script.js"></script>
+<script defer src="proj4.js"></script>
+<script defer src="convertisseur-coordonnees.js"></script>
+<script defer src="outils-commun.js"></script>
+<script defer src="outils-points.js"></script>
+<script defer src="saisie-points.js"></script>
+<script defer src="export-moteur.js"></script>
+<script defer src="export-ui.js"></script>
+</body>
+</html>

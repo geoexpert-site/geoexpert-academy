@@ -1,0 +1,25 @@
+/* Styles propres aux nouveaux outils SIG (s'ajoute à convertisseur.css, même charte turquoise et violet). Mobile d'abord. */
+.sig-liens { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 16px; line-height: 1.5; }
+.sig-liens a { color: var(--teal); text-decoration: underline; font-weight: 600; }
+.fp-cta p a { color: #fff; text-decoration: underline; font-weight: 600; }
+
+.cv-card .cv-radio-row { display: flex; flex-wrap: wrap; gap: 14px; }
+.cv-unit-in { display: grid; gap: 12px; grid-template-columns: 1fr; }
+.cv-haaca { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cv-haaca label { font-size: 13px; }
+.sig-tableau-fin td.num { text-align: right; }
+
+.sig-barre { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; padding: 10px; }
+.sig-barre svg { display: block; width: 100%; height: auto; }
+.sig-boutons { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+.sig-boutons .btn { min-height: 44px; padding: 0 14px; }
+.sig-boutons .btn[aria-pressed="true"] { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+.sig-carte { height: 420px; margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; z-index: 0; background: #eef3f4; }
+.sig-carte[hidden] { display: none; }
+.sig-marqueur { width: 28px !important; height: 28px !important; margin: -14px 0 0 -14px !important; border-radius: 50%; background: #4B3F92; color: #fff; font: 700 13px/24px Inter, Arial, sans-serif; text-align: center; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,.4); box-sizing: border-box; }
+
+@media (min-width: 640px) {
+  .cv-unit-in { grid-template-columns: 1.2fr 1fr; }
+  .sig-carte { height: 520px; }
+}
