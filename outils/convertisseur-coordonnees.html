@@ -152,6 +152,14 @@
     <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour convertir vos coordonnées.</p></noscript>
     <div class="cv-card">
 
+      <div class="cv-field cv-region">
+        <label for="region">Zone géographique</label>
+        <select id="region">
+          <option value="ci" selected>Côte d'Ivoire (zones 29N et 30N)</option>
+          <option value="monde">Autre pays (monde entier)</option>
+        </select>
+      </div>
+
       <div class="cv-tabs" role="tablist" aria-label="Type de conversion">
         <button type="button" class="cv-tab" role="tab" id="tab-gps" aria-selected="true" aria-controls="p-gps">GPS → UTM</button>
         <button type="button" class="cv-tab" role="tab" id="tab-utm" aria-selected="false" aria-controls="p-utm" tabindex="-1">UTM → GPS</button>
@@ -170,12 +178,12 @@
             <div class="cv-field">
               <label for="g-lat">Latitude</label>
               <input type="text" id="g-lat" inputmode="decimal" autocomplete="off" placeholder="5.3600">
-              <small>Positive au nord de l'équateur (Côte d'Ivoire : entre 4 et 11).</small>
+              <small id="g-lat-aide">Positive au nord de l'équateur (Côte d'Ivoire : entre 4 et 11).</small>
             </div>
             <div class="cv-field">
               <label for="g-lon">Longitude</label>
               <input type="text" id="g-lon" autocomplete="off" placeholder="-4.0083">
-              <small>Négative à l'ouest de Greenwich (Côte d'Ivoire : entre -9 et -2).</small>
+              <small id="g-lon-aide">Négative à l'ouest de Greenwich (Côte d'Ivoire : entre -9 et -2).</small>
             </div>
           </div>
 
@@ -207,7 +215,8 @@
               <option value="29">Forcer la zone 29N</option>
               <option value="30">Forcer la zone 30N</option>
             </select>
-            <small>La Côte d'Ivoire est à cheval sur les zones 29N (à l'ouest de 6° O) et 30N.</small>
+            <input type="text" id="g-zone-w" autocomplete="off" placeholder="Automatique, ou par exemple 31N" hidden>
+            <small id="g-zone-aide">La Côte d'Ivoire est à cheval sur les zones 29N (à l'ouest de 6° O) et 30N.</small>
           </div>
 
           <div class="cv-actions"><button type="submit" class="btn btn-primary">Convertir</button></div>
@@ -236,6 +245,7 @@
                 <option value="30" selected>30N (EPSG:32630)</option>
                 <option value="29">29N (EPSG:32629)</option>
               </select>
+              <input type="text" id="u-zone-w" autocomplete="off" placeholder="Par exemple 31N ou 35S" hidden>
             </div>
           </div>
           <div class="cv-actions"><button type="submit" class="btn btn-primary">Convertir</button></div>
@@ -262,7 +272,14 @@
                 <option value="29">29N</option>
                 <option value="30">30N</option>
               </select>
+              <input type="text" id="b-zone-w" autocomplete="off" placeholder="Vide = automatique (par exemple 31N)" hidden>
             </div>
+          </div>
+          <div class="cv-field cv-import">
+            <label for="b-file">Importer des points</label>
+            <input type="file" id="b-file" multiple accept=".csv,.txt,.tsv,.gpx,.kml,.geojson,.json">
+            <small>Fichiers CSV, GPX, KML ou GeoJSON, un ou plusieurs à la fois : les points sont mis bout à bout puis convertis ensemble. Le fichier est lu dans votre navigateur et n'est envoyé nulle part. Pour un CSV, nommez les colonnes « latitude » et « longitude », ou « Est », « Nord » et « zone ».</small>
+            <div id="b-import-msg" class="cv-msg info" role="status" hidden></div>
           </div>
           <div class="cv-field">
             <label for="b-txt">Vos points (un par ligne)</label>
@@ -273,11 +290,18 @@
         <div class="cv-actions">
           <button type="button" class="btn btn-primary" id="b-go">Convertir la liste</button>
           <button type="button" class="btn btn-outline" id="b-csv" disabled>Télécharger en CSV</button>
+          <button type="button" class="btn btn-outline" id="b-kml" disabled>Télécharger en KML</button>
+          <button type="button" class="btn btn-outline" id="b-map" disabled>Afficher sur la carte</button>
           <button type="button" class="btn btn-outline" id="b-clear">Effacer</button>
         </div>
         <div id="b-msg" class="cv-msg info" role="status" hidden></div>
         <div id="b-copy-wrap" style="margin-top:12px"></div>
         <div id="b-out" class="cv-table-wrap"></div>
+        <div id="b-extra" class="cv-extra" hidden>
+          <p class="cv-hint"><strong>KML :</strong> fichier à ouvrir dans Google Earth (menu Projets, importer un fichier KML) ou dans QGIS. Il est créé dans votre navigateur et ne va nulle part tant que vous ne l'ouvrez pas vous-même.</p>
+          <p class="cv-hint"><strong>Carte :</strong> le bouton charge un fond de carte OpenStreetMap. Les serveurs d'OpenStreetMap voient alors la zone affichée, pas votre liste de points.</p>
+        </div>
+        <div id="b-mapbox" class="cv-map-canvas" hidden aria-label="Carte des points convertis"></div>
       </div>
 
     </div>
@@ -293,7 +317,7 @@
   <div class="container"><div class="fp-wrap cv-prose">
     <h2>À quoi sert cet outil ?</h2>
     <p>Un GPS de téléphone donne une latitude et une longitude, alors que les plans, les levés de terrain et beaucoup de données SIG sont en coordonnées UTM, exprimées en mètres. Cet outil fait le passage de l'un à l'autre en quelques secondes, pour un point ou pour une liste collée depuis un tableur.</p>
-    <p>Il est pensé pour la Côte d'Ivoire : il reconnaît seul la zone UTM (29N ou 30N) et vous prévient quand une valeur est impossible ou située hors du pays. Vous pouvez ensuite copier chaque résultat ou télécharger le tableau en CSV, par exemple pour l'ouvrir dans QGIS.</p>
+    <p>Il est pensé pour la Côte d'Ivoire (l'option « Autre pays » ouvre l'outil au monde entier) : il reconnaît seul la zone UTM (29N ou 30N) et vous prévient quand une valeur est impossible ou située hors du pays. Vous pouvez ensuite copier chaque résultat ou télécharger le tableau en CSV, par exemple pour l'ouvrir dans QGIS.</p>
   </div></div>
 </section>
 
@@ -359,6 +383,7 @@
 <script defer src="../script.js"></script>
 <script defer src="proj4.js"></script>
 <script defer src="convertisseur-coordonnees.js"></script>
+<script defer src="convertisseur-import.js"></script>
 <script defer src="convertisseur-ui.js"></script>
 </body>
 </html>
