@@ -1,0 +1,84 @@
+/* Outil « Convertisseur de coordonnées » : mobile d'abord.
+   Utilise uniquement les variables de style.css (turquoise, indigo, magenta). */
+
+.cv-hero { background: var(--bg-soft); border-bottom: 1px solid var(--line); padding: 28px 0 24px; }
+.cv-hero h1 { font-size: clamp(25px, 6vw, 40px); line-height: 1.18; font-weight: 800; margin: 0 0 12px; color: var(--ink); overflow-wrap: anywhere; }
+.cv-lead { font-size: 16px; line-height: 1.6; color: var(--ink-dim); margin: 0 0 10px; max-width: 720px; }
+.cv-privacy { display: inline-block; margin: 0; padding: 6px 12px; border-radius: 999px; background: var(--teal-soft); color: #00717f; font-size: 14px; font-weight: 600; }
+
+.cv-tool { padding: 24px 0 8px; }
+.cv-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 12px 32px rgba(0,146,166,.08); padding: 16px; max-width: 860px; margin: 0 auto; }
+
+.cv-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 18px; padding: 4px; background: var(--bg-soft); border-radius: 12px; }
+.cv-tab { appearance: none; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.25; color: var(--ink-dim); padding: 10px 6px; border-radius: 9px; cursor: pointer; min-height: 44px; }
+.cv-tab[aria-selected="true"] { background: #fff; color: var(--indigo); box-shadow: 0 1px 6px rgba(75,63,146,.18); }
+.cv-tab:focus-visible, .cv-card button:focus-visible, .cv-card input:focus-visible, .cv-card select:focus-visible, .cv-card textarea:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+.cv-panel[hidden] { display: none; }
+.cv-fields { display: grid; gap: 14px; margin: 0 0 14px; }
+.cv-field label, .cv-field .cv-label { display: block; font-size: 14px; font-weight: 700; color: var(--ink); margin: 0 0 5px; }
+.cv-field small { display: block; font-size: 12.5px; color: var(--ink-dim); margin-top: 4px; line-height: 1.4; }
+.cv-card input[type="text"], .cv-card select, .cv-card textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; /* 16 px : évite le zoom automatique sur iPhone */ color: var(--ink); background: #fff; border: 1.5px solid var(--line-strong); border-radius: 10px; padding: 10px 12px; min-height: 46px; }
+.cv-card textarea { min-height: 150px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; line-height: 1.5; resize: vertical; }
+.cv-card input[aria-invalid="true"], .cv-card textarea[aria-invalid="true"] { border-color: #c0392b; }
+
+.cv-mode { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 14px; font-size: 14.5px; }
+.cv-mode label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-weight: 600; color: var(--ink); min-height: 32px; }
+.cv-mode input { width: 18px; height: 18px; accent-color: var(--teal); }
+
+.cv-dms { display: grid; grid-template-columns: 1fr 1fr 1.2fr 0.9fr; gap: 8px; }
+.cv-dms .cv-sub { font-size: 12px; color: var(--ink-dim); margin: 0 0 3px; display: block; }
+.cv-dms input, .cv-dms select { padding-left: 8px; padding-right: 8px; }
+
+.cv-row2 { display: grid; gap: 14px; }
+
+.cv-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 0; }
+.cv-actions .btn { min-height: 46px; }
+.cv-actions .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+.cv-msg { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; font-size: 14.5px; line-height: 1.5; }
+.cv-msg.err { background: #fdecea; border: 1px solid #f3b9b2; color: #8a2a1f; }
+.cv-msg.info { background: #fff8e9; border: 1px solid #f2dfb7; color: #6b531d; }
+
+.cv-result { margin: 16px 0 0; display: grid; gap: 10px; }
+.cv-res-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 10px; background: #fff; }
+.cv-res-text { min-width: 0; }
+.cv-res-label { display: block; font-size: 12.5px; color: var(--ink-dim); font-weight: 600; }
+.cv-res-value { display: block; font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.cv-copy { flex: 0 0 auto; appearance: none; border: 1.5px solid var(--teal); background: #fff; color: #00717f; font: inherit; font-size: 14px; font-weight: 700; padding: 8px 14px; border-radius: 999px; cursor: pointer; min-height: 40px; }
+.cv-copy:hover { background: var(--teal-soft); }
+.cv-copy.ok { background: var(--teal); color: #fff; }
+.cv-copy-all { justify-self: start; }
+
+.cv-table-wrap { overflow-x: auto; margin: 14px 0 0; border: 1px solid var(--line); border-radius: 10px; -webkit-overflow-scrolling: touch; }
+.cv-table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.cv-table th, .cv-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #edf2f3; white-space: nowrap; }
+.cv-table th { background: var(--bg-soft); color: var(--ink); font-size: 13px; position: sticky; top: 0; }
+.cv-table td.err { white-space: normal; color: #8a2a1f; min-width: 220px; }
+.cv-table tr:last-child td { border-bottom: 0; }
+
+.cv-below { max-width: 860px; margin: 18px auto 0; display: grid; gap: 12px; }
+.cv-warning { padding: 14px 16px; border-radius: 12px; background: #fff3e0; border: 2px solid #e8a33d; color: #5a3a00; font-size: 15px; line-height: 1.5; font-weight: 600; }
+.cv-scope { padding: 14px 16px; border-radius: 12px; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--indigo); color: var(--ink-dim); font-size: 14.5px; line-height: 1.55; }
+.cv-scope a { color: var(--teal); text-decoration: underline; font-weight: 600; }
+
+.cv-prose { max-width: 760px; }
+.cv-prose p { font-size: 16px; line-height: 1.7; color: var(--ink-dim); margin: 0 0 14px; }
+.cv-prose strong { color: var(--ink); }
+.cv-example { margin: 16px 0 0; padding: 14px 16px; background: #fff; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; line-height: 1.7; color: var(--ink-dim); }
+.cv-example code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14.5px; color: var(--ink); background: var(--bg-soft); padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+
+.cv-noscript { max-width: 860px; margin: 0 auto 14px; padding: 12px 14px; border-radius: 10px; background: #fdecea; color: #8a2a1f; }
+
+@media (min-width: 640px) {
+  .cv-hero { padding: 40px 0 32px; }
+  .cv-card { padding: 26px; }
+  .cv-row2 { grid-template-columns: 1fr 1fr; }
+  .cv-tab { font-size: 15px; }
+  .cv-fields.three { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 380px) {
+  .cv-dms { grid-template-columns: 1fr 1fr; }
+}
+
+.cv-table-wrap:empty { display: none; }
