@@ -47,12 +47,51 @@
 
     var iLat = indexDe(noms, NOMS_LAT), iLon = indexDe(noms, NOMS_LON);
     var iEst = indexDe(noms, NOMS_EST), iNord = indexDe(noms, NOMS_NORD), iZone = indexDe(noms, NOMS_ZONE);
+
+    // Noms de colonnes plus libres : « latitude_deg », « Longitude (°) », « X coord »…
+    if (entete) {
+      var brut = rows[0].map(function (h) { return ' ' + h.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ') + ' '; });
+      var trouver = function (mots) {
+        for (var i = 0; i < brut.length; i++) for (var j = 0; j < mots.length; j++) if (brut[i].indexOf(' ' + mots[j] + ' ') >= 0) return i;
+        return -1;
+      };
+      if (iLat < 0) iLat = trouver(['lat', 'latitude', 'latitud']);
+      if (iLon < 0) iLon = trouver(['lon', 'long', 'lng', 'longitude', 'longitud']);
+      if (iEst < 0) iEst = trouver(['est', 'easting']);      // « X_Est_m », « Est (m) »…
+      if (iNord < 0) iNord = trouver(['nord', 'northing']);  // « Y_Nord_m », « Nord (m) »…
+      if (iZone < 0) iZone = trouver(['zone', 'fuseau']);
+    }
+
+    // Colonne de géométrie WKT (exports QGIS, OpenStreetMap…) : POINT (lon lat), ou le centre approché d'un polygone
+    var iWkt = -1;
+    if (iLat < 0 || iLon < 0) {
+      var reWkt = /^\s*(MULTI)?(POINT|LINESTRING|POLYGON)/i;
+      for (var c = 0; c < (data[0] || []).length; c++) {
+        if (reWkt.test(data[0][c]) || (entete && /^(wkt|geom|geometry|thegeom|wktgeom|geometrie)$/.test(noms[c]))) { iWkt = c; break; }
+      }
+    }
+    if (iWkt >= 0 && !(iLat >= 0 && iLon >= 0)) {
+      var ptsWkt = [], ignWkt = 0, approx = false;
+      data.forEach(function (r) {
+        var txt = String(r[iWkt] || ''), re = /(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)\s+(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)/g, m, n = 0, sx = 0, sy = 0;
+        var sommets = [];
+        while ((m = re.exec(txt))) sommets.push([parseFloat(m[1]), parseFloat(m[2])]);
+        // un anneau de polygone se termine par son premier sommet : on ne le compte qu'une fois
+        if (sommets.length > 2 && sommets[0][0] === sommets[sommets.length - 1][0] && sommets[0][1] === sommets[sommets.length - 1][1]) sommets.pop();
+        sommets.forEach(function (s) { sx += s[0]; sy += s[1]; n++; });
+        if (!n) { ignWkt++; return; }
+        if (n > 1) approx = true;
+        ptsWkt.push({ lat: Math.round(sy / n * 1e7) / 1e7, lon: Math.round(sx / n * 1e7) / 1e7 });
+      });
+      return { mode: 'gps', points: ptsWkt, ignorees: ignWkt, approx: approx };
+    }
+
     var mode = null, a, b, z = -1;
     if (iLat >= 0 && iLon >= 0) { mode = 'gps'; a = iLat; b = iLon; }
     else if (iEst >= 0 && iNord >= 0) { mode = 'utm'; a = iEst; b = iNord; z = iZone; }
     else if (entete) {
       var iX = noms.indexOf('x'), iY = noms.indexOf('y');
-      if (iX < 0 || iY < 0) return { erreur: 'Colonnes non reconnues. Nommez-les latitude et longitude, ou Est et Nord (plus zone), ou x et y.' };
+      if (iX < 0 || iY < 0) return { erreur: 'Colonnes non reconnues (colonnes trouvées : ' + rows[0].slice(0, 12).join(', ') + (rows[0].length > 12 ? '…' : '') + '). Nommez-les latitude et longitude, ou Est et Nord (plus zone), ou x et y, ou gardez une colonne de géométrie WKT.' };
       var x0 = G.lireNombre((data[0] || [])[iX]);
       if (Math.abs(x0) > 1000) { mode = 'utm'; a = iX; b = iY; z = iZone; }
       else { mode = 'gps'; a = iY; b = iX; } // x = longitude, y = latitude

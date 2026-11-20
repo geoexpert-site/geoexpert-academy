@@ -348,11 +348,11 @@
       return lireTexte(f).then(function (t) { var r = GI.lireFichier(f.name, t); r.nom = f.name; return r; },
         function () { return { nom: f.name, erreur: 'lecture impossible' }; });
     })).then(function (res) {
-      var gps = [], utm = [], erreurs = [], ignorees = 0, nbFichiers = 0;
+      var gps = [], utm = [], erreurs = [], ignorees = 0, nbFichiers = 0, approx = false;
       res.forEach(function (r) {
         if (r.erreur) { erreurs.push(r.nom + ' : ' + r.erreur); return; }
         if (!r.points.length) { erreurs.push(r.nom + ' : aucun point trouvé'); return; }
-        nbFichiers++; ignorees += r.ignorees || 0;
+        nbFichiers++; ignorees += r.ignorees || 0; if (r.approx) approx = true;
         (r.mode === 'gps' ? gps : utm).push.apply(r.mode === 'gps' ? gps : utm, r.points);
       });
       var mode = gps.length >= utm.length ? 'gps' : 'utm', pts = mode === 'gps' ? gps : utm;
@@ -363,6 +363,22 @@
       var info = pts.length + ' point' + (pts.length > 1 ? 's' : '') + ' importé' + (pts.length > 1 ? 's' : '') + ' (' + (mode === 'gps' ? 'GPS' : 'UTM') + ').';
       if (gps.length && utm.length) info += ' Vos fichiers mélangent GPS et UTM : seuls les points ' + (mode === 'gps' ? 'GPS' : 'UTM') + ' ont été gardés, importez les autres séparément.';
       if (ignorees) info += ' ' + ignorees + ' ligne' + (ignorees > 1 ? 's' : '') + ' ignorée' + (ignorees > 1 ? 's' : '') + ' (valeurs non numériques).';
+      if (mode === 'utm' && pts.some(function (p) { return !p.zone; })) {
+        if (!monde()) {
+          // Zone absente du fichier : on prend celle (29N ou 30N) où le plus de points tombent en Côte d'Ivoire.
+          var meilleure = 30, max = -1;
+          [29, 30].forEach(function (zz) {
+            var n = 0;
+            pts.forEach(function (p) { if (!p.zone) { try { G.utmVersGps(p.est, p.nord, { z: zz, h: 'N' }, false); n++; } catch (e) {} } });
+            if (n > max) { max = n; meilleure = zz; }
+          });
+          $('b-zone').value = String(meilleure);
+          info += ' Le fichier n’indique pas la zone UTM : la zone ' + meilleure + 'N a été choisie automatiquement (' + max + ' point' + (max > 1 ? 's' : '') + ' tombent en Côte d’Ivoire). Changez-la dans la liste « Zone si absente de la ligne » si besoin.';
+        } else {
+          info += ' Le fichier n’indique pas la zone UTM : renseignez-la dans le champ « Zone si absente de la ligne » (par exemple 31N), puis cliquez sur « Convertir la liste ».';
+        }
+      }
+      if (approx) info += ' Pour les lignes et polygones, le point utilisé est le centre approché de la forme.';
       if (erreurs.length) info += ' Problème : ' + erreurs.join(' ; ') + '.';
       $('b-mode').value = mode; majAideLot();
       $('b-txt').value = GI.versTexte(mode, pts);
