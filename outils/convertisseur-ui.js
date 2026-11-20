@@ -40,7 +40,7 @@
     b.setAttribute('aria-label', 'Copier ' + libelle);
     b.addEventListener('click', function () {
       copier(texte).then(function () {
-        b.textContent = 'Copié ✓'; b.classList.add('ok');
+        b.textContent = 'Copié'; b.classList.add('ok');
         setTimeout(function () { b.textContent = 'Copier'; b.classList.remove('ok'); }, 1600);
       }, function () { b.textContent = 'Échec'; setTimeout(function () { b.textContent = 'Copier'; }, 1600); });
     });
