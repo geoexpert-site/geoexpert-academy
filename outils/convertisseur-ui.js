@@ -68,6 +68,26 @@
     }
   }
 
+  // Boutons « Voir sur la carte » : ouvrent un site externe seulement si l'utilisateur clique.
+  function ajouterCarte(conteneur, lat, lon) {
+    var la = lat.toFixed(6), lo = lon.toFixed(6);
+    var liens = [
+      { t: 'Voir sur OpenStreetMap', u: 'https://www.openstreetmap.org/?mlat=' + la + '&mlon=' + lo + '#map=16/' + la + '/' + lo },
+      { t: 'Voir sur Google Earth', u: 'https://earth.google.com/web/search/' + la + ',' + lo }
+    ];
+    var boite = document.createElement('div'); boite.className = 'cv-map';
+    var ligne = document.createElement('div'); ligne.className = 'cv-map-btns';
+    liens.forEach(function (x) {
+      var a = document.createElement('a');
+      a.className = 'btn btn-outline'; a.href = x.u; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = x.t;
+      ligne.appendChild(a);
+    });
+    var note = document.createElement('small');
+    note.textContent = 'Ces boutons ouvrent un autre site et lui transmettent la position de ce point.';
+    boite.appendChild(ligne); boite.appendChild(note);
+    conteneur.appendChild(boite);
+  }
+
   function zoneChoisie(sel) { return sel.value === 'auto' ? 0 : parseInt(sel.value, 10); }
 
   // --- 1. GPS -> UTM ---
@@ -101,6 +121,7 @@
         { label: 'Hémisphère', valeur: 'Nord' }
       ];
       resultats($('g-res'), items);
+      ajouterCarte($('g-res'), lat, lon);
       if (u.forcee) {
         msg.className = 'cv-msg info';
         msg.textContent = 'Vous avez forcé la zone ' + u.label + ' alors que ce point se trouve dans la zone ' + u.zoneAuto + 'N. Le résultat est correct mais plus déformé : utilisez la zone automatique sauf si votre projet impose l’autre.';
@@ -125,6 +146,7 @@
         { label: 'Longitude (DMS)', valeur: r.lonDms },
         { label: 'Latitude, longitude', valeur: r.lat.toFixed(6) + ', ' + r.lon.toFixed(6) }
       ]);
+      ajouterCarte($('u-res'), r.lat, r.lon);
     } catch (err) { afficherErreur(msg, err.message); }
   });
 
