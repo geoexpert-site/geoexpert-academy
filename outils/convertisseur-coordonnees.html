@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertisseur de coordonnées GPS UTM gratuit – Côte d'Ivoire | GeoExpert Academy</title>
+<meta name="description" content="Convertissez gratuitement vos coordonnées GPS en UTM (zones 29N et 30N) et inversement. Un point ou une liste, export CSV. Rien n'est envoyé.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/convertisseur-coordonnees">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/convertisseur-coordonnees">
+<meta property="og:title" content="Convertisseur de coordonnées GPS UTM gratuit – Côte d'Ivoire">
+<meta property="og:description" content="Convertissez gratuitement vos coordonnées GPS en UTM (zones 29N et 30N) et inversement. Un point ou une liste, export CSV. Rien n'est envoyé.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Comment convertir des coordonnées GPS en UTM ?","acceptedAnswer":{"@type":"Answer","text":"Ouvrez l'onglet « GPS → UTM » de l'outil, saisissez la latitude et la longitude en degrés décimaux (par exemple 5.3600 et -4.0083) ou en degrés-minutes-secondes, puis cliquez sur « Convertir ». L'outil donne l'Est et le Nord en mètres, ainsi que la zone UTM, détectée automatiquement à partir de la longitude. En Côte d'Ivoire, une longitude négative signifie « à l'ouest de Greenwich »."}},
+{"@type":"Question","name":"Dans quelle zone UTM se trouve Abidjan ?","acceptedAnswer":{"@type":"Answer","text":"Abidjan (environ 5.3600 de latitude et -4.0083 de longitude) est dans la zone UTM 30 Nord (EPSG:32630). Ses coordonnées UTM sont d'environ 388 283 m (Est) et 592 550 m (Nord). La Côte d'Ivoire est à cheval sur deux zones : la zone 29 Nord à l'ouest du méridien 6° Ouest (par exemple San-Pédro ou Man) et la zone 30 Nord à l'est (par exemple Abidjan, Yamoussoukro, Bouaké ou Korhogo)."}},
+{"@type":"Question","name":"Comment convertir des coordonnées UTM en GPS ?","acceptedAnswer":{"@type":"Answer","text":"Ouvrez l'onglet « UTM → GPS », saisissez l'Est et le Nord en mètres, choisissez la zone (29N ou 30N) puis cliquez sur « Convertir ». L'outil affiche la latitude et la longitude en degrés décimaux et en degrés-minutes-secondes. Si le résultat tombe hors de la Côte d'Ivoire, vérifiez d'abord la zone : une mauvaise zone décale le point d'environ 6 degrés."}},
+{"@type":"Question","name":"Peut-on utiliser cet outil pour un plan de lotissement officiel ?","acceptedAnswer":{"@type":"Answer","text":"Non. Les résultats sont indicatifs. Pour un document officiel (plan de lotissement, bornage, dossier foncier), les coordonnées doivent être établies ou vérifiées par un géomètre agréé. L'outil sert à comprendre, contrôler et préparer vos données, pas à remplacer un levé ni un document officiel."}},
+{"@type":"Question","name":"Comment faire la même chose dans QGIS ?","acceptedAnswer":{"@type":"Answer","text":"Dans QGIS, ajoutez vos points avec « Couche > Ajouter une couche > Ajouter une couche de texte délimité » en choisissant le système de coordonnées de vos données (EPSG:4326 pour du GPS, EPSG:32630 pour de l'UTM zone 30N). Pour obtenir les coordonnées dans un autre système, utilisez l'outil « Reprojeter une couche » de la boîte à outils de traitements, avec le système d'arrivée voulu. La formation QGIS de GeoExpert Academy vous guide pas à pas sur ces étapes."}}
+]}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li>Outils</li>
+    <li aria-current="page">Convertisseur de coordonnées</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <h1>Convertisseur de coordonnées GPS ⇄ UTM (Côte d'Ivoire)</h1>
+    <p class="cv-lead">Outil gratuit : passez de la latitude et la longitude (GPS) aux coordonnées UTM en mètres, et inversement, pour un point ou pour toute une liste.</p>
+    <p class="cv-privacy">🔒 Vos coordonnées restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour convertir vos coordonnées.</p></noscript>
+    <div class="cv-card">
+
+      <div class="cv-tabs" role="tablist" aria-label="Type de conversion">
+        <button type="button" class="cv-tab" role="tab" id="tab-gps" aria-selected="true" aria-controls="p-gps">GPS → UTM</button>
+        <button type="button" class="cv-tab" role="tab" id="tab-utm" aria-selected="false" aria-controls="p-utm" tabindex="-1">UTM → GPS</button>
+        <button type="button" class="cv-tab" role="tab" id="tab-lot" aria-selected="false" aria-controls="p-lot" tabindex="-1">Plusieurs points</button>
+      </div>
+
+      <!-- 1. GPS vers UTM -->
+      <div class="cv-panel" id="p-gps" role="tabpanel" aria-labelledby="tab-gps">
+        <form id="g-form" novalidate>
+          <div class="cv-mode" role="radiogroup" aria-label="Format de saisie">
+            <label><input type="radio" name="gmode" value="dec" checked> Degrés décimaux</label>
+            <label><input type="radio" name="gmode" value="dms"> Degrés-minutes-secondes</label>
+          </div>
+
+          <div id="g-dec" class="cv-fields">
+            <div class="cv-field">
+              <label for="g-lat">Latitude</label>
+              <input type="text" id="g-lat" inputmode="decimal" autocomplete="off" placeholder="5.3600">
+              <small>Positive au nord de l'équateur (Côte d'Ivoire : entre 4 et 11).</small>
+            </div>
+            <div class="cv-field">
+              <label for="g-lon">Longitude</label>
+              <input type="text" id="g-lon" autocomplete="off" placeholder="-4.0083">
+              <small>Négative à l'ouest de Greenwich (Côte d'Ivoire : entre -9 et -2).</small>
+            </div>
+          </div>
+
+          <div id="g-dms" class="cv-fields" hidden>
+            <div class="cv-field">
+              <span class="cv-label" id="g-lat-t">Latitude</span>
+              <div class="cv-dms" role="group" aria-labelledby="g-lat-t">
+                <div><span class="cv-sub">Degrés</span><input type="text" id="g-lat-d" inputmode="numeric" autocomplete="off" placeholder="5" aria-label="Latitude, degrés"></div>
+                <div><span class="cv-sub">Minutes</span><input type="text" id="g-lat-m" inputmode="numeric" autocomplete="off" placeholder="21" aria-label="Latitude, minutes"></div>
+                <div><span class="cv-sub">Secondes</span><input type="text" id="g-lat-s" inputmode="decimal" autocomplete="off" placeholder="36" aria-label="Latitude, secondes"></div>
+                <div><span class="cv-sub">Sens</span><select id="g-lat-h" aria-label="Latitude, nord ou sud"><option value="N">N</option><option value="S">S</option></select></div>
+              </div>
+            </div>
+            <div class="cv-field">
+              <span class="cv-label" id="g-lon-t">Longitude</span>
+              <div class="cv-dms" role="group" aria-labelledby="g-lon-t">
+                <div><span class="cv-sub">Degrés</span><input type="text" id="g-lon-d" inputmode="numeric" autocomplete="off" placeholder="4" aria-label="Longitude, degrés"></div>
+                <div><span class="cv-sub">Minutes</span><input type="text" id="g-lon-m" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Longitude, minutes"></div>
+                <div><span class="cv-sub">Secondes</span><input type="text" id="g-lon-s" inputmode="decimal" autocomplete="off" placeholder="29.88" aria-label="Longitude, secondes"></div>
+                <div><span class="cv-sub">Sens</span><select id="g-lon-h" aria-label="Longitude, est ou ouest"><option value="O" selected>O (ouest)</option><option value="E">E (est)</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-field" style="margin-bottom:14px">
+            <label for="g-zone">Zone UTM</label>
+            <select id="g-zone">
+              <option value="auto" selected>Automatique (selon la longitude)</option>
+              <option value="29">Forcer la zone 29N</option>
+              <option value="30">Forcer la zone 30N</option>
+            </select>
+            <small>La Côte d'Ivoire est à cheval sur les zones 29N (à l'ouest de 6° O) et 30N.</small>
+          </div>
+
+          <div class="cv-actions"><button type="submit" class="btn btn-primary">Convertir</button></div>
+          <div id="g-msg" class="cv-msg" role="alert" hidden></div>
+          <div id="g-res" class="cv-result" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <!-- 2. UTM vers GPS -->
+      <div class="cv-panel" id="p-utm" role="tabpanel" aria-labelledby="tab-utm" hidden>
+        <form id="u-form" novalidate>
+          <div class="cv-fields">
+            <div class="cv-row2">
+              <div class="cv-field">
+                <label for="u-est">Est (mètres)</label>
+                <input type="text" id="u-est" inputmode="decimal" autocomplete="off" placeholder="388283.08">
+              </div>
+              <div class="cv-field">
+                <label for="u-nord">Nord (mètres)</label>
+                <input type="text" id="u-nord" inputmode="decimal" autocomplete="off" placeholder="592550.20">
+              </div>
+            </div>
+            <div class="cv-field">
+              <label for="u-zone">Zone UTM</label>
+              <select id="u-zone">
+                <option value="30" selected>30N (EPSG:32630)</option>
+                <option value="29">29N (EPSG:32629)</option>
+              </select>
+            </div>
+          </div>
+          <div class="cv-actions"><button type="submit" class="btn btn-primary">Convertir</button></div>
+          <div id="u-msg" class="cv-msg" role="alert" hidden></div>
+          <div id="u-res" class="cv-result" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <!-- 3. Plusieurs points -->
+      <div class="cv-panel" id="p-lot" role="tabpanel" aria-labelledby="tab-lot" hidden>
+        <div class="cv-fields">
+          <div class="cv-row2">
+            <div class="cv-field">
+              <label for="b-mode">Conversion</label>
+              <select id="b-mode">
+                <option value="gps" selected>GPS → UTM</option>
+                <option value="utm">UTM → GPS</option>
+              </select>
+            </div>
+            <div class="cv-field">
+              <label for="b-zone" id="b-zone-label">Zone UTM de sortie</label>
+              <select id="b-zone">
+                <option value="auto" selected>Automatique</option>
+                <option value="29">29N</option>
+                <option value="30">30N</option>
+              </select>
+            </div>
+          </div>
+          <div class="cv-field">
+            <label for="b-txt">Vos points (un par ligne)</label>
+            <textarea id="b-txt" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="b-aide"></textarea>
+            <small id="b-aide"></small>
+          </div>
+        </div>
+        <div class="cv-actions">
+          <button type="button" class="btn btn-primary" id="b-go">Convertir la liste</button>
+          <button type="button" class="btn btn-outline" id="b-csv" disabled>Télécharger en CSV</button>
+          <button type="button" class="btn btn-outline" id="b-clear">Effacer</button>
+        </div>
+        <div id="b-msg" class="cv-msg info" role="status" hidden></div>
+        <div id="b-copy-wrap" style="margin-top:12px"></div>
+        <div id="b-out" class="cv-table-wrap"></div>
+      </div>
+
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">⚠️ Résultats indicatifs. Pour un document officiel, faites vérifier vos coordonnées par un géomètre agréé.</p>
+      <p class="cv-scope">Cet outil convertit entre WGS84 et UTM WGS84. Pour les systèmes locaux historiques, utilisez QGIS. <a href="../formation-qgis">Découvrir la formation QGIS</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert cet outil ?</h2>
+    <p>Un GPS de téléphone donne une latitude et une longitude, alors que les plans, les levés de terrain et beaucoup de données SIG sont en coordonnées UTM, exprimées en mètres. Cet outil fait le passage de l'un à l'autre en quelques secondes, pour un point ou pour une liste collée depuis un tableur.</p>
+    <p>Il est pensé pour la Côte d'Ivoire : il reconnaît seul la zone UTM (29N ou 30N) et vous prévient quand une valeur est impossible ou située hors du pays. Vous pouvez ensuite copier chaque résultat ou télécharger le tableau en CSV, par exemple pour l'ouvrir dans QGIS.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Quelle différence entre GPS et UTM ?</h2>
+    <p><strong>Le GPS (WGS84)</strong> repère un point sur toute la Terre avec deux angles : la latitude (nord-sud) et la longitude (est-ouest), en degrés. <strong>L'UTM</strong> découpe la Terre en bandes de 6 degrés de large, les zones, et repère un point par une distance en mètres : l'Est (mesuré à partir d'une origine propre à la zone) et le Nord (mesuré depuis l'équateur). Les mètres sont pratiques pour mesurer des distances et des surfaces.</p>
+    <p>La Côte d'Ivoire est traversée par la limite entre la zone 29N et la zone 30N, d'où l'importance d'indiquer la zone avec les coordonnées : sans elle, un Est et un Nord ne désignent pas un lieu précis.</p>
+    <div class="cv-example"><strong>Exemple, Abidjan :</strong><br>
+      GPS : latitude <code>5.3600</code>, longitude <code>-4.0083</code><br>
+      UTM zone 30N : Est <code>388283.08</code> m, Nord <code>592550.20</code> m</div>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Comment convertir des coordonnées GPS en UTM ?</summary>
+        <p>Ouvrez l'onglet « GPS → UTM » de l'outil, saisissez la latitude et la longitude en degrés décimaux (par exemple 5.3600 et -4.0083) ou en degrés-minutes-secondes, puis cliquez sur « Convertir ». L'outil donne l'Est et le Nord en mètres, ainsi que la zone UTM, détectée automatiquement à partir de la longitude. En Côte d'Ivoire, une longitude négative signifie « à l'ouest de Greenwich ».</p></details>
+      <details><summary>Dans quelle zone UTM se trouve Abidjan ?</summary>
+        <p>Abidjan (environ 5.3600 de latitude et -4.0083 de longitude) est dans la zone UTM 30 Nord (EPSG:32630). Ses coordonnées UTM sont d'environ 388 283 m (Est) et 592 550 m (Nord). La Côte d'Ivoire est à cheval sur deux zones : la zone 29 Nord à l'ouest du méridien 6° Ouest (par exemple San-Pédro ou Man) et la zone 30 Nord à l'est (par exemple Abidjan, Yamoussoukro, Bouaké ou Korhogo).</p></details>
+      <details><summary>Comment convertir des coordonnées UTM en GPS ?</summary>
+        <p>Ouvrez l'onglet « UTM → GPS », saisissez l'Est et le Nord en mètres, choisissez la zone (29N ou 30N) puis cliquez sur « Convertir ». L'outil affiche la latitude et la longitude en degrés décimaux et en degrés-minutes-secondes. Si le résultat tombe hors de la Côte d'Ivoire, vérifiez d'abord la zone : une mauvaise zone décale le point d'environ 6 degrés.</p></details>
+      <details><summary>Peut-on utiliser cet outil pour un plan de lotissement officiel ?</summary>
+        <p>Non. Les résultats sont indicatifs. Pour un document officiel (plan de lotissement, bornage, dossier foncier), les coordonnées doivent être établies ou vérifiées par un géomètre agréé. L'outil sert à comprendre, contrôler et préparer vos données, pas à remplacer un levé ni un document officiel.</p></details>
+      <details><summary>Comment faire la même chose dans QGIS ?</summary>
+        <p>Dans QGIS, ajoutez vos points avec « Couche &gt; Ajouter une couche &gt; Ajouter une couche de texte délimité » en choisissant le système de coordonnées de vos données (EPSG:4326 pour du GPS, EPSG:32630 pour de l'UTM zone 30N). Pour obtenir les coordonnées dans un autre système, utilisez l'outil « Reprojeter une couche » de la boîte à outils de traitements, avec le système d'arrivée voulu. La <a href="../formation-qgis">formation QGIS de GeoExpert Academy</a> vous guide pas à pas sur ces étapes.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Maîtrisez les systèmes de coordonnées</h2>
+    <p>Apprenez à gérer les systèmes de coordonnées dans QGIS, pas à pas, avec un accompagnement WhatsApp de 3 mois.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-qgis" class="btn btn-light">Voir la formation QGIS</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20QGIS%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="convertisseur-coordonnees.html" class="footer-legal-link">Outils</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page : les coordonnées saisies ne quittent jamais le navigateur. -->
+<script defer src="../script.js"></script>
+<script defer src="proj4.js"></script>
+<script defer src="convertisseur-coordonnees.js"></script>
+<script defer src="convertisseur-ui.js"></script>
+</body>
+</html>
