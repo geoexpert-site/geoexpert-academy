@@ -2643,3 +2643,20 @@ html, body{
 .pay-online .btn{font-size:16px;min-height:48px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;text-align:center}
 .pay-online-help{margin:4px 0 0}
 .pay-online-help a{color:var(--teal);text-decoration:underline}
+
+/* ---------- « Voir plus » (avis et galerie de l accueil) : <details> sans JavaScript ---------- */
+.voir-plus{ margin-top:22px; }
+.voir-plus-btn{ display:flex; width:fit-content; margin:0 auto; cursor:pointer; list-style:none; text-align:center; }
+.voir-plus-btn::-webkit-details-marker{ display:none; }
+.voir-plus-btn::marker{ content:""; }
+.voir-plus .lbl-ouvert{ display:none; }
+.voir-plus[open] .lbl-ouvert{ display:inline; }
+.voir-plus[open] .lbl-ferme{ display:none; }
+.voir-plus[open] > .voir-plus-btn{ margin-bottom:22px; }
+.voir-plus-btn:focus-visible{ outline:3px solid var(--teal); outline-offset:3px; }
+
+/* Détails repliables dans une carte de formation */
+.card-details{ margin:0 0 16px; }
+.card-details summary{ cursor:pointer; font-weight:600; font-size:14px; color:var(--teal); text-decoration:underline; }
+.card-details summary:focus-visible{ outline:3px solid var(--teal); outline-offset:3px; }
+.card-details[open] summary{ margin-bottom:10px; }
