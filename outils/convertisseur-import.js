@@ -13,6 +13,8 @@
   var NOMS_EST = ['est', 'easting', 'estm', 'xutm', 'eastingm'];
   var NOMS_NORD = ['nord', 'northing', 'nordm', 'yutm', 'northingm'];
   var NOMS_ZONE = ['zone', 'fuseau', 'utmzone', 'zoneutm'];
+  var NOMS_GROUPE = ['parcelle', 'parcel', 'lot', 'polygone', 'polygon', 'groupe', 'group', 'idparcelle', 'nomparcelle', 'parcelleid', 'numparcelle'];
+  var NOMS_LIBELLE = ['nom', 'name', 'libelle', 'label', 'parcelle', 'lot', 'id'];
 
   function indexDe(noms, liste) {
     for (var i = 0; i < noms.length; i++) if (liste.indexOf(noms[i]) >= 0) return i;
@@ -47,6 +49,7 @@
 
     var iLat = indexDe(noms, NOMS_LAT), iLon = indexDe(noms, NOMS_LON);
     var iEst = indexDe(noms, NOMS_EST), iNord = indexDe(noms, NOMS_NORD), iZone = indexDe(noms, NOMS_ZONE);
+    var iGrp = indexDe(noms, NOMS_GROUPE), iLib = indexDe(noms, NOMS_LIBELLE);
 
     // Noms de colonnes plus libres : « latitude_deg », « Longitude (°) », « X coord »…
     if (entete) {
@@ -83,7 +86,9 @@
         if (n > 1) approx = true;
         ptsWkt.push({ lat: Math.round(sy / n * 1e7) / 1e7, lon: Math.round(sx / n * 1e7) / 1e7 });
       });
-      return { mode: 'gps', points: ptsWkt, ignorees: ignWkt, approx: approx };
+      return { mode: 'gps', points: ptsWkt, ignorees: ignWkt, approx: approx,
+        wkts: data.map(function (r) { return String(r[iWkt] || ''); }),
+        libelles: data.map(function (r) { return iLib >= 0 ? String(r[iLib] || '') : ''; }) };
     }
 
     var mode = null, a, b, z = -1;
@@ -105,10 +110,11 @@
     data.forEach(function (r) {
       var p = G.lireNombre(r[a]), q = G.lireNombre(r[b]);
       if (isNaN(p) || isNaN(q)) { ignorees++; return; }
-      if (mode === 'gps') points.push({ lat: p, lon: q });
-      else points.push({ est: p, nord: q, zone: z >= 0 ? String(r[z] || '').trim() : '' });
+      var g = iGrp >= 0 ? String(r[iGrp] || '').trim() : '';
+      if (mode === 'gps') points.push({ lat: p, lon: q, g: g });
+      else points.push({ est: p, nord: q, zone: z >= 0 ? String(r[z] || '').trim() : '', g: g });
     });
-    return { mode: mode, points: points, ignorees: ignorees };
+    return { mode: mode, points: points, ignorees: ignorees, groupes: iGrp >= 0 };
   }
 
   function analyserXml(texte) {
@@ -182,5 +188,163 @@
     }).join('\n');
   }
 
-  root.GeoImport = { lireFichier: lireFichier, versTexte: versTexte, MAX_OCTETS: MAX_OCTETS };
+
+  // ====================== PARCELLES (calculateur de surface) ======================
+  // Un fichier peut contenir une ou plusieurs parcelles. Résultat : { parcelles: [{ libelle, mode, points, trous }], ignorees } ou { erreur }.
+  // - polygones GeoJSON / KML / WKT : une parcelle par polygone (contour extérieur ; les trous sont signalés mais ignorés) ;
+  // - tracés et routes GPX : une parcelle par tracé ;
+  // - CSV de points : une parcelle par valeur de la colonne « parcelle » / « lot » / « polygone »…, sinon une seule parcelle.
+  function nettoyerAnneau(pts) {
+    return pts.length > 2 && pts[0].lat === pts[pts.length - 1].lat && pts[0].lon === pts[pts.length - 1].lon ? pts.slice(0, -1) : pts;
+  }
+  function parcelleGps(libelle, pts, trous) { return { libelle: libelle, mode: 'gps', points: nettoyerAnneau(pts), trous: trous || 0 }; }
+
+  // WKT : POLYGON((a b, c d, ...),(trou)) ou MULTIPOLYGON(((...)),((...))). Renvoie [{ exterieur: [{lat,lon}], trous: n }].
+  function wktPolygones(txt) {
+    var m = /^\s*(MULTIPOLYGON|POLYGON)\s*(?:ZM|Z|M)?\s*(\(.*\))\s*$/i.exec(String(txt || ''));
+    if (!m) return null;
+    var multi = /^MULTI/i.test(m[1]), i = 0, corps = m[2];
+    function lireListe() {
+      var enfants = [], nombres = '';
+      i++; // saute la parenthèse ouvrante
+      while (i < corps.length) {
+        var c = corps.charAt(i);
+        if (c === '(') enfants.push(lireListe());
+        else if (c === ')') { i++; return { enfants: enfants, texte: nombres }; }
+        else { nombres += c; i++; }
+      }
+      return { enfants: enfants, texte: nombres };
+    }
+    var racine = lireListe();
+    function anneau(noeud) {
+      var pts = [];
+      noeud.texte.split(',').forEach(function (morceau) {
+        var r = /(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)\s+(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)/.exec(morceau);
+        if (r) pts.push({ lat: parseFloat(r[2]), lon: parseFloat(r[1]) });
+      });
+      return pts;
+    }
+    var polys = multi ? racine.enfants : [racine];
+    return polys.map(function (p) { return { exterieur: anneau(p.enfants[0] || { texte: '' }), trous: Math.max(0, p.enfants.length - 1) }; });
+  }
+
+  function parcellesCsv(r) {
+    if (r.wkts) { // colonne de géométrie WKT contenant des polygones
+      var res = [], n = 0, polygones = false;
+      r.wkts.forEach(function (w, idx) {
+        var ps = wktPolygones(w);
+        if (!ps) return;
+        polygones = true;
+        ps.forEach(function (p, k) {
+          if (p.exterieur.length < 3) return;
+          n++;
+          res.push(parcelleGps((r.libelles[idx] || ('Polygone ' + n)) + (ps.length > 1 ? ' (' + (k + 1) + ')' : ''), p.exterieur, p.trous));
+        });
+      });
+      if (polygones) return { parcelles: res, ignorees: 0 };
+    }
+    if (!r.points || !r.points.length) return { parcelles: [], ignorees: r.ignorees || 0 };
+    if (r.groupes) { // une parcelle par valeur de la colonne de groupe, dans l'ordre d'apparition
+      var ordre = [], parG = {};
+      r.points.forEach(function (p) {
+        var cle = p.g || '(sans nom)';
+        if (!parG[cle]) { parG[cle] = []; ordre.push(cle); }
+        parG[cle].push(p);
+      });
+      return { parcelles: ordre.map(function (cle) { return { libelle: cle, mode: r.mode, points: parG[cle], trous: 0 }; }), ignorees: r.ignorees || 0 };
+    }
+    return { parcelles: [{ libelle: 'Points du fichier', mode: r.mode, points: r.points, trous: 0 }], ignorees: r.ignorees || 0 };
+  }
+
+  function parcellesGeoJson(texte) {
+    var obj;
+    try { obj = JSON.parse(texte); } catch (e) { return { erreur: 'Fichier GeoJSON illisible.' }; }
+    var res = [], pts = [], n = 0;
+    function nom(props, k) {
+      props = props || {};
+      var v = props.name || props.nom || props.Name || props.NOM || props.parcelle || props.lot || props.id;
+      return v != null && String(v) !== '' ? String(v) : 'Polygone ' + k;
+    }
+    function anneau(coords) {
+      return coords.filter(function (c) { return typeof c[0] === 'number' && typeof c[1] === 'number'; }).map(function (c) { return { lat: c[1], lon: c[0] }; });
+    }
+    (function marcher(o, props) {
+      if (!o || typeof o !== 'object') return;
+      if (Array.isArray(o)) { o.forEach(function (x) { marcher(x, props); }); return; }
+      if (o.type === 'FeatureCollection') marcher(o.features, props);
+      else if (o.type === 'Feature') marcher(o.geometry, o.properties);
+      else if (o.type === 'GeometryCollection') marcher(o.geometries, props);
+      else if (o.type === 'Polygon' && Array.isArray(o.coordinates)) { n++; res.push(parcelleGps(nom(props, n), anneau(o.coordinates[0] || []), o.coordinates.length - 1)); }
+      else if (o.type === 'MultiPolygon' && Array.isArray(o.coordinates)) {
+        o.coordinates.forEach(function (pc, k) { n++; res.push(parcelleGps(nom(props, n) + ' (' + (k + 1) + ')', anneau(pc[0] || []), pc.length - 1)); });
+      }
+      else if (o.type === 'Point' && Array.isArray(o.coordinates)) pts.push.apply(pts, anneau([o.coordinates]));
+      else if (o.type === 'MultiPoint' && Array.isArray(o.coordinates)) pts.push.apply(pts, anneau(o.coordinates));
+    })(obj, null);
+    if (!res.length && pts.length) res.push({ libelle: 'Points du fichier', mode: 'gps', points: pts, trous: 0 });
+    return { parcelles: res.filter(function (p) { return p.points.length; }), ignorees: 0 };
+  }
+
+  function coordsKml(el) { // « lon,lat,alt lon,lat,alt … »
+    return el.textContent.trim().split(/\s+/).map(function (t) {
+      var c = t.split(','), lon = G.lireNombre(c[0]), lat = G.lireNombre(c[1]);
+      return isNaN(lat) || isNaN(lon) ? null : { lat: lat, lon: lon };
+    }).filter(Boolean);
+  }
+  function enfantTexte(el, tag) {
+    for (var c = el.firstElementChild; c; c = c.nextElementSibling) if (c.localName === tag) return c.textContent.trim();
+    return '';
+  }
+  function parcellesKml(texte) {
+    var doc = analyserXml(texte);
+    if (!doc) return { erreur: 'Fichier KML illisible.' };
+    var res = [], pts = [], n = 0, marques = doc.getElementsByTagName('Placemark');
+    for (var i = 0; i < marques.length; i++) {
+      var nomPm = enfantTexte(marques[i], 'name'), polys = marques[i].getElementsByTagName('Polygon');
+      for (var k = 0; k < polys.length; k++) {
+        var ext = polys[k].getElementsByTagName('outerBoundaryIs')[0], cs = ext ? ext.getElementsByTagName('coordinates')[0] : null;
+        if (!cs) continue;
+        n++;
+        res.push(parcelleGps((nomPm || 'Polygone ' + n) + (polys.length > 1 ? ' (' + (k + 1) + ')' : ''), coordsKml(cs), polys[k].getElementsByTagName('innerBoundaryIs').length));
+      }
+      var points = marques[i].getElementsByTagName('Point');
+      for (var q = 0; q < points.length; q++) { var pc = points[q].getElementsByTagName('coordinates')[0]; if (pc) pts.push.apply(pts, coordsKml(pc)); }
+    }
+    if (!res.length && pts.length) res.push({ libelle: 'Points du fichier', mode: 'gps', points: pts, trous: 0 });
+    return { parcelles: res.filter(function (p) { return p.points.length; }), ignorees: 0 };
+  }
+
+  function parcellesGpx(texte) {
+    var doc = analyserXml(texte);
+    if (!doc) return { erreur: 'Fichier GPX illisible.' };
+    var res = [];
+    function pointsDe(el, tag) {
+      var out = [], els = el.getElementsByTagName(tag);
+      for (var i = 0; i < els.length; i++) {
+        var lat = G.lireNombre(els[i].getAttribute('lat')), lon = G.lireNombre(els[i].getAttribute('lon'));
+        if (!isNaN(lat) && !isNaN(lon)) out.push({ lat: lat, lon: lon });
+      }
+      return out;
+    }
+    [['trk', 'trkpt', 'Tracé'], ['rte', 'rtept', 'Route']].forEach(function (d) {
+      var els = doc.getElementsByTagName(d[0]);
+      for (var i = 0; i < els.length; i++) res.push(parcelleGps(enfantTexte(els[i], 'name') || (d[2] + ' ' + (i + 1)), pointsDe(els[i], d[1])));
+    });
+    if (!res.length) { var w = pointsDe(doc, 'wpt'); if (w.length) res.push({ libelle: 'Points du fichier', mode: 'gps', points: w, trous: 0 }); }
+    return { parcelles: res.filter(function (p) { return p.points.length; }), ignorees: 0 };
+  }
+
+  function lireParcelles(nom, texte) {
+    var ext = (/\.([a-z0-9]+)$/i.exec(nom) || [, ''])[1].toLowerCase();
+    var debut = texte.replace(/^﻿/, '').trimStart().charAt(0);
+    var kind = ext === 'gpx' ? 'gpx' : ext === 'kml' ? 'kml' : (ext === 'geojson' || ext === 'json') ? 'geojson'
+      : (ext === 'csv' || ext === 'txt' || ext === 'tsv') ? 'csv' : debut === '{' ? 'geojson' : debut === '<' ? (/<gpx/i.test(texte) ? 'gpx' : 'kml') : 'csv';
+    if (kind === 'gpx') return parcellesGpx(texte);
+    if (kind === 'kml') return parcellesKml(texte);
+    if (kind === 'geojson') return parcellesGeoJson(texte);
+    var r = lireCsv(texte);
+    return r.erreur ? r : parcellesCsv(r);
+  }
+
+  root.GeoImport = { lireFichier: lireFichier, lireParcelles: lireParcelles, versTexte: versTexte, MAX_OCTETS: MAX_OCTETS };
 })(window);

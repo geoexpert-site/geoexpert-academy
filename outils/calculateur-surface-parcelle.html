@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur de surface de parcelle à partir de coordonnées (m², hectares) | GeoExpert Academy</title>
+<meta name="description" content="Calculez gratuitement la surface d'une parcelle (m², hectares, ha-a-ca) à partir de coordonnées GPS ou UTM, avec schéma. Rien n'est envoyé.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/calculateur-surface-parcelle">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/calculateur-surface-parcelle">
+<meta property="og:title" content="Calculateur de surface de parcelle à partir de coordonnées">
+<meta property="og:description" content="Calculez gratuitement la surface d'une parcelle (m², hectares, ha-a-ca) à partir de coordonnées GPS ou UTM, avec schéma. Rien n'est envoyé.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Comment calculer la surface d'un terrain à partir de coordonnées ?","acceptedAnswer":{"@type":"Answer","text":"Saisissez les points du contour de la parcelle, dans l'ordre, en UTM (Est, Nord) ou en GPS (latitude, longitude), puis cliquez sur « Calculer ». Si vos points sont en GPS, l'outil les convertit d'abord en UTM, puis applique la formule du lacet. Vous obtenez la surface en mètres carrés, en hectares et en hectares-ares-centiares, ainsi que le périmètre."}},
+{"@type":"Question","name":"Combien d'ares dans un hectare ?","acceptedAnswer":{"@type":"Answer","text":"Un hectare (ha) vaut 100 ares (a), soit 10 000 mètres carrés. Un are vaut 100 centiares (ca), et un centiare vaut 1 mètre carré. Ainsi, 12 345,67 m² font 1 ha 23 a 45 ca (les décimales du centiare sont ignorées)."}},
+{"@type":"Question","name":"Quelle différence entre la surface sur plan et la surface réelle ?","acceptedAnswer":{"@type":"Answer","text":"La surface sur plan est calculée à plat, sur la projection UTM. La Terre étant courbe, la surface sur l'ellipsoïde WGS84 est légèrement différente : d'après nos mesures en Côte d'Ivoire, l'écart reste inférieur à 0,2 %. L'outil ne tient pas compte du relief : sur un terrain en pente, la surface le long du sol est plus grande que sa projection à plat."}},
+{"@type":"Question","name":"Peut-on utiliser ce résultat pour un document officiel ?","acceptedAnswer":{"@type":"Answer","text":"Non. Les résultats sont indicatifs. Pour un document officiel (plan de lotissement, bornage, titre foncier), la surface doit être établie ou vérifiée par un géomètre agréé. L'outil sert à estimer, contrôler et préparer vos données."}},
+{"@type":"Question","name":"Comment calculer une surface dans QGIS ?","acceptedAnswer":{"@type":"Answer","text":"Dans QGIS, ajoutez ou dessinez votre polygone, ouvrez la calculatrice de champ et créez un champ avec l'expression $area, qui donne la surface sur l'ellipsoïde du projet, ou area($geometry), qui donne la surface sur plan dans le système de coordonnées de la couche. Pour une parcelle en UTM zone 30N, la couche doit être en EPSG:32630. La formation QGIS de GeoExpert Academy vous guide pas à pas sur ces étapes."}}
+]}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+<link rel="stylesheet" href="surface.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li>Outils</li>
+    <li aria-current="page">Calculateur de surface de parcelle</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <h1>Calculateur de surface de parcelle à partir de coordonnées</h1>
+    <p class="cv-lead">Outil gratuit : entrez les points du contour de votre terrain, en UTM ou en GPS, et obtenez la surface en m², en hectares et en ha-a-ca, avec un schéma.</p>
+    <p class="cv-privacy">Vos coordonnées restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour calculer une surface.</p></noscript>
+    <div class="cv-card">
+
+      <div class="cv-mode" role="radiogroup" aria-label="Type de coordonnées">
+        <label><input type="radio" name="smode" value="utm" checked> Coordonnées UTM (Est, Nord)</label>
+        <label><input type="radio" name="smode" value="gps"> Coordonnées GPS (latitude, longitude)</label>
+      </div>
+
+      <div class="cv-field" style="margin-bottom:14px">
+        <label for="s-zone" id="s-zone-label">Zone UTM</label>
+        <select id="s-zone"></select>
+        <small>La Côte d'Ivoire est à cheval sur les zones 29N (à l'ouest de 6° O) et 30N.</small>
+      </div>
+
+      <div class="cv-field cv-import">
+        <label for="s-file">Importer un fichier de parcelles</label>
+        <input type="file" id="s-file" multiple accept=".csv,.txt,.tsv,.gpx,.kml,.geojson,.json">
+        <small>Fichiers CSV, GPX, KML ou GeoJSON, un ou plusieurs à la fois. Un fichier de polygones (GeoJSON, KML, WKT) donne une surface par parcelle ; un tracé GPX ou un CSV de points donne une parcelle (ou une par valeur de la colonne « parcelle » ou « lot »). Le fichier est lu dans votre navigateur et n'est envoyé nulle part. Les trous éventuels sont ignorés.</small>
+        <div id="s-import-msg" class="cv-msg info" role="status" hidden></div>
+      </div>
+
+      <div class="cv-field">
+        <label for="s-txt">Points du contour (au moins 3, dans l'ordre)</label>
+        <textarea id="s-txt" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="s-aide"></textarea>
+        <small id="s-aide"></small>
+        <small>Pas besoin de répéter le premier point : le contour est refermé automatiquement.</small>
+      </div>
+
+      <div class="sf-add">
+        <span class="cv-label">Ou ajoutez les points un par un</span>
+        <div class="cv-row2">
+          <div class="cv-field"><label for="s-a" id="s-lab-a">Est (mètres)</label><input type="text" id="s-a" inputmode="decimal" autocomplete="off"></div>
+          <div class="cv-field"><label for="s-b" id="s-lab-b">Nord (mètres)</label><input type="text" id="s-b" autocomplete="off"></div>
+        </div>
+        <button type="button" class="btn btn-outline" id="s-add">Ajouter le point</button>
+      </div>
+
+      <div class="cv-actions" style="margin-top:16px">
+        <button type="button" class="btn btn-primary" id="s-calc">Calculer</button>
+        <button type="button" class="btn btn-outline" id="s-exemple">Exemple</button>
+        <button type="button" class="btn btn-outline" id="s-clear">Effacer</button>
+      </div>
+
+      <div id="s-msg" class="cv-msg" role="alert" hidden></div>
+      <div id="s-multi" class="sf-multi" hidden>
+        <h2 class="sf-h">Parcelles importées</h2>
+        <div id="s-multi-actions" class="cv-actions"><span id="s-multi-copy"></span><button type="button" class="btn btn-outline" id="s-multi-csv">Télécharger le tableau en CSV</button></div>
+        <div id="s-multi-table" class="cv-table-wrap"></div>
+        <p class="cv-hint">Cliquez sur « Voir » pour afficher le détail et le schéma d'une parcelle.</p>
+      </div>
+      <div id="s-warn" class="sf-warn" aria-live="polite"></div>
+      <div id="s-res" class="cv-result" aria-live="polite"></div>
+
+      <div id="s-actions" class="cv-actions" hidden style="margin-top:14px">
+        <span id="s-copy-wrap"></span>
+        <button type="button" class="btn btn-outline" id="s-csv">Télécharger les points en CSV</button>
+        <button type="button" class="btn btn-outline" id="s-svg">Télécharger le schéma</button>
+      </div>
+
+      <div id="s-draw" class="sf-draw" hidden>
+        <div id="s-draw-svg"></div>
+      </div>
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir la surface par un géomètre agréé.</p>
+      <p class="cv-scope">Surface calculée sur le plan UTM (zones 29N et 30N). Les terrains avec trous (les trous sont ignorés à l'import), les cours d'eau et les plans cadastraux complexes ne sont pas pris en charge. Pour ces cas, utilisez QGIS. <a href="../formation-qgis">Découvrir la formation QGIS</a></p>
+      <p class="cv-scope">Vos coordonnées sont en GPS ? <a href="convertisseur-coordonnees.html">Convertissez-les en UTM avec notre convertisseur</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert ce calculateur ?</h2>
+    <p>Quand vous avez les coordonnées des bornes ou des sommets d'un terrain, ce calculateur donne sa surface en quelques secondes, sans logiciel. Vous obtenez des mètres carrés, des hectares et le découpage en hectares, ares et centiares que l'on utilise couramment pour les terrains.</p>
+    <p>Il calcule aussi le périmètre, vérifie que votre contour est cohérent (par exemple qu'il ne se croise pas) et dessine la parcelle avec ses sommets numérotés. Vous pouvez copier le résultat, télécharger les points en CSV et le schéma en SVG.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Comment la surface est-elle calculée ?</h2>
+    <p>L'outil utilise la <strong>formule du lacet</strong>. Les points sont d'abord exprimés en UTM, c'est-à-dire en mètres sur un plan (si vous saisissez du GPS, il les convertit pour vous). Puis, pour chaque côté du contour, on multiplie l'Est d'un point par le Nord du point suivant, et on retire l'Est du point suivant multiplié par le Nord du point. On additionne tout, on prend la valeur absolue, et on divise par 2.</p>
+    <div class="cv-example">
+      <strong>Exemple : un carré de 100 m de côté</strong><br>
+      Points (en mètres, par rapport au premier point) : 1 = (0 ; 0), 2 = (100 ; 0), 3 = (100 ; 100), 4 = (0 ; 100).<br>
+      Côté 1 → 2 : 0 × 0 − 100 × 0 = <code>0</code><br>
+      Côté 2 → 3 : 100 × 100 − 100 × 0 = <code>10 000</code><br>
+      Côté 3 → 4 : 100 × 100 − 0 × 100 = <code>10 000</code><br>
+      Côté 4 → 1 : 0 × 0 − 0 × 100 = <code>0</code><br>
+      Somme = 20 000, divisée par 2 = <strong>10 000 m²</strong>, soit 1 ha 00 a 00 ca.
+    </div>
+    <p style="margin-top:16px">Le contour est refermé automatiquement (du dernier point vers le premier). Le résultat n'a de sens que si les points suivent le contour dans l'ordre et que les côtés ne se croisent pas.</p>
+    <p><strong>Sur plan, pas sur l'ellipsoïde.</strong> Cette surface est calculée à plat, sur la projection UTM. D'après nos mesures sur 6 emplacements en Côte d'Ivoire et des parcelles de 300 m², 5 000 m² et 5 ha, elle diffère de la surface calculée sur l'ellipsoïde WGS84 de moins de 0,2 % (de -0,08 % à +0,19 %), quelle que soit la taille de la parcelle.</p>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Comment calculer la surface d'un terrain à partir de coordonnées ?</summary>
+        <p>Saisissez les points du contour de la parcelle, dans l'ordre, en UTM (Est, Nord) ou en GPS (latitude, longitude), puis cliquez sur « Calculer ». Si vos points sont en GPS, l'outil les convertit d'abord en UTM, puis applique la formule du lacet. Vous obtenez la surface en mètres carrés, en hectares et en hectares-ares-centiares, ainsi que le périmètre.</p></details>
+      <details><summary>Combien d'ares dans un hectare ?</summary>
+        <p>Un hectare (ha) vaut 100 ares (a), soit 10 000 mètres carrés. Un are vaut 100 centiares (ca), et un centiare vaut 1 mètre carré. Ainsi, 12 345,67 m² font 1 ha 23 a 45 ca (les décimales du centiare sont ignorées).</p></details>
+      <details><summary>Quelle différence entre la surface sur plan et la surface réelle ?</summary>
+        <p>La surface sur plan est calculée à plat, sur la projection UTM. La Terre étant courbe, la surface sur l'ellipsoïde WGS84 est légèrement différente : d'après nos mesures en Côte d'Ivoire, l'écart reste inférieur à 0,2 %. L'outil ne tient pas compte du relief : sur un terrain en pente, la surface le long du sol est plus grande que sa projection à plat.</p></details>
+      <details><summary>Peut-on utiliser ce résultat pour un document officiel ?</summary>
+        <p>Non. Les résultats sont indicatifs. Pour un document officiel (plan de lotissement, bornage, titre foncier), la surface doit être établie ou vérifiée par un géomètre agréé. L'outil sert à estimer, contrôler et préparer vos données.</p></details>
+      <details><summary>Comment calculer une surface dans QGIS ?</summary>
+        <p>Dans QGIS, ajoutez ou dessinez votre polygone, ouvrez la calculatrice de champ et créez un champ avec l'expression $area, qui donne la surface sur l'ellipsoïde du projet, ou area($geometry), qui donne la surface sur plan dans le système de coordonnées de la couche. Pour une parcelle en UTM zone 30N, la couche doit être en EPSG:32630. La <a href="../formation-qgis">formation QGIS de GeoExpert Academy</a> vous guide pas à pas sur ces étapes.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Allez plus loin avec QGIS</h2>
+    <p>Apprenez à calculer des surfaces et à gérer vos plans de parcelles dans QGIS, pas à pas, avec un accompagnement WhatsApp de 3 mois.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-qgis" class="btn btn-light">Voir la formation QGIS</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20QGIS%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="convertisseur-coordonnees.html" class="footer-legal-link">Outils</a>
+    <a href="calculateur-surface-parcelle.html" class="footer-legal-link">Calcul de surface</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page : les coordonnées saisies ne quittent jamais le navigateur. -->
+<script defer src="../script.js"></script>
+<script defer src="proj4.js"></script>
+<script defer src="convertisseur-coordonnees.js"></script>
+<script defer src="outils-commun.js"></script>
+<script defer src="convertisseur-import.js"></script>
+<script defer src="surface-moteur.js"></script>
+<script defer src="surface-ui.js"></script>
+</body>
+</html>
