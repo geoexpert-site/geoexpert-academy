@@ -301,10 +301,17 @@
       box.hidden = false;
       if (carte) { carte.remove(); carte = null; }
       carte = L.map(box, { scrollWheelZoom: false });
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      var plan = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
-      }).addTo(carte);
+      });
+      // Vue satellite : images Esri World Imagery (chargées seulement si l'utilisateur choisit « Satellite »)
+      var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19, maxNativeZoom: 18,
+        attribution: 'Tiles &copy; Esri &mdash; Source : Esri, Maxar, Earthstar Geographics et la communauté GIS'
+      });
+      plan.addTo(carte);
+      L.control.layers({ 'Plan (OpenStreetMap)': plan, 'Satellite (Esri)': satellite }, null, { collapsed: false }).addTo(carte);
       var coins = [];
       pts.forEach(function (r) {
         var p = document.createElement('div'); p.textContent = G.descriptionPoint(r);
