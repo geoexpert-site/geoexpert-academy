@@ -27,32 +27,9 @@
     });
   });
 
-  // --- Copier ---
-  function copier(texte) {
-    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(texte);
-    return new Promise(function (ok, ko) {
-      var ta = document.createElement('textarea');
-      ta.value = texte; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy') ? ok() : ko(); } catch (e) { ko(e); }
-      document.body.removeChild(ta);
-    });
-  }
-  function boutonCopier(texte, libelle) {
-    var b = document.createElement('button');
-    b.type = 'button'; b.className = 'cv-copy'; b.textContent = 'Copier';
-    b.setAttribute('aria-label', 'Copier ' + libelle);
-    b.addEventListener('click', function () {
-      copier(texte).then(function () {
-        b.textContent = 'Copié'; b.classList.add('ok');
-        setTimeout(function () { b.textContent = 'Copier'; b.classList.remove('ok'); }, 1600);
-      }, function () { b.textContent = 'Échec'; setTimeout(function () { b.textContent = 'Copier'; }, 1600); });
-    });
-    return b;
-  }
-
-  function afficherErreur(zone, message) { zone.className = 'cv-msg err'; zone.textContent = message; zone.hidden = false; }
-  function cacher(zone) { zone.hidden = true; zone.textContent = ''; }
+  // Fonctions partagées avec les autres outils (outils-commun.js)
+  var OC = window.OutilsCommun;
+  var boutonCopier = OC.boutonCopier, afficherErreur = OC.afficherErreur, cacher = OC.cacher, telecharger = OC.telecharger;
 
   function resultats(conteneur, items) {
     conteneur.textContent = '';
@@ -264,15 +241,6 @@
     bc.addEventListener('click', function () { setTimeout(function () { if (bc.textContent === 'Copier') bc.textContent = 'Copier le tableau'; }, 1700); });
     $('b-copy-wrap').appendChild(bc);
   });
-
-  function telecharger(contenu, type, nom) {
-    var blob = new Blob([contenu], { type: type });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = nom;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-  }
 
   $('b-csv').addEventListener('click', function () {
     if (!dernier) return;
