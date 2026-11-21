@@ -8,7 +8,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var MAX_POINTS = 500;
   var saisie = window.GeoSaisie.monter($('saisie'), {
-    id: 'v', titre: 'Points (un par ligne)',
+    id: 'v', titre: 'Points (un par ligne)', apresImport: function () { afficher(); },
     exemple: { utm: '388000; 592000\n388100; 592000\n388100; 592100\n388000; 592100', gps: '5.3600, -4.0083\n7.6906, -5.0300' }
   });
   var carte = null, calques = null, etat = { marqueurs: [], erreursTuiles: 0, tuilesChargees: 0 };

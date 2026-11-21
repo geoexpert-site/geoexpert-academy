@@ -23,6 +23,13 @@
         '<textarea id="' + id + '-txt" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="' + id + '-aide"></textarea>' +
         '<small id="' + id + '-aide"></small>' +
       '</div>' +
+      (opts.importer === false ? '' :
+      '<div class="cv-field cv-import" style="margin-bottom:14px">' +
+        '<label for="' + id + '-file">Importer un fichier de points</label>' +
+        '<input type="file" id="' + id + '-file" multiple accept=".csv,.txt,.tsv,.gpx,.kml,.geojson,.json">' +
+        '<small>Fichiers CSV, TXT, GPX, KML ou GeoJSON, un ou plusieurs à la fois (5 Mo maximum chacun). Le fichier est lu dans votre navigateur et n’est envoyé nulle part. Les points importés remplacent la liste ci-dessus.</small>' +
+        '<div id="' + id + '-import-msg" class="cv-msg info" role="status" hidden></div>' +
+      '</div>') +
       '<div class="sf-add">' +
         '<span class="cv-label">Ou ajoutez les points un par un</span>' +
         '<div class="cv-row2">' +
@@ -75,8 +82,65 @@
     $('add').addEventListener('click', ajouter);
     ['a', 'b'].forEach(function (k) { $(k).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); ajouter(); } }); });
 
+    // --- Import de fichiers (lus localement) ---
+    function lireTexte(f) {
+      return new Promise(function (ok, ko) {
+        var fr = new FileReader();
+        fr.onload = function () { ok(String(fr.result)); };
+        fr.onerror = function () { ko(new Error('lecture impossible')); };
+        fr.readAsText(f);
+      });
+    }
+    function meilleureZone(pts) { // zone 29N ou 30N où le plus de points tombent en Côte d'Ivoire
+      var best = 30, max = -1;
+      [29, 30].forEach(function (zz) {
+        var n = 0;
+        pts.forEach(function (p) { try { C.utmVersGps(p.est, p.nord, { z: zz, h: 'N' }, false); n++; } catch (e) {} });
+        if (n > max) { max = n; best = zz; }
+      });
+      return { zone: best, n: max };
+    }
+    function importer(input) {
+      var GI = root.GeoImport, msg = $('import-msg'), fichiers = Array.prototype.slice.call(input.files || []);
+      msg.hidden = true;
+      if (!fichiers.length) return;
+      if (!GI) { msg.className = 'cv-msg err'; msg.textContent = 'L’import de fichiers n’est pas disponible. Rechargez la page.'; msg.hidden = false; return; }
+      Promise.all(fichiers.map(function (f) {
+        if (f.size > GI.MAX_OCTETS) return Promise.resolve({ nom: f.name, erreur: 'fichier trop gros (5 Mo maximum)' });
+        return lireTexte(f).then(function (t) { var r = GI.lireSommets(f.name, t); r.nom = f.name; return r; }, function () { return { nom: f.name, erreur: 'lecture impossible' }; });
+      })).then(function (res) {
+        var gps = [], utm = [], erreurs = [], ignorees = 0, approx = false;
+        res.forEach(function (r) {
+          if (r.erreur) { erreurs.push(r.nom + ' : ' + r.erreur); return; }
+          if (!r.points.length) { erreurs.push(r.nom + ' : aucun point trouvé'); return; }
+          ignorees += r.ignorees || 0; if (r.approx) approx = true;
+          (r.mode === 'gps' ? gps : utm).push.apply(r.mode === 'gps' ? gps : utm, r.points);
+        });
+        var mode = gps.length >= utm.length ? 'gps' : 'utm', pts = mode === 'gps' ? gps : utm;
+        if (!pts.length) { msg.className = 'cv-msg err'; msg.textContent = 'Aucun point importé. ' + erreurs.join(' ; '); msg.hidden = false; input.value = ''; return; }
+        var info = pts.length + ' point' + (pts.length > 1 ? 's' : '') + ' importé' + (pts.length > 1 ? 's' : '') + ' (' + (mode === 'gps' ? 'GPS' : 'UTM') + ').';
+        if (gps.length && utm.length) info += ' Vos fichiers mélangent GPS et UTM : seuls les points ' + (mode === 'gps' ? 'GPS' : 'UTM') + ' ont été gardés, importez les autres séparément.';
+        if (ignorees) info += ' ' + ignorees + ' ligne' + (ignorees > 1 ? 's' : '') + ' ignorée' + (ignorees > 1 ? 's' : '') + ' (valeurs non numériques).';
+        var zone = null;
+        if (mode === 'utm' && pts.some(function (p) { return !p.zone; })) {
+          var mz = meilleureZone(pts.filter(function (p) { return !p.zone; }));
+          zone = mz.zone;
+          info += ' Le fichier n’indique pas la zone UTM : la zone ' + zone + 'N a été choisie automatiquement. Changez-la dans la liste si besoin.';
+        }
+        if (approx) info += ' Pour les lignes et polygones, le point utilisé est le centre approché de la forme.';
+        if (erreurs.length) info += ' Problème : ' + erreurs.join(' ; ') + '.';
+        saisie.definir(mode, zone, GI.versTexte(mode, pts));
+        msg.className = 'cv-msg info'; msg.textContent = info; msg.hidden = false;
+        input.value = '';
+        ecouteurs.forEach(function (f) { f('texte'); });
+        if (opts.apresImport) opts.apresImport();
+      });
+    }
+    if (opts.importer !== false) $('file').addEventListener('change', function () { importer(this); });
+
+    var saisie;
     majMode();
-    return {
+    return saisie = {
       mode: modeActuel,
       zone: function () { return parseInt($('zone').value, 10) || 0; },
       texte: function () { return $('txt').value; },

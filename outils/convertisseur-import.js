@@ -181,6 +181,58 @@
     return lireCsv(texte);
   }
 
+  // Comme lireFichier, mais pour GeoJSON et KML on garde TOUS les sommets des lignes et des polygones (contour extérieur,
+  // sans répéter le premier point à la fin), dans l'ordre du fichier. Sert aux outils qui travaillent sur des tracés
+  // (coordonnées vers KML, distance, visualiseur) : un fichier exporté par ces outils peut ainsi être ré-importé.
+  function enleverFermeture(pts) {
+    if (pts.length > 3 && pts[0].lat === pts[pts.length - 1].lat && pts[0].lon === pts[pts.length - 1].lon) return pts.slice(0, -1);
+    return pts;
+  }
+  function sommetsGeoJson(texte) {
+    var obj, points = [];
+    try { obj = JSON.parse(texte); } catch (e) { return { erreur: 'Fichier GeoJSON illisible.' }; }
+    function pt(c) { return (c && typeof c[0] === 'number' && typeof c[1] === 'number') ? { lat: c[1], lon: c[0] } : null; }
+    function suite(liste) { return (liste || []).map(pt).filter(Boolean); }
+    (function marcher(o) {
+      if (!o || typeof o !== 'object') return;
+      if (Array.isArray(o)) { o.forEach(marcher); return; }
+      var c = o.coordinates;
+      switch (o.type) {
+        case 'FeatureCollection': marcher(o.features); break;
+        case 'Feature': marcher(o.geometry); break;
+        case 'GeometryCollection': marcher(o.geometries); break;
+        case 'Point': if (pt(c)) points.push(pt(c)); break;
+        case 'MultiPoint': case 'LineString': if (Array.isArray(c)) points.push.apply(points, suite(c)); break;
+        case 'MultiLineString': if (Array.isArray(c)) c.forEach(function (l) { points.push.apply(points, suite(l)); }); break;
+        case 'Polygon': if (Array.isArray(c) && c[0]) points.push.apply(points, enleverFermeture(suite(c[0]))); break;
+        case 'MultiPolygon': if (Array.isArray(c)) c.forEach(function (p) { if (p && p[0]) points.push.apply(points, enleverFermeture(suite(p[0]))); }); break;
+      }
+    })(obj);
+    return { mode: 'gps', points: points, ignorees: 0 };
+  }
+  function sommetsKml(texte) {
+    var doc = analyserXml(texte);
+    if (!doc) return { erreur: 'Fichier KML illisible.' };
+    var points = [], els = doc.getElementsByTagName('coordinates');
+    for (var i = 0; i < els.length; i++) {
+      var parent = els[i].parentNode, nom = parent ? parent.localName : '';
+      if (nom !== 'Point' && nom !== 'LineString' && nom !== 'LinearRing') continue;
+      var interieur = false;
+      for (var a = parent.parentNode; a; a = a.parentNode) if (a.localName === 'innerBoundaryIs') interieur = true;
+      if (interieur) continue; // trous des polygones : ignorés
+      var pts = coordsKml(els[i]);
+      points.push.apply(points, nom === 'LinearRing' ? enleverFermeture(pts) : pts);
+    }
+    return { mode: 'gps', points: points, ignorees: 0 };
+  }
+  function lireSommets(nom, texte) {
+    var ext = (/\.([a-z0-9]+)$/i.exec(nom) || [, ''])[1].toLowerCase();
+    var debut = texte.replace(/^﻿/, '').trimStart().charAt(0);
+    if (ext === 'geojson' || ext === 'json' || (!ext && debut === '{')) return sommetsGeoJson(texte);
+    if (ext === 'kml' || (!ext && debut === '<' && !/<gpx/i.test(texte))) return sommetsKml(texte);
+    return lireFichier(nom, texte);
+  }
+
   // Met les points au format de la zone de texte « Plusieurs points ».
   function versTexte(mode, points) {
     return points.map(function (p) {
@@ -346,5 +398,5 @@
     return r.erreur ? r : parcellesCsv(r);
   }
 
-  root.GeoImport = { lireFichier: lireFichier, lireParcelles: lireParcelles, versTexte: versTexte, MAX_OCTETS: MAX_OCTETS };
+  root.GeoImport = { lireFichier: lireFichier, lireSommets: lireSommets, lireParcelles: lireParcelles, versTexte: versTexte, MAX_OCTETS: MAX_OCTETS };
 })(window);

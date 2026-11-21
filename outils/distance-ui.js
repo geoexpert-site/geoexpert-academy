@@ -5,7 +5,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var dernier = null;
   var saisie = window.GeoSaisie.monter($('saisie'), {
-    id: 'd', titre: 'Points (2 points, ou plus pour un cheminement)',
+    id: 'd', titre: 'Points (2 points, ou plus pour un cheminement)', apresImport: function () { calculer(); },
     aide: {
       utm: 'Un point par ligne : Est, Nord (et la zone si besoin). Avec plus de 2 points, l’outil calcule chaque segment et la distance totale. Exemple : 388000; 592000',
       gps: 'Un point par ligne : latitude, longitude en degrés décimaux. Avec plus de 2 points, l’outil calcule chaque segment et la distance totale. Exemple : 5.3600, -4.0083'

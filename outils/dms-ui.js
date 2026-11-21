@@ -87,5 +87,30 @@
     $('c-txt').value = '5.3600, -4.0083\n5°21\'36"N 4°0\'29.88"W\n7.6906; -5.0300\n9°27\'28.8"N; 5°37\'46.56"O\n';
     $('c-go').click();
   });
-  $('c-clear').addEventListener('click', function () { $('c-txt').value = ''; effacerListe(); });
+  // Import de fichier : CSV/TXT lus tels quels si ce sont des lignes DMS ; GPX, KML, GeoJSON et CSV décimaux passés par l'import commun
+  $('c-file').addEventListener('change', function () {
+    var input = this, f = (input.files || [])[0], msg = $('c-import-msg'), GI = window.GeoImport;
+    msg.hidden = true; if (!f) return;
+    function dire(t, err) { msg.className = 'cv-msg ' + (err ? 'err' : 'info'); msg.textContent = t; msg.hidden = false; }
+    if (f.size > GI.MAX_OCTETS) { dire('Fichier trop gros (5 Mo maximum).', true); input.value = ''; return; }
+    var fr = new FileReader();
+    fr.onerror = function () { dire('Lecture du fichier impossible.', true); };
+    fr.onload = function () {
+      var texte = String(fr.result), brut = /\.(csv|txt|tsv)$/i.test(f.name), r = GI.lireFichier(f.name, texte), ligne = null;
+      if (texte.trim() === '') { dire('Le fichier est vide.', true); input.value = ''; return; }
+      if (!r.erreur && r.points && r.points.length && r.mode === 'gps' && !r.ignorees) {
+        ligne = r.points.map(function (p) { return p.lat + ', ' + p.lon; }).join(String.fromCharCode(10));
+        dire(r.points.length + ' point' + (r.points.length > 1 ? 's' : '') + ' importé' + (r.points.length > 1 ? 's' : '') + '.', false);
+      } else if (brut) {
+        ligne = texte.charAt(0) === String.fromCharCode(65279) ? texte.slice(1) : texte;
+        dire('Fichier lu tel quel : une ligne par point, latitude puis longitude (DMS ou décimal). Les lignes non reconnues sont signalées dans le tableau.', false);
+      } else {
+        dire('Aucun point GPS trouvé dans ce fichier. ' + (r.erreur || ''), true);
+      }
+      input.value = '';
+      if (ligne !== null) { $('c-txt').value = ligne; $('c-go').click(); }
+    };
+    fr.readAsText(f);
+  });
+  $('c-clear').addEventListener('click', function () { $('c-txt').value = ''; effacerListe(); OC.cacher($('c-import-msg')); });
 })();
