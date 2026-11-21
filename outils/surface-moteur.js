@@ -4,23 +4,11 @@
    Séparé de l'interface pour pouvoir être testé sous Node. */
 (function (root) {
   'use strict';
-  var C = root.GeoConv;
-  if (!C) throw new Error('GeoConv (convertisseur-coordonnees.js) doit être chargé avant ce fichier');
+  var C = root.GeoConv, P = root.GeoPoints;
+  if (!C || !P) throw new Error('GeoConv (convertisseur-coordonnees.js) et GeoPoints (outils-points.js) doivent être chargés avant ce fichier');
 
-  var MAX_POINTS = 2000;
+  var MAX_POINTS = P.MAX_POINTS;
   var DISTANCE_MAX = 50000; // mètres : au-delà, probable erreur de saisie
-
-  // --- Lecture d'une ligne : séparateurs ; tabulation, virgule ou espaces (virgule décimale acceptée) ---
-  function jetons(ligne) {
-    var l = ligne.trim();
-    if (/[;\t]/.test(l)) return l.split(/[;\t]/).map(function (s) { return s.trim(); }).filter(function (s, i, a) { return s !== '' || i < a.length - 1; });
-    if (l.indexOf(',') >= 0) {
-      var c = l.split(',').map(function (s) { return s.trim(); });
-      var tousNombres = c.slice(0, 2).every(function (s) { return !isNaN(C.lireNombre(s)); });
-      if (c.length <= 3 && c.every(function (s) { return s !== ''; }) && tousNombres) return c;
-    }
-    return l.split(/\s+/);
-  }
 
   function formatHaAca(surface) {
     var c = Math.floor(Math.round(surface * 1e6) / 1e6); // centiares entiers (les décimales sont tronquées)
@@ -61,64 +49,10 @@
   // zone : 29 ou 30 (zone par défaut pour l'UTM, ou zone imposée pour le GPS) ; 0 = automatique (GPS seulement).
   // Renvoie { ok:false, erreur } ou { ok:true, ... résultats }.
   function analyser(texte, mode, zone) {
-    var lignes = String(texte || '').split(/\r?\n/), brutes = [];
-    lignes.forEach(function (l, i) { if (l.trim() !== '') brutes.push({ n: i + 1, t: l }); });
-    // Ligne d'en-tête (aucun chiffre) : ignorée
-    if (brutes.length && !/\d/.test(brutes[0].t)) brutes.shift();
-    if (brutes.length > MAX_POINTS) return { ok: false, erreur: 'Trop de points (' + brutes.length + ') : cet outil en accepte ' + MAX_POINTS + ' au maximum.' };
-    if (!brutes.length) return { ok: false, erreur: 'Saisissez au moins 3 points : un par ligne, dans l’ordre du contour.' };
-
-    var pts = [], avert = [];
-    var i, p;
-    try {
-      if (mode === 'gps') {
-        var gps = brutes.map(function (b) {
-          var j = jetons(b.t);
-          if (j.length !== 2) throw new Error('Ligne ' + b.n + ' : format attendu « latitude, longitude » (deux valeurs). Exemple : 5.3600, -4.0083');
-          var lat = C.lireNombre(j[0]), lon = C.lireNombre(j[1]);
-          if (isNaN(lat) || isNaN(lon)) throw new Error('Ligne ' + b.n + ' : valeur non numérique. La latitude et la longitude doivent être des nombres, par exemple 5.3600 et -4.0083.');
-          return { n: b.n, lat: lat, lon: lon };
-        });
-        var zz = zone;
-        if (!zz) {
-          var moy = gps.reduce(function (s, g) { return s + g.lon; }, 0) / gps.length;
-          zz = C.zoneDepuisLongitude(moy);
-          if (zz !== 29 && zz !== 30) throw new Error('Ces points sont en dehors de la Côte d’Ivoire (zones UTM 29N et 30N). Vérifiez vos valeurs.');
-        }
-        var zonesPts = {};
-        gps.forEach(function (g) {
-          var u;
-          try { u = C.gpsVersUtm(g.lat, g.lon, { z: zz, h: 'N' }, false); }
-          catch (e) { throw new Error('Ligne ' + g.n + ' : ' + e.message); }
-          zonesPts[C.zoneDepuisLongitude(g.lon)] = true;
-          pts.push({ n: g.n, x: u.easting, y: u.northing, lat: g.lat, lon: g.lon });
-        });
-        if (Object.keys(zonesPts).length > 1) avert.push('Votre parcelle est à cheval sur les zones UTM 29N et 30N : tous les points ont été calculés dans la zone ' + zz + 'N.');
-        zone = zz;
-      } else {
-        var zonesVues = {};
-        var lues = brutes.map(function (b) {
-          var j = jetons(b.t);
-          if (j.length < 2 || j.length > 3) throw new Error('Ligne ' + b.n + ' : format attendu « Est, Nord » ou « Est, Nord, zone » (par exemple 388000, 592000, 30N).');
-          var est = C.lireNombre(j[0]), nord = C.lireNombre(j[1]);
-          if (isNaN(est) || isNaN(nord)) throw new Error('Ligne ' + b.n + ' : valeur non numérique. L’Est et le Nord doivent être des nombres, par exemple 388000 et 592000.');
-          var z = j.length === 3 ? C.lireZone(j[2], false) : (zone ? { z: zone, h: 'N' } : null);
-          if (j.length === 3 && !z) throw new Error('Ligne ' + b.n + ' : zone invalide, écrivez 29N ou 30N.');
-          if (!z) throw new Error('Ligne ' + b.n + ' : zone manquante. Ajoutez-la en 3e colonne (29N ou 30N) ou choisissez-la dans la liste.');
-          zonesVues[z.z] = true;
-          return { n: b.n, est: est, nord: nord, z: z };
-        });
-        var listeZ = Object.keys(zonesVues);
-        if (listeZ.length > 1) throw new Error('Les points sont dans des zones UTM différentes (29N et 30N). Tous les points d’une parcelle doivent être dans la même zone : convertissez-les d’abord dans une seule zone.');
-        lues.forEach(function (l) {
-          var g;
-          try { g = C.utmVersGps(l.est, l.nord, l.z, false); }
-          catch (e) { throw new Error('Ligne ' + l.n + ' : ' + e.message); }
-          pts.push({ n: l.n, x: l.est, y: l.nord, lat: g.lat, lon: g.lon });
-        });
-        zone = parseInt(listeZ[0], 10);
-      }
-    } catch (e) { return { ok: false, erreur: e.message }; }
+    var lec = P.lire(texte, mode, zone, { parcelle: true, messageVide: 'Saisissez au moins 3 points : un par ligne, dans l’ordre du contour.' });
+    if (!lec.ok) return lec;
+    var pts = lec.points, avert = lec.avertissements.slice(), i;
+    zone = lec.zone;
 
     // Polygone refermé automatiquement : on retire le dernier point s'il répète le premier
     if (pts.length > 3 && Math.hypot(pts[0].x - pts[pts.length - 1].x, pts[0].y - pts[pts.length - 1].y) < 1e-6) {
@@ -245,6 +179,6 @@
 
   root.GeoSurface = {
     analyser: analyser, formatHaAca: formatHaAca, texteResultat: texteResultat, texteHaAca: texteHaAca,
-    versCsv: versCsv, versCsvParcelles: versCsvParcelles, dessinSvg: dessinSvg, fr: fr, jetons: jetons, MAX_POINTS: MAX_POINTS
+    versCsv: versCsv, versCsvParcelles: versCsvParcelles, dessinSvg: dessinSvg, fr: fr, jetons: P.jetons, MAX_POINTS: MAX_POINTS
   };
 })(typeof window !== 'undefined' ? window : globalThis);

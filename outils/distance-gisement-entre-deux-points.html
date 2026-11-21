@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance et gisement entre deux points (UTM, GPS) | GeoExpert Academy</title>
+<meta name="description" content="Calculez gratuitement la distance, l'azimut et le gisement en grades entre deux points UTM ou GPS, ou le long d'un cheminement. Rien n'est envoyé.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/distance-gisement-entre-deux-points">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/distance-gisement-entre-deux-points">
+<meta property="og:title" content="Distance et gisement entre deux points">
+<meta property="og:description" content="Calculez gratuitement la distance, l'azimut et le gisement en grades entre deux points UTM ou GPS, ou le long d'un cheminement. Rien n'est envoyé.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Quelle est la différence entre azimut et gisement ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "L'azimut est l'angle compté depuis le Nord dans le sens horaire, de 0 à 360 degrés. Le gisement désigne la même direction, mais exprimée en grades (gon, de 0 à 400) et comptée depuis le Nord du quadrillage de la carte. Pour passer des degrés aux grades, on multiplie par 400 et on divise par 360 : 90 degrés valent 100 gon."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Comment calculer la distance entre deux points GPS ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Il ne suffit pas d'appliquer le théorème de Pythagore sur des degrés, car un degré de longitude et un degré de latitude n'ont pas la même longueur. Cet outil calcule la distance sur l'ellipsoïde WGS84, le modèle de la Terre utilisé par le GPS. Pour des points en UTM, il calcule la distance à plat sur le plan, en mètres."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Qu'est-ce que l'azimut inverse ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "C'est l'azimut pour aller du point 2 vers le point 1. Sur un plan, il vaut l'azimut aller plus 180 degrés (ou moins 180, pour rester entre 0 et 360). Avec des points GPS sur de longues distances, il peut s'écarter un peu de cette règle, car la Terre est courbe : l'outil le calcule directement."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Peut-on calculer la longueur d'un chemin avec plusieurs points ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Oui. Saisissez les points dans l'ordre du parcours, un par ligne : l'outil calcule la distance de chaque segment et la distance totale. Vous pouvez copier le résultat ou le télécharger en CSV."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Ce résultat est-il utilisable pour un document officiel ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Non, les résultats sont indicatifs. Pour un document officiel (plan, bornage, titre foncier), les mesures doivent être établies ou vérifiées par un géomètre agréé. L'outil sert à contrôler et à préparer vos données."
+   }
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+<link rel="stylesheet" href="outils-index.css">
+<link rel="stylesheet" href="surface.css">
+<link rel="stylesheet" href="outils-sig.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html">Outils SIG</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li><a href="index.html">Outils SIG</a></li>
+    <li aria-current="page">Distance et gisement entre deux points</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <p class="ot-all"><a href="index.html">← Tous les outils SIG</a></p>
+    <h1>Distance et gisement entre deux points</h1>
+    <p class="cv-lead">Outil gratuit : saisissez deux points en UTM ou en GPS et obtenez la distance, l'azimut en degrés et le gisement en grades. Plusieurs points ? Vous obtenez chaque segment et le total.</p>
+    <p class="cv-privacy">Vos coordonnées restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour l'utiliser.</p></noscript>
+    <div class="cv-card">
+      <div id="saisie"></div>
+
+      <div class="cv-actions" style="margin-top:16px">
+        <button type="button" class="btn btn-primary" id="d-calc">Calculer</button>
+        <button type="button" class="btn btn-outline" id="d-exemple">Exemple</button>
+        <button type="button" class="btn btn-outline" id="d-clear">Effacer</button>
+      </div>
+      <div id="d-msg" class="cv-msg err" role="alert" hidden></div>
+      <div id="d-warn" class="sf-warn" aria-live="polite"></div>
+      <div id="d-res" class="cv-result" aria-live="polite"></div>
+      <div id="d-table" class="cv-table-wrap"></div>
+      <p id="d-methode" class="cv-hint" hidden></p>
+      <div id="d-actions" class="cv-actions" hidden style="margin-top:14px">
+        <span id="d-copy-wrap"></span>
+        <button type="button" class="btn btn-outline" id="d-csv">Télécharger en CSV</button>
+      </div>
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir les mesures par un géomètre agréé.</p>
+      <p class="cv-scope">Les points doivent être en Côte d'Ivoire (zones UTM 29N et 30N). En UTM, tous les points doivent être dans la même zone. Pour un cheminement (plus de 2 points), saisissez-les dans l'ordre du parcours.</p>
+      <p class="cv-scope">Vos coordonnées sont dans un autre format ? <a href="convertisseur-coordonnees.html">Convertissez-les d'abord avec notre convertisseur GPS ⇄ UTM</a>. Pour voir vos points sur une carte, utilisez le <a href="visualiseur-coordonnees-carte.html">visualiseur de coordonnées</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert cet outil ?</h2>
+    <p>Cet outil donne la distance entre deux points à partir de leurs coordonnées, ainsi que la direction à suivre pour aller de l'un à l'autre. Il sert à contrôler une mesure de terrain, à vérifier un cheminement ou à préparer un levé.</p>
+    <p>La direction est donnée de deux façons : l'azimut, en degrés de 0 à 360 depuis le Nord dans le sens des aiguilles d'une montre, et le gisement en grades (gon), l'unité utilisée par de nombreux instruments topographiques (un tour complet fait 400 gon). L'outil indique aussi l'azimut inverse, c'est-à-dire celui du retour.</p>
+    <p>Si vous saisissez plus de deux points, l'outil traite la liste comme un cheminement : il calcule la distance de chaque segment, puis la distance totale.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Comment ça marche ?</h2>
+    <p>Avec des points <strong>UTM</strong>, la distance se calcule à plat sur le plan : racine carrée de (écart en Est)² + (écart en Nord)². L'azimut est l'angle entre la direction du Nord et la ligne qui joint les deux points. Avec des points <strong>GPS</strong>, la distance est calculée sur l'ellipsoïde WGS84, c'est-à-dire en suivant la courbure de la Terre, et non à plat.</p>
+    <div class="cv-example">
+      <strong>Exemple : deux points en UTM 30N</strong><br>
+      Point 1 : <code>388000; 592000</code> · Point 2 : <code>388300; 592400</code><br>
+      Écart en Est : 300 m. Écart en Nord : 400 m. Distance : √(300² + 400²) = √250 000 = <strong>500 m</strong> (0,5 km).<br>
+      Azimut : l'angle depuis le Nord est arctan(300 ÷ 400) = <strong>36,8699 °</strong>, soit <strong>40,9666 gon</strong> (36,8699 × 400 ÷ 360).<br>
+      Azimut inverse (de 2 vers 1) : 36,8699 + 180 = <strong>216,8699 °</strong>, soit 240,9666 gon.
+    </div>
+    <p style="margin-top:16px"><strong>Plan ou ellipsoïde ?</strong> Pour des points UTM, la distance à plat diffère légèrement de la distance sur l'ellipsoïde. D'après nos mesures sur 5 paires de points en Côte d'Ivoire (de 100 m à 533 km), l'écart va de −0,025 % à +0,085 %. Pour des points GPS, notre calcul concorde avec la bibliothèque de référence pyproj (Geod) à moins de 0,01 mm près, sur 6 paires de points de 100 m à 533 km.</p>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Quelle est la différence entre azimut et gisement ?</summary>
+        <p>L'azimut est l'angle compté depuis le Nord dans le sens horaire, de 0 à 360 degrés. Le gisement désigne la même direction, mais exprimée en grades (gon, de 0 à 400) et comptée depuis le Nord du quadrillage de la carte. Pour passer des degrés aux grades, on multiplie par 400 et on divise par 360 : 90 degrés valent 100 gon.</p></details>
+      <details><summary>Comment calculer la distance entre deux points GPS ?</summary>
+        <p>Il ne suffit pas d'appliquer le théorème de Pythagore sur des degrés, car un degré de longitude et un degré de latitude n'ont pas la même longueur. Cet outil calcule la distance sur l'ellipsoïde WGS84, le modèle de la Terre utilisé par le GPS. Pour des points en UTM, il calcule la distance à plat sur le plan, en mètres.</p></details>
+      <details><summary>Qu'est-ce que l'azimut inverse ?</summary>
+        <p>C'est l'azimut pour aller du point 2 vers le point 1. Sur un plan, il vaut l'azimut aller plus 180 degrés (ou moins 180, pour rester entre 0 et 360). Avec des points GPS sur de longues distances, il peut s'écarter un peu de cette règle, car la Terre est courbe : l'outil le calcule directement.</p></details>
+      <details><summary>Peut-on calculer la longueur d'un chemin avec plusieurs points ?</summary>
+        <p>Oui. Saisissez les points dans l'ordre du parcours, un par ligne : l'outil calcule la distance de chaque segment et la distance totale. Vous pouvez copier le résultat ou le télécharger en CSV.</p></details>
+      <details><summary>Ce résultat est-il utilisable pour un document officiel ?</summary>
+        <p>Non, les résultats sont indicatifs. Pour un document officiel (plan, bornage, titre foncier), les mesures doivent être établies ou vérifiées par un géomètre agréé. L'outil sert à contrôler et à préparer vos données.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Autres outils gratuits</h2>
+    <ul class="sig-liens">
+        <li><a href="calculateur-surface-parcelle.html">Calculateur de surface de parcelle</a></li>
+        <li><a href="visualiseur-coordonnees-carte.html">Visualiseur de coordonnées sur une carte</a></li>
+        <li><a href="convertisseur-coordonnees.html">Convertisseur de coordonnées GPS ⇄ UTM</a></li>
+        <li><a href="calculateur-echelle.html">Calculateur d’échelle</a></li>
+        <li><a href="index.html">Tous les outils SIG</a></li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Allez plus loin avec QGIS</h2>
+    <p>Mesurer des distances, tracer des cheminements et analyser vos données de terrain se fait dans QGIS. Apprenez à l'utiliser pas à pas, avec un accompagnement WhatsApp de 3 mois.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-qgis" class="btn btn-light">Voir la formation QGIS</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20QGIS%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="index.html" class="footer-legal-link">Tous les outils SIG</a>
+    <a href="distance-gisement-entre-deux-points.html" class="footer-legal-link">Distance et gisement entre deux points</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page. -->
+<script defer src="../script.js"></script>
+<script defer src="proj4.js"></script>
+<script defer src="convertisseur-coordonnees.js"></script>
+<script defer src="outils-commun.js"></script>
+<script defer src="outils-points.js"></script>
+<script defer src="saisie-points.js"></script>
+<script defer src="distance-moteur.js"></script>
+<script defer src="distance-ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertisseur d'unités de surface : m², are, hectare, acre, lot | GeoExpert Academy</title>
+<meta name="description" content="Convertissez gratuitement m², ares, hectares, ha-a-ca, km², acres et lots. Toutes les conversions en même temps, dans votre navigateur.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/convertisseur-unites-surface">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/convertisseur-unites-surface">
+<meta property="og:title" content="Convertisseur d'unités de surface (m², are, hectare, acre, lot)">
+<meta property="og:description" content="Convertissez gratuitement m², ares, hectares, ha-a-ca, km², acres et lots. Toutes les conversions en même temps, dans votre navigateur.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Combien d'ares dans un hectare ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Un hectare vaut 100 ares, soit 10 000 mètres carrés. Un are vaut 100 centiares, et un centiare vaut 1 mètre carré. Ainsi, 1 ha 23 a 45 ca font 12 345 m²."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Quelle est la taille d'un lot en Côte d'Ivoire ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Il n'y a pas une taille unique : elle dépend des communes et des lotissements. Cet outil propose 600 m² au départ, une valeur courante, mais elle n'est pas officielle. Vous pouvez la modifier dans le champ prévu, pour que les conversions correspondent à votre cas. Pour une taille précise, référez-vous à votre document de lotissement."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Combien de m² dans un acre ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Un acre vaut exactement 4 046,8564224 m², soit environ 0,4047 hectare. Inversement, un hectare vaut environ 2,471 acres."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Comment écrire une surface en ha-a-ca ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "On écrit d'abord les hectares entiers, puis les ares entiers du reste, puis les centiares restants. Par exemple, 12 345,67 m² s'écrivent 1 ha 23 a 45,67 ca. Dans cet outil, le reste est affiché avec deux décimales, et le total est toujours cohérent (par exemple 99,996 m² deviennent 1 a 0 ca)."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Peut-on utiliser ces conversions pour un document officiel ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Les conversions de ce convertisseur sont exactes, mais la surface d'un terrain pour un document officiel (titre foncier, plan de lotissement, bornage) doit être établie ou vérifiée par un géomètre agréé. L'outil sert à convertir et à contrôler des valeurs."
+   }
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+<link rel="stylesheet" href="outils-index.css">
+<link rel="stylesheet" href="surface.css">
+<link rel="stylesheet" href="outils-sig.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html">Outils SIG</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li><a href="index.html">Outils SIG</a></li>
+    <li aria-current="page">Convertisseur d'unités de surface</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <p class="ot-all"><a href="index.html">← Tous les outils SIG</a></p>
+    <h1>Convertisseur d'unités de surface</h1>
+    <p class="cv-lead">Outil gratuit : saisissez une surface dans une unité (m², are, hectare, ha-a-ca, km², acre ou lot) et voyez toutes les autres conversions en même temps.</p>
+    <p class="cv-privacy">Vos valeurs restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour l'utiliser.</p></noscript>
+    <div class="cv-card">
+      <div class="cv-unit-in">
+        <div class="cv-field"><label for="u-unite">Unité de départ</label><select id="u-unite"></select></div>
+        <div class="cv-field" id="u-simple"><label for="u-val">Valeur</label><input type="text" id="u-val" inputmode="decimal" autocomplete="off" placeholder="12 345,67"></div>
+        <div class="cv-field" id="u-haaca" hidden>
+          <span class="cv-label">Hectares, ares, centiares</span>
+          <div class="cv-haaca">
+            <div><label for="u-ha">ha</label><input type="text" id="u-ha" inputmode="decimal" autocomplete="off" placeholder="1"></div>
+            <div><label for="u-a">a</label><input type="text" id="u-a" inputmode="decimal" autocomplete="off" placeholder="23"></div>
+            <div><label for="u-ca">ca</label><input type="text" id="u-ca" inputmode="decimal" autocomplete="off" placeholder="45"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-field" style="margin-bottom:14px">
+        <label for="u-lot">Taille d'un lot (en m²)</label>
+        <input type="text" id="u-lot" inputmode="decimal" autocomplete="off">
+        <small>Valeur de départ : 600 m², une taille courante pour un lot en Côte d'Ivoire. <strong>Elle est modifiable et n'est pas officielle</strong> : la taille d'un lot varie selon les communes et les lotissements. Mettez celle de votre cas.</small>
+      </div>
+
+      <div class="cv-actions">
+        <button type="button" class="btn btn-outline" id="u-exemple">Exemple</button>
+        <button type="button" class="btn btn-outline" id="u-clear">Effacer</button>
+      </div>
+      <div id="u-msg" class="cv-msg err" role="alert" hidden></div>
+      <div id="u-res" class="cv-result" aria-live="polite"></div>
+      <p id="u-note" class="cv-hint" aria-live="polite"></p>
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir les surfaces par un géomètre agréé.</p>
+      <p class="cv-scope">Un hectare vaut 10 000 m², un are vaut 100 m², un centiare vaut 1 m², un acre vaut 4 046,8564224 m². Ces valeurs sont exactes. La taille d'un <strong>lot</strong> est la seule valeur que vous pouvez changer.</p>
+      <p class="cv-scope">Vous voulez calculer la surface d'un terrain à partir de ses coordonnées ? <a href="calculateur-surface-parcelle.html">Utilisez le calculateur de surface de parcelle</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert cet outil ?</h2>
+    <p>Les surfaces de terrains s'écrivent de plusieurs façons : en mètres carrés sur un plan, en hectares pour une plantation, en ha-a-ca sur un document foncier, en lots dans un lotissement, ou en acres dans des documents anglo-saxons. Cet outil passe de l'une à l'autre sans calcul à la main.</p>
+    <p>Vous saisissez une valeur dans l'unité de votre choix et toutes les conversions s'affichent en même temps, avec un bouton pour copier chaque résultat. L'unité « ha-a-ca » se saisit avec trois champs : hectares, ares et centiares.</p>
+    <p>La taille d'un lot n'est pas la même partout. Vous pouvez la modifier pour que les conversions correspondent à votre commune ou à votre lotissement.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Comment ça marche ?</h2>
+    <p>Chaque valeur est d'abord convertie en mètres carrés, puis en toutes les autres unités, avec les facteurs exacts : 1 ha = 10 000 m², 1 a = 100 m², 1 ca = 1 m², 1 km² = 1 000 000 m² et 1 acre = 4 046,8564224 m². Pour le ha-a-ca, on prend les hectares entiers, puis les ares entiers du reste, puis le reste en centiares.</p>
+    <div class="cv-example">
+      <strong>Exemple : 12 345,67 m²</strong><br>
+      12 345,67 m² = <code>1,234567 ha</code> = <code>123,4567 a</code> = <code>0,01234567 km²</code><br>
+      En ha-a-ca : 1 hectare (10 000 m²), puis 23 ares (2 300 m²), puis 45,67 centiares : <strong>1 ha 23 a 45,67 ca</strong>. En centiares entiers, c'est 1 ha 23 a 45 ca, avec un reste de 0,67 ca.<br>
+      En acres : 12 345,67 ÷ 4 046,8564224 ≈ <code>3,050681</code> acres. En lots de 600 m² : 12 345,67 ÷ 600 ≈ <code>20,57612</code> lots.
+    </div>
+    <p style="margin-top:16px">Les nombres s'écrivent à la française : virgule pour les décimales, espace pour les milliers. Vous pouvez saisir une virgule ou un point pour les décimales : « 12 345,67 » et « 12345.67 » donnent le même résultat.</p>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Combien d'ares dans un hectare ?</summary>
+        <p>Un hectare vaut 100 ares, soit 10 000 mètres carrés. Un are vaut 100 centiares, et un centiare vaut 1 mètre carré. Ainsi, 1 ha 23 a 45 ca font 12 345 m².</p></details>
+      <details><summary>Quelle est la taille d'un lot en Côte d'Ivoire ?</summary>
+        <p>Il n'y a pas une taille unique : elle dépend des communes et des lotissements. Cet outil propose 600 m² au départ, une valeur courante, mais elle n'est pas officielle. Vous pouvez la modifier dans le champ prévu, pour que les conversions correspondent à votre cas. Pour une taille précise, référez-vous à votre document de lotissement.</p></details>
+      <details><summary>Combien de m² dans un acre ?</summary>
+        <p>Un acre vaut exactement 4 046,8564224 m², soit environ 0,4047 hectare. Inversement, un hectare vaut environ 2,471 acres.</p></details>
+      <details><summary>Comment écrire une surface en ha-a-ca ?</summary>
+        <p>On écrit d'abord les hectares entiers, puis les ares entiers du reste, puis les centiares restants. Par exemple, 12 345,67 m² s'écrivent 1 ha 23 a 45,67 ca. Dans cet outil, le reste est affiché avec deux décimales, et le total est toujours cohérent (par exemple 99,996 m² deviennent 1 a 0 ca).</p></details>
+      <details><summary>Peut-on utiliser ces conversions pour un document officiel ?</summary>
+        <p>Les conversions de ce convertisseur sont exactes, mais la surface d'un terrain pour un document officiel (titre foncier, plan de lotissement, bornage) doit être établie ou vérifiée par un géomètre agréé. L'outil sert à convertir et à contrôler des valeurs.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Autres outils gratuits</h2>
+    <ul class="sig-liens">
+        <li><a href="calculateur-surface-parcelle.html">Calculateur de surface de parcelle</a></li>
+        <li><a href="convertisseur-coordonnees.html">Convertisseur de coordonnées GPS ⇄ UTM</a></li>
+        <li><a href="coordonnees-vers-kml-geojson.html">Coordonnées vers KML / GeoJSON / CSV</a></li>
+        <li><a href="calculateur-echelle.html">Calculateur d’échelle</a></li>
+        <li><a href="index.html">Tous les outils SIG</a></li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Mesurez vos surfaces avec QGIS</h2>
+    <p>Dans QGIS, vous calculez la surface de vos parcelles à partir de couches de polygones. Apprenez à le faire pas à pas, avec un accompagnement WhatsApp de 3 mois.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-qgis" class="btn btn-light">Voir la formation QGIS</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20QGIS%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="index.html" class="footer-legal-link">Tous les outils SIG</a>
+    <a href="convertisseur-unites-surface.html" class="footer-legal-link">Convertisseur d'unités de surface</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page. -->
+<script defer src="../script.js"></script>
+<script defer src="outils-commun.js"></script>
+<script defer src="unites-moteur.js"></script>
+<script defer src="unites-ui.js"></script>
+</body>
+</html>

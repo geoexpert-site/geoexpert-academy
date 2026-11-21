@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertisseur DMS en degrés décimaux (et inversement) | GeoExpert Academy</title>
+<meta name="description" content="Convertissez gratuitement des coordonnées en degrés-minutes-secondes (DMS) en degrés décimaux, et inversement. Liste de points, copie et CSV.">
+<link rel="canonical" href="https://geoexpertacademy.ci/outils/convertisseur-dms-degres-decimaux">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="GeoExpert Academy &amp; Consulting">
+<meta property="og:url" content="https://geoexpertacademy.ci/outils/convertisseur-dms-degres-decimaux">
+<meta property="og:title" content="Convertisseur DMS ⇄ degrés décimaux">
+<meta property="og:description" content="Convertissez gratuitement des coordonnées en degrés-minutes-secondes (DMS) en degrés décimaux, et inversement. Liste de points, copie et CSV.">
+<meta property="og:image" content="https://geoexpertacademy.ci/images/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Comment convertir des degrés-minutes-secondes en degrés décimaux ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Divisez les minutes par 60, divisez les secondes par 3 600, puis additionnez le tout aux degrés. Par exemple, 5° 21′ 36″ font 5 + 21 ÷ 60 + 36 ÷ 3 600 = 5,36 degrés. Pour le Sud et l'Ouest, la valeur est négative. Cet outil fait ce calcul pour vous."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Pourquoi la longitude de la Côte d'Ivoire est-elle négative ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "La longitude est comptée à partir du méridien de Greenwich : positive vers l'est, négative vers l'ouest. La Côte d'Ivoire est à l'ouest de ce méridien, donc ses longitudes sont négatives (par exemple −4,0083 pour Abidjan). Elles s'écrivent aussi 4° 0′ 29,88″ Ouest, avec la lettre O ou W."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Quelles écritures l'outil accepte-t-il ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Par exemple 5°20'30.5\"N, 5 20 30.5 N, 5° 20′ 30,5″, N 5 20 30.5, ou en décimal 5.3418 et -4.0083. La virgule ou le point peuvent servir de séparateur décimal. Pour l'ouest, vous pouvez écrire O, W, Ouest, ou mettre un signe moins."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Pourquoi les secondes ne peuvent-elles pas valoir 60 ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Parce que 60 secondes font 1 minute, et 60 minutes font 1 degré. Quand un arrondi donnerait 60 secondes, l'outil passe à la minute suivante (ou au degré suivant) : 59,9999 secondes deviennent donc 0 seconde de la minute suivante."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Combien de décimales faut-il pour un GPS précis ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Un degré de latitude fait environ 111 km, donc la 5e décimale correspond à environ 1 mètre et la 6e décimale à environ 10 centimètres. Cet outil garde 8 décimales (environ 1 millimètre), ce qui est plus fin que la précision d'un GPS ordinaire."
+   }
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../titres-accueil.css">
+<link rel="stylesheet" href="../formation-page.css">
+<link rel="stylesheet" href="convertisseur.css">
+<link rel="stylesheet" href="outils-index.css">
+<link rel="stylesheet" href="surface.css">
+<link rel="stylesheet" href="outils-sig.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="eager">
+      </picture>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-item">
+        <a href="../index.html">Accueil</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../index.html#formations">Formations</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Formations">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../index.html#formations">
+            <strong>Formations en direct</strong>
+            <small>Nos sessions en présentiel</small>
+          </a>
+          <a href="../formations-video-geoexpert.html">
+            <strong>Plateforme e-learning</strong>
+            <small>Apprendre à la demande</small>
+          </a>
+          <a href="../tarifs.html">
+            <strong>Tarifs</strong>
+            <small>Nos prix et formules</small>
+          </a>
+          <a href="../ressources.html">
+            <strong>Ressources gratuites</strong>
+            <small>Kit de démarrage SIG offert</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../services.html">Services</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Services">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../services.html">
+            <strong>Nos services</strong>
+            <small>Formation, consulting, SIG</small>
+          </a>
+          <a href="../realisations.html">
+            <strong>Réalisations</strong>
+            <small>Projets et portfolio</small>
+          </a>
+          <a href="../videos.html">
+            <strong>Vidéos</strong>
+            <small>Démonstrations et tutoriels</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="index.html">Outils SIG</a>
+      </div>
+
+      <div class="nav-item">
+        <a href="../blog.html">Blog</a>
+        <button type="button" class="nav-toggle-sub" aria-label="Ouvrir le sous-menu Blog">
+          <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="../blog.html">
+            <strong>Tous les articles</strong>
+            <small>Guides et conseils</small>
+          </a>
+          <a href="../faq.html">
+            <strong>FAQ</strong>
+            <small>Questions fréquentes</small>
+          </a>
+          <a href="../a-propos.html">
+            <strong>À propos</strong>
+            <small>Notre histoire, notre équipe</small>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="../contact.html">Contact</a>
+      </div>
+    </nav>
+    <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%2C%20je%20souhaite%20parler%20%C3%A0%20un%20expert." class="btn btn-whatsapp header-cta" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.51 3.63 1.4 5.14L2 22l5.13-1.5a9.8 9.8 0 0 0 4.9 1.32h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.17 3.02 14.69 2 12.04 2Zm0 18.09h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.91.94-3.03-.2-.31a8.17 8.17 0 0 1-1.26-4.42c0-4.52 3.68-8.2 8.2-8.2 2.19 0 4.25.85 5.8 2.41a8.14 8.14 0 0 1 2.4 5.8c0 4.52-3.68 8.17-8.26 8.17Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<nav class="fp-crumb" aria-label="Fil d'Ariane">
+  <div class="container"><ol>
+    <li><a href="../index.html">Accueil</a></li>
+    <li><a href="index.html">Outils SIG</a></li>
+    <li aria-current="page">Convertisseur DMS ⇄ degrés décimaux</li>
+  </ol></div>
+</nav>
+
+<section class="cv-hero">
+  <div class="container">
+    <p class="ot-all"><a href="index.html">← Tous les outils SIG</a></p>
+    <h1>Convertisseur degrés-minutes-secondes ⇄ degrés décimaux</h1>
+    <p class="cv-lead">Outil gratuit : passez de 5°21'36"N à 5,36 et inversement, pour la latitude et la longitude. Plusieurs écritures sont acceptées, et vous pouvez convertir une liste de points d'un coup.</p>
+    <p class="cv-privacy">Vos coordonnées restent dans votre navigateur.</p>
+  </div>
+</section>
+
+<section class="cv-tool" id="outil">
+  <div class="container">
+    <noscript><p class="cv-noscript">Cet outil a besoin de JavaScript. Activez-le dans votre navigateur pour l'utiliser.</p></noscript>
+    <div class="cv-card">
+      <div class="cv-tabs" role="tablist" aria-label="Type de conversion">
+        <button type="button" class="cv-tab" role="tab" id="tab-a" aria-selected="true" aria-controls="p-a">DMS → décimal</button>
+        <button type="button" class="cv-tab" role="tab" id="tab-b" aria-selected="false" aria-controls="p-b" tabindex="-1">Décimal → DMS</button>
+        <button type="button" class="cv-tab" role="tab" id="tab-c" aria-selected="false" aria-controls="p-c" tabindex="-1">Liste de points</button>
+      </div>
+
+      <div class="cv-panel" id="p-a" role="tabpanel" aria-labelledby="tab-a">
+        <div class="cv-fields">
+          <div class="cv-field"><label for="a-lat">Latitude (DMS)</label><input type="text" id="a-lat" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="5°21'36&quot;N"><small>Écritures acceptées : 5°21'36"N · 5 21 36 N · 5° 21′ 36,5″ · N 5 21 36. N ou S.</small></div>
+          <div class="cv-field"><label for="a-lon">Longitude (DMS)</label><input type="text" id="a-lon" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="4°0'29.88&quot;O"><small>E pour l'Est, O ou W pour l'Ouest. En Côte d'Ivoire, la longitude est à l'Ouest (négative en décimal).</small></div>
+        </div>
+        <div class="cv-actions">
+          <button type="button" class="btn btn-primary" id="a-go">Convertir</button>
+          <button type="button" class="btn btn-outline" id="a-exemple">Exemple</button>
+          <button type="button" class="btn btn-outline" id="a-clear">Effacer</button>
+        </div>
+        <div id="a-msg" class="cv-msg err" role="alert" hidden></div>
+        <div id="a-res" class="cv-result" aria-live="polite"></div>
+      </div>
+
+      <div class="cv-panel" id="p-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+        <div class="cv-fields">
+          <div class="cv-field"><label for="b-lat">Latitude (degrés décimaux)</label><input type="text" id="b-lat" inputmode="decimal" autocomplete="off" placeholder="5.3600"><small>Un signe moins ou la lettre S pour le sud.</small></div>
+          <div class="cv-field"><label for="b-lon">Longitude (degrés décimaux)</label><input type="text" id="b-lon" inputmode="decimal" autocomplete="off" placeholder="-4.0083"><small>Un signe moins pour l'Ouest (par exemple -4.0083), ou une lettre : E, O, W.</small></div>
+        </div>
+        <div class="cv-actions">
+          <button type="button" class="btn btn-primary" id="b-go">Convertir</button>
+          <button type="button" class="btn btn-outline" id="b-exemple">Exemple</button>
+          <button type="button" class="btn btn-outline" id="b-clear">Effacer</button>
+        </div>
+        <div id="b-msg" class="cv-msg err" role="alert" hidden></div>
+        <div id="b-res" class="cv-result" aria-live="polite"></div>
+      </div>
+
+      <div class="cv-panel" id="p-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+        <div class="cv-field">
+          <label for="c-txt">Points (un par ligne : latitude puis longitude)</label>
+          <textarea id="c-txt" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="c-aide" placeholder="5.3600, -4.0083&#10;5°21'36&quot;N 4°0'29.88&quot;W&#10;7.6906; -5.0300"></textarea>
+          <small id="c-aide">Chaque ligne peut être en DMS ou en degrés décimaux, et les écritures peuvent être mélangées. Séparez la latitude de la longitude par une virgule suivie d'une espace, un point-virgule, une tabulation, ou par les lettres N/S et E/O.</small>
+        </div>
+        <div class="cv-actions">
+          <button type="button" class="btn btn-primary" id="c-go">Convertir la liste</button>
+          <button type="button" class="btn btn-outline" id="c-exemple">Exemple</button>
+          <button type="button" class="btn btn-outline" id="c-clear">Effacer</button>
+        </div>
+        <div id="c-msg" class="cv-msg info" role="status" hidden></div>
+        <div id="c-actions" class="cv-actions" hidden style="margin-top:14px"><span id="c-copy-wrap"></span><button type="button" class="btn btn-outline" id="c-csv">Télécharger en CSV</button></div>
+        <div id="c-out" class="cv-table-wrap"></div>
+      </div>
+    </div>
+
+    <div class="cv-below">
+      <p class="cv-warning" role="note">Résultats indicatifs. Pour un document officiel, faites établir les coordonnées par un géomètre agréé.</p>
+      <p class="cv-scope">Les degrés décimaux sont arrondis à 8 décimales (environ 1 millimètre) et les secondes au millième : un aller-retour entre les deux écritures ne déforme pas la valeur. Les minutes et les secondes doivent être inférieures à 60.</p>
+      <p class="cv-scope">Vous avez des coordonnées UTM ? <a href="convertisseur-coordonnees.html">Convertissez-les en GPS avec notre convertisseur GPS ⇄ UTM</a>. Pour voir vos points sur une carte, utilisez le <a href="visualiseur-coordonnees-carte.html">visualiseur de coordonnées</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fp-section">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>À quoi sert cet outil ?</h2>
+    <p>Les coordonnées GPS s'écrivent de deux façons : en degrés décimaux (5,3600) ou en degrés, minutes et secondes (5° 21′ 36″). Les logiciels SIG et les GPS n'utilisent pas toujours la même. Cet outil passe de l'une à l'autre dans les deux sens, pour la latitude comme pour la longitude.</p>
+    <p>Il accepte plusieurs écritures (avec ou sans symboles, virgule ou point pour les décimales, O ou W pour l'Ouest) et vérifie que les valeurs sont possibles : latitude de −90 à 90, longitude de −180 à 180, minutes et secondes inférieures à 60.</p>
+    <p>Vous pouvez aussi coller une liste de points, avec un point par ligne, puis copier le tableau ou le télécharger en CSV.</p>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Comment ça marche ?</h2>
+    <p>Une minute vaut 1/60 de degré et une seconde vaut 1/3600 de degré. Pour passer des DMS au décimal, on calcule : degrés + minutes ÷ 60 + secondes ÷ 3600. L'Ouest et le Sud donnent des valeurs négatives. Pour l'inverse, on garde la partie entière comme degrés, on multiplie le reste par 60 pour obtenir les minutes, puis le reste des minutes par 60 pour obtenir les secondes.</p>
+    <div class="cv-example">
+      <strong>Exemple : Abidjan</strong><br>
+      Latitude <code>5,3600</code> : 5 degrés, puis 0,3600 × 60 = 21,6 minutes soit 21 minutes, puis 0,6 × 60 = 36 secondes : <strong>5° 21′ 36″ N</strong>.<br>
+      Longitude <code>-4,0083</code> : le signe moins indique l'Ouest. 4 degrés, puis 0,0083 × 60 = 0,498 minute soit 0 minute, puis 0,498 × 60 = 29,88 secondes : <strong>4° 0′ 29,88″ O</strong>.<br>
+      Dans l'autre sens : 5 + 21 ÷ 60 + 36 ÷ 3600 = 5,3600 ; et −(4 + 0 ÷ 60 + 29,88 ÷ 3600) = −4,0083.
+    </div>
+    <p style="margin-top:16px">Les arrondis sont gérés avec soin : si les secondes arrondies atteignent 60, la minute suivante est utilisée. Par exemple, 5° 20′ 59,9999″ N s'affiche 5° 21′ 0″ N, et jamais « 60 secondes ».</p>
+  </div></div>
+</section>
+
+<section class="fp-section" id="faq">
+  <div class="container"><div class="fp-wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="fp-faq">
+      <details><summary>Comment convertir des degrés-minutes-secondes en degrés décimaux ?</summary>
+        <p>Divisez les minutes par 60, divisez les secondes par 3 600, puis additionnez le tout aux degrés. Par exemple, 5° 21′ 36″ font 5 + 21 ÷ 60 + 36 ÷ 3 600 = 5,36 degrés. Pour le Sud et l'Ouest, la valeur est négative. Cet outil fait ce calcul pour vous.</p></details>
+      <details><summary>Pourquoi la longitude de la Côte d'Ivoire est-elle négative ?</summary>
+        <p>La longitude est comptée à partir du méridien de Greenwich : positive vers l'est, négative vers l'ouest. La Côte d'Ivoire est à l'ouest de ce méridien, donc ses longitudes sont négatives (par exemple −4,0083 pour Abidjan). Elles s'écrivent aussi 4° 0′ 29,88″ Ouest, avec la lettre O ou W.</p></details>
+      <details><summary>Quelles écritures l'outil accepte-t-il ?</summary>
+        <p>Par exemple 5°20'30.5"N, 5 20 30.5 N, 5° 20′ 30,5″, N 5 20 30.5, ou en décimal 5.3418 et -4.0083. La virgule ou le point peuvent servir de séparateur décimal. Pour l'ouest, vous pouvez écrire O, W, Ouest, ou mettre un signe moins.</p></details>
+      <details><summary>Pourquoi les secondes ne peuvent-elles pas valoir 60 ?</summary>
+        <p>Parce que 60 secondes font 1 minute, et 60 minutes font 1 degré. Quand un arrondi donnerait 60 secondes, l'outil passe à la minute suivante (ou au degré suivant) : 59,9999 secondes deviennent donc 0 seconde de la minute suivante.</p></details>
+      <details><summary>Combien de décimales faut-il pour un GPS précis ?</summary>
+        <p>Un degré de latitude fait environ 111 km, donc la 5e décimale correspond à environ 1 mètre et la 6e décimale à environ 10 centimètres. Cet outil garde 8 décimales (environ 1 millimètre), ce qui est plus fin que la précision d'un GPS ordinaire.</p></details>
+    </div>
+  </div></div>
+</section>
+
+<section class="fp-section alt">
+  <div class="container"><div class="fp-wrap cv-prose">
+    <h2>Autres outils gratuits</h2>
+    <ul class="sig-liens">
+        <li><a href="convertisseur-coordonnees.html">Convertisseur de coordonnées GPS ⇄ UTM</a></li>
+        <li><a href="visualiseur-coordonnees-carte.html">Visualiseur de coordonnées sur une carte</a></li>
+        <li><a href="coordonnees-vers-kml-geojson.html">Coordonnées vers KML / GeoJSON / CSV</a></li>
+        <li><a href="distance-gisement-entre-deux-points.html">Distance et gisement entre deux points</a></li>
+        <li><a href="index.html">Tous les outils SIG</a></li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="fp-cta" id="formation">
+  <div class="container">
+    <h2>Placez vos coordonnées dans Google Earth Pro</h2>
+    <p>Google Earth Pro permet d'afficher et de saisir des coordonnées en degrés décimaux ou en DMS, de numériser et d'exporter en KML. Découvrez la formation, avec un accompagnement WhatsApp de 3 mois.</p>
+    <div class="fp-cta-actions">
+      <a href="../formation-google-earth-pro" class="btn btn-light">Voir la formation Google Earth Pro</a>
+      <a href="https://wa.me/2250787015030?text=Bonjour%20GeoExpert%20Academy%2C%20j'ai%20une%20question%20sur%20la%20formation%20Google%20Earth%20Pro%20en%20ligne." class="btn btn-ghost" target="_blank" rel="noopener">Poser une question sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <picture>
+        <source srcset="../images/logo-full.webp" type="image/webp">
+        <img src="../images/logo-full.png" alt="GeoExpert Academy & Consulting" class="brand-logo" width="200" height="60" loading="lazy">
+      </picture>
+    </div>
+    <a href="index.html" class="footer-legal-link">Tous les outils SIG</a>
+    <a href="convertisseur-dms-degres-decimaux.html" class="footer-legal-link">Convertisseur DMS ⇄ degrés décimaux</a>
+    <a href="../politique-confidentialite.html" class="footer-legal-link">Politique de confidentialité</a>
+    <a href="../mentions-legales.html" class="footer-legal-link">Mentions légales</a>
+    <a href="../cgv.html" class="footer-legal-link">CGV</a>
+    <p>&copy; 2026 GeoExpert Academy & Consulting Abidjan, Bouaké, Côte d'Ivoire.</p>
+  </div>
+</footer>
+
+<!-- Aucun pixel de suivi ni assistant de chat sur cette page. -->
+<script defer src="../script.js"></script>
+<script defer src="outils-commun.js"></script>
+<script defer src="dms-moteur.js"></script>
+<script defer src="dms-ui.js"></script>
+</body>
+</html>

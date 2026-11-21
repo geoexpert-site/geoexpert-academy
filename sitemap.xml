@@ -37,6 +37,42 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://geoexpertacademy.ci/outils/coordonnees-vers-kml-geojson</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/outils/convertisseur-unites-surface</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/outils/distance-gisement-entre-deux-points</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/outils/convertisseur-dms-degres-decimaux</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/outils/calculateur-echelle</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://geoexpertacademy.ci/outils/visualiseur-coordonnees-carte</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://geoexpertacademy.ci/blog.html</loc>
     <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
